@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.2.3'
+ModuleVersion = '1.2.4'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -34,8 +34,8 @@ Description = 'The Hawk module has been designed to ease the burden on O365 admi
 
 It does NOT take the place of a human reviewing the data generated and is simply here to make data gathering easier.
 
-YouTube Playlist:
-https://www.youtube.com/playlist?list=PL29G41eY-uQP_u-qY6_CF0e4n3nTN-r1s
+Hawk has moved to GitHub and is availble for all to contribute.
+https://github.com/Canthv0/hawk
 '
 
 # Minimum version of the Windows PowerShell engine required by this module
@@ -75,14 +75,14 @@ RequiredAssemblies = @('Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsF
 NestedModules = @('Tenant\Get-HawkTenantAzureAuthenticationLogs.ps1','Tenant\Get-HawkTenantConfiguration.ps1','Tenant\Get-HawkTenantEDiscoveryConfiguration.ps1',
 'Tenant\Get-HawkTenantInboxRules.ps1','Tenant\Get-HawkTenantOauthConsentGrants.ps1','Tenant\Get-HawkTenantRBACChanges.ps1','Tenant\Search-HawkTenantActivityByIP.ps1',
 'Tenant\Search-HawkTenantEXOAuditLog.ps1','Tenant\Start-HawkTenantInvestigation.ps1','User\Get-HawkUserAuthHistory.ps1','User\Get-HawkUserConfiguration.ps1',
-'User\Get-HawkUserEmailForwarding.ps1','User\Get-HawkUserInboxRule.ps1','User\Get-HawkUserMailboxAuditing.ps1','User\Start-HawkUserInvestigation.ps1'
+'User\Get-HawkUserEmailForwarding.ps1','User\Get-HawkUserInboxRule.ps1','User\Get-HawkUserMailboxAuditing.ps1','User\Start-HawkUserInvestigation.ps1','User\Get-HawkUserAdminAudit.ps1'
 )
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfiguration','Get-HawkTenantEDiscoveryConfiguration','Get-HawkTenantInboxRules',
 'Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkUserAuthHistory','Get-HawkUserConfiguration','Get-HawkUserEmailForwarding','Get-HawkUserInboxRule',
 'Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject','Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation',
-'Start-HawkUserInvestigation','Update-HawkModule'
+'Start-HawkUserInvestigation','Update-HawkModule','Get-HawkUserAdminAudit'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -114,13 +114,15 @@ PrivateData = @{
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://www.youtube.com/playlist?list=PL29G41eY-uQP_u-qY6_CF0e4n3nTN-r1s'
+        ProjectUri = 'https://github.com/Canthv0/hawk'
 
         # A URL to an icon representing this module.
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
         ReleaseNotes = '
+        1.2.4 - Updated with GitHub Link
+        1.2.4 - Added Get-HawkUserAdminAudit to return all exo shell changes recorded in the admin audit log for a given user
         1.2.3 - Fixed issue where geoip lookups were failing
         1.2.3 - GeoIp lookups are now using http://api.ipstack.com users will need to provide their own API key due to 10k per month limit on free accounts
         1.2.3 - Introduced storing Hawk Data between sessions by storing in %localappdata%\hawk\hawk.json
