@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.2.4'
+ModuleVersion = '1.2.5'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -121,6 +121,9 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '
+        1.2.5 - Fixed issue with search-adminaudit log where in one instance it was only searching 14 days
+        1.2.5 - Updated output files for Get-HawkUserAuthHistory to be more clear about what they contain
+        1.2.5 - Updated output for Get-HawkUserAuthHistory so that it will always return all files
         1.2.4 - Updated with GitHub Link
         1.2.4 - Added Get-HawkUserAdminAudit to return all exo shell changes recorded in the admin audit log for a given user
         1.2.3 - Fixed issue where geoip lookups were failing
