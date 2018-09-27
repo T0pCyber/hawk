@@ -30,8 +30,8 @@ Function Get-HawkUserAuthHistory {
 
         # Get only the unique IP addresses and report them
         [array]$LogonIPs = $ExpandedUserLogonLogs | Select-Object -Unique -Property ClientIP
-        Out-LogFile ("Found " + $LogonIPs.count + " Unique IPs connecting to this user")
-        $LogonIPs | Out-MultipleFileType -fileprefix "Logon_IPAddresses" -User $user -csv
+        Out-LogFile ("Found " + $LogonIPs.count + " Unique IPs attempting to connect to this user")
+        $LogonIPs | Out-MultipleFileType -fileprefix "All_Attempted_Logon_IPAddresses" -User $user -csv
 
         # Make sure we have some logons before we process them
         if ($null -eq $LogonIPs) {
@@ -72,21 +72,48 @@ Function Get-HawkUserAuthHistory {
 
                 Write-Progress -Completed -Activity "Looking Up Ip Address Locations" -Status " "
 
-                Out-LogFile "Writing Logon sessions with IP Locations"
-                $Output | Out-MultipleFileType -fileprefix "Logon_Events_With_Locations" -User $User -csv -xml
-                $Output | Where-Object {$_.LoginStatus -eq '0'} | Out-MultipleFileType -FilePrefix "Successful_Logon_Events_With_Locations" -User $User -csv -xml
+                Out-LogFile "Writing All Attempted Logon sessions with IP Locations"
+                $Output | Out-MultipleFileType -fileprefix "Attempted_Logon_Events_With_Locations" -User $User -csv -xml
+                
+                # Pull out successful logons because they are more interesting
+                [array]$SuccessfulLogons = $Output | Where-Object {$_.ResultStatus -eq 'Succeeded'} 
+                
+                # Null check successfullogons and return a defult value
+                if ($null -eq $SuccessfulLogons)
+                {
+                    [PSCustomObject]@{Warning = "No Success Logons found. This could point towards a problem gathering data or an issue with the filter that is used by Hawk.  Please review the RAW data"} | Out-MultipleFileType -FilePrefix "Successful_Logon_Events_With_Locations" -User $User -csv -xml
+                }
+                else 
+                {
+                    $SuccessfulLogons | Out-MultipleFileType -FilePrefix "Successful_Logon_Events_With_Locations" -User $User -csv -xml
+                }
+
+                
 
                 Out-LogFile "Writing List of unique logon locations"
-                Select-UniqueObject -ObjectArray $IPLocations -Property ip | Out-MultipleFileType -fileprefix "Logon_Locations" -user $user -csv -txt
-                $Global:IPlocationCache | Out-MultipleFileType -FilePrefix "All_Logon_Locations" -csv
+                Select-UniqueObject -ObjectArray $IPLocations -Property ip | Out-MultipleFileType -fileprefix "Attempted_Logon_Locations" -user $user -csv -txt
+                $Global:IPlocationCache | Out-MultipleFileType -FilePrefix "All_Attempted_Logon_Locations" -csv
             }
 
             # if we don't have the lookup ip address switch then ouput just = our existing data
             else {
+                
                 $Output = $ExpandedUserLogonLogs
                 Out-LogFile "Writing Logon Session"
-                $Output | Out-MultipleFileType -fileprefix "Logon_Events" -User $user -csv -xml
-                $Output | Where-Object {$_.LoginStatus -eq '0'} | Out-MultipleFileType -FilePrefix "Successful_Logon_Events" -User $User -csv -xml
+                $Output | Out-MultipleFileType -fileprefix "Attempted_Logon_Events" -User $user -csv -xml
+                
+                # Pull out successful logons because they are more interesting
+                [array]$SuccessfulLogons = $Output | Where-Object {$_.ResultStatus -eq 'Succeeded'} 
+
+                # Null check successfullogons and return a defult value
+                if ($null -eq $SuccessfulLogons)
+                {
+                    [PSCustomObject]@{Warning = "No Success Logons found. This could point towards a problem gathering data or an issue with the filter that is used by Hawk.  Please review the RAW data"} | Out-MultipleFileType -FilePrefix "Successful_Logon_Events_With_Locations" -User $User -csv -xml
+                }
+                else 
+                {
+                    $SuccessfulLogons | Out-MultipleFileType -FilePrefix "Successful_Logon_Events" -User $User -csv -xml
+                }
             }
         }
     }
@@ -123,37 +150,33 @@ Function Get-HawkUserAuthHistory {
 
 	==== If -ResolveIPLocations is specified. ====
 
-	File: Logon_Events_With_Locations.csv
+	File: Attempted_Logon_Events_With_Locations.csv
 	Path: \<User>
 	Description: List of all logon events with the location discovered for the IP and if it is a Microsoft IP.
 
-	File: Logon_Events_With_Locations.xml
+	File: Attempted_Logon_Events_With_Locations.xml
 	Path: \<User>\XML
 	Description: List of all logon events with the location discovered for the IP and if it is a Microsoft IP in CLI XML.
 
 	File: Successful_Logon_Events_With_Locations.csv
 	Path: \<User>
-	Description: List of all logon events that had LoginStatus = 0. Includes the location discovered for the IP and if it is a Microsoft IP.
+	Description: List of all logon events that had ResultStatus = Succeeded. Includes the location discovered for the IP and if it is a Microsoft IP.
 
 	File: Successful_Logon_Events_With_Locations.xml
 	Path: \<User>\XML
-	Description: List of all logon events that had LoginStatus = 0. Includes the location discovered for the IP and if it is a Microsoft IP in CLI XML.
+	Description: List of all logon events that had ResultStatus = Succeeded. Includes the location discovered for the IP and if it is a Microsoft IP in CLI XML.
 
-	File: All_Logon_Locations.csv
+	File: All_Attempted_Logon_Locations.csv
 	Path: \
-	Description: All ip addresses and their resolved locations for all users investigated.
-
-	File: All_Logon_Locations.txt
-	Path: \
-	Description: All ip addresses and their resolved locations for all users investigated.
+	Description: All ip addresses and their resolved locations for ALL users investigated.
 
 	==== If -ResolveIPLocations is NOT specified. ====
 
-	File: Logon_Events.csv
+	File: Attempted_Logon_Events.csv
 	Path: \<User>
 	Description:  All logon events that were found.
 
-	File: Logon_Events.xml
+	File: Attempted_Logon_Events.xml
 	Path: \<User>\XML
 	Description: All logon events that were found in CLI XML.
 

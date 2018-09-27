@@ -32,7 +32,7 @@ Function Search-HawkTenantEXOAuditLog {
 		
     # Look for changes to user forwarding
     Out-LogFile "Searching for user Forwarding Changes" -action
-    [array]$TenantForwardingChanges = Search-AdminAuditLog -Cmdlets Set-Mailbox -Parameters ForwardingAddress, ForwardingSMTPAddress
+    [array]$TenantForwardingChanges = Search-AdminAuditLog -Cmdlets Set-Mailbox -Parameters ForwardingAddress, ForwardingSMTPAddress -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
 	
     if ($TenantForwardingChanges.count -gt 0) {
         Out-LogFile ("Found " + $TenantForwardingChanges.count + " Change(s) to user Email Forwarding") -notice
