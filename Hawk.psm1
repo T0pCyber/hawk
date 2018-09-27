@@ -1197,11 +1197,14 @@ Function Initialize-HawkGlobalObject {
         )
 
         # Determine if we have access to a P1 or P2 Azure Ad License
-        if ([bool](Get-MsolAccountSku | Where-Object {$_.accountskuid -like "*aad_premium*"})) {
+        # EMS SKU contains Azure P1 as part of the sku
+        if ([bool](Get-MsolAccountSku | Where-Object {($_.accountskuid -like "*aad_premium*") -or ($_.accountskuid -like "*EMS")})) 
+        {
             Write-Output "Advanced Azure AD License Found"
             [bool]$AdvancedAzureLicense = $true
         }
-        else {
+        else 
+        {
             Write-Output "Advanced Azure AD License NOT Found"
             [bool]$AdvancedAzureLicense = $false
         }

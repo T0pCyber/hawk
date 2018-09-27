@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.2.5'
+ModuleVersion = '1.2.6'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -121,6 +121,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes = '
+        1.2.6 - Included EMS sku in list of SKUs that can do advanced AD searches as the azure P1 plan is part of that SKU
         1.2.5 - Fixed issue with search-adminaudit log where in one instance it was only searching 14 days
         1.2.5 - Updated output files for Get-HawkUserAuthHistory to be more clear about what they contain
         1.2.5 - Updated output for Get-HawkUserAuthHistory so that it will always return all files
