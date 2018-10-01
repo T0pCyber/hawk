@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.3.1'
+ModuleVersion = '1.3.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -121,6 +121,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.3.2 - Fixed issue with JSON conversion throwing errors on duplicate properties
         1.3.1 - Updated Get-HawkUserAuthHistory to generate fewer files that are more readable
         1.3.1 - Updated Get-HawkUserAuthHistory to gather more authentication data
         1.2.6 - Included EMS sku in list of SKUs that can do advanced AD searches as the azure P1 plan is part of that SKU
