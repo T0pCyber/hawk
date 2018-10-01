@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.2.6'
+ModuleVersion = '1.3.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -120,7 +120,8 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes = '
+        ReleaseNotes =
+        1.3.1 -  '
         1.2.6 - Included EMS sku in list of SKUs that can do advanced AD searches as the azure P1 plan is part of that SKU
         1.2.5 - Fixed issue with search-adminaudit log where in one instance it was only searching 14 days
         1.2.5 - Updated output files for Get-HawkUserAuthHistory to be more clear about what they contain
@@ -136,15 +137,6 @@ PrivateData = @{
         1.2.0 - Get-HawkTenantEXOAuditLog RunDate timezone was ambiguous.  It now outputs in UTC and calls that out.
         1.2.0 - Updated Description
         1.2.0 - Moved all exported function out of hawk.psm1 into seperate ps1 files. This should make things easier to manage / read.
-        1.1.4 - Fixed issue where incorrect logging cmdlet was being called
-        1.1.3 - Removed Compress-HawkData cmdlet
-        1.1.3 - Update description, URL, and Icon
-        1.1.2 - Fixed issue with using the wrong account to try and access the windows graph API
-        1.1.1 - All files related to the tenenat are now put in the \Tenant directory
-        1.1.1 - Reduced the number of text files generated as output
-        1.1.1 - Updated Get-HawkTenantAzureAuthenticationLogs to use user credentials instead of APP credentials
-        1.1.0 - New Cmdlet Get-HawkTenantAzureAuthenticationLogs will gather Azure AD Sign In logs if you have P1 or P2 license
-        1.0.1 - Fixed issue with date range validation failing occasionally
         '
 
         # External dependent modules of this module

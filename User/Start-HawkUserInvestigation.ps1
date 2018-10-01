@@ -18,7 +18,8 @@ Function Start-HawkUserInvestigation {
         Get-HawkUserInboxRule -User $User
         Get-HawkUserEmailForwarding -User $User
         Get-HawkUserAuthHistory -User $user -ResolveIPLocations
-        Get-HawkUserMailboxAuditing -User $User
+		Get-HawkUserMailboxAuditing -User $User
+		Get-HawkUserAdminAudit -User $User
     }
 
     <#
@@ -36,7 +37,8 @@ Function Start-HawkUserInvestigation {
 	Get-HawkUserInboxRule               Searches the user for Inbox Rules
 	Get-HawkUserEmailForwarding         Looks for email forwarding configured on the user
 	Get-HawkuserAuthHistory             Searches the unified audit log for users logons
-	Get-HawkUserMailboxAuditing         Searches the unified audit log for mailbox auditing information			
+	Get-HawkUserMailboxAuditing         Searches the unified audit log for mailbox auditing information
+	Get-HawkUserAdminAudit					
 
 	.PARAMETER UserPrincipalName
 	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
