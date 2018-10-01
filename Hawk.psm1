@@ -130,7 +130,7 @@ Function Get-IPGeolocation {
         $Error.Clear()
         $geoip = Invoke-RestMethod -Method Get -URI $resource -ErrorAction SilentlyContinue
 
-        if ($Error.Count -gt 0)
+        if (($Error.Count -gt 0) -or ($null -eq $geoip.type))
         {
             Out-LogFile ("Failed to retreive location for IP " + $IPAddress)
             $hash = @{
@@ -144,7 +144,7 @@ Function Get-IPGeolocation {
         }
         else {
             # Determine if this IP is known to be owned by Microsoft
-            [string]$isMSFTIP = Test-MicrosoftIP -IP $IPAddress
+            [string]$isMSFTIP = Test-MicrosoftIP -IP $IPAddress -type $geoip.type
 
             # Push return into a response object
             $hash = @{
@@ -670,7 +670,9 @@ Function Test-MicrosoftIP {
     param
     (
         [Parameter(Mandatory = $true)]
-        [string]$IPToTest
+        [string]$IPToTest,
+        [Parameter(Mandatory=$true)]
+        [string]$Type
     )
 
     # Check if we have imported all of our IP Addresses
@@ -748,7 +750,8 @@ Function Test-MicrosoftIP {
     }
 	
     # Determine if we have an ipv6 or ipv4 address
-    if ($IPToTest -like "*:*") {
+    if ($Type -like "ipv6") 
+    {
 
         # Compare to the IPv6 list
         [int]$i = 0
@@ -766,14 +769,16 @@ Function Test-MicrosoftIP {
         # Return the value of test true = in MSFT network
         Return $test
     }
-    else {
+    else
+    {
         # Compare to the IPv4 list
         [int]$i = 0
         [int]$count = $MSFTIPList.ipv4objects.count - 1
 		
         # Compare each IP to the ip networks to see if it is in that network
         # If we get back a True or we are beyond the end of the list then stop
-        do {
+        do 
+        {
             # Test the IP
             $parsedip = [System.Net.IPAddress]::Parse($IPToTest)
             $test = [System.Net.IPNetwork]::Contains($MSFTIPList.ipv4objects[$i], $parsedip)
@@ -975,8 +980,17 @@ Function Import-AzureAuthenticationLogs
                                 $baseproperties.add($object.name) | out-null
                             }
 
-                            # Now add the entry from extendedproperties to the overall properties list
-                            $processedentry | Add-Member -MemberType NoteProperty -Name $object.name -Value $object.value
+                            # For some entries a property can appear in ExtendedProperties and as a normal property
+                            # We need to deal with this situation
+                            try 
+                            {
+                                # Now add the entry from extendedproperties to the overall properties list
+                                $processedentry | Add-Member -MemberType NoteProperty -Name $object.name -Value $object.value -ErrorAction SilentlyContinue
+                            }
+                            catch 
+                            {
+                                if ((($error[0].FullyQualifiedErrorId).split(",")[0]) -eq "MemberAlreadyExists"){}
+                            }
                         }
 
                         # Convert our extended properties into a string and add that just for fidelity
@@ -1035,7 +1049,20 @@ Function Import-AzureAuthenticationLogs
                 {
                     $processedentry | Add-Member -MemberType NoteProperty -Name CreationTime -value (get-date $entry.Creationtime -format g)
                 }
-                Default { $processedentry | Add-Member -MemberType NoteProperty -Name $member.name -Value $entry.($member.name) }
+                Default 
+                { 
+                    # For some entries a property can appear in ExtendedProperties and as a normal property
+                    # We need to deal with this situation
+                    try 
+                    {
+                        # Now add the entry from extendedproperties to the overall properties list
+                        $processedentry | Add-Member -MemberType NoteProperty -Name $member.name -Value $entry.($member.name) -ErrorAction SilentlyContinue
+                    }
+                    catch 
+                    {
+                        if ((($error[0].FullyQualifiedErrorId).split(",")[0]) -eq "MemberAlreadyExists"){}
+                    }
+                }
             } 
         }
 
