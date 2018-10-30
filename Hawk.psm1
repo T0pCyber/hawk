@@ -96,11 +96,11 @@ Function Get-IPGeolocation {
     if ($null -eq $HawkAppData.access_key)
     {
 
-        Write-Host "
+        Write-Host -ForegroundColor Green "
 
         IpStack.com now requires an API access key to gather GeoIP information from their API.
 
-        Please get an access key from https://ipstack.com/ and provide it below.
+        Please get a Free access key from https://ipstack.com/ and provide it below.
 
         "
 
@@ -282,7 +282,9 @@ Function Get-AllUnifiedAuditLogEntry {
     param 
     (
         [Parameter(Mandatory = $true)]
-        [string]$UnifiedSearch
+        [string]$UnifiedSearch,
+        [datetime]$StartDate = $Hawk.StartDate,
+        [datetime]$EndDate = $Hawk.EndDate
     )
 	
     # Validate the incoming search command
@@ -296,7 +298,7 @@ Function Get-AllUnifiedAuditLogEntry {
     [string]$cmd = $null
 	
     # build our search command to execute
-    $cmd = $UnifiedSearch + " -StartDate " + $Hawk.StartDate + " -EndDate " + $Hawk.EndDate + " -SessionCommand ReturnLargeSet -resultsize 1000 -sessionid " + (Get-Date -UFormat %H%M%S)
+    $cmd = $UnifiedSearch + " -StartDate `'" + $StartDate + "`' -EndDate `'" + $EndDate + "`' -SessionCommand ReturnLargeSet -resultsize 1000 -sessionid " + (Get-Date -UFormat %H%M%S)
     Out-LogFile ("Running Unified Audit Log Search")
     Out-Logfile $cmd
 
@@ -1399,7 +1401,7 @@ Function Initialize-HawkGlobalObject {
 
         # Determine if we have access to a P1 or P2 Azure Ad License
         # EMS SKU contains Azure P1 as part of the sku
-        if ([bool](Get-MsolAccountSku | Where-Object {($_.accountskuid -like "*aad_premium*") -or ($_.accountskuid -like "*EMS")})) 
+        if ([bool](Get-MsolAccountSku | Where-Object {($_.accountskuid -like "*aad_premium*") -or ($_.accountskuid -like "*EMS*")})) 
         {
             Write-Output "Advanced Azure AD License Found"
             [bool]$AdvancedAzureLicense = $true
