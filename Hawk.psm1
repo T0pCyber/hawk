@@ -416,6 +416,92 @@ Function Out-LogFile {
 
 }
 
+# Adds the data to an XML report
+Function Out-Report {
+    Param
+    (
+        [Parameter(Mandatory=$true)]
+        [string]$Name,
+        [Parameter(Mandatory=$true)]
+        [string]$Value,
+        [string]$Description,
+        [string]$State,
+        [string]$Identity
+    )
+
+    $reportpath = Join-path $hawk.filepath report.xml
+
+    # See if we have already created a report file
+    # If so we need to import it
+    if (Test-path $reportpath)
+    {
+        $reportxml = $null
+        [xml]$reportxml = get-content $reportpath
+    }
+    else 
+    {
+        # Create new XML object
+    }
+
+    # Switch statement to handle the state and output an html color
+    switch ($State)
+    {
+        Warning {$highlighcolor = "Yellow"}
+        Success {$highlighcolor = "Green"}
+        Error {$highlighcolor = "Red"}
+        default {$highlighcolor = "White"}
+    }
+   
+    ### Add New Entity ###
+    # Create the new elements we need to stub out an entity
+    $newentity = $reportxml.CreateElement("entity")
+    $newentityname = $reportxml.CreateElement("name")
+    $newentityproperty = $reportxml.CreateElement("property")
+
+    # Add them together and set values
+    $newentity.AppendChild($newentityname)
+    $newentity.name = $Name
+    $newentity.AppendChild($newentityproperty)
+
+    # Add the new entity stub back to the XML
+    $reportxml.report.AppendChild($newentity)
+
+
+    ### Add new property to existing Entity ###
+
+    # Create the elements that we are going to need
+    $newproperty = $reportxml.CreateElement("property")
+    $newname = $reportxml.CreateElement("name")
+    $newvalue = $reportxml.CreateElement("value")
+    $newcolor = $reportxml.CreateElement("color")
+    $newdescription = $reportxml.CreateElement("description")
+
+    # Add them up and set their values
+    $newproperty.AppendChild($newname)
+    $newproperty.name = $Name
+
+    $newproperty.AppendChild($newvalue)
+    $newproperty.value = $Value
+
+    $newproperty.AppendChild($newcolor)
+    $newproperty.color = $color
+
+    $newproperty.AppendChild($newdescription)
+    $newproperty.description = $Description
+
+    # Add the newly created property to the entity
+    ($reportxml.report.entity | where {$_.name -eq $Identity}).AppendChild($newproperty)
+
+    # Update existing property
+    (($reportxml.report.entity | where {$_.name -eq $Identity}).property | where {$_.name -eq $Name}).value = $Value
+    (($reportxml.report.entity | where {$_.name -eq $Identity}).property | where {$_.name -eq $Name}).color = $color
+    (($reportxml.report.entity | where {$_.name -eq $Identity}).property | where {$_.name -eq $Name}).descriptoin = $Description
+
+    
+
+
+}
+
 # Sends the output of a cmdlet to a txt file and a clixml file
 Function Out-MultipleFileType {
     param 
