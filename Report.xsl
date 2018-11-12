@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns="http://www.w3.org/1999/xhtml">
+<?xml-stylesheet type="text/xsl" href="D:\OneDrive_Personal\OneDrive\Git_Repository\Hawk\hawk\report.xsl"?>
+
 <xsl:template match="/">
     <html>
         <head>
@@ -11,8 +13,19 @@ xmlns="http://www.w3.org/1999/xhtml">
 			background-color: #AAAFAB;
 			border-radius: 5px;
 			padding: 3px;
-			padding-left: 25px;
+			padding-right: 25px;
 			color: white;
+			display: inline-block;
+            width:15%;
+		}
+		.main{
+			background-color: white;
+			border-radius: 5px;
+			padding: 3px;
+			padding-left: 25px;
+			color: black;
+			display: inline-block;
+            width:25%;
 		}
 		li {
 			margin: 10px;
@@ -41,7 +54,7 @@ xmlns="http://www.w3.org/1999/xhtml">
 			transform-origin:25% 50%;
 			border: 8px solid transparent;
 			border-width: 8px 12px;
-			border-left-color: white;
+			border-left-color: royalblue;
 			margin-left: -20px;
 			width: 0;
 			height: 0;
@@ -64,19 +77,26 @@ xmlns="http://www.w3.org/1999/xhtml">
 		</style>
 		</head>
         <body>
-        <title>Hawk Report</title>
-		<xsl:for-each select="report/entity">
-		<ul>
-			<li><input type="checkbox" id="{name}"/> <label for="{name}"><xsl:value-of select="name"/></label>
+	        <title>Hawk Report</title>
+			<xsl:for-each select="report/entity">
 			<ul>
-			<xsl:for-each select="property">
-				<li><label style="background-color: {color}"><xsl:value-of select="name"/></label><xsl:value-of select="value"/></li>
-			</xsl:for-each>
+				<li><input type="checkbox" id="{identity}"/> <label class="main" for="{identity}"><xsl:value-of select="identity"/></label>
+				<ul>
+				<xsl:for-each select="property">
+					<li>
+						<label style="background-color: {color}"><xsl:value-of select="name"/></label><xsl:value-of select="value"/>
+						<xsl:if test="description!=''">
+							<br /><b>Description: </b><xsl:value-of select="description"/>
+						</xsl:if>
+						<xsl:if test="link!=''">
+							<br /><a href="{link}"><xsl:value-of select="link"/></a>
+						</xsl:if>
+					</li>
+				</xsl:for-each>
+				</ul>
+				</li>
 			</ul>
-		</li>
-		</ul>
-		</xsl:for-each>
-		
+			</xsl:for-each>
 		</body>
     </html>
 </xsl:template>

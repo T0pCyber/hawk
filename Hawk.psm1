@@ -427,28 +427,27 @@ Function Out-Report {
         [Parameter(Mandatory=$true)]
         [string]$Value,
         [string]$Description,
-        [string]$State
+        [string]$State,
+        [string]$Link
         
     )
 
     # Force the case on all our critical values
-    $Property = $Property.tolower()
-    $Identity = $Identity.tolower()
+    #$Property = $Property.tolower()
+    #$Identity = $Identity.tolower()
 
     # Set our output path
     # Single report file for all outputs user/tenant/etc.
     # This might change in the future???
-    #$reportpath = Join-path $hawk.filepath report.xml
-
-    $reportpath = Join-path "c:\temp" report.xml
-
+    $reportpath = Join-path $hawk.filepath report.xml
+    
     # Switch statement to handle the state to color mapping
     switch ($State)
     {
-        Warning {$highlighcolor = "Yellow"}
+        Warning {$highlighcolor = "#FF8000"}
         Success {$highlighcolor = "Green"}
-        Error {$highlighcolor = "Red"}
-        default {$highlighcolor = "White"}
+        Error {$highlighcolor = "#8A0808"}
+        default {$highlighcolor = "Light Grey"}
     }
 
     # See if we have already created a report file
@@ -461,12 +460,13 @@ Function Out-Report {
     # Since we have NOTHING we will create a new XML and just add / save / and exit
     else 
     {
+        Out-LogFile ("Creating new Report file" + $reportpath)
         # Create the report xml object     
         $reportxml = New-Object xml
 
         # Create the xml declaraiton and stylesheet  
         $reportxml.AppendChild($reportxml.CreateXmlDeclaration("1.0",$null,$null)) | Out-Null
-        $xmlstyle = "type=`"text/xsl`" href=`"report.xsl`""
+        $xmlstyle = "type=`"text/xsl`" href=`"https://csshawk.azurewebsites.net/report.xsl`""
         $reportxml.AppendChild($reportxml.CreateProcessingInstruction("xml-stylesheet",$xmlstyle)) | Out-Null
 
         # Create all of the needed elements
@@ -478,6 +478,7 @@ Function Out-Report {
         $newentitypropertyvalue = $reportxml.CreateElement("value")
         $newentitypropertycolor = $reportxml.CreateElement("color")
         $newentitypropertydescription = $reportxml.CreateElement("description")
+        $newentitypropertylink = $reportxml.CreateElement("link")
         
         ### Build the XML from the bottom up ###
         # Add the property values to the entity object
@@ -485,12 +486,14 @@ Function Out-Report {
         $newentityproperty.AppendChild($newentitypropertyvalue) | Out-Null
         $newentityproperty.AppendChild($newentitypropertycolor) | Out-Null
         $newentityproperty.AppendChild($newentitypropertydescription) | Out-Null
+        $newentityproperty.AppendChild($newentitypropertylink) | Out-Null
 
         # Set the values for the leaf nodes we just added
         $newentityproperty.name = $Property
         $newentityproperty.value = $Value
         $newentityproperty.color = $highlighcolor
         $newentityproperty.description = $Description
+        $newentityproperty.link = $Link
         
         # Add the identity element to the entity and set its value
         $newentity.AppendChild($newentityidentity) | Out-Null
@@ -507,14 +510,10 @@ Function Out-Report {
 
         # save the xml
         $reportxml.save($reportpath)
-
-        # exit the function
-        break
-
     } 
 
     # We need to check if an entity with the ID $identity already exists
-    if ($reportxml.report.entity.identity.contains($Identity)){}
+    if ($reportxml.report.entity.identity.contains($Identity)){Write-Host "Entity Found"}
     # Didn't find and entity so we are going to create the whole thing and once
     else 
     {
@@ -526,6 +525,7 @@ Function Out-Report {
         $newentitypropertyvalue = $reportxml.CreateElement("value")
         $newentitypropertycolor = $reportxml.CreateElement("color")
         $newentitypropertydescription = $reportxml.CreateElement("description")
+        $newentitypropertylink = $reportxml.CreateElement("link")
 
         ### Build the XML from the bottom up ###
         # Add the property values to the entity object
@@ -533,12 +533,14 @@ Function Out-Report {
         $newentityproperty.AppendChild($newentitypropertyvalue) | Out-Null
         $newentityproperty.AppendChild($newentitypropertycolor) | Out-Null
         $newentityproperty.AppendChild($newentitypropertydescription) | Out-Null
+        $newentityproperty.AppendChild($newentitypropertylink) | Out-Null
 
         # Set the values for the leaf nodes we just added
         $newentityproperty.name = $Property
         $newentityproperty.value = $Value
         $newentityproperty.color = $highlighcolor
         $newentityproperty.description = $Description
+        $newentityproperty.link = $Link
 
         # Add them together and set values
         $newentity.AppendChild($newentityidentity) | Out-Null
@@ -557,6 +559,7 @@ Function Out-Report {
         (($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).property | Where-Object {$_.name -eq $Property}).value = $Value
         (($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).property | Where-Object {$_.name -eq $Property}).color = $highlighcolor
         (($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).property | Where-Object {$_.name -eq $Property}).description = $Description
+        (($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).property | Where-Object {$_.name -eq $Property}).link = $Link
     }
     # We need to add the property to the entity
     else 
@@ -568,22 +571,24 @@ Function Out-Report {
         $newvalue = $reportxml.CreateElement("value")
         $newcolor = $reportxml.CreateElement("color")
         $newdescription = $reportxml.CreateElement("description")
+        $newlink = $reportxml.CreateElement("link")
 
-        # Add them up and set their values
+        # Add on all of the elements
         $newproperty.AppendChild($newname) | Out-Null
-        $newproperty.name = $Property
-
         $newproperty.AppendChild($newvalue) | Out-Null
-        $newproperty.value = $Value
-
-        $newproperty.AppendChild($newcolor) | Out-Null
-        $newproperty.color = $highlighcolor
-
+        $newproperty.AppendChild($newcolor) | Out-Null        
         $newproperty.AppendChild($newdescription) | Out-Null
+        $newproperty.AppendChild($newlink) | Out-Null
+        
+        # Set the values
+        $newproperty.name = $Property
+        $newproperty.value = $Value
+        $newproperty.color = $highlighcolor
         $newproperty.description = $Description
+        $newproperty.link = $Link
 
         # Add the newly created property to the entity
-        ($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).AppendChild($newproperty)
+        ($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).AppendChild($newproperty) | Out-Null
     }
 
     # Make sure we save our changes
