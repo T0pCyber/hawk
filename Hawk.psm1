@@ -420,16 +420,36 @@ Function Out-LogFile {
 Function Out-Report {
     Param
     (
+        [Parameter(Mandatory=$true)]    
+        [string]$Identity,
         [Parameter(Mandatory=$true)]
-        [string]$Name,
+        [string]$Property,
         [Parameter(Mandatory=$true)]
         [string]$Value,
         [string]$Description,
-        [string]$State,
-        [string]$Identity
+        [string]$State
+        
     )
 
-    $reportpath = Join-path $hawk.filepath report.xml
+    # Force the case on all our critical values
+    $Property = $Property.tolower()
+    $Identity = $Identity.tolower()
+
+    # Set our output path
+    # Single report file for all outputs user/tenant/etc.
+    # This might change in the future???
+    #$reportpath = Join-path $hawk.filepath report.xml
+
+    $reportpath = Join-path "c:\temp" report.xml
+
+    # Switch statement to handle the state to color mapping
+    switch ($State)
+    {
+        Warning {$highlighcolor = "Yellow"}
+        Success {$highlighcolor = "Green"}
+        Error {$highlighcolor = "Red"}
+        default {$highlighcolor = "White"}
+    }
 
     # See if we have already created a report file
     # If so we need to import it
@@ -438,67 +458,136 @@ Function Out-Report {
         $reportxml = $null
         [xml]$reportxml = get-content $reportpath
     }
+    # Since we have NOTHING we will create a new XML and just add / save / and exit
     else 
     {
-        # Create new XML object
-    }
+        # Create the report xml object     
+        $reportxml = New-Object xml
 
-    # Switch statement to handle the state and output an html color
-    switch ($State)
+        # Create the xml declaraiton and stylesheet  
+        $reportxml.AppendChild($reportxml.CreateXmlDeclaration("1.0",$null,$null)) | Out-Null
+        $xmlstyle = "type=`"text/xsl`" href=`"report.xsl`""
+        $reportxml.AppendChild($reportxml.CreateProcessingInstruction("xml-stylesheet",$xmlstyle)) | Out-Null
+
+        # Create all of the needed elements
+        $newreport = $reportxml.CreateElement("report")
+        $newentity = $reportxml.CreateElement("entity")
+        $newentityidentity = $reportxml.CreateElement("identity")
+        $newentityproperty = $reportxml.CreateElement("property")
+        $newentitypropertyname = $reportxml.CreateElement("name")
+        $newentitypropertyvalue = $reportxml.CreateElement("value")
+        $newentitypropertycolor = $reportxml.CreateElement("color")
+        $newentitypropertydescription = $reportxml.CreateElement("description")
+        
+        ### Build the XML from the bottom up ###
+        # Add the property values to the entity object
+        $newentityproperty.AppendChild($newentitypropertyname) | Out-Null
+        $newentityproperty.AppendChild($newentitypropertyvalue) | Out-Null
+        $newentityproperty.AppendChild($newentitypropertycolor) | Out-Null
+        $newentityproperty.AppendChild($newentitypropertydescription) | Out-Null
+
+        # Set the values for the leaf nodes we just added
+        $newentityproperty.name = $Property
+        $newentityproperty.value = $Value
+        $newentityproperty.color = $highlighcolor
+        $newentityproperty.description = $Description
+        
+        # Add the identity element to the entity and set its value
+        $newentity.AppendChild($newentityidentity) | Out-Null
+        $newentity.identity = $Identity
+
+        # Add the property to the entity
+        $newentity.AppendChild($newentityproperty) | Out-Null
+
+        # Add the entity to the report
+        $newreport.AppendChild($newentity) | Out-Null
+
+        # Add the whole thing to the xml root
+        $reportxml.AppendChild($newreport) | Out-Null
+
+        # save the xml
+        $reportxml.save($reportpath)
+
+        # exit the function
+        break
+
+    } 
+
+    # We need to check if an entity with the ID $identity already exists
+    if ($reportxml.report.entity.identity.contains($Identity)){}
+    # Didn't find and entity so we are going to create the whole thing and once
+    else 
     {
-        Warning {$highlighcolor = "Yellow"}
-        Success {$highlighcolor = "Green"}
-        Error {$highlighcolor = "Red"}
-        default {$highlighcolor = "White"}
+         # Create all of the needed elements
+        $newentity = $reportxml.CreateElement("entity")
+        $newentityidentity = $reportxml.CreateElement("identity")
+        $newentityproperty = $reportxml.CreateElement("property")
+        $newentitypropertyname = $reportxml.CreateElement("name")
+        $newentitypropertyvalue = $reportxml.CreateElement("value")
+        $newentitypropertycolor = $reportxml.CreateElement("color")
+        $newentitypropertydescription = $reportxml.CreateElement("description")
+
+        ### Build the XML from the bottom up ###
+        # Add the property values to the entity object
+        $newentityproperty.AppendChild($newentitypropertyname) | Out-Null
+        $newentityproperty.AppendChild($newentitypropertyvalue) | Out-Null
+        $newentityproperty.AppendChild($newentitypropertycolor) | Out-Null
+        $newentityproperty.AppendChild($newentitypropertydescription) | Out-Null
+
+        # Set the values for the leaf nodes we just added
+        $newentityproperty.name = $Property
+        $newentityproperty.value = $Value
+        $newentityproperty.color = $highlighcolor
+        $newentityproperty.description = $Description
+
+        # Add them together and set values
+        $newentity.AppendChild($newentityidentity) | Out-Null
+        $newentity.identity = $Identity
+        $newentity.AppendChild($newentityproperty) | Out-Null
+
+        # Add the new entity stub back to the XML
+        $reportxml.report.AppendChild($newentity) | Out-Null
     }
-   
-    ### Add New Entity ###
-    # Create the new elements we need to stub out an entity
-    $newentity = $reportxml.CreateElement("entity")
-    $newentityname = $reportxml.CreateElement("name")
-    $newentityproperty = $reportxml.CreateElement("property")
 
-    # Add them together and set values
-    $newentity.AppendChild($newentityname)
-    $newentity.name = $Name
-    $newentity.AppendChild($newentityproperty)
+    # Now we need to check for the property we are looking to add
+    # The property exists so we need to update it
+    if (($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).property.name.contains($Property))
+    {
+        ### Update existing property ###
+        (($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).property | Where-Object {$_.name -eq $Property}).value = $Value
+        (($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).property | Where-Object {$_.name -eq $Property}).color = $highlighcolor
+        (($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).property | Where-Object {$_.name -eq $Property}).description = $Description
+    }
+    # We need to add the property to the entity
+    else 
+    {
+        ### Add new property to existing Entity ###
+        # Create the elements that we are going to need
+        $newproperty = $reportxml.CreateElement("property")
+        $newname = $reportxml.CreateElement("name")
+        $newvalue = $reportxml.CreateElement("value")
+        $newcolor = $reportxml.CreateElement("color")
+        $newdescription = $reportxml.CreateElement("description")
 
-    # Add the new entity stub back to the XML
-    $reportxml.report.AppendChild($newentity)
+        # Add them up and set their values
+        $newproperty.AppendChild($newname) | Out-Null
+        $newproperty.name = $Property
 
+        $newproperty.AppendChild($newvalue) | Out-Null
+        $newproperty.value = $Value
 
-    ### Add new property to existing Entity ###
+        $newproperty.AppendChild($newcolor) | Out-Null
+        $newproperty.color = $highlighcolor
 
-    # Create the elements that we are going to need
-    $newproperty = $reportxml.CreateElement("property")
-    $newname = $reportxml.CreateElement("name")
-    $newvalue = $reportxml.CreateElement("value")
-    $newcolor = $reportxml.CreateElement("color")
-    $newdescription = $reportxml.CreateElement("description")
+        $newproperty.AppendChild($newdescription) | Out-Null
+        $newproperty.description = $Description
 
-    # Add them up and set their values
-    $newproperty.AppendChild($newname)
-    $newproperty.name = $Name
+        # Add the newly created property to the entity
+        ($reportxml.report.entity | Where-Object {$_.identity -eq $Identity}).AppendChild($newproperty)
+    }
 
-    $newproperty.AppendChild($newvalue)
-    $newproperty.value = $Value
-
-    $newproperty.AppendChild($newcolor)
-    $newproperty.color = $color
-
-    $newproperty.AppendChild($newdescription)
-    $newproperty.description = $Description
-
-    # Add the newly created property to the entity
-    ($reportxml.report.entity | where {$_.name -eq $Identity}).AppendChild($newproperty)
-
-    # Update existing property
-    (($reportxml.report.entity | where {$_.name -eq $Identity}).property | where {$_.name -eq $Name}).value = $Value
-    (($reportxml.report.entity | where {$_.name -eq $Identity}).property | where {$_.name -eq $Name}).color = $color
-    (($reportxml.report.entity | where {$_.name -eq $Identity}).property | where {$_.name -eq $Name}).descriptoin = $Description
-
-    
-
+    # Make sure we save our changes
+    $reportxml.Save($reportpath)
 
 }
 
@@ -682,7 +771,7 @@ Function Test-EXOConnection {
 # Test if we are connected to MSOL and connect if we are not
 Function Test-MSOLConnection {
 	
-    try {Get-MsolCompanyInformation -ErrorAction Stop | Out-Null}
+    try {Get-MsolCompanyInformation -ErrorAction Sto)}
     catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
 		
         # Write to the screen if we don't have a log file path yet
@@ -1010,8 +1099,7 @@ Function Update-HawkModule {
 }					
 
 # Takes in a set of azure Authentication logs and combines them into a unified output
-Function Import-AzureAuthenticationLogs 
-{
+Function Import-AzureAuthenticationLogs)
     Param([array]$JsonConvertedLogs)
 
     # Null out the output object
