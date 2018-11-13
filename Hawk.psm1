@@ -485,8 +485,8 @@ Function Out-Report {
 
         # Create the xml declaraiton and stylesheet  
         $reportxml.AppendChild($reportxml.CreateXmlDeclaration("1.0",$null,$null)) | Out-Null
-        $xmlstyle = "type=`"text/xsl`" href=`"https://csshawk.azurewebsites.net/report.xsl`""
-        $reportxml.AppendChild($reportxml.CreateProcessingInstruction("xml-stylesheet",$xmlstyle)) | Out-Null
+        # $xmlstyle = "type=`"text/xsl`" href=`"https://csshawk.azurewebsites.net/report.xsl`""
+        # $reportxml.AppendChild($reportxml.CreateProcessingInstruction("xml-stylesheet",$xmlstyle)) | Out-Null
 
         # Create all of the needed elements
         $newreport = $reportxml.CreateElement("report")
