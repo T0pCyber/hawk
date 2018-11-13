@@ -219,9 +219,13 @@ Function Get-HawkMessageHeader
 	Gathers the header from the an msg file prepares a report
 
 	.DESCRIPTION
-    Pulls the header from an MSG file
-    Processes the header and outputs the results to report.xml.
-    Limited Analysis is done on the header to flag known issues.
+    Gathers the header from the an msg file prepares a report
+    
+    For Best Results:
+    * Capture a message which was sent from the bad actor to an internal user.
+    * Get a copy of the message from the internal user's mailbox.
+    * For transfering the file ensure that the source msg is zipped before emailing.
+    * On Recieve the admin should extract the MSG and run this cmdlet against it.
 	
 	.OUTPUTS
 	File: report.xml
