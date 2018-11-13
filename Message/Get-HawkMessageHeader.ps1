@@ -3,7 +3,7 @@ Function Get-HawkMessageHeader
     param
     (
         [Parameter(Mandatory = $true)]
-		[string]$Emlfile	
+		[string]$MSGFile	
     )
 
     # Create the outlook com object
@@ -22,27 +22,30 @@ Function Get-HawkMessageHeader
         
     }
 
+    # Create the Hawk object if it isn't there already
+    Initialize-HawkGlobalObject
+
     
     # check to see if we have a valid file path
-    if (test-path $Emlfile)
+    if (test-path $MSGFile)
     {
         
         # Convert a possible relative path to a full path
-        $Emlfile = (Resolve-Path $Emlfile).Path
+        $MSGFile = (Resolve-Path $MSGFile).Path
 
         # Store the file name for later use
-        $EmlfileName = $Emlfile | Split-Path -Leaf
+        $MSGFileName = $MSGFile | Split-Path -Leaf
         
-        Write-Host ("Reading message header from file " + $Emlfile) -action
+        Write-Host ("Reading message header from file " + $MSGFile) -action
         # Import the message and start processing the header
         try 
         {
-            $msg = $ol.CreateItemFromTemplate($Emlfile)
+            $msg = $ol.CreateItemFromTemplate($MSGFile)
             $header = $msg.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001E")
         }
         catch
         {
-            Write-Host ("Unable to load " + $Emlfile)
+            Write-Host ("Unable to load " + $MSGFile)
             Write-Host $Error[0]
             break
         }
@@ -52,8 +55,8 @@ Function Get-HawkMessageHeader
     else 
     {
         # If we don't have a valid file path log an error and stop
-        Write-Host ("Failed to find file " + $emlfile) -error
-        Write-Error -Message "Failed to find file " + $emlfile -ErrorAction Stop
+        Write-Host ("Failed to find file " + $MSGFile) -error
+        Write-Error -Message "Failed to find file " + $MSGFile -ErrorAction Stop
     }
         
     # Make sure or variable are empty
@@ -124,15 +127,15 @@ Function Get-HawkMessageHeader
     ### Determine how it was submitted to the service
     if ($receivedHeadersObject[0].ReceivedBy -like "*outlook.com*")
     {
-        Out-Report -Identity $EmlfileName -Property "Submitting Host" -Value $receivedHeadersObject[0].ReceivedBy -Description "Submitted from Office 365" -State Warning
+        Out-Report -Identity $MSGFileName -Property "Submitting Host" -Value $receivedHeadersObject[0].ReceivedBy -Description "Submitted from Office 365" -State Warning
     }
     else 
     {
-        Out-Report -Identity $EmlfileName -Property "Submitting Host" -Value $receivedHeadersObject[0].ReceivedBy -Description "Submitted from Internet"
+        Out-Report -Identity $MSGFileName -Property "Submitting Host" -Value $receivedHeadersObject[0].ReceivedBy -Description "Submitted from Internet"
     }
 
     ### Output to the report the client that submitted
-    Out-Report -Identity $EmlfileName -Property "Submitting Client" -Value $receivedHeadersObject[0].ReceivedWith -Description "Submitting Client"
+    Out-Report -Identity $MSGFileName -Property "Submitting Client" -Value $receivedHeadersObject[0].ReceivedWith -Description "Submitting Client"
 
     ### Output the AuthAS type
     $AuthAs = $output | Where-Object {$_.header -like 'X-MS-Exchange-Organization-AuthAs'}
@@ -143,11 +146,11 @@ Function Get-HawkMessageHeader
         # If auth is anonymous then it came from the internet
         if ($AuthAs.value -eq "Anonymous")
         {
-            Out-Report -Identity $EmlfileName -Property "Authentication Method" -Value $AuthAs.value -Description "Method used to authenticate" -Link "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help"
+            Out-Report -Identity $MSGFileName -Property "Authentication Method" -Value $AuthAs.value -Description "Method used to authenticate" -Link "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help"
         }
         else
         {
-            Out-Report -Identity $EmlfileName -Property "Authentication Method" -Value $AuthAs.value -Description "Method used to authenticate" -State Warning -link "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help"
+            Out-Report -Identity $MSGFileName -Property "Authentication Method" -Value $AuthAs.value -Description "Method used to authenticate" -State Warning -link "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help"
         }
     }
     
@@ -160,11 +163,11 @@ Function Get-HawkMessageHeader
         # If auth is anonymous then it came from the internet
         if ($AuthMech.value -eq "04" -or $AuthMech -eq "06")
         {
-            Out-Report -Identity $EmlfileName -Property "Authentication Mechanism" -Value $AuthMech.value -Description "04 is Credentials Used`n06 is SMTP Authentication`nMethod used to authenticate <a href=`"https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help`">X-MS-Exchange-Organization-AuthAs</a>" -state Warning
+            Out-Report -Identity $MSGFileName -Property "Authentication Mechanism" -Value $AuthMech.value -Description "04 is Credentials Used`n06 is SMTP Authentication`nMethod used to authenticate <a href=`"https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help`">X-MS-Exchange-Organization-AuthAs</a>" -state Warning
         }
         else
         {
-            Out-Report -Identity $EmlfileName -Property "Authentication Mechanism" -Value $AuthMech.value -Description "Mechanism used to authenticate" -link "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help"
+            Out-Report -Identity $MSGFileName -Property "Authentication Mechanism" -Value $AuthMech.value -Description "Mechanism used to authenticate" -link "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help"
         }
     }
 
@@ -189,19 +192,22 @@ Function Get-HawkMessageHeader
     # Check to see if they match
     if ($fromString.trim() -eq $ReturnPath.value.trim())
     {
-        Out-Report -Identity $EmlfileName -Property "P1 P2 Match" -Value ("From: " + $From.value + " Return-Path: " + $ReturnPath.value) -Description "P1 and P2 Header should match"
+        Out-Report -Identity $MSGFileName -Property "P1 P2 Match" -Value ("From: " + $From.value + " Return-Path: " + $ReturnPath.value) -Description "P1 and P2 Header should match"
     }
     else
     {
-        Out-Report -Identity $EmlfileName -Property "P1 P2 Match" -Value ("From: " + $From.value + " Return-Path: " + $ReturnPath.value) -Description "P1 and P2 Header don't Match" -state Error
+        Out-Report -Identity $MSGFileName -Property "P1 P2 Match" -Value ("From: " + $From.value + " Return-Path: " + $ReturnPath.value) -Description "P1 and P2 Header don't Match" -state Error
     }
 
     # Header text path 
-    $HeaderOutputPath = Join-path $hawk.filepath ($EmlfileName + "\Message_Header.csv")
-    Out-Report -Identity $EmlfileName -Property "Header Path" -Value $HeaderOutputPath -Description "Location of Full Header"
+    $HeaderOutputPath = Join-path $hawk.filepath ($MSGFileName + "\Message_Header.csv")
+    Out-Report -Identity $MSGFileName -Property "Header Path" -Value $HeaderOutputPath -Description "Location of Full Header"
 
     # Output everything to a file
-    $Output | Out-MultipleFileType -FilePrefix "Message_Header" -User $EmlfileName -csv -txt
+    $Output | Out-MultipleFileType -FilePrefix "Message_Header" -User $MSGFileName -csv -txt
+
+    # Output the RAW Header to the file for use in other tools
+    $header | Out-MultipleFileType -FilePrefix "Message_Header_RAW" -user $MSGFileName -txt
 }
 
 

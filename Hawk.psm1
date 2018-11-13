@@ -440,7 +440,7 @@ Function Out-Report {
     # Single report file for all outputs user/tenant/etc.
     # This might change in the future???
     $reportpath = Join-path $hawk.filepath report.xml
-    
+
     # Switch statement to handle the state to color mapping
     switch ($State)
     {
@@ -450,6 +450,25 @@ Function Out-Report {
         default {$highlighcolor = "Light Grey"}
     }
 
+    # Check if we have our XSL file in the output directory
+    $xslpath = Join-path $hawk.filepath Report.xsl
+    
+    if (Test-Path $xslpath ){}
+    else
+    {
+        # Copy the XSL file into the current output path
+        $sourcepath = join-path (split-path (Get-Module Hawk).path) report.xsl
+        if (test-path $sourcepath)
+        {
+            Copy-Item -Path $sourcepath -Destination $hawk.filepath
+        }
+        # If we couldn't find it throw and error and stop
+        else 
+        {
+            Write-Error ("Unable to find transform file " + $sourcepath) -ErrorAction Stop
+        }
+    }
+    
     # See if we have already created a report file
     # If so we need to import it
     if (Test-path $reportpath)
@@ -513,7 +532,7 @@ Function Out-Report {
     } 
 
     # We need to check if an entity with the ID $identity already exists
-    if ($reportxml.report.entity.identity.contains($Identity)){Write-Host "Entity Found"}
+    if ($reportxml.report.entity.identity.contains($Identity)){}
     # Didn't find and entity so we are going to create the whole thing and once
     else 
     {
@@ -594,6 +613,8 @@ Function Out-Report {
     # Make sure we save our changes
     $reportxml.Save($reportpath)
 
+    # Convert it to HTML and Save
+    Convert-ReportToHTML -Xml $reportpath -Xsl $xslpath
 }
 
 # Sends the output of a cmdlet to a txt file and a clixml file
@@ -776,7 +797,7 @@ Function Test-EXOConnection {
 # Test if we are connected to MSOL and connect if we are not
 Function Test-MSOLConnection {
 	
-    try {Get-MsolCompanyInformation -ErrorAction Sto)}
+    try {Get-MsolCompanyInformation -ErrorAction Stop | Out-Null}
     catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
 		
         # Write to the screen if we don't have a log file path yet
@@ -1104,7 +1125,7 @@ Function Update-HawkModule {
 }					
 
 # Takes in a set of azure Authentication logs and combines them into a unified output
-Function Import-AzureAuthenticationLogs)
+Function Import-AzureAuthenticationLogs {
     Param([array]$JsonConvertedLogs)
 
     # Null out the output object
@@ -1296,6 +1317,43 @@ Function Import-AzureAuthenticationLogs)
 
     # write-host $baseproperties
     return $sortedoutput
+}
+
+# Convert a reportxml to html
+Function Convert-ReportToHTML {
+    param 
+    (
+        [Parameter(Mandatory=$true)]
+        $Xml,
+        [Parameter(Mandatory=$true)]
+        $Xsl
+    )
+
+    begin
+    {
+        # Make sure that the files are there
+        if (!(test-path $Xml))
+        {
+            Write-Error "XML File not found for conversion" -ErrorAction Stop
+        }
+        if (!(test-path $Xsl))
+        {
+            Write-Error "XSL File not found for Conversion" -ErrorAction Stop
+        }
+    }
+
+    process 
+    {
+        # Create the output file name
+        $OutputFile = Join-Path (Split-path $xml) ((split-path $xml -Leaf).split(".")[0] + ".html")
+
+        # Run the transform on the XML and produce the HTML
+        $xslt = New-Object System.Xml.Xsl.XslCompiledTransform;
+        $xslt.Load($xsl);
+        $xslt.Transform($xml, $OutputFile);
+    }
+    end
+    {}
 }
 
 # ============== Global Functions ==============

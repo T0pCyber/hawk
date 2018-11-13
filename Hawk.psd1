@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.5.0'
+ModuleVersion = '1.6.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -76,14 +76,14 @@ NestedModules = @('Tenant\Get-HawkTenantAzureAuthenticationLogs.ps1','Tenant\Get
 'Tenant\Get-HawkTenantInboxRules.ps1','Tenant\Get-HawkTenantOauthConsentGrants.ps1','Tenant\Get-HawkTenantRBACChanges.ps1','Tenant\Search-HawkTenantActivityByIP.ps1',
 'Tenant\Search-HawkTenantEXOAuditLog.ps1','Tenant\Start-HawkTenantInvestigation.ps1','User\Get-HawkUserAuthHistory.ps1','User\Get-HawkUserConfiguration.ps1',
 'User\Get-HawkUserEmailForwarding.ps1','User\Get-HawkUserInboxRule.ps1','User\Get-HawkUserMailboxAuditing.ps1','User\Start-HawkUserInvestigation.ps1','User\Get-HawkUserAdminAudit.ps1',
-'Tenant\Get-HawkTenantAuthHistory.ps1','User\Get-HawkUserHiddenRule.ps1'
+'Tenant\Get-HawkTenantAuthHistory.ps1','User\Get-HawkUserHiddenRule.ps1','.\message\Get-HawkMessageHeader.ps1'
 )
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfiguration','Get-HawkTenantEDiscoveryConfiguration','Get-HawkTenantInboxRules',
 'Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkUserAuthHistory','Get-HawkUserConfiguration','Get-HawkUserEmailForwarding','Get-HawkUserInboxRule',
 'Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject','Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation',
-'Start-HawkUserInvestigation','Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule'
+'Start-HawkUserInvestigation','Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -121,7 +121,9 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes ='
+        ReleaseNotes ='1.6.0 - Added Get-HawkMessageHeader cmdlet to pull and analyse the header from an MSG file
+        1.6.0 - Added support for sending data to an XML file that can be transformed with an XSLT
+        1.6.0 - Published XSLT template to Azure
         1.5.0 - Added Get-HawkUserHiddenRule - Uses EWS Impersonation to search for Hidden inbox rules in a user mailbox (BETA)
         1.4.0 - Fixed issue with list of SKUs that can do Advanced AD searches
         1.4.0 - Added Get-HawkTenantAuthHistory.  It will return 48 hours with of unified audit logs for all users.
