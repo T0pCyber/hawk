@@ -7,7 +7,8 @@ Function Get-HawkUserConfiguration {
         [array]$UserPrincipalName
     )
 
-    Test-EXOConnection
+	Test-EXOConnection
+	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkUserConfiguration"}
 
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName

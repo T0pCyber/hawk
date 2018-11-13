@@ -1,7 +1,8 @@
 # Executes the series of Hawk cmdets that search the whole tenant
 Function Start-HawkTenantInvestigation {
 
-    Out-LogFile "Starting Tenant Sweep"
+	Out-LogFile "Starting Tenant Sweep"
+	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantInvestigation"}
 	
     Get-HawkTenantConfiguration
     Get-HawkTenantEDiscoveryConfiguration

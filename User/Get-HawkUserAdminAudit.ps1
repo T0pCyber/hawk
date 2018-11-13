@@ -7,6 +7,7 @@ Function Get-HawkUserAdminAudit
     )
 
     Test-EXOConnection
+    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkUserAdminAudit"}
 
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName

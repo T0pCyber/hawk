@@ -4,7 +4,8 @@
 ## Dig thru transport rules and look for ones forwarding or turfing mail
 Function Get-HawkTenantConfiguration {
 	
-    Test-EXOConnection
+	Test-EXOConnection
+	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantConfiguration"}
 	
     #Check Audit Log Config Setting and make sure it is enabled
     Out-LogFile "Gathering Tenant Configuration Information" -action

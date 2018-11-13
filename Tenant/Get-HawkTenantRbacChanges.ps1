@@ -1,7 +1,8 @@
 # Search for any changes made to RBAC in the search window and report them
 Function Get-HawkTenantRBACChanges {
 
-    Test-EXOConnection
+	Test-EXOConnection
+	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantRBACChanges"}
 
     Out-LogFile "Gathering any changes to RBAC configuration" -action
 

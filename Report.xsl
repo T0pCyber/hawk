@@ -72,6 +72,10 @@
 			/*margin-top: 6px;
 			margin-left: -25px;*/
 		}
+		.value {
+			padding-left 10px;
+			
+		}
 		</style>
 		</head>
         <body>
@@ -82,7 +86,7 @@
 				<ul>
 				<xsl:for-each select="property">
 					<li>
-						<label style="background-color: {color}"><xsl:value-of select="name"/></label><xsl:value-of select="value"/>
+						<label style="background-color: {color}"><xsl:value-of select="name"/></label><span class="value"><xsl:value-of select="value"/></span>
 						<xsl:if test="description!=''">
 							<br /><b>Description: </b><xsl:value-of select="description"/>
 						</xsl:if>

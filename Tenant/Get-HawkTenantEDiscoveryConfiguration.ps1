@@ -2,6 +2,7 @@
 Function Get-HawkTenantEDiscoveryConfiguration {
 
     Test-EXOConnection
+    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantEDiscoveryConfiguration"}
 
     Out-LogFile "Gathering Tenant information about E-Discovery Configuration" -action
 	

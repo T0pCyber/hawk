@@ -6,6 +6,8 @@ Function Get-HawkMessageHeader
 		[string]$MSGFile	
     )
 
+   
+
     # Create the outlook com object
     try 
     {
@@ -14,9 +16,9 @@ Function Get-HawkMessageHeader
     catch [System.Runtime.InteropServices.COMException]
     {
         # If we throw a com expection most likely reason is outlook isn't installed
-        Write-Host "Unable to log outlook com object." -error
-        Write-Host "Please make sure outlook is installed." -error
-        Write-Host $Error[0]
+       Out-LogFile "Unable to create outlook com object." -error
+       Out-LogFile "Please make sure outlook is installed." -error
+       Out-LogFile $Error[0]
         
         Write-Error "Unable to create Outlook Com Object, please ensure outlook is installed" -ErrorAction Stop
         
@@ -24,6 +26,7 @@ Function Get-HawkMessageHeader
 
     # Create the Hawk object if it isn't there already
     Initialize-HawkGlobalObject
+    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkMessageHeader"}
 
     
     # check to see if we have a valid file path
@@ -36,7 +39,7 @@ Function Get-HawkMessageHeader
         # Store the file name for later use
         $MSGFileName = $MSGFile | Split-Path -Leaf
         
-        Write-Host ("Reading message header from file " + $MSGFile) -action
+        Out-LogFile ("Reading message header from file " + $MSGFile) -action
         # Import the message and start processing the header
         try 
         {
@@ -45,8 +48,8 @@ Function Get-HawkMessageHeader
         }
         catch
         {
-            Write-Host ("Unable to load " + $MSGFile)
-            Write-Host $Error[0]
+           Out-LogFile ("Unable to load " + $MSGFile)
+           Out-LogFile $Error[0]
             break
         }
 
@@ -55,7 +58,7 @@ Function Get-HawkMessageHeader
     else 
     {
         # If we don't have a valid file path log an error and stop
-        Write-Host ("Failed to find file " + $MSGFile) -error
+       Out-LogFile ("Failed to find file " + $MSGFile) -error
         Write-Error -Message "Failed to find file " + $MSGFile -ErrorAction Stop
     }
         
@@ -97,8 +100,8 @@ Function Get-HawkMessageHeader
                 
                 # Split the string on the divider and add it to the object
                 [array]$StringSplit = $CombinedString -split ":",2
-                $Object | Add-Member -MemberType NoteProperty -Name "Header" -Value $StringSplit[0]
-                $Object | Add-Member -MemberType NoteProperty -Name "Value" -Value $StringSplit[1]
+                $Object | Add-Member -MemberType NoteProperty -Name "Header" -Value $StringSplit[0].trim()
+                $Object | Add-Member -MemberType NoteProperty -Name "Value" -Value $StringSplit[1].trim()
 
                 # Add to the output array
                 [array]$Output += $Object
@@ -150,7 +153,7 @@ Function Get-HawkMessageHeader
         }
         else
         {
-            Out-Report -Identity $MSGFileName -Property "Authentication Method" -Value $AuthAs.value -Description "Method used to authenticate" -State Warning -link "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help"
+            Out-Report -Identity $MSGFileName -Property "Authentication Method" -Value $AuthAs.value -Description "Method used to authenticate" -link "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help" -State Warning
         }
     }
     
@@ -161,9 +164,9 @@ Function Get-HawkMessageHeader
     else 
     {
         # If auth is anonymous then it came from the internet
-        if ($AuthMech.value -eq "04" -or $AuthMech -eq "06")
+        if ($AuthMech.value -eq "04" -or $AuthMech.value -eq "06")
         {
-            Out-Report -Identity $MSGFileName -Property "Authentication Mechanism" -Value $AuthMech.value -Description "04 is Credentials Used`n06 is SMTP Authentication`nMethod used to authenticate <a href=`"https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help`">X-MS-Exchange-Organization-AuthAs</a>" -state Warning
+            Out-Report -Identity $MSGFileName -Property "Authentication Mechanism" -Value $AuthMech.value -Description "04 = Credentials Used; 06 = SMTP Authentication" -link "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help" -state Warning
         }
         else
         {
@@ -192,11 +195,11 @@ Function Get-HawkMessageHeader
     # Check to see if they match
     if ($fromString.trim() -eq $ReturnPath.value.trim())
     {
-        Out-Report -Identity $MSGFileName -Property "P1 P2 Match" -Value ("From: " + $From.value + " Return-Path: " + $ReturnPath.value) -Description "P1 and P2 Header should match"
+        Out-Report -Identity $MSGFileName -Property "P1 P2 Match" -Value ("From: " + $From.value + ";  Return-Path: " + $ReturnPath.value) -Description "P1 and P2 Header should match"
     }
     else
     {
-        Out-Report -Identity $MSGFileName -Property "P1 P2 Match" -Value ("From: " + $From.value + " Return-Path: " + $ReturnPath.value) -Description "P1 and P2 Header don't Match" -state Error
+        Out-Report -Identity $MSGFileName -Property "P1 P2 Match" -Value ("From: " + $From.value + ";  Return-Path: " + $ReturnPath.value) -Description "P1 and P2 Header don't Match" -state Error
     }
 
     # Header text path 
@@ -204,10 +207,46 @@ Function Get-HawkMessageHeader
     Out-Report -Identity $MSGFileName -Property "Header Path" -Value $HeaderOutputPath -Description "Location of Full Header"
 
     # Output everything to a file
-    $Output | Out-MultipleFileType -FilePrefix "Message_Header" -User $MSGFileName -csv -txt
+    $Output | Out-MultipleFileType -FilePrefix "Message_Header" -User $MSGFileName -csv
 
     # Output the RAW Header to the file for use in other tools
     $header | Out-MultipleFileType -FilePrefix "Message_Header_RAW" -user $MSGFileName -txt
+
+
+   <#
+ 
+	.SYNOPSIS
+	Gathers the header from the an msg file prepares a report
+
+	.DESCRIPTION
+    Pulls the header from an MSG file
+    Processes the header and outputs the results to report.xml.
+    Limited Analysis is done on the header to flag known issues.
+	
+	.OUTPUTS
+	File: report.xml
+	Path: \
+    Description: Report xml file for data storage
+    
+    File: report.html
+	Path: \
+    Description: HTML file for viewing report
+    
+    File: Message_Header.csv
+	Path: \<message name>
+    Description: Message Header in CSV form
+    
+    File: Message_Header_RAW.txt
+	Path: \<message name>
+	Description: Raw header sutible for going into other tools
+
+
+	.EXAMPLE
+	Get-HawkMessageHeader -msgfile 'c:\temp\my suspicious message.msg'
+
+	Pulls the header and reviews critical information
+	
+	#>
 }
 
 

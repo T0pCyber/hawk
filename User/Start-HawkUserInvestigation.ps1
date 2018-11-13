@@ -6,7 +6,8 @@ Function Start-HawkUserInvestigation {
         [array]$UserPrincipalName
     )
 
-    Get-HawkTenantConfiguration
+	Get-HawkTenantConfiguration
+	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkUserInvestigation"}
 
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName

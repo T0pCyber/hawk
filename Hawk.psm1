@@ -782,7 +782,11 @@ Function Test-CCOConnection {
 
 # Test if we are connected to Exchange Online and connect if not
 Function Test-EXOConnection {
-    try { $null = Get-OrganizationConfig -erroraction stop }
+    try 
+    { 
+        $null = Get-OrganizationConfig -erroraction stop
+        Out-LogFile "EXO Connected"
+    }
     catch [System.Management.Automation.CommandNotFoundException] {
         Out-LogFile "[ERROR] - Not Connected to Exchange Online"
         Write-Output "`nPlease connect to Exchange Online Prior to running"
@@ -797,7 +801,11 @@ Function Test-EXOConnection {
 # Test if we are connected to MSOL and connect if we are not
 Function Test-MSOLConnection {
 	
-    try {Get-MsolCompanyInformation -ErrorAction Stop | Out-Null}
+    try 
+    {
+        $null = Get-MsolCompanyInformation -ErrorAction Stop
+        Out-LogFile "MSOL Connected"
+    }
     catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
 		
         # Write to the screen if we don't have a log file path yet
@@ -817,6 +825,7 @@ Function Test-MSOLConnection {
 
 # Test if we have a connection with the AzureAD Cmdlets
 Function Test-AzureADConnection {
+    
     $TestModule = Get-Module AzureAD -ListAvailable -ErrorAction SilentlyContinue
     $MinimumVersion = New-Object -TypeName Version -ArgumentList "2.0.0.131"
 
@@ -840,7 +849,11 @@ Function Test-AzureADConnection {
     # Do nothing
     else {}
 
-    try { $Null = Get-AzureADTenantDetail -ErrorAction Stop}
+    try 
+    { 
+        $Null = Get-AzureADTenantDetail -ErrorAction Stop
+        Out-LogFile "AzureAD Connected"
+    }
     catch [Microsoft.Open.Azure.AD.CommonLibrary.AadNeedAuthenticationException] {
         Out-LogFile "Please connect to AzureAD prior to running this cmdlet"
         Out-LogFile "Connect-AzureAD"
@@ -1547,7 +1560,9 @@ Function Initialize-HawkGlobalObject {
 	FOR ANY DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
 	PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR OTHER PECUNIARY LOSS)
 	ARISING OUT OF THE USE OF OR INABILITY TO USE THE SAMPLE SCRIPTS OR DOCUMENTATION,
-	EVEN IF MICROSOFT HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
+    EVEN IF MICROSOFT HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
+    
+    ** THIS MODULE COLLECTS NON-PII INFORMATION TO INFORM THE DEVELOPERS OF ITS USEAGE.
 			")
 
             # Prompt the user to agree with EULA
@@ -1665,6 +1680,14 @@ Function Initialize-HawkGlobalObject {
         Out-LogFile ("Version " + (Get-Module Hawk).version)
         Out-LogFile $Hawk
 
+        # Initilize Application Insights client
+        Out-LogFile "Initilizing Application Insights" -action
+        $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
+        Write-Host 
+        if ($Null -eq $Client)
+        {
+            New-AIClient -key $insightkey
+        }
     }
 
     <#

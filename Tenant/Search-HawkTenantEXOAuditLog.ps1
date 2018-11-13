@@ -3,6 +3,7 @@
 Function Search-HawkTenantEXOAuditLog {
 
     Test-EXOConnection
+    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Search-HawkTenantEXOAuditLog"}
 
     Out-LogFile "Searching EXO Audit Logs" -Action 
     Out-LogFile "Searching Entire Admin Audit Log for Specific cmdlets"

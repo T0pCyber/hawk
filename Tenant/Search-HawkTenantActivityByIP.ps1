@@ -7,6 +7,7 @@ Function Search-HawkTenantActivityByIP {
     )
 
     Test-EXOConnection
+    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantActivityByIP"}
 
     # Replace an : in the IP address with . since : isn't allowed in a directory name
     $DirectoryName = $IpAddress.replace(":", ".")
