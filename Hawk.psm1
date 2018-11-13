@@ -785,7 +785,7 @@ Function Test-EXOConnection {
     try 
     { 
         $null = Get-OrganizationConfig -erroraction stop
-        Out-LogFile "EXO Connected"
+        
     }
     catch [System.Management.Automation.CommandNotFoundException] {
         Out-LogFile "[ERROR] - Not Connected to Exchange Online"
@@ -795,17 +795,13 @@ Function Test-EXOConnection {
         Write-Output "`nFor Accounts protected by MFA"
         Write-Output "https://technet.microsoft.com/en-us/library/mt775114(v=exchg.160).aspx `n"
         break
-    }
+    }    
 }
 
 # Test if we are connected to MSOL and connect if we are not
 Function Test-MSOLConnection {
 	
-    try 
-    {
-        $null = Get-MsolCompanyInformation -ErrorAction Stop
-        Out-LogFile "MSOL Connected"
-    }
+    try {$null = Get-MsolCompanyInformation -ErrorAction Stop}
     catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
 		
         # Write to the screen if we don't have a log file path yet
@@ -852,7 +848,6 @@ Function Test-AzureADConnection {
     try 
     { 
         $Null = Get-AzureADTenantDetail -ErrorAction Stop
-        Out-LogFile "AzureAD Connected"
     }
     catch [Microsoft.Open.Azure.AD.CommonLibrary.AadNeedAuthenticationException] {
         Out-LogFile "Please connect to AzureAD prior to running this cmdlet"
@@ -1082,8 +1077,8 @@ Function Update-HawkModule {
 
                 # Check to see what the user choose
                 switch ($result) {
-                    0 {$Upgrade = $true}
-                    1 {$Upgrade = $false}
+                    0 {$Upgrade = $true;Send-AIEvent -Event Upgrade -Properties @{"Upgrade"="True"}}
+                    1 {$Upgrade = $false;Send-AIEvent -Event Upgrade -Properties @{"Upgrade"="False"}}
                 }
             }
             # If the versions match then we don't need to upgrade
@@ -1534,6 +1529,14 @@ Function Initialize-HawkGlobalObject {
     # True if Doesn't exits; -force is true; variable is null
     if (($null -eq (Get-Variable -Name Hawk -ErrorAction SilentlyContinue)) -or ($Force -eq $true) -or ($null -eq $Hawk)) {
 
+        # Initilize Application Insights client
+        $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
+        if ($Null -eq $Client)
+        {
+            Write-Host "Initilizing Application Insights"
+            $Client = New-AIClient -key $insightkey
+        }   
+     
         # Test if we have a connection to msol
         Test-MSOLConnection
 
@@ -1680,14 +1683,6 @@ Function Initialize-HawkGlobalObject {
         Out-LogFile ("Version " + (Get-Module Hawk).version)
         Out-LogFile $Hawk
 
-        # Initilize Application Insights client
-        Out-LogFile "Initilizing Application Insights" -action
-        $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
-        Write-Host 
-        if ($Null -eq $Client)
-        {
-            New-AIClient -key $insightkey
-        }
     }
 
     <#
