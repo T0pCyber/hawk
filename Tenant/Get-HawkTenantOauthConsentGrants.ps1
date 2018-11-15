@@ -5,7 +5,7 @@ Function Get-HawkTenantOauthConsentGrants {
     Out-LogFile "Gathering Oauth Consent Grants"
 
     Test-AzureADConnection
-    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantOauthConsentGrants"}
+    Send-AIEvent -Event "CmdRun"
 
     # Next up gather the consent grants using the azureadcommand
     [array]$Grant = Get-AzureADOauth2PermissionGrant -all:$true

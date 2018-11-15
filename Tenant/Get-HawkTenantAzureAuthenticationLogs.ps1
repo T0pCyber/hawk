@@ -7,7 +7,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
 
     # Need to setup the hawk global object explicitly here instead of relying on out-logfile to do it
     Initialize-HawkGlobalObject
-    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantAzureAuthenticationLogs"}
+    Send-AIEvent -Event "CmdRun"
 
     # Make sure we have the needed license to access this report
     if ([bool]$hawk.AdvancedAzureLicense) {

@@ -4,7 +4,7 @@ Function Get-HawkTenantInboxRules {
 
 
     Test-EXOConnection
-    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantInboxRules"}
+    Send-AIEvent -Event "CmdRun"
 
     # Prompt the user that this is going to take a long time to run
     $title = "Long Running Command"

@@ -2,7 +2,7 @@
 Function Start-HawkTenantInvestigation {
 
 	Out-LogFile "Starting Tenant Sweep"
-	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantInvestigation"}
+	Send-AIEvent -Event "CmdRun"
 	
     Get-HawkTenantConfiguration
     Get-HawkTenantEDiscoveryConfiguration

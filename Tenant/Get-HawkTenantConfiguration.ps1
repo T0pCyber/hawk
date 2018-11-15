@@ -5,7 +5,7 @@
 Function Get-HawkTenantConfiguration {
 	
 	Test-EXOConnection
-	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantConfiguration"}
+	Send-AIEvent -Event "CmdRun"
 	
     #Check Audit Log Config Setting and make sure it is enabled
     Out-LogFile "Gathering Tenant Configuration Information" -action

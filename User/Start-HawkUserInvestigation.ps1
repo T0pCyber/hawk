@@ -7,7 +7,7 @@ Function Start-HawkUserInvestigation {
     )
 
 	Out-LogFile "Investigating Users"
-	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkUserInvestigation"}
+	Send-AIEvent -Event "CmdRun"
 
 	# Pull the tenent configuration
 	Get-HawkTenantConfiguration	

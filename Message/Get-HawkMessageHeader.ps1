@@ -26,7 +26,7 @@ Function Get-HawkMessageHeader
 
     # Create the Hawk object if it isn't there already
     Initialize-HawkGlobalObject
-    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkMessageHeader"}
+    Send-AIEvent -Event "CmdRun"
 
     
     # check to see if we have a valid file path

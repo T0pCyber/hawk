@@ -1,5 +1,5 @@
 # Looks for hidden inbox rules in the mailbox
-Function Get-HawkUserHiddenRule {
+Function Get-HawkUserHiddenInboxRule {
     param
     (
         [Parameter(Mandatory = $true)]
@@ -9,7 +9,7 @@ Function Get-HawkUserHiddenRule {
     )
 	
 	Test-EXOConnection
-	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkUserHiddenRule"}
+	Send-AIEvent -Event "CmdRun"
 
     # Verify our UPN input
 	[array]$UserArray = Test-UserObject -ToTest $UserPrincipalName

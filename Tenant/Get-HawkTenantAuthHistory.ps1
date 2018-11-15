@@ -23,7 +23,7 @@ Function Get-HawkTenantAuthHistory {
     }
 
     Test-EXOConnection
-    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantAuthHistory"}
+    Send-AIEvent -Event "CmdRun"
 
     # Setup inial start and end time for the search
     [datetime]$CurrentStart = $DateToStartSearch

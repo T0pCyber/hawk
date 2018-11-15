@@ -2,7 +2,7 @@
 Function Get-HawkTenantRBACChanges {
 
 	Test-EXOConnection
-	Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkTenantRBACChanges"}
+	Send-AIEvent -Event "CmdRun"
 
     Out-LogFile "Gathering any changes to RBAC configuration" -action
 

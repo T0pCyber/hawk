@@ -7,7 +7,7 @@ Function Get-HawkUserEmailForwarding {
     )
 
     Test-EXOConnection
-    Send-AIEvent -Event "CmdRun" -Properties @{"cmdlet"="Get-HawkUserEmailForwarding"}
+    Send-AIEvent -Event "CmdRun"
 
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
