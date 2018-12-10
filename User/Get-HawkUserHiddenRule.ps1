@@ -1,9 +1,10 @@
 # Looks for hidden inbox rules in the mailbox
-Function Get-HawkUserHiddenInboxRule {
+Function Get-HawkUserHiddenRule {
     param
     (
         [Parameter(Mandatory = $true)]
 		[array]$UserPrincipalName,
+		[switch]$UseImpersonation,
 		$EWSCredential
 	
     )
@@ -86,7 +87,7 @@ Function Get-HawkUserHiddenInboxRule {
 			if ($_.Exception.innerexception -like "*permission to impersonate*")
 			{
 				Out-LogFile ("[ERROR] - Account does not have Impersonation Rights on Mailbox: " + $EmailAddress)
-				Out-LogFile "https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-configure-impersonation:"
+				Out-LogFile "https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-configure-impersonation"
 				Write-Error $_ -ErrorAction Stop
 			}
 			# If it isn't an impersonation error throw it and stop
@@ -129,7 +130,8 @@ Function Get-HawkUserHiddenInboxRule {
 			{
 				$priority = ($rule.ExtendedProperties | Where-Object {$_.propertydefinition.tag -eq 38}).value
 				Out-LogFile ("Possible Hidden Rule found in mailbox: " + $EmailAddress + " -- Rule Priority: " + $priority) -notice
-				$rule | Out-MultipleFileType -FilePrefix "EWS_Inbox_rule" -csv -user $user -append
+				$RuleOutput = $rule | Select-Object -Property ID,@{Name="Priority";Expression={($rule.ExtendedProperties | where {$_.propertydefinition -like "*38*"}).value}}
+				$RuleOutput | Out-MultipleFileType -FilePrefix "EWS_Inbox_rule" -txt -user $user -append
 				$FoundHidden = $true
 			}
 			
@@ -152,6 +154,16 @@ Function Get-HawkUserHiddenInboxRule {
 	.DESCRIPTION
 	Pulls inbox rules for the specified user using EWS.
 	Searches the resulting rules looking for "hidden" rules.
+
+	Requires impersonation:
+	https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-configure-impersonation
+
+	Since the rules are hidden we have to pull it as a message instead of a rule.
+	That means that the only information we can get back is the ID and Priority of the rule.
+	Once a mailbox has been identified as having a hidden rule please use MFCMapi to review and remove the rule as needed.
+	
+	https://blogs.msdn.microsoft.com/hkong/2015/02/27/how-to-delete-corrupted-hidden-inbox-rules-from-a-mailbox-using-mfcmapi/
+
 
 	.PARAMETER UserPrincipalName
 	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
