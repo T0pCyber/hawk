@@ -24,6 +24,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
 
     # Get the Oauth token Expiration time short 5 mintues
     $OauthExpiration =  (get-date ($oauth.ExpiresOn.UtcDateTime)).AddMinutes(-5)
+    Out-Logfile ("Oauth Expiration Time: " + $OauthExpiration)
 
     # Tenant Domain
     $TenantDomain = ((get-msoldomain | Where-Object {$_.isinitial -eq $true}).name)
@@ -45,6 +46,9 @@ Function Get-HawkTenantAzureAuthenticationLogs {
     $Report = $null
     $i = 0
 
+    # Clear out any existing errors
+    $error.clear()
+
     do {
 
         # Null out our raw report
@@ -55,6 +59,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
         }
         catch {
             Out-LogFile "[ERROR] - Error retrieving report"
+            Write-Log $Error
             break
         }
 
@@ -63,6 +68,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
 
         # Get our next report url if we didn't get all of the data
         $Url = ($RawReport.Content | ConvertFrom-Json).'@odata.nextLink'
+        Out-LogFile ("Next URL = " + $Url)
 
         $i++
 
