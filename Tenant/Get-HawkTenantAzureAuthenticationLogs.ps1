@@ -61,6 +61,10 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             Out-LogFile $RawReport.StatusCode
         }
         catch {
+
+            Out-LogFile "Catch"
+            Out-LogFile $RawReport.StatusCode
+            $RawReport | Export-Clixml C:\raw_report.xml
             
             if ($RawReport.StatusCode -eq 503)
             {
