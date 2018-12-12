@@ -81,7 +81,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             else 
             {
                 Out-LogFile "[ERROR] - Error retrieving report"
-                Out-MultipleFileType -FilePrefix "Raw_Report" -xml
+                $RawReport | Out-MultipleFileType -FilePrefix "Raw_Report" -xml
                 Out-LogFile $Error
                 break
             }
