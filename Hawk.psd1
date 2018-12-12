@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.6.4'
+ModuleVersion = '1.6.5'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -121,7 +121,8 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes ='1.6.4 - Updates to Get-HawkTenantAzureAuthenticationLogs to better diagnose issues
+        ReleaseNotes ='1.6.4 - Updates to Get-HawkTenantAzureAuthenticationLogs to better diagnose issues (addtional)
+        1.6.4 - Updates to Get-HawkTenantAzureAuthenticationLogs to better diagnose issues
         1.6.2 - Updated Help on Get-HawkUserHiddenRule with what to do with the output
         1.6.2 - Fixed issue with output of Get-HawkUserHiddenRule to output ID and priority into a text file
         1.6.2 - Updated name of Get-HawkUserHiddenRule to be in line with naming convention
