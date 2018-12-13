@@ -66,14 +66,14 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             Out-LogFile $RawReport.StatusCode
             $RawReport | Export-Clixml C:\raw_report.xml
             
+            # If status code is 503 then we had too many requests
             if ($RawReport.StatusCode -eq 503)
             {
                 Out-LogFile "[WARNING] - Endpoint Overwhelmed Sleeping 5 min"
                 Start-SleepwithProgress -sleeptime 300
                 $Backoff = $true
-
-
             }
+            # if status code is 429 we got an explicit backoff from the service
             if ($RawReport.StatusCode -eq 429)
             {
                 Out-LogFile "[WARNING] - Backoff Requested"
@@ -82,6 +82,15 @@ Function Get-HawkTenantAzureAuthenticationLogs {
                 Start-SleepWithProgress -sleeptime 300
                 $Backoff = $true
             }
+            # If the RawReport is just empty then something went wrong and we should retry
+            if ($null -eq $RawReport)
+            {
+                Out-LogFile "[WARNING] - No Data Returned"
+                Out-LogFile "Sleeping 5 minutes"
+                Start-SleepWithProgress -sleeptime 300
+                $Backoff = $true                
+            }
+            # In all other cases we are going to bail
             else 
             {
                 Out-LogFile "[ERROR] - Error retrieving report"
@@ -100,9 +109,12 @@ Function Get-HawkTenantAzureAuthenticationLogs {
                 Write-Error "Backed off 3 times in a row stopping processing" -ErrorAction Stop
                 break
             }
-            
-            # Increment the backoffcount
-            $BackoffCount++
+            else 
+            {
+                # Increment the backoffcount
+                $BackoffCount++
+                Out-LogFile ("BackoffCount: " + $BackoffCount)
+            }            
         }
         else
         {
@@ -130,7 +142,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
                 }
             }
         }
-        
+
     } while ($null -ne $Url)
 
     Out-LogFile ("Retrieved " + $Report.count + " Azure AD Sign In Entries")
