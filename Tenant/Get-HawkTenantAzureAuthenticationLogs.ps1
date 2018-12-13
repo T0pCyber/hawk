@@ -58,13 +58,13 @@ Function Get-HawkTenantAzureAuthenticationLogs {
 
         try {
             $RawReport = Invoke-WebRequest -UseBasicParsing -Headers $Header -Uri $url
-            Out-LogFile $RawReport.StatusCode
+            # Out-LogFile $RawReport.StatusCode
         }
         catch {
 
             Out-LogFile "Catch"
             Out-LogFile $RawReport.StatusCode
-            $RawReport | Export-Clixml C:\raw_report.xml
+           $RawReport | Export-Clixml C:\raw_report.xml
             
             # If status code is 503 then we had too many requests
             if ($RawReport.StatusCode -eq 503)
@@ -118,15 +118,19 @@ Function Get-HawkTenantAzureAuthenticationLogs {
         }
         else
         {
+
+            # Make sure the report is set to $null
+            $Report = $Null
+
             # Convert the report and then output it
-            $Report += (ConvertFrom-Json -InputObject (($RawReport).content)).value
+            $Report = (ConvertFrom-Json -InputObject (($RawReport).content)).value
 
             # Reset our backoffcount
             $BackoffCount = 0
 
             # Get our next report url if we didn't get all of the data
             $Url = ($RawReport.Content | ConvertFrom-Json).'@odata.nextLink'
-            Out-LogFile ("Next URL = " + $Url)
+            # Out-LogFile ("Next URL = " + $Url)
 
             $i++
 
@@ -141,12 +145,11 @@ Function Get-HawkTenantAzureAuthenticationLogs {
                     $OauthExpiration = (get-date $oauth.ExpiresOn).AddMinutes(-5)
                 }
             }
+
+            # Out-LogFile ("Retrieved " + $Report.count + " Azure AD Sign In Entries")
+            Out-MultipleFileType -FilePrefix Azure_Ad_signin -csv -Object $Report -append
         }
-
     } while ($null -ne $Url)
-
-    Out-LogFile ("Retrieved " + $Report.count + " Azure AD Sign In Entries")
-    Out-MultipleFileType -FilePrefix Azure_Ad_signin -csv -Object $Report
 
     <#
 

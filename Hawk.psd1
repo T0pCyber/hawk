@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.6.7'
+ModuleVersion = '1.6.9'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -121,7 +121,8 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes ='1.6.5 - Updates to Get-HawkTenantAzureAuthenticationLogs to better diagnose issues (addtional)
+        ReleaseNotes ='1.6.9 - Corrected an issue that would cause excessive memory usage on Get-HawkTenantAzureAuthenticationLogs
+        1.6.5 - Updates to Get-HawkTenantAzureAuthenticationLogs to better diagnose issues (addtional)
         1.6.4 - Updates to Get-HawkTenantAzureAuthenticationLogs to better diagnose issues
         1.6.2 - Updated Help on Get-HawkUserHiddenRule with what to do with the output
         1.6.2 - Fixed issue with output of Get-HawkUserHiddenRule to output ID and priority into a text file
@@ -136,16 +137,6 @@ PrivateData = @{
         1.3.2 - Fixed issue with JSON conversion throwing errors on duplicate properties
         1.3.1 - Updated Get-HawkUserAuthHistory to generate fewer files that are more readable
         1.3.1 - Updated Get-HawkUserAuthHistory to gather more authentication data
-        1.2.6 - Included EMS sku in list of SKUs that can do advanced AD searches as the azure P1 plan is part of that SKU
-        1.2.5 - Fixed issue with search-adminaudit log where in one instance it was only searching 14 days
-        1.2.5 - Updated output files for Get-HawkUserAuthHistory to be more clear about what they contain
-        1.2.5 - Updated output for Get-HawkUserAuthHistory so that it will always return all files
-        1.2.4 - Updated with GitHub Link
-        1.2.4 - Added Get-HawkUserAdminAudit to return all exo shell changes recorded in the admin audit log for a given user
-        1.2.3 - Fixed issue where geoip lookups were failing
-        1.2.3 - GeoIp lookups are now using http://api.ipstack.com users will need to provide their own API key due to 10k per month limit on free accounts
-        1.2.3 - Introduced storing Hawk Data between sessions by storing in %localappdata%\hawk\hawk.json
-        1.2.2 - Fixed issue where Get-HawkTenantAzureAuthenticationLogs was only retrieving 1000 results
         '
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
