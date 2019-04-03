@@ -45,7 +45,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
     # Null out report and setup our counter
     $Report = $null
     $i = 0
-    $BackoffCount = 0
+    [int]$BackoffCount = 1
 
     # Clear out any existing errors
     $error.clear()
@@ -57,14 +57,16 @@ Function Get-HawkTenantAzureAuthenticationLogs {
         $Backoff = $false
 
         try {
-            $RawReport = Invoke-WebRequest -UseBasicParsing -Headers $Header -Uri $url
+            $RawReport = Invoke-WebRequest -UseBasicParsing -Headers $Header -Uri $url -TimeoutSec 300
             # Out-LogFile $RawReport.StatusCode
         }
         catch {
 
             Out-LogFile "Catch"
-            Out-LogFile $RawReport.StatusCode
-           $RawReport | Export-Clixml C:\raw_report.xml
+            Out-LogFile "Error:"
+            Out-LogFile $_
+            Out-LogFile ("Status Code:" + $RawReport.StatusCode)
+            $RawReport | Export-Clixml C:\raw_report.xml
             
             # If status code is 503 then we had too many requests
             if ($RawReport.StatusCode -eq 503)
@@ -74,7 +76,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
                 $Backoff = $true
             }
             # if status code is 429 we got an explicit backoff from the service
-            if ($RawReport.StatusCode -eq 429)
+            elseif ($RawReport.StatusCode -eq 429)
             {
                 Out-LogFile "[WARNING] - Backoff Requested"
                 Out-LogFile $RawReport.Content
@@ -83,19 +85,19 @@ Function Get-HawkTenantAzureAuthenticationLogs {
                 $Backoff = $true
             }
             # If the RawReport is just empty then something went wrong and we should retry
-            if ($null -eq $RawReport)
+            elseif ($null -eq $RawReport)
             {
                 Out-LogFile "[WARNING] - No Data Returned"
-                Out-LogFile "Sleeping 5 minutes"
-                Start-SleepWithProgress -sleeptime 300
+                Start-SleepWithProgress -sleeptime (300 * $BackoffCount)
                 $Backoff = $true                
             }
+
             # In all other cases we are going to bail
             else 
             {
                 Out-LogFile "[ERROR] - Error retrieving report"
                 $RawReport | Out-MultipleFileType -FilePrefix "Raw_Report" -xml
-                Out-LogFile $Error
+                Out-LogFile $_
                 break
             }
         }
@@ -103,16 +105,17 @@ Function Get-HawkTenantAzureAuthenticationLogs {
         if ($Backoff)
         {
             # If we had to backoff then we just need to go thru and try again ... we should keep a backoff count
-            if ($BackoffCount -gt 3)
+            if ([int]$BackoffCount -gt 3)
             {
                 Out-LogFile "[ERROR] - Backed off too many times"
+                Out-LogFile $error
                 Write-Error "Backed off 3 times in a row stopping processing" -ErrorAction Stop
                 break
             }
             else 
             {
                 # Increment the backoffcount
-                $BackoffCount++
+                [int]$BackoffCount++
                 Out-LogFile ("BackoffCount: " + $BackoffCount)
             }            
         }
@@ -126,11 +129,11 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             $Report = (ConvertFrom-Json -InputObject (($RawReport).content)).value
 
             # Reset our backoffcount
-            $BackoffCount = 0
+            $BackoffCount = 1
 
             # Get our next report url if we didn't get all of the data
             $Url = ($RawReport.Content | ConvertFrom-Json).'@odata.nextLink'
-            # Out-LogFile ("Next URL = " + $Url)
+            Out-LogFile ("Next URL = " + $Url)
 
             $i++
 
@@ -138,7 +141,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             # Don't need to check every time ... once per 10 is good
             if ($i % 10) {
                 # If the current date is > expiration then we need to get a new token
-                if ((get-date) -gt $OauthExpiration) {
+                if ((get-date).ToUniversalTime() -gt $OauthExpiration) {
 
                     $oauth = Get-UserGraphAPIToken -AppIDURL "https://graph.windows.net"
                     $Header = @{'Authorization' = "$($oauth.AccessTokenType) $($oauth.AccessToken)"}

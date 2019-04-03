@@ -1,3 +1,4 @@
+
 Function Get-HawkMessageHeader
 {
     param
@@ -212,45 +213,6 @@ Function Get-HawkMessageHeader
     # Output the RAW Header to the file for use in other tools
     $header | Out-MultipleFileType -FilePrefix "Message_Header_RAW" -user $MSGFileName -txt
 
-
-   <#
- 
-	.SYNOPSIS
-	Gathers the header from the an msg file prepares a report
-
-	.DESCRIPTION
-    Gathers the header from the an msg file prepares a report
-    
-    For Best Results:
-    * Capture a message which was sent from the bad actor to an internal user.
-    * Get a copy of the message from the internal user's mailbox.
-    * For transfering the file ensure that the source msg is zipped before emailing.
-    * On Recieve the admin should extract the MSG and run this cmdlet against it.
-	
-	.OUTPUTS
-	File: report.xml
-	Path: \
-    Description: Report xml file for data storage
-    
-    File: report.html
-	Path: \
-    Description: HTML file for viewing report
-    
-    File: Message_Header.csv
-	Path: \<message name>
-    Description: Message Header in CSV form
-    
-    File: Message_Header_RAW.txt
-	Path: \<message name>
-	Description: Raw header sutible for going into other tools
-
-
-	.EXAMPLE
-	Get-HawkMessageHeader -msgfile 'c:\temp\my suspicious message.msg'
-
-	Pulls the header and reviews critical information
-	
-	#>
 }
 
 
