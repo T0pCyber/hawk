@@ -146,7 +146,7 @@ PrivateData = @{
 } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
-HelpInfoURI = 'https://github.com/Canthv0/hawk/Help'
+HelpInfoURI = 'https://github.com/Canthv0/hawk/tree/master/Help'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
