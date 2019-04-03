@@ -1,6 +1,28 @@
 # Return logon information from the Azure Audit logs
 Function Get-HawkTenantAzureAuthenticationLogs {
 
+    <#
+
+	.SYNOPSIS
+	Retrieves Azure AD Sign in Logs
+
+	.DESCRIPTION
+    Uses Graph API to retrieve Azure AD Signin Logs
+    ** Requires that the tenant have an Azure AD P1 or P2 license or trial license
+
+	.OUTPUTS
+
+	File: Azure_AD_Signin.csv
+	Path: \
+	Description: Azure AD Signin Report
+
+    .EXAMPLE
+	Get-HawkTenantAzureAuthenticationLogs
+
+	Returns all Azure AD Signin reports in CSV format
+
+	#>
+
 
     # Make sure we have a connection to MSOL since we will need it
     Test-MSOLConnection
@@ -23,14 +45,14 @@ Function Get-HawkTenantAzureAuthenticationLogs {
     $oauth = Get-UserGraphAPIToken -AppIDURL "https://graph.windows.net"
 
     # Get the Oauth token Expiration time short 5 mintues
-    $OauthExpiration =  (get-date ($oauth.ExpiresOn.UtcDateTime)).AddMinutes(-5)
+    $OauthExpiration = (Get-Date ($oauth.ExpiresOn.UtcDateTime)).AddMinutes(-5)
     Out-Logfile ("Oauth Expiration Time: " + $OauthExpiration)
 
     # Tenant Domain
-    $TenantDomain = ((get-msoldomain | Where-Object {$_.isinitial -eq $true}).name)
+    $TenantDomain = ((Get-MsolDomain | Where-Object { $_.isinitial -eq $true }).name)
 
     # Pull the current date -30 days in the correct format (logs only go back 30 days)
-    [string]$PastPeriod = "{0:s}" -f (get-date).AddDays(-30) + "Z"
+    [string]$PastPeriod = "{0:s}" -f (Get-Date).AddDays(-30) + "Z"
 
     # Build the filter for pulling the data
     [string]$Filter = "`$filter=signinDateTime+ge+" + $PastPeriod
@@ -40,7 +62,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
     Out-Logfile ("URL: " + $Url)
 
     # Build access header
-    $Header = @{'Authorization' = "$($oauth.AccessTokenType) $($oauth.AccessToken)"}
+    $Header = @{'Authorization' = "$($oauth.AccessTokenType) $($oauth.AccessToken)" }
 
     # Null out report and setup our counter
     $Report = $null
@@ -69,15 +91,13 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             $RawReport | Export-Clixml C:\raw_report.xml
             
             # If status code is 503 then we had too many requests
-            if ($RawReport.StatusCode -eq 503)
-            {
+            if ($RawReport.StatusCode -eq 503) {
                 Out-LogFile "[WARNING] - Endpoint Overwhelmed Sleeping 5 min"
                 Start-SleepwithProgress -sleeptime 300
                 $Backoff = $true
             }
             # if status code is 429 we got an explicit backoff from the service
-            elseif ($RawReport.StatusCode -eq 429)
-            {
+            elseif ($RawReport.StatusCode -eq 429) {
                 Out-LogFile "[WARNING] - Backoff Requested"
                 Out-LogFile $RawReport.Content
                 Out-LogFile "Sleeping 5 minutes"
@@ -85,16 +105,14 @@ Function Get-HawkTenantAzureAuthenticationLogs {
                 $Backoff = $true
             }
             # If the RawReport is just empty then something went wrong and we should retry
-            elseif ($null -eq $RawReport)
-            {
+            elseif ($null -eq $RawReport) {
                 Out-LogFile "[WARNING] - No Data Returned"
                 Start-SleepWithProgress -sleeptime (300 * $BackoffCount)
                 $Backoff = $true                
             }
 
             # In all other cases we are going to bail
-            else 
-            {
+            else {
                 Out-LogFile "[ERROR] - Error retrieving report"
                 $RawReport | Out-MultipleFileType -FilePrefix "Raw_Report" -xml
                 Out-LogFile $_
@@ -102,25 +120,21 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             }
         }
 
-        if ($Backoff)
-        {
+        if ($Backoff) {
             # If we had to backoff then we just need to go thru and try again ... we should keep a backoff count
-            if ([int]$BackoffCount -gt 3)
-            {
+            if ([int]$BackoffCount -gt 3) {
                 Out-LogFile "[ERROR] - Backed off too many times"
                 Out-LogFile $error
                 Write-Error "Backed off 3 times in a row stopping processing" -ErrorAction Stop
                 break
             }
-            else 
-            {
+            else {
                 # Increment the backoffcount
                 [int]$BackoffCount++
                 Out-LogFile ("BackoffCount: " + $BackoffCount)
             }            
         }
-        else
-        {
+        else {
 
             # Make sure the report is set to $null
             $Report = $Null
@@ -141,11 +155,11 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             # Don't need to check every time ... once per 10 is good
             if ($i % 10) {
                 # If the current date is > expiration then we need to get a new token
-                if ((get-date).ToUniversalTime() -gt $OauthExpiration) {
+                if ((Get-Date).ToUniversalTime() -gt $OauthExpiration) {
 
                     $oauth = Get-UserGraphAPIToken -AppIDURL "https://graph.windows.net"
-                    $Header = @{'Authorization' = "$($oauth.AccessTokenType) $($oauth.AccessToken)"}
-                    $OauthExpiration = (get-date $oauth.ExpiresOn).AddMinutes(-5)
+                    $Header = @{'Authorization' = "$($oauth.AccessTokenType) $($oauth.AccessToken)" }
+                    $OauthExpiration = (Get-Date $oauth.ExpiresOn).AddMinutes(-5)
                 }
             }
 
@@ -153,26 +167,4 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             Out-MultipleFileType -FilePrefix Azure_Ad_signin -csv -Object $Report -append
         }
     } while ($null -ne $Url)
-
-    <#
-
-	.SYNOPSIS
-	Retrieves Azure AD Sign in Logs
-
-	.DESCRIPTION
-    Uses Graph API to retrieve Azure AD Signin Logs
-    ** Requires that the tenant have an Azure AD P1 or P2 license or trial license
-
-	.OUTPUTS
-
-	File: Azure_AD_Signin.csv
-	Path: \
-	Description: Azure AD Signin Report
-
-    .EXAMPLE
-	Get-HawkTenantAzureAuthenticationLogs
-
-	Returns all Azure AD Signin reports in CSV format
-
-	#>
 }

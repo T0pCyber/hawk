@@ -1,28 +1,29 @@
-<#
- 
-.SYNOPSIS
-Gathers 48 hours worth of Unified Audit logs.
-Pulls everyting into a CSV file.
-
-.DESCRIPTION
-Connects to EXO and searches the unified audit log file only a date time filter.
-Searches in 15 minute increments to ensure that we gather all data.
-
-Should be used once you have used other commands to determine a "window" that needs more review.
-
-.OUTPUTS
-File: Audit_Log_Full_<date>.csv
-Path: \Tenant
-Description: Audit data for ALL users over a 48 hour period
-
-.EXAMPLE
-Get-HawkTenantAuthHistory -StartDate "10/25/2018"
-
-Gathers 48 hours worth of audit data starting at midnight on October 25th 2018
-	
-#>
-
 Function Get-HawkTenantAuthHistory {
+
+    <#
+    
+    .SYNOPSIS
+    Gathers 48 hours worth of Unified Audit logs.
+    Pulls everyting into a CSV file.
+
+    .DESCRIPTION
+    Connects to EXO and searches the unified audit log file only a date time filter.
+    Searches in 15 minute increments to ensure that we gather all data.
+
+    Should be used once you have used other commands to determine a "window" that needs more review.
+
+    .OUTPUTS
+    File: Audit_Log_Full_<date>.csv
+    Path: \Tenant
+    Description: Audit data for ALL users over a 48 hour period
+
+    .EXAMPLE
+    Get-HawkTenantAuthHistory -StartDate "10/25/2018"
+
+    Gathers 48 hours worth of audit data starting at midnight on October 25th 2018
+        
+    #>
+
     Param (
         [Parameter(Mandatory = $true)]
         $StartDate,
@@ -79,8 +80,5 @@ Function Get-HawkTenantAuthHistory {
 
         # Increment our count
         $CurrentCount++
-
     }
-
-
 }
