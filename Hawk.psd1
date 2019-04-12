@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.6.11'
+ModuleVersion = '1.6.13'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -27,7 +27,7 @@ Author = 'hawk_feedback@microsoft.com'
 CompanyName = 'Matt Byrd'
 
 # Copyright statement for this module
-Copyright = '(c) 2017 matbyrd@microsoft.com. All rights reserved.'
+Copyright = '(c) 2019 matbyrd@microsoft.com. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'The Hawk module has been designed to ease the burden on O365 administrators who are performing a forensic analysis in their organization.  It accelerates the gathering of data from multiple sources in the service.
@@ -72,18 +72,35 @@ RequiredAssemblies = @('Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsF
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('Tenant\Get-HawkTenantAzureAuthenticationLogs.ps1','Tenant\Get-HawkTenantConfiguration.ps1','Tenant\Get-HawkTenantEDiscoveryConfiguration.ps1',
-'Tenant\Get-HawkTenantInboxRules.ps1','Tenant\Get-HawkTenantOauthConsentGrants.ps1','Tenant\Get-HawkTenantRBACChanges.ps1','Tenant\Search-HawkTenantActivityByIP.ps1',
-'Tenant\Search-HawkTenantEXOAuditLog.ps1','Tenant\Start-HawkTenantInvestigation.ps1','User\Get-HawkUserAuthHistory.ps1','User\Get-HawkUserConfiguration.ps1',
-'User\Get-HawkUserEmailForwarding.ps1','User\Get-HawkUserInboxRule.ps1','User\Get-HawkUserMailboxAuditing.ps1','User\Start-HawkUserInvestigation.ps1','User\Get-HawkUserAdminAudit.ps1',
-'Tenant\Get-HawkTenantAuthHistory.ps1','User\Get-HawkUserHiddenRule.ps1','.\message\Get-HawkMessageHeader.ps1'
+NestedModules = @(
+    'General\Initialize-HawkGlobalObject.ps1',
+    'Message\Get-HawkMessageHeader.ps1',
+    'Tenant\Get-HawkTenantAzureAuthenticationLogs.ps1',
+    'Tenant\Get-HawkTenantConfiguration.ps1',
+    'Tenant\Get-HawkTenantEDiscoveryConfiguration.ps1',
+    'Tenant\Get-HawkTenantInboxRules.ps1',
+    'Tenant\Get-HawkTenantOauthConsentGrants.ps1',
+    'Tenant\Get-HawkTenantRBACChanges.ps1',
+    'Tenant\Get-HawkTenantAuthHistory.ps1',
+    'Tenant\Search-HawkTenantActivityByIP.ps1',
+    'Tenant\Search-HawkTenantEXOAuditLog.ps1',
+    'Tenant\Start-HawkTenantInvestigation.ps1',
+    'User\Get-HawkUserAuthHistory.ps1',
+    'User\Get-HawkUserConfiguration.ps1',
+    'User\Get-HawkUserEmailForwarding.ps1',
+    'User\Get-HawkUserInboxRule.ps1',
+    'User\Get-HawkUserMailboxAuditing.ps1',
+    'User\Get-HawkUserAdminAudit.ps1',
+    'User\Get-HawkUserHiddenRule.ps1',
+    'User\Start-HawkUserInvestigation.ps1'
 )
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfiguration','Get-HawkTenantEDiscoveryConfiguration','Get-HawkTenantInboxRules',
-'Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkUserAuthHistory','Get-HawkUserConfiguration','Get-HawkUserEmailForwarding','Get-HawkUserInboxRule',
-'Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject','Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation',
-'Start-HawkUserInvestigation','Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader'
+FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfiguration','Get-HawkTenantEDiscoveryConfiguration',
+'Get-HawkTenantInboxRules','Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkUserAuthHistory','Get-HawkUserConfiguration',
+'Get-HawkUserEmailForwarding','Get-HawkUserInboxRule','Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject',
+'Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation','Start-HawkUserInvestigation',
+'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -122,6 +139,9 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.7.0 - Rework of Initialize-HawkGlobalObject to now accept swtiches to facilitate scripting Hawk Commands
+        1.7.0 - Further help updates
+        1.7.0 - Moved Initialize-HawkGlobalObject into its own ps1 file in the General Folder
         1.6.11 - Get-HawkMessageHeader removed HTML output outputs to CSV now
         1.6.11 - Started working thru help documentation
         1.6.9 - Corrected an issue that would cause excessive memory usage on Get-HawkTenantAzureAuthenticationLogs
