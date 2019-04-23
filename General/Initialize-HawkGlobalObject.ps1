@@ -49,9 +49,9 @@ Function Initialize-HawkGlobalObject {
 
     param
     (
-        [switch]$Force,
-        [switch]$IAgreeToTheEula,
-        [switch]$SkipUpdate,
+        [switch]$Force=$false,
+        [switch]$IAgreeToTheEula=$false,
+        [switch]$SkipUpdate=$false,
         [int]$DaysToLookBack,
         [string]$FilePath
     )
@@ -146,7 +146,7 @@ Function Initialize-HawkGlobalObject {
     Function Get-Eula {
 
         if ([string]::IsNullOrEmpty($Hawk.EULA)) {
-            Write-Information @(" 
+            Write-Information (" 
 			
 	DISCLAIMER:
 
@@ -163,7 +163,7 @@ Function Initialize-HawkGlobalObject {
     EVEN IF MICROSOFT HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
     
     ** THIS MODULE COLLECTS NON-PII INFORMATION TO INFORM THE DEVELOPERS OF ITS USEAGE.
-			") 
+			")
 
             # Prompt the user to agree with EULA
             $title = "Disclaimer"

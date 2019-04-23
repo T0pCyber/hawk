@@ -1,5 +1,4 @@
-Function Get-HawkUserAdminAudit 
-{
+Function Get-HawkUserAdminAudit {
     param
     (
         [Parameter(Mandatory = $true)]
@@ -12,8 +11,7 @@ Function Get-HawkUserAdminAudit
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    Foreach ($Object in $UserArray)
-    {
+    Foreach ($Object in $UserArray) {
         [string]$User = $Object.UserPrincipalName
 
         # Get the mailbox name since that is what we store in the admin audit log
