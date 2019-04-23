@@ -76,14 +76,14 @@ NestedModules = @('Tenant\Get-HawkTenantAzureAuthenticationLogs.ps1','Tenant\Get
 'Tenant\Get-HawkTenantInboxRules.ps1','Tenant\Get-HawkTenantOauthConsentGrants.ps1','Tenant\Get-HawkTenantRBACChanges.ps1','Tenant\Search-HawkTenantActivityByIP.ps1',
 'Tenant\Search-HawkTenantEXOAuditLog.ps1','Tenant\Start-HawkTenantInvestigation.ps1','User\Get-HawkUserAuthHistory.ps1','User\Get-HawkUserConfiguration.ps1',
 'User\Get-HawkUserEmailForwarding.ps1','User\Get-HawkUserInboxRule.ps1','User\Get-HawkUserMailboxAuditing.ps1','User\Start-HawkUserInvestigation.ps1','User\Get-HawkUserAdminAudit.ps1',
-'Tenant\Get-HawkTenantAuthHistory.ps1','User\Get-HawkUserHiddenRule.ps1','.\message\Get-HawkMessageHeader.ps1'
+'Tenant\Get-HawkTenantAuthHistory.ps1','User\Get-HawkUserHiddenRule.ps1','.\User\Get-HawkUserAutoReply.ps1','.\message\Get-HawkMessageHeader.ps1'
 )
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfiguration','Get-HawkTenantEDiscoveryConfiguration','Get-HawkTenantInboxRules',
 'Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkUserAuthHistory','Get-HawkUserConfiguration','Get-HawkUserEmailForwarding','Get-HawkUserInboxRule',
 'Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject','Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation',
-'Start-HawkUserInvestigation','Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader'
+'Start-HawkUserInvestigation','Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkUserAutoReply','Get-HawkMessageHeader'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -122,6 +122,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.7.0 - Added Get-HawkUserAutoReply.  It will export the autoreplyconfig if in an Enabled state.
         1.6.11 - Get-HawkMessageHeader removed HTML output outputs to CSV now
         1.6.11 - Started working thru help documentation
         1.6.9 - Corrected an issue that would cause excessive memory usage on Get-HawkTenantAzureAuthenticationLogs
@@ -155,4 +156,3 @@ HelpInfoURI = 'https://github.com/Canthv0/hawk/tree/master/Help'
 # DefaultCommandPrefix = ''
 
 }
-
