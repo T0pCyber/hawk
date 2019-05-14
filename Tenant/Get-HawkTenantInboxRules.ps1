@@ -45,21 +45,18 @@ Function Get-HawkTenantInboxRules {
     Out-LogFile ("Found " + $AllMailboxes.count + " Mailboxes")
 
     # Get the path to start-robustcloudcommand
-    [string]$scriptpath = "& `'" + (Join-Path (Split-path ((get-module Hawk).path) -Parent) "Start-RobustCloudCommand.ps1") + "`'"
+    # [string]$scriptpath = "& `'" + (Join-Path (Split-path ((get-module Hawk).path) -Parent) "Start-RobustCloudCommand.ps1") + "`'"
     
     # get EXO Credentials
-    Out-LogFile "Gathering EXO Admin Credentials"
-    $cred = Get-Credential -Message "EXO Credentials"
+    # Out-LogFile "Gathering EXO Admin Credentials"
+    # $cred = Get-Credential -Message "EXO Credentials"
 
     # Path for robust log file
     $RobustLog = Join-path $Hawk.FilePath "Robust.log"
 
     # Build the command we are going to need to run with start-robustcloudcommand
-    $cmd = $scriptpath + " -Agree -Credential `$cred -logfile `$RobustLog -recipients `$AllMailboxes -scriptblock {Get-HawkUserInboxRule -UserPrincipalName `$input.PrimarySmtpAddress.tostring()}"
-    
-    # Quote out the script path so we can deal with spaces in the path
-    
-    
+    $cmd = "Start-RobustCloudCommand -logfile `$RobustLog -recipients `$AllMailboxes -scriptblock {Get-HawkUserInboxRule -UserPrincipalName `$input.PrimarySmtpAddress.tostring()}"
+       
     # Invoke our Start-Robust command to get all of the inbox rules
     Out-LogFile "===== Starting Robust Cloud Command to Gather User Specific information from all tenant users ====="
     Out-LogFile $cmd

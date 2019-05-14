@@ -59,7 +59,8 @@ PowerShellVersion = '5.0'
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
     @{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'; },
-    @{ModuleName = 'CloudConnect'; ModuleVersion = '0.6.0'; }
+    @{ModuleName = 'CloudConnect'; ModuleVersion = '0.6.0'; },
+    @{ModuleName = 'RobustCloudCommand'; ModuleVersion = '1.1.0'; }
     )
 
 # Assemblies that must be loaded prior to importing this module
@@ -160,15 +161,6 @@ PrivateData = @{
         1.6.2 - Fixed issue with output of Get-HawkUserHiddenRule to output ID and priority into a text file
         1.6.2 - Updated name of Get-HawkUserHiddenRule to be in line with naming convention
         1.6.1 - Added Azure AppInsight integration
-        1.6.0 - Added Get-HawkMessageHeader cmdlet to pull and analyse the header from an MSG file
-        1.6.0 - Added support for sending data to an XML file that can be transformed with an XSLT
-        1.6.0 - Published XSLT template to Azure
-        1.5.0 - Added Get-HawkUserHiddenRule - Uses EWS Impersonation to search for Hidden inbox rules in a user mailbox (BETA)
-        1.4.0 - Fixed issue with list of SKUs that can do Advanced AD searches
-        1.4.0 - Added Get-HawkTenantAuthHistory.  It will return 48 hours with of unified audit logs for all users.
-        1.3.2 - Fixed issue with JSON conversion throwing errors on duplicate properties
-        1.3.1 - Updated Get-HawkUserAuthHistory to generate fewer files that are more readable
-        1.3.1 - Updated Get-HawkUserAuthHistory to gather more authentication data
         '
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

@@ -789,6 +789,7 @@ Function Test-EXOConnection {
     }
     catch [System.Management.Automation.CommandNotFoundException] {
         Out-LogFile "[ERROR] - Not Connected to Exchange Online"
+        Out-LogFile "Connecting to EXO using CloudConnect"
         Connect-EXO
     }
 }
