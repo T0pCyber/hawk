@@ -1,4 +1,27 @@
 Function Get-HawkUserAdminAudit {
+    
+    <#
+ 
+	.SYNOPSIS
+	Searches the EXO Audit logs for any commands that were run against the provided user object.
+
+	.DESCRIPTION
+    Searches the EXO Audit logs for any commands that were run against the provided user object.
+    Limited by the provided search period.
+		
+	.OUTPUTS
+
+	File: Simple_User_Changes.csv
+	Path: \<user>
+	Description: All cmdlets that were run against the user in a simple format.
+
+	.EXAMPLE
+    Get-HawkUserAdminAudit -UserPrincipalName user@company.com
+    
+    Gets all changes made to user@company.com and ouputs them to the csv and xml files.
+	
+    #>
+    
     param
     (
         [Parameter(Mandatory = $true)]
@@ -27,7 +50,7 @@ Function Get-HawkUserAdminAudit {
         if ($UserChanges.Count -gt 0) {
             Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
             $UserChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -user $User
-            $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -xml -user $User
+            $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -user $User
         }
         # Otherwise report no results found
         else {
@@ -35,30 +58,4 @@ Function Get-HawkUserAdminAudit {
         }
 
     }
-
-    <#
- 
-	.SYNOPSIS
-	Searches the EXO Audit logs for any commands that were run against the provided user object.
-
-	.DESCRIPTION
-    Searches the EXO Audit logs for any commands that were run against the provided user object.
-    Limited by the provided search period.
-		
-	.OUTPUTS
-
-	File: Simple_User_Changes.csv
-	Path: \<user>
-	Description: All cmdlets that were run against the user in a simple format.
-
-	File: User_Changes.xml
-	Path: \<user>\XML
-	Description: All User changes as a CLI XML
-
-	.EXAMPLE
-    Get-HawkUserAdminAudit -UserPrincipalName user@company.com
-    
-    Gets all changes made to user@company.com and ouputs them to the csv and xml files.
-	
-	#>
 }

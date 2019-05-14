@@ -57,7 +57,10 @@ PowerShellVersion = '5.0'
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @(@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'; })
+RequiredModules = @(
+    @{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'; },
+    @{ModuleName = 'CloudConnect'; ModuleVersion = '0.6.0'; }
+    )
 
 # Assemblies that must be loaded prior to importing this module
 RequiredAssemblies = @('Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll','Microsoft.IdentityModel.Clients.ActiveDirectory.dll')
