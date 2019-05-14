@@ -789,13 +789,8 @@ Function Test-EXOConnection {
     }
     catch [System.Management.Automation.CommandNotFoundException] {
         Out-LogFile "[ERROR] - Not Connected to Exchange Online"
-        Write-Output "`nPlease connect to Exchange Online Prior to running"
-        Write-Output "`nStandard connection method"
-        Write-Output "https://technet.microsoft.com/en-us/library/jj984289(v=exchg.160).aspx"
-        Write-Output "`nFor Accounts protected by MFA"
-        Write-Output "https://technet.microsoft.com/en-us/library/mt775114(v=exchg.160).aspx `n"
-        break
-    }    
+        Connect-EXO
+    }
 }
 
 # Test if we are connected to MSOL and connect if we are not
