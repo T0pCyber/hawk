@@ -141,10 +141,13 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes ='1.7.1 - Fixed issues with Initialize-HawkGlobalObject where some switches were not defaulting to False
+        ReleaseNotes ='1.8.0 - Leverages ConnectCloud Module to connect to EXO if no current connection
+        1.8.0 - Updated Help for all HawkUser cmdlets
+        1.8.0 - Removed XML output for all HawkUser cmdlets
+        1.7.1 - Fixed issues with Initialize-HawkGlobalObject where some switches were not defaulting to False
         1.7.1 - Removed xml output from Get-HawkUserMailboxAuditing as part of continued output cleanup/streamlining
         1.7.1 - Updated Help on Get-HawkUserMailboxAuditing
-        1.7.1. - Get-HawkUserMailboxAuditing now searches the Mailbox Audit Log as well as the Unified Audit Log
+        1.7.1 - Get-HawkUserMailboxAuditing now searches the Mailbox Audit Log as well as the Unified Audit Log
         1.7.0 - Rework of Initialize-HawkGlobalObject to now accept swtiches to facilitate scripting Hawk Commands
         1.7.0 - Further help updates
         1.7.0 - Moved Initialize-HawkGlobalObject into its own ps1 file in the General Folder
