@@ -41,13 +41,6 @@ Function Get-HawkTenantAzureAuthenticationLogs {
         break
     }
 
-    # Get our oauth token
-    $oauth = Get-UserGraphAPIToken -AppIDURL "https://graph.windows.net"
-
-    # Get the Oauth token Expiration time short 5 mintues
-    $OauthExpiration = (Get-Date ($oauth.ExpiresOn.UtcDateTime)).AddMinutes(-5)
-    Out-Logfile ("Oauth Expiration Time: " + $OauthExpiration)
-
     # Tenant Domain
     $TenantDomain = ((Get-MsolDomain | Where-Object { $_.isinitial -eq $true }).name)
 
@@ -62,7 +55,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
     Out-Logfile ("URL: " + $Url)
 
     # Build access header
-    $Header = @{'Authorization' = "$($oauth.AccessTokenType) $($oauth.AccessToken)" }
+    $Header = Connect-AzureGraph
 
     # Null out report and setup our counter
     $Report = $null
@@ -153,18 +146,11 @@ Function Get-HawkTenantAzureAuthenticationLogs {
 
             # We need to check for an expiring oauth token (could take some time to retrieve all data)
             # Don't need to check every time ... once per 10 is good
-            if ($i % 10) {
-                # If the current date is > expiration then we need to get a new token
-                if ((Get-Date).ToUniversalTime() -gt $OauthExpiration) {
-
-                    $oauth = Get-UserGraphAPIToken -AppIDURL "https://graph.windows.net"
-                    $Header = @{'Authorization' = "$($oauth.AccessTokenType) $($oauth.AccessToken)" }
-                    $OauthExpiration = (Get-Date $oauth.ExpiresOn).AddMinutes(-5)
-                }
-            }
-
-            # Out-LogFile ("Retrieved " + $Report.count + " Azure AD Sign In Entries")
-            Out-MultipleFileType -FilePrefix Azure_Ad_signin -csv -Object $Report -append
+            if ($i % 10) { $Header = Connect-AzureGraph }
         }
-    } while ($null -ne $Url)
+
+        # Out-LogFile ("Retrieved " + $Report.count + " Azure AD Sign In Entries")
+        Out-MultipleFileType -FilePrefix Azure_Ad_signin -csv -Object $Report -append
+    }
+    while ($null -ne $Url)
 }

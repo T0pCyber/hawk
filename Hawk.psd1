@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.8.1'
+ModuleVersion = '1.8.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -59,7 +59,7 @@ PowerShellVersion = '5.0'
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
     @{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'; },
-    @{ModuleName = 'CloudConnect'; ModuleVersion = '0.6.0'; },
+    @{ModuleName = 'CloudConnect'; ModuleVersion = '1.0.0'; },
     @{ModuleName = 'RobustCloudCommand'; ModuleVersion = '1.1.0'; }
     )
 
@@ -142,8 +142,10 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes ='1.8.1 - Moved to RobustCloudCommand module instead of script
-        1.8.0 - Leverages ConnectCloud Module to connect to EXO if no current connection
+        ReleaseNotes ='1.8.2 - Removed an unused utility function
+        1.8.2 - Getting the token for Azure Graph now uses CloudConnect
+        1.8.1 - Moved to RobustCloudCommand module instead of script
+        1.8.0 - Leverages CloudConnect Module to connect to EXO if no current connection
         1.8.0 - Updated Help for all HawkUser cmdlets
         1.8.0 - Removed XML output for all HawkUser cmdlets
         1.7.1 - Fixed issues with Initialize-HawkGlobalObject where some switches were not defaulting to False

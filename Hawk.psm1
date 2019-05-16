@@ -17,66 +17,6 @@
 
 # ============== Utility Functions ==============
 
-# Build a user OauthToken
-Function Get-UserGraphAPIToken {
-
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$AppIDURL
-        )
-	
-    # Make sure we have a connection to msol since we needed it for this
-    $null = Test-MSOLConnection
-
-    [string]$TenantName = (Get-MsolCompanyInformation).initialdomain
-	
-    # Azure Powershell Client ID
-    $clientId = "1950a258-227b-4e31-a9cf-717495945fc2" 
-    
-    # Set redirect URI for Azure PowerShell
-    $redirectUri = "urn:ietf:wg:oauth:2.0:oob"
-
-    # Set Resource URI to Azure Service Management API
-    $resourceAppIdURI = $AppIDURL
-
-    # Set Authority to Azure AD Tenant
-    $authority = "https://login.windows.net/$TenantName"
-
-    # TEMP
-    # Read in the username of the account that can access this
-    $Username = Read-Host "Please provide the upn of the account with access to read the Azure Audit logs:"
-
-    # Create AuthenticationContext tied to Azure AD Tenant
-    $authContext = New-Object "Microsoft.IdentityModel.Clients.ActiveDirectory.AuthenticationContext" -ArgumentList $authority
-    $userid = New-Object "Microsoft.IdentityModel.Clients.ActiveDirectory.UserIdentifier" -ArgumentList $Username,"1"
-    
-    # Acquire token
-    $authResult = $authContext.AcquireToken($resourceAppIdURI, $clientId, $redirectUri,"Always",$userid)
-
-    # Return Token
-    return $authResult
-
-     <#
- 
-	.SYNOPSIS
-	Returning an Oauth Token for a given azure resource endpoint
-
-	.DESCRIPTION
-    Using the same authentication modules as msonline will generate an oauth token for a provided endpoint
-    Will use an existing connection if it is there or prompt from creds if needed
-    			
-	.OUTPUTS
-    Oauth Token
-    
-    .EXAMPLE
-    Get-UserGraphAPIToken -AppIDURL "https://graph.windows.net"
-    
-    Returns a user based token for graph.windows.net
-	
-	#>
-
-}
-
 # Get the Location of an IP using the freegeoip.net rest API
 Function Get-IPGeolocation {
 
