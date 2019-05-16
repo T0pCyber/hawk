@@ -139,8 +139,26 @@ Function Get-SimpleAdminAuditLog {
 
             # Get the alias of the User that ran the command
             [string]$user = $_.caller
+
+            # If it is null then replace with *** for admin call
             if ([string]::IsNullOrEmpty($user)) {$user = "***"}
-            else {$user = ($_.caller.split("/"))[-1]}
+            
+            # if we have 'on behalf of' then we need to do some more processing to get the right value
+            elseif ($_.caller -like "*on ehalf of*"){
+                $split = $_.caller.split("/")
+                $Start = (($Split[3].split(" "))[0]).TrimEnd('"')
+                $End = $Split[-1].trimend('"')
+
+                [string]$User = $Start + " on behalf of " + $end
+            }
+            # If there is a / in the username lests simply it
+            elseif ($_.caller -contains "/"){
+                [string]$user = ($_.caller.split("/"))[-1]
+            }
+            # If none of the above or true just pass it thru
+            else {
+                [string]$user = $_.caller
+            }
 
             # Build the command that was run
             $switches = $_.cmdletparameters

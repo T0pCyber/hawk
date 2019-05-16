@@ -7,6 +7,12 @@ Function Search-HawkTenantEXOAuditLog {
 
     Out-LogFile "Searching EXO Audit Logs" -Action 
     Out-LogFile "Searching Entire Admin Audit Log for Specific cmdlets"
+
+    #Make sure our values are null
+    $TenantInboxRules = $Null
+    $TenantSetInboxRules = $Null
+    $TenantRemoveInboxRules = $Null
+
     
     # Search for the creation of ANY inbox rules    
     Out-LogFile "Searching for ALL Inbox Rules Created in the Shell" -action
@@ -17,9 +23,33 @@ Function Search-HawkTenantEXOAuditLog {
 	
         Out-LogFile ("Found " + $TenantInboxRules.count + " Inbox Rule(s) created from PowerShell")
         $TenantInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_New_InboxRule" -csv
-        $TenantInboxRules | Out-MultipleFileType -fileprefix "New_InboxRules" -xml
+        $TenantInboxRules | Out-MultipleFileType -fileprefix "New_InboxRules" -csv
     }
-	
+    
+    # Search for the Modification of ANY inbox rules    
+    Out-LogFile "Searching for ALL Inbox Rules Modified in the Shell" -action
+    [array]$TenantSetInboxRules = Search-AdminAuditLog -Cmdlets Set-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
+        
+    # If we found anything report it and log it
+    if ($TenantSetInboxRules.count -gt 0) {
+        
+        Out-LogFile ("Found " + $TenantSetInboxRules.count + " Inbox Rule(s) created from PowerShell")
+        $TenantSetInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_Set_InboxRule" -csv
+        $TenantSetInboxRules | Out-MultipleFileType -fileprefix "Set_InboxRules" -csv
+    }
+
+    # Search for the Modification of ANY inbox rules    
+    Out-LogFile "Searching for ALL Inbox Rules Removed in the Shell" -action
+    [array]$TenantRemoveInboxRules = Search-AdminAuditLog -Cmdlets Remove-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
+            
+    # If we found anything report it and log it
+    if ($TenantRemoveInboxRules.count -gt 0) {
+            
+        Out-LogFile ("Found " + $TenantRemoveInboxRules.count + " Inbox Rule(s) created from PowerShell")
+        $TenantRemoveInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_Remove_InboxRule" -csv
+        $TenantRemoveInboxRules | Out-MultipleFileType -fileprefix "Remove_InboxRules" -csv
+    }
+    
     # Searching for interesting inbox rules
     Out-LogFile "Searching for Interesting Inbox Rules Created in the Shell" -action
     [array]$InvestigateInboxRules = Search-AdminAuditLog -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -cmdlets New-InboxRule -Parameters ForwardTo, ForwardAsAttachmentTo, RedirectTo, DeleteMessage
@@ -51,32 +81,32 @@ Function Search-HawkTenantEXOAuditLog {
             $user = ($Change.CmdletParameters | Where-Object ($_.name -eq "Identity")).value
 
             # Check the ForwardingSMTPAddresses first
-            if ([string]::IsNullOrEmpty(($Change.CmdletParameters | Where-Object {$_.name -eq "ForwardingSMTPAddress"}).value)) {}
+            if ([string]::IsNullOrEmpty(($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingSMTPAddress" }).value)) { }
             # If not null then push the email address into $output
             else {
-                [array]$Output = $Output + ($Change.CmdletParameters | Where-Object {$_.name -eq "ForwardingSMTPAddress"}) | Select-Object -Property @{Name = "UserModified"; Expression = {$user}}, @{Name = "TargetSMTPAddress"; Expression = {$_.value.split(":")[1]}}
+                [array]$Output = $Output + ($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingSMTPAddress" }) | Select-Object -Property @{Name = "UserModified"; Expression = { $user } }, @{Name = "TargetSMTPAddress"; Expression = { $_.value.split(":")[1] } }
             }
 			
             # Check ForwardingAddress
-            if ([string]::IsNullOrEmpty(($Change.CmdletParameters | Where-Object {$_.name -eq "ForwardingAddress"}).value)) {}
+            if ([string]::IsNullOrEmpty(($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value)) { }
             else {
                 # Here we get back a recipient object in EXO not an SMTP address
                 # So we need to go track down the recipient object
-                $recipient = Get-Recipient (($Change.CmdletParameters | Where-Object {$_.name -eq "ForwardingAddress"}).value) -ErrorAction SilentlyContinue
+                $recipient = Get-Recipient (($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value) -ErrorAction SilentlyContinue
 				
                 # If we can't resolve the recipient we need to log that
                 if ($null -eq $recipient) {
-                    Out-LogFile ("Unable to resolve forwarding Target Recipient " + ($Change.CmdletParameters | Where-Object {$_.name -eq "ForwardingAddress"})) -notice
+                    Out-LogFile ("Unable to resolve forwarding Target Recipient " + ($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" })) -notice
                 }
                 # If we can resolve it then we need to push the address the mail was being set to into $output
                 else {
                     # Determine the type of recipient and handle as needed to get out the SMTP address
                     Switch ($recipient.RecipientType) {
                         # For mailcontact we needed the external email address
-                        MailContact {[array]$Output += $recipient | Select-Object -Property @{Name = "UserModified"; Expression = {$user}}; @{Name = "TargetSMTPAddress"; Expression = {$_.ExternalEmailAddress.split(":")[1] }}
+                        MailContact { [array]$Output += $recipient | Select-Object -Property @{Name = "UserModified"; Expression = { $user } }; @{Name = "TargetSMTPAddress"; Expression = { $_.ExternalEmailAddress.split(":")[1] } }
                         }
                         # For all others I believe primary will work
-                        Default {[array]$Output += $recipient| Select-Object -Property @{Name = "UserModified"; Expression = {$user}}; @{Name = "TargetSMTPAddress"; Expression = {$_.PrimarySmtpAddress}}
+                        Default { [array]$Output += $recipient | Select-Object -Property @{Name = "UserModified"; Expression = { $user } }; @{Name = "TargetSMTPAddress"; Expression = { $_.PrimarySmtpAddress } }
                         }
                     }
                 }
@@ -108,7 +138,7 @@ Function Search-HawkTenantEXOAuditLog {
         Out-LogFile ("Found " + $TenantImpersonatingRoles.count + " Impersonation Roles.  Default is 1") -notice
         $TenantImpersonatingRoles | Out-MultipleFileType -fileprefix "_Investigate_Impersonation_Roles" -csv -xml -Notice
     }
-    elseif ($TenantImpersonatingRoles.count -eq 0) {}
+    elseif ($TenantImpersonatingRoles.count -eq 0) { }
     else {
         $TenantImpersonatingRoles | Out-MultipleFileType -fileprefix "Impersonation_Roles" -csv -xml
     }
@@ -128,7 +158,7 @@ Function Search-HawkTenantEXOAuditLog {
         Out-LogFile ("Found default number of Impersonation users")
         $Output | Out-MultipleFileType -fileprefix "Impersonation_Rights" -csv -xml
     }
-    else {}
+    else { }
 
 
     <#
