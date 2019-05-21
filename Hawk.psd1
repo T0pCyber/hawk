@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.8.3'
+ModuleVersion = '1.8.4'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -64,7 +64,7 @@ RequiredModules = @(
     )
 
 # Assemblies that must be loaded prior to importing this module
-RequiredAssemblies = @('Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll','Microsoft.IdentityModel.Clients.ActiveDirectory.dll')
+# RequiredAssemblies = @('Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll','Microsoft.IdentityModel.Clients.ActiveDirectory.dll')
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
 # ScriptsToProcess = @()
@@ -142,7 +142,8 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes ='1.8.3 - Added search for Set-InboxRule and Remove-InboxRule to Search-HawkTenantEXOAuditLog (Thanks Danny for feedback)
+        ReleaseNotes ='1.8.4 - Removed un-needed dependencies that were impacting functionality
+        1.8.3 - Added search for Set-InboxRule and Remove-InboxRule to Search-HawkTenantEXOAuditLog (Thanks Danny for feedback)
         1.8.3 - Fixed issue with simple audit log output when caller contained "on behalf of"
         1.8.2 - Removed an unused utility function
         1.8.2 - Getting the token for Azure Graph now uses CloudConnect
