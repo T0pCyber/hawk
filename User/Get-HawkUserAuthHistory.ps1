@@ -75,7 +75,26 @@ Function Get-HawkUserAuthHistory {
             Out-LogFile "Converting AuditData"
             $ExpandedUserLogonLogs = $null
             $ExpandedUserLogonLogs = New-Object System.Collections.ArrayList
-            $ExpandedUserLogonLogs.AddRange(($UserLogonLogs | Select-object -ExpandProperty AuditData | ConvertFrom-Json))
+            $FailedConversions = $null
+            $FailedConversions = New-Object System.Collections.ArrayList
+
+            # Process our results in a way to deal with JSON Errors
+            Foreach ($Entry in $UserLogonLogs){
+
+                try {
+                    $jsonEntry = $Entry.AuditData | ConvertFrom-Json
+                    $ExpandedUserLogonLogs.Add($jsonEntry) | Out-Null
+                }
+                catch {
+                    $FailedConversions.Add($Entry) | Out-Null
+                }
+            }
+
+            if ($null -eq $FailedConversions){}
+            else {
+                Out-LogFile ("[ERROR] - " + $FailedConversions.Count + " Entries failed JSON Conversion")
+                $FailedConversions | Out-MultipleFileType -fileprefix "Failed_Conversion_Authentication_Logs" -user $User -csv
+            }
 
             # Add IP Geo Location information to the data
             if ($ResolveIPLocations) {
@@ -112,7 +131,7 @@ Function Get-HawkUserAuthHistory {
             (Import-AzureAuthenticationLogs -JsonConvertedLogs $ExpandedUserLogonLogs) | Out-MultipleFileType -fileprefix "Converted_Authentication_Logs" -User $User -csv
 
             # Export RAW data
-            $UserLogonLogs | Out-MultipleFileType -fileprefix "Raw_Authentication_Logs" -user $User
+            $UserLogonLogs | Out-MultipleFileType -fileprefix "Raw_Authentication_Logs" -user $User -csv
 
         }
     }
