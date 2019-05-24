@@ -56,11 +56,22 @@ Function Start-HawkUserInvestigation {
     foreach ($Object in $UserArray) {
         [string]$User = $Object.UserPrincipalName
 		
-        Get-HawkUserConfiguration -User $User
-        Get-HawkUserInboxRule -User $User
-        Get-HawkUserEmailForwarding -User $User
-        Get-HawkUserAuthHistory -User $user -ResolveIPLocations
-        Get-HawkUserMailboxAuditing -User $User
+		Out-LogFile "Running Get-HawkUserConfiguration"
+		Get-HawkUserConfiguration -User $User
+		
+		Out-LogFile "Running Get-HawkUserInboxRule"
+		Get-HawkUserInboxRule -User $User
+		
+		Out-LogFile "Running Get-HawkUserEmailForwarding"
+		Get-HawkUserEmailForwarding -User $User
+		
+		Out-LogFile "Running Get-HawkUserAuthHistory"
+		Get-HawkUserAuthHistory -User $user -ResolveIPLocations
+		
+		Out-LogFile "Running Get-HawkUserMailboxAuditing"
+		Get-HawkUserMailboxAuditing -User $User
+		
+		Out-LogFile "Running Get-HawkUserAdminAudit"
         Get-HawkUserAdminAudit -User $User
     }
 }

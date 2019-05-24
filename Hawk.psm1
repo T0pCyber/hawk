@@ -720,23 +720,28 @@ Function Test-CCOConnection {
 Function Test-EXOConnection {
 
     # Check our token cache and if it will expire in less than 15 min renew the session
-    if (((Get-TokenCache | Where-Object { $_.resource -like "outlook.office365.com" }).ExpiresOn - ((get-date).AddMilliseconds(15))) -le 0) {
-        Connect-EXO
-    }
-    else {
+    $Expires = (Get-TokenCache | Where-Object { $_.resource -like "*outlook.office365.com*" }).ExpiresOn
 
-        # See if we are connected to EXO
-        try { 
-            $null = Get-OrganizationConfig -erroraction stop
-        
-        }
-        catch [System.Management.Automation.CommandNotFoundException] {
-            # Connect to EXO if we couldn't find the command
-            Out-LogFile "[ERROR] - Not Connected to Exchange Online"
-            Out-LogFile "Connecting to EXO using CloudConnect"
+    # if Expires is null we want to just move on
+    if ($null -eq $Expires) { }
+    else {
+        # If it is not null then we need to see if it is expiring soon
+        if (($Expires - ((get-date).AddMinutes(15)) -le 0)) {
+            Out-LogFile "Token Near Expiry - rebuilding EXO connection"
             Connect-EXO
         }
+    }
 
+    # In all cases make sure we are "connected" to EXO
+    try { 
+        $null = Get-OrganizationConfig -erroraction stop
+                    
+    }
+    catch [System.Management.Automation.CommandNotFoundException] {
+        # Connect to EXO if we couldn't find the command
+        Out-LogFile "Not Connected to Exchange Online"
+        Out-LogFile "Connecting to EXO using CloudConnect Module"
+        Connect-EXO
     }
 }
 
@@ -845,11 +850,13 @@ Function Test-MicrosoftIP {
 
         $Error.clear()
         # Read in the XML file from the internet
-        Out-LogFile ("Reading XML for MSFT IP Addresses https://support.content.office.net/en-us/static/O365IPAddresses.xml")
-        [xml]$msftxml = (Invoke-webRequest -Uri https://support.content.office.net/en-us/static/O365IPAddresses.xml).content
+        # Out-LogFile ("Reading XML for MSFT IP Addresses https://support.content.office.net/en-us/static/O365IPAddresses.xml")
+        # [xml]$msftxml = (Invoke-webRequest -Uri https://support.content.office.net/en-us/static/O365IPAddresses.xml).content
+
+        $MSFTJSON = (Invoke-WebRequest -uri ("https://endpoints.office.com/endpoints/Worldwide?ClientRequestId=" + (new-guid).ToString())).content | ConvertFrom-Json
 
         if ($Error.Count -gt 0) {
-            Out-Logfile "[WARNING] - Unable to retrieve XML file"
+            Out-Logfile "[WARNING] - Unable to retrieve JSON file"
             Return "Unknown"
         }
 
@@ -857,31 +864,27 @@ Function Test-MicrosoftIP {
         [array]$ipv6 = $Null
         [array]$ipv4 = $Null
 
-        # Go thru each product in the XML
-        foreach ($Product in $msftxml.products.product) {
-			
-            # For each product look thru the list of ip addresses
-            foreach ($addresslist in $Product.addresslist) {
-                # If IPv6 add to that list
-                if ($addresslist.type -eq "Ipv6") {
-                    $ipv6 += $addresslist.address
-
-                }
-                # if IPv4 add to that list
-                elseif ($addresslist.type -eq "IPv4") {
-                    $ipv4 += $addresslist.address
-                }
-                # if anything else ignore
-                else { }
-            }
+        # Put all of the IP addresses from the JSON into a simple array
+        Foreach ($Entry in $MSFTJSON) {
+            $IPList += $_.IPs
         }
 
-        # Now we need to filter out the duplicate addresses in the lists
-        $ipv6 = $ipv6 | select-object -Unique
-        $ipv4 = $ipv4 | Select-Object -Unique
+        # Throw out duplicates
+        $IPList = $IPList | Select-Object -Unique
+
+        # Add the IP Addresses into either the v4 or v6 arrays
+        Foreach ($ip in $IPList){
+            if ($ip -like "*.*"){
+                $ipv4 += $ip
+            }
+            else {
+                $ipv6 += $ip
+            }            
+        }
 
         Out-LogFile ("Found " + $ipv6.Count + " unique MSFT IPv6 address ranges")
         Out-LogFile ("Found " + $ipv4.count + " unique MSFT IPv4 address ranges")
+        
         # New up using our networking dll we need to pull these all in as network objects
         foreach ($ip in $ipv6) {
             [array]$ipv6objects += [System.Net.IPNetwork]::Parse($ip)
