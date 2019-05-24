@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.8.5'
+ModuleVersion = '1.8.6'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -142,7 +142,8 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes ='1.8.5 - Updated output from Get-HawkUserAuthHistory to remove the BASE object from the CSV
+        ReleaseNotes ='1.8.6 - Fixed issue with IP Address lookup in Get-HawkUserAuthHistory
+        1.8.5 - Updated output from Get-HawkUserAuthHistory to remove the BASE object from the CSV
         1.8.5 - Updated EXO Connection logic to renew token if it will expire in 15 minutes
         1.8.5 - Fixed issue Get-HawkUserAuthHistory failing on a single entry failing JSON conversion
         1.8.4 - Removed un-needed dependencies that were impacting functionality
