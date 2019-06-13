@@ -67,7 +67,14 @@ Function Get-HawkUserConfiguration {
 
         #Gather mailbox information
         Out-LogFile "Gathering Mailbox Information"
-        Get-Mailbox -identity $user | Out-MultipleFileType -FilePrefix "Mailbox_Info" -User $User -txt
+		$mbx = Get-Mailbox -identity $user
+		
+		# Test to see if we have an archive and include that info as well
+		if (!($null -eq $mbx.archivedatabase)){
+			Get-MailboxStatistics -identity $user -Archive | Out-MultipleFileType -FilePrefix "Mailbox_Archive_Statistics" -user $user -txt
+		}		
+		
+		$mbx | Out-MultipleFileType -FilePrefix "Mailbox_Info" -User $User -txt
         Get-MailboxStatistics -identity $user | Out-MultipleFileType -FilePrefix "Mailbox_Statistics" -User $User -txt
         Get-MailboxFolderStatistics -identity $user | Out-MultipleFileType -FilePrefix "Mailbox_Folder_Statistics" -User $User -txt
 
