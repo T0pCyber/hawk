@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.8.6'
+ModuleVersion = '1.8.7'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -96,7 +96,8 @@ NestedModules = @(
     'User\Get-HawkUserMailboxAuditing.ps1',
     'User\Get-HawkUserAdminAudit.ps1',
     'User\Get-HawkUserHiddenRule.ps1',
-    'User\Start-HawkUserInvestigation.ps1'
+    'User\Start-HawkUserInvestigation.ps1',
+    '.\user\Get-HawkUserPWNCheck.ps1'
 )
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
@@ -104,7 +105,7 @@ FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfi
 'Get-HawkTenantInboxRules','Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkUserAuthHistory','Get-HawkUserConfiguration',
 'Get-HawkUserEmailForwarding','Get-HawkUserInboxRule','Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject',
 'Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation','Start-HawkUserInvestigation',
-'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader'
+'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader','Get-HawkUserPWNCheck'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -142,7 +143,9 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes ='1.8.6 - Fixed issue with IP Address lookup in Get-HawkUserAuthHistory (Thanks Kelvin for Feedback)
+        ReleaseNotes ='1.8.7 - Mailbox information will now include archive statistics
+        1.8.7 - Added Get-HawkUserPWNCheck will check HaveIBeenPWNed to see if an email is part of a public breach
+        1.8.6 - Fixed issue with IP Address lookup in Get-HawkUserAuthHistory (Thanks Kelvin for Feedback)
         1.8.5 - Updated output from Get-HawkUserAuthHistory to remove the BASE object from the CSV
         1.8.5 - Updated EXO Connection logic to renew token if it will expire in 15 minutes
         1.8.5 - Fixed issue Get-HawkUserAuthHistory failing on a single entry failing JSON conversion
@@ -155,22 +158,6 @@ PrivateData = @{
         1.8.0 - Leverages CloudConnect Module to connect to EXO if no current connection
         1.8.0 - Updated Help for all HawkUser cmdlets
         1.8.0 - Removed XML output for all HawkUser cmdlets
-        1.7.1 - Fixed issues with Initialize-HawkGlobalObject where some switches were not defaulting to False
-        1.7.1 - Removed xml output from Get-HawkUserMailboxAuditing as part of continued output cleanup/streamlining
-        1.7.1 - Updated Help on Get-HawkUserMailboxAuditing
-        1.7.1 - Get-HawkUserMailboxAuditing now searches the Mailbox Audit Log as well as the Unified Audit Log
-        1.7.0 - Rework of Initialize-HawkGlobalObject to now accept swtiches to facilitate scripting Hawk Commands
-        1.7.0 - Further help updates
-        1.7.0 - Moved Initialize-HawkGlobalObject into its own ps1 file in the General Folder
-        1.6.11 - Get-HawkMessageHeader removed HTML output outputs to CSV now
-        1.6.11 - Started working thru help documentation
-        1.6.9 - Corrected an issue that would cause excessive memory usage on Get-HawkTenantAzureAuthenticationLogs
-        1.6.5 - Updates to Get-HawkTenantAzureAuthenticationLogs to better diagnose issues (addtional)
-        1.6.4 - Updates to Get-HawkTenantAzureAuthenticationLogs to better diagnose issues
-        1.6.2 - Updated Help on Get-HawkUserHiddenRule with what to do with the output
-        1.6.2 - Fixed issue with output of Get-HawkUserHiddenRule to output ID and priority into a text file
-        1.6.2 - Updated name of Get-HawkUserHiddenRule to be in line with naming convention
-        1.6.1 - Added Azure AppInsight integration
         '
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
