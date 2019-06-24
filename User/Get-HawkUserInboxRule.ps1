@@ -92,7 +92,7 @@ Function Get-HawkUserInboxRule {
         # Get any Sweep Rules
         # Suggested by Adonis Sardinas
         Out-LogFile ("Gathering Sweep Rules: " + $User) -action
-        $SweepRules = Get-SweepRules -Mailbox $User
+        $SweepRules = Get-SweepRule -Mailbox $User
 
         if ($null -eq $SweeRules) { Out-LogFile "No Sweep Rules found" }
         else {

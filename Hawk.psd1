@@ -143,7 +143,9 @@ PrivateData = @{
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
-        ReleaseNotes ='1.8.7 - Mailbox information will now include archive statistics
+        ReleaseNotes ='
+        1.8.8 - Fixed issue where the wrong cmdlet was being called for Get-SweepRule
+        1.8.7 - Mailbox information will now include archive statistics
         1.8.7 - Added Get-HawkUserPWNCheck will check HaveIBeenPWNed to see if an email is part of a public breach
         1.8.6 - Fixed issue with IP Address lookup in Get-HawkUserAuthHistory (Thanks Kelvin for Feedback)
         1.8.5 - Updated output from Get-HawkUserAuthHistory to remove the BASE object from the CSV
