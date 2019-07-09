@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.8.7'
+ModuleVersion = '1.8.8'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -144,6 +144,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.8.8 - Updated required module versions to correct some connection issues
         1.8.8 - Fixed issue where the wrong cmdlet was being called for Get-SweepRule
         1.8.7 - Mailbox information will now include archive statistics
         1.8.7 - Added Get-HawkUserPWNCheck will check HaveIBeenPWNed to see if an email is part of a public breach
