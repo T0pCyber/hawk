@@ -90,7 +90,7 @@ Function Get-HawkUserAuthHistory {
                 }
             }
 
-            if ($null -eq $FailedConversions){}
+            if ($FailedConversions -le 0){}
             else {
                 Out-LogFile ("[ERROR] - " + $FailedConversions.Count + " Entries failed JSON Conversion")
                 $FailedConversions | Out-MultipleFileType -fileprefix "Failed_Conversion_Authentication_Logs" -user $User -csv
