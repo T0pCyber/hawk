@@ -753,16 +753,16 @@ Function Test-MSOLConnection {
 		
         # Write to the screen if we don't have a log file path yet
         if ([string]::IsNullOrEmpty($Hawk.Logfile)) {
-            Write-Output "[ERROR] - Please connect to MSOL prior to running this cmdlet"
-            Write-Output "https://docs.microsoft.com/en-us/powershell/module/msonline/?view=azureadps-1.0#msonline `n"
+            Write-Output "Connecting to MSOLService using MSOnline Module"
         }
         # Otherwise output to the log file
         else {
-            Out-LogFile "[ERROR] - Please connect to MSOL prior to running this cmdlet"
-            Out-LogFile "https://docs.microsoft.com/en-us/powershell/module/msonline/?view=azureadps-1.0#msonline `n"
+            Out-LogFile "Connecting to MSOLService using MSOnline Module"
         }
-		
-        break
+
+        # Connect to the MSOl Service (This should have been installed with the CloudConnect Module)
+        Connect-MsolService
+
     }
 }
 
