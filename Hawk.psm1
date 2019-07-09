@@ -873,8 +873,8 @@ Function Test-MicrosoftIP {
         $IPList = $IPList | Select-Object -Unique
 
         # Add the IP Addresses into either the v4 or v6 arrays
-        Foreach ($ip in $IPList){
-            if ($ip -like "*.*"){
+        Foreach ($ip in $IPList) {
+            if ($ip -like "*.*") {
                 $ipv4 += $ip
             }
             else {
