@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.10.0'
+ModuleVersion = '1.10.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -147,6 +147,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.10.1 - Corrected issue with IP address lookup code that resulted in extensive errors
         1.10.0 - Updated Test-MSOLConnection to automatically connect using Connect-MSOLService
         1.9.0 - Checked in to pull requests
         1.9.0 - Added Get-HawkUserAutoReply to pull autoreply information (thx chrish012)
