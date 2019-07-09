@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.8.8'
+ModuleVersion = '1.9.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -147,6 +147,9 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.9.0 - Checked in to pull requests
+        1.9.0 - Added Get-HawkUserAutoReply to pull autoreply information (thx chrish012)
+        1.9.0 - Fix for mailbox audit logs and non us dates (thx imcfarla2003)
         1.8.8 - Updated required module versions to correct some connection issues
         1.8.8 - Fixed issue where the wrong cmdlet was being called for Get-SweepRule
         1.8.7 - Mailbox information will now include archive statistics

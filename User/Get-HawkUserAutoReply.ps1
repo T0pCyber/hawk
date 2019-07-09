@@ -29,7 +29,7 @@ Function Get-HawkUserAutoReply {
         # Output Enabled AutoReplyConfiguration to a generic txt
         else {
 
-            $AutoReply | Out-MultipleFileType -FilePreFix "AutoReply" -User $user -txt -xml
+            $AutoReply | Out-MultipleFileType -FilePreFix "AutoReply" -User $user -txt
         }
     }
 
