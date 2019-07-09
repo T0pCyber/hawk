@@ -63,7 +63,7 @@ function Get-HawkUserMailboxAuditing {
     
         do {
             # Get the end of the Range we are going to gather data for
-            [string]$RangeEnd = get-date ((Get-date ($RangeStart)).AddDays(5)) -UFormat %m/%d/%Y
+            [string]$RangeEnd = get-date ((Get-date ([datetime]::ParseExact($RangeStart, "MM/dd/yyyy", $null))).AddDays(5)) -UFormat %m/%d/%Y
     
             # Do the actual search
             Out-LogFile ("Searching Range " + $RangeStart + " To " + $RangeEnd)
