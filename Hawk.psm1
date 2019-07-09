@@ -866,7 +866,7 @@ Function Test-MicrosoftIP {
 
         # Put all of the IP addresses from the JSON into a simple array
         Foreach ($Entry in $MSFTJSON) {
-            $IPList += $_.IPs
+            $IPList += $Entry.IPs
         }
 
         # Throw out duplicates
