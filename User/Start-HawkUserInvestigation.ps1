@@ -1,7 +1,35 @@
 # String together the hawk user functions to pull data for a single user
 Function Start-HawkUserInvestigation {
+
+    param
+    (
+        [Parameter(Mandatory = $true)]
+        [array]$UserPrincipalName
+    )
+
+	Out-LogFile "Investigating Users"
+	Send-AIEvent -Event "CmdRun"
+
+	# Pull the tenent configuration
+	Get-HawkTenantConfiguration
+
+    # Verify our UPN input
+    [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
+
+    foreach ($Object in $UserArray) {
+        [string]$User = $Object.UserPrincipalName
+
+        Get-HawkUserConfiguration -User $User
+        Get-HawkUserInboxRule -User $User
+		Get-HawkUserEmailForwarding -User $User
+		Get-HawkUserAutoReply -User $User
+        Get-HawkUserAuthHistory -User $user -ResolveIPLocations
+		Get-HawkUserMailboxAuditing -User $User
+		Get-HawkUserAdminAudit -User $User
+    }
+
     <#
- 
+
 	.SYNOPSIS
 	Gathers common data about a provided user.
 
@@ -14,9 +42,11 @@ Function Start-HawkUserInvestigation {
 	Get-HawkUserConfiguration           Basic User information
 	Get-HawkUserInboxRule               Searches the user for Inbox Rules
 	Get-HawkUserEmailForwarding         Looks for email forwarding configured on the user
+	Get-HawkUserAutoReply				Looks for enabled AutoReplyConfiguration
 	Get-HawkuserAuthHistory             Searches the unified audit log for users logons
 	Get-HawkUserMailboxAuditing         Searches the unified audit log for mailbox auditing information
 	Get-HawkUserAdminAudit				Searches the EXO Audit logs for any commands that were run against the provided user object.	
+
 
 	.PARAMETER UserPrincipalName
 	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
@@ -35,7 +65,7 @@ Function Start-HawkUserInvestigation {
 	Start-HawkUserInvestigation -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
 
 	Runs all Get-HawkUser* cmdlets against all users who have "C-Level" set in CustomAttribute1
-	
+
 	#>
 
     param

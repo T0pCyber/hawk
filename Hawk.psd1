@@ -76,6 +76,7 @@ RequiredModules = @(
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
+
 NestedModules = @(
     'General\Initialize-HawkGlobalObject.ps1',
     'Message\Get-HawkMessageHeader.ps1',
@@ -97,7 +98,8 @@ NestedModules = @(
     'User\Get-HawkUserAdminAudit.ps1',
     'User\Get-HawkUserHiddenRule.ps1',
     'User\Start-HawkUserInvestigation.ps1',
-    '.\user\Get-HawkUserPWNCheck.ps1'
+    'User\Get-HawkUserPWNCheck.ps1',
+    'User\Get-HawkUserAutoReply.ps1'
 )
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
@@ -105,7 +107,8 @@ FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfi
 'Get-HawkTenantInboxRules','Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkUserAuthHistory','Get-HawkUserConfiguration',
 'Get-HawkUserEmailForwarding','Get-HawkUserInboxRule','Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject',
 'Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation','Start-HawkUserInvestigation',
-'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader','Get-HawkUserPWNCheck'
+'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader','Get-HawkUserPWNCheck','Get-HawkUserAutoReply'
+
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -176,4 +179,3 @@ HelpInfoURI = 'https://github.com/Canthv0/hawk/tree/master/Help'
 # DefaultCommandPrefix = ''
 
 }
-
