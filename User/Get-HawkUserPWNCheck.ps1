@@ -5,7 +5,7 @@ Function Get-HawkUserPWNCheck {
 	Checks an email address against haveibeenpwned.com
 
 	.DESCRIPTION
-	Checks a single 
+	Checks a single email address against HaveIBeenPwned. Note this will require an API key soon
 
 	.PARAMETER Email
     Accepts since EMail address or array of Email address strings.
@@ -37,11 +37,11 @@ Function Get-HawkUserPWNCheck {
         $uriEncodeEmail = [uri]::EscapeDataString($($user))
 
         # Build and invoke the URL
-        $InvokeURL = 'https://haveibeenpwned.com/api/v2/breachedaccount/' + $uriEncodeEmail -userAgent 'Hawk'
+        $InvokeURL = 'https://haveibeenpwned.com/api/v2/breachedaccount/' + $uriEncodeEmail
         $Error.clear()
 
         try {
-            $Result = Invoke-WebRequest $InvokeURL -ErrorAction Stop
+            $Result = Invoke-WebRequest $InvokeURL -userAgent 'Hawk' -ErrorAction Stop
         }
         catch {
             switch ($Error[0].exception.response.statuscode) {
