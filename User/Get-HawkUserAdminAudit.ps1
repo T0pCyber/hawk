@@ -50,7 +50,7 @@ Function Get-HawkUserAdminAudit {
         if ($UserChanges.Count -gt 0) {
             Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
             $UserChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -user $User
-            $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -user $User
+            $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -user $User
         }
         # Otherwise report no results found
         else {
