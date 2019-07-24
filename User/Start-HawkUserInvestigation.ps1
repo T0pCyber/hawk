@@ -68,12 +68,6 @@ Function Start-HawkUserInvestigation {
 
 	#>
 
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [array]$UserPrincipalName
-    )
-
     Out-LogFile "Investigating Users"
     Send-AIEvent -Event "CmdRun"
 
