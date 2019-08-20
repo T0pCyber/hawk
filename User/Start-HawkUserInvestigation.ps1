@@ -19,6 +19,7 @@ Function Start-HawkUserInvestigation {
 	Get-HawkuserAuthHistory             Searches the unified audit log for users logons
 	Get-HawkUserMailboxAuditing         Searches the unified audit log for mailbox auditing information
 	Get-HawkUserAdminAudit				Searches the EXO Audit logs for any commands that were run against the provided user object.	
+	Get-HawkUserMessageTrace			Pulls the email sent by the user in the last 7 days.
 
 
 	.PARAMETER UserPrincipalName
@@ -81,6 +82,9 @@ Function Start-HawkUserInvestigation {
         Get-HawkUserMailboxAuditing -User $User
 			
         Out-LogFile "Running Get-HawkUserAdminAudit"
-        Get-HawkUserAdminAudit -User $User
+		Get-HawkUserAdminAudit -User $User
+		
+		Out-LogFile "Running Get-HawkUserMessageTrace"
+		Get-HawkUserMessageTrace -user $User
     }
 }

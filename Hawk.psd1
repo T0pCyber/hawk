@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.10.1'
+ModuleVersion = '1.10.2'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -147,6 +147,11 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.11.0 - Added Get-HawkUserMessageTrace to Start-HawkUserInvestigation
+        1.11.0 - Added Get-HawkUserMessageTrace to pull all email sent by a user in the last 7 days
+        1.10.2 - Fixed issue with Start-HawkUserInvestigation where there were duplicate parameters (TheSleepingFox)
+        1.10.2 - Fixed Issue with Get-HawkUserAdminAudit log where an output parameter was missing (TheSleepingFox) 
+        1.10.2 - Get-HawkUserPWNCheck is working for now, site is going to move to an API key so updates will need to be made in the future. (Absoblogginlutely)
         1.10.1 - Corrected issue with IP address lookup code that resulted in extensive errors
         1.10.0 - Updated Test-MSOLConnection to automatically connect using Connect-MSOLService
         1.9.0 - Checked in to pull requests
