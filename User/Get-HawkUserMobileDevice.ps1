@@ -2,22 +2,26 @@ Function Get-HawkUserMobileDevice {
     <#
  
 	.SYNOPSIS
-	Pull that last 7 days of message trace data for the specified user.
+	Gathers mobile devices that are connected to the account
 
 	.DESCRIPTION
-    Pulls the basic message trace data for the specified user.
-    Can only pull the last 7 days as that is all we keep in get-messagetrace
+    Pulls all mobile devices attached to them mailbox using get-mobiledevice
 
-    Further investigation will require Start-HistoricalSearch
+    If any devices had their first sync inside of the investigation window it will flag them.
+    Investigator should follow up on these devices
 
 	.PARAMETER UserPrincipalName
 	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
 
 	.OUTPUTS
 	
-	File: Message_Trace.csv
+	File: MobileDevices.csv
 	Path: \<User>
-	Description: Output of Get-MessageTrace -Sender <primarysmtpaddress>
+    Description: All mobile devices attached to the mailbox
+    
+    File: _Investigate_MobileDevice.csv
+    Path: \<User>
+    Descriptoin: Any devices that were found to have their first sync inside of the investigation window
 	
 	.EXAMPLE
 
@@ -55,10 +59,13 @@ Function Get-HawkUserMobileDevice {
         else {
             Out-Logfile ("Found " + $MobileDevices.count + " Devices")
 
+            # Convert the string date into a date object
+            $StartDate = Get-date $Hawk.StartDate
+
             # Check each device to see if it was NEW
             # If so flag it for investigation
             foreach ($Device in $MobileDevices){
-                if ($Device.FirstSyncTime -gt $Hawk.EndDate){
+                if ($Device.FirstSyncTime -gt $StartDate){
                     Out-Logfile ("Device found that was first synced inside investigation window") -notice
                     Out-LogFile ("DeviceID: " + $Device.DeviceID) -notice
                     $Device | Out-MultipleFileType -FilePreFix "_Investigate_MobileDevice" -user $user -csv -append -Notice
