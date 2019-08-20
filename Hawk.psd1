@@ -150,7 +150,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
-        1.13.0 - Files output to the user directory now contain _<user> this is to allow excel to open multiple CSV files with the "same" name
+        1.13.0 - Files output to the user directory now contain _<user> this is to allow excel to open multiple CSV files with the "same" name (Suggestion from Absoblogginlutely)
         1.12.1 - Added Get-HawkUserMobileDevices to Start-HawkUserInvestigation
         1.12.0 - Added Get-HawkUserMobileDevices to gather mobile devices and flag devices to investigate
         1.11.0 - Added Get-HawkUserMessageTrace to Start-HawkUserInvestigation
@@ -163,23 +163,6 @@ PrivateData = @{
         1.9.0 - Checked in to pull requests
         1.9.0 - Added Get-HawkUserAutoReply to pull autoreply information (thx chrish012)
         1.9.0 - Fix for mailbox audit logs and non us dates (thx imcfarla2003)
-        1.8.8 - Updated required module versions to correct some connection issues
-        1.8.8 - Fixed issue where the wrong cmdlet was being called for Get-SweepRule
-        1.8.7 - Mailbox information will now include archive statistics
-        1.8.7 - Added Get-HawkUserPWNCheck will check HaveIBeenPWNed to see if an email is part of a public breach
-        1.8.6 - Fixed issue with IP Address lookup in Get-HawkUserAuthHistory (Thanks Kelvin for Feedback)
-        1.8.5 - Updated output from Get-HawkUserAuthHistory to remove the BASE object from the CSV
-        1.8.5 - Updated EXO Connection logic to renew token if it will expire in 15 minutes
-        1.8.5 - Fixed issue Get-HawkUserAuthHistory failing on a single entry failing JSON conversion
-        1.8.4 - Removed un-needed dependencies that were impacting functionality
-        1.8.3 - Added search for Set-InboxRule and Remove-InboxRule to Search-HawkTenantEXOAuditLog (Thanks Danny for feedback)
-        1.8.3 - Fixed issue with simple audit log output when caller contained "on behalf of"
-        1.8.2 - Removed an unused utility function
-        1.8.2 - Getting the token for Azure Graph now uses CloudConnect
-        1.8.1 - Moved to RobustCloudCommand module instead of script
-        1.8.0 - Leverages CloudConnect Module to connect to EXO if no current connection
-        1.8.0 - Updated Help for all HawkUser cmdlets
-        1.8.0 - Removed XML output for all HawkUser cmdlets
         '
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
