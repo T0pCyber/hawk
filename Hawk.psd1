@@ -100,7 +100,8 @@ NestedModules = @(
     'User\Start-HawkUserInvestigation.ps1',
     'User\Get-HawkUserPWNCheck.ps1',
     'User\Get-HawkUserAutoReply.ps1',
-    'User\Get-HawkUserMessageTrace.ps1'
+    'User\Get-HawkUserMessageTrace.ps1',
+    'User\Get-HawkUserMobileDevice.ps1'
 )
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
@@ -109,7 +110,7 @@ FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfi
 'Get-HawkUserEmailForwarding','Get-HawkUserInboxRule','Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject',
 'Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation','Start-HawkUserInvestigation',
 'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader','Get-HawkUserPWNCheck','Get-HawkUserAutoReply',
-'Get-HawkUserMessageTrace'
+'Get-HawkUserMessageTrace','Get-HawkUserMobileDevice'
 
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
