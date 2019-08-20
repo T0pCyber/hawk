@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.12.0'
+ModuleVersion = '1.12.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -150,6 +150,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.12.1 - Added Get-HawkUserMobileDevices to Start-HawkUserInvestigation
         1.12.0 - Added Get-HawkUserMobileDevices to gather mobile devices and flag devices to investigate
         1.11.0 - Added Get-HawkUserMessageTrace to Start-HawkUserInvestigation
         1.11.0 - Added Get-HawkUserMessageTrace to pull all email sent by a user in the last 7 days (Suggestion from Absoblogginglutely)
