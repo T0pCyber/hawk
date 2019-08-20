@@ -1,6 +1,7 @@
 # String together the hawk user functions to pull data for a single user
 Function Start-HawkUserInvestigation {
-	    <#
+
+    <#
 
 	.SYNOPSIS
 	Gathers common data about a provided user.
@@ -46,27 +47,40 @@ Function Start-HawkUserInvestigation {
         [array]$UserPrincipalName
     )
 
-	Out-LogFile "Investigating Users"
-	Send-AIEvent -Event "CmdRun"
+    Out-LogFile "Investigating Users"
+    Send-AIEvent -Event "CmdRun"
 
-	# Pull the tenent configuration
-	Get-HawkTenantConfiguration
+    # Pull the tenent configuration
+    Get-HawkTenantConfiguration
 
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
     foreach ($Object in $UserArray) {
         [string]$User = $Object.UserPrincipalName
-
-		Get-HawkTenantConfiguration
-		Get-HawkUserConfiguration -User $User
+		
+        Out-LogFile "Running Get-HawkUserConfiguration"
+        Get-HawkTenantConfiguration
+			
+        Out-LogFile "Running Get-HawkUserConfiguration"
+        Get-HawkUserConfiguration -User $User
+			
+        Out-LogFile "Running Get-HawkUserInboxRule"
         Get-HawkUserInboxRule -User $User
+			
+        Out-LogFile "Running Get-HawkUserEmailForwarding"
 		Get-HawkUserEmailForwarding -User $User
+		
+		Out-LogFile "Running Get-HawkUserAutoReply"
 		Get-HawkUserAutoReply -User $User
+			
+        Out-LogFile "Running Get-HawkUserAuthHistory"
         Get-HawkUserAuthHistory -User $user -ResolveIPLocations
-		Get-HawkUserMailboxAuditing -User $User
-		Get-HawkUserAdminAudit -User $User
+			
+        Out-LogFile "Running Get-HawkUserMailboxAuditing"
+        Get-HawkUserMailboxAuditing -User $User
+			
+        Out-LogFile "Running Get-HawkUserAdminAudit"
+        Get-HawkUserAdminAudit -User $User
     }
-
-
 }
