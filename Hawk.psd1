@@ -99,7 +99,8 @@ NestedModules = @(
     'User\Get-HawkUserHiddenRule.ps1',
     'User\Start-HawkUserInvestigation.ps1',
     'User\Get-HawkUserPWNCheck.ps1',
-    'User\Get-HawkUserAutoReply.ps1'
+    'User\Get-HawkUserAutoReply.ps1',
+    'User\Get-HawkUserMessageTrace.ps1'
 )
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
@@ -107,7 +108,8 @@ FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfi
 'Get-HawkTenantInboxRules','Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkUserAuthHistory','Get-HawkUserConfiguration',
 'Get-HawkUserEmailForwarding','Get-HawkUserInboxRule','Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject',
 'Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation','Start-HawkUserInvestigation',
-'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader','Get-HawkUserPWNCheck','Get-HawkUserAutoReply'
+'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader','Get-HawkUserPWNCheck','Get-HawkUserAutoReply',
+'Get-HawkUserMessageTrace'
 
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -148,7 +150,7 @@ PrivateData = @{
         # ReleaseNotes of this module
         ReleaseNotes ='
         1.11.0 - Added Get-HawkUserMessageTrace to Start-HawkUserInvestigation
-        1.11.0 - Added Get-HawkUserMessageTrace to pull all email sent by a user in the last 7 days
+        1.11.0 - Added Get-HawkUserMessageTrace to pull all email sent by a user in the last 7 days (Suggestion from Absoblogginglutely)
         1.10.2 - Fixed issue with Start-HawkUserInvestigation where there were duplicate parameters (TheSleepingFox)
         1.10.2 - Fixed Issue with Get-HawkUserAdminAudit log where an output parameter was missing (TheSleepingFox) 
         1.10.2 - Get-HawkUserPWNCheck is working for now, site is going to move to an API key so updates will need to be made in the future. (Absoblogginlutely)

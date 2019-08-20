@@ -3,43 +3,30 @@ Function Get-HawkUserMessageTrace {
     <#
  
 	.SYNOPSIS
-	Pulls inbox rules for the specified user.
+	Pull that last 7 days of message trace data for the specified user.
 
 	.DESCRIPTION
-	Gathers inbox rules for the provided uers.
-	Looks for rules that forward or delete email and flag them for follow up
+    Pulls the basic message trace data for the specified user.
+    Can only pull the last 7 days as that is all we keep in get-messagetrace
+
+    Further investigation will require Start-HistoricalSearch
 
 	.PARAMETER UserPrincipalName
 	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
 
 	.OUTPUTS
 	
-	File: _Investigate_InboxRules.csv
+	File: Message_Trace.csv
 	Path: \<User>
-	Description: Inbox rules that delete or forward messages.
-
-	File: InboxRules.csv
-	Path: \<User>
-	Description: All inbox rules that were found for the user.
-
-	File: All_InboxRules.csv
-	Path: \
-	Description: All users inbox rules.
+	Description: Output of Get-MessageTrace -Sender <primarysmtpaddress>
 	
 	.EXAMPLE
 
-	Get-HawkUserInboxRule -UserPrincipalName user@contoso.com
+	Get-HawkUserMessageTrace -UserPrincipalName user@contoso.com
 
-	Pulls all inbox rules for user@contoso.com and looks for Investigate rules.
+	Gets the message trace for user@contoso.com for the last 7 days
 
-	.EXAMPLE
-
-	Get-HawkUserInboxRule -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
-
-	Gathers inbox rules for all users who have "C-Level" set in CustomAttribute1
-
-	
-    #>
+	#>
     
     param
     (
