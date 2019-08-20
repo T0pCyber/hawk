@@ -593,7 +593,12 @@ Function Out-MultipleFileType {
         }
         else {
             $path = join-path $Hawk.filepath $user
+            
+            # Set a bool so we know this is a user output
             [bool]$UserOutput = $true
+            # Build short name of user so that it is easier to read
+            [string]$ShortUser = ($User.split('@'))[0]
+
             # Test the path if it is there do nothing otherwise create it
             if (test-path $path) { }
             else {
@@ -629,7 +634,7 @@ Function Out-MultipleFileType {
 
                 # Build the file name and write it out
                 if ($UserOutput) {
-                    $filename = Join-Path $xmlpath ($FilePrefix + "_" + $User + ".xml")                    
+                    $filename = Join-Path $xmlpath ($FilePrefix + "_" + $ShortUser + ".xml")                    
                 }
                 else {
                     $filename = Join-Path $xmlPath ($FilePrefix + ".xml")
@@ -647,7 +652,7 @@ Function Out-MultipleFileType {
             if ($csv -eq $true) {
                 # Build the file name
                 if ($UserOutput) {
-                    $filename = Join-Path $Path ($FilePrefix + "_" + $User + ".csv")
+                    $filename = Join-Path $Path ($FilePrefix + "_" + $ShortUser + ".csv")
                 }
                 else {
                     $filename = Join-Path $Path ($FilePrefix + ".csv")
@@ -676,7 +681,7 @@ Function Out-MultipleFileType {
             if ($txt -eq $true) {
                 # Build the file name
                 if ($UserOutput) {
-                    $filename = Join-Path $Path ($FilePrefix + "_" + $User + ".txt")
+                    $filename = Join-Path $Path ($FilePrefix + "_" + $ShortUser + ".txt")
                 }
                 else {
                     $filename = Join-Path $Path ($FilePrefix + ".txt")
