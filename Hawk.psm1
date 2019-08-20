@@ -593,6 +593,7 @@ Function Out-MultipleFileType {
         }
         else {
             $path = join-path $Hawk.filepath $user
+            [bool]$UserOutput = $true
             # Test the path if it is there do nothing otherwise create it
             if (test-path $path) { }
             else {
@@ -627,7 +628,12 @@ Function Out-MultipleFileType {
                 }
 
                 # Build the file name and write it out
-                $filename = Join-Path $xmlPath ($FilePrefix + ".xml")
+                if ($UserOutput) {
+                    $filename = Join-Path $xmlpath ($FilePrefix + "_" + $User + ".xml")                    
+                }
+                else {
+                    $filename = Join-Path $xmlPath ($FilePrefix + ".xml")
+                }
                 Out-LogFile ("Writing Data to " + $filename)
 
                 # Output our objects to clixml
@@ -640,7 +646,12 @@ Function Out-MultipleFileType {
             # Output CSV file
             if ($csv -eq $true) {
                 # Build the file name
-                $filename = Join-Path $Path ($FilePrefix + ".csv")
+                if ($UserOutput) {
+                    $filename = Join-Path $Path ($FilePrefix + "_" + $User + ".csv")
+                }
+                else {
+                    $filename = Join-Path $Path ($FilePrefix + ".csv")
+                }              
 				
                 # If we have -append then append the data
                 if ($append) {
@@ -664,7 +675,12 @@ Function Out-MultipleFileType {
             # Output Text files
             if ($txt -eq $true) {
                 # Build the file name
-                $filename = Join-Path $Path ($FilePrefix + ".txt")
+                if ($UserOutput) {
+                    $filename = Join-Path $Path ($FilePrefix + "_" + $User + ".txt")
+                }
+                else {
+                    $filename = Join-Path $Path ($FilePrefix + ".txt")
+                }              
 				
                 # If we have -append then append the data
                 if ($Append) {

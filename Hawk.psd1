@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.12.1'
+ModuleVersion = '1.13.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -150,6 +150,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.13.0 - Files output to the user directory now contain _<user> this is to allow excel to open multiple CSV files with the "same" name
         1.12.1 - Added Get-HawkUserMobileDevices to Start-HawkUserInvestigation
         1.12.0 - Added Get-HawkUserMobileDevices to gather mobile devices and flag devices to investigate
         1.11.0 - Added Get-HawkUserMessageTrace to Start-HawkUserInvestigation
