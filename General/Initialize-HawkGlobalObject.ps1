@@ -206,12 +206,6 @@ Function Initialize-HawkGlobalObject {
 
     if (($null -eq (Get-Variable -Name Hawk -ErrorAction SilentlyContinue)) -or ($Force -eq $true) -or ($null -eq $Hawk)) {
 
-        # Setup Applicaiton insights
-        New-ApplicationInsight
-
-        # Test if we have a connection to msol
-        Test-MSOLConnection
-
         ### Checking for Updates ###
         # If we are skipping the update log it
         if ($SkipUpdate) {
@@ -221,6 +215,12 @@ Function Initialize-HawkGlobalObject {
         else {
             Update-HawkModule
         }
+        
+        # Setup Applicaiton insights
+        New-ApplicationInsight
+
+        # Test if we have a connection to msol
+        Test-MSOLConnection
 
         # If the global variable Hawk doesn't exist or we have -force then set the variable up
         Write-Information "Setting Up initial Hawk environment variable"

@@ -88,6 +88,6 @@ Function Start-HawkUserInvestigation {
 		Get-HawkUserMessageTrace -user $User
 
 		Out-LogFile "Running Get-HawkUserMobileDevices"
-		Get-HawkUserMobileDevices -user $User
+		Get-HawkUserMobileDevice -user $User
     }
 }
