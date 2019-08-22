@@ -298,7 +298,7 @@ Function Initialize-HawkGlobalObject {
         Write-Information "Setting up Global Hawk environment variable`n"
         New-Variable -Name Hawk -Scope Global -value $Output -Force
         Out-LogFile "Global Variable Configured"
-        Out-LogFile ("Version " + (Get-Module Hawk).version)
+        Out-LogFile ("*** Version " + (Get-Module Hawk).version + " ***")
         Out-LogFile $Hawk
 
         #### End of IF
