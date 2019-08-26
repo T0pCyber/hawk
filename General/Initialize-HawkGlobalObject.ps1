@@ -49,9 +49,9 @@ Function Initialize-HawkGlobalObject {
 
     param
     (
-        [switch]$Force=$false,
-        [switch]$IAgreeToTheEula=$false,
-        [switch]$SkipUpdate=$false,
+        [switch]$Force = $false,
+        [switch]$IAgreeToTheEula = $false,
+        [switch]$SkipUpdate = $false,
         [int]$DaysToLookBack,
         [string]$FilePath
     )
@@ -206,6 +206,9 @@ Function Initialize-HawkGlobalObject {
 
     if (($null -eq (Get-Variable -Name Hawk -ErrorAction SilentlyContinue)) -or ($Force -eq $true) -or ($null -eq $Hawk)) {
 
+        # Setup Applicaiton insights
+        New-ApplicationInsight
+
         ### Checking for Updates ###
         # If we are skipping the update log it
         if ($SkipUpdate) {
@@ -216,9 +219,6 @@ Function Initialize-HawkGlobalObject {
             Update-HawkModule
         }
         
-        # Setup Applicaiton insights
-        New-ApplicationInsight
-
         # Test if we have a connection to msol
         Test-MSOLConnection
 

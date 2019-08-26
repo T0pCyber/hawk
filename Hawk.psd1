@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.13.3'
+ModuleVersion = '1.13.4'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -150,6 +150,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.13.4 - Changed initilization order so that application insights is starting first
         1.13.3 - Fixed a Recursion with the upgrade funcationality.  If 1.13.2 was install a MANUAL update to 1.13.3 will be required. Update-Module Hawk
         1.13.2 - Fixed automatic update logic to properly update when a revision occurs
         1.13.2 - Impoved version reporting to log file
