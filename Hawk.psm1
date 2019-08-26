@@ -1021,6 +1021,7 @@ Function Update-HawkModule {
             Write-Output "Checking for latest version online"
             $onlineversion = Find-Module -name Hawk -erroraction silentlycontinue
             $Localversion = (Get-Module Hawk | Sort-Object -Property Version -Descending)[0]
+            Write-Output ("Found Version " + $onlineversion.version + " Online")
 			
             if ($null -eq $onlineversion){
                 Write-Output "[ERROR] - Unable to check Hawk version in Gallery"
