@@ -55,6 +55,18 @@ Function Get-IPGeolocation {
     # Check the global IP cache and see if we already have the IP there
     if ($IPLocationCache.ip -contains $IPAddress) {
         return ($IPLocationCache | Where-Object { $_.ip -eq $IPAddress } )
+        Write-Verbose ("IP Cache Hit: " + [string]$IPAddress)
+    }
+    elseif ($IPAddress -eq "<null>"){
+        write-Verbose ("Null IP Provided: " + $IPAddress)
+                $hash = @{
+                IP               = $IPAddress
+                CountryName      = "NULL IP"
+                Continent        = "Unknown"
+                ContinentName    = "Unknown"
+                City             = "Unknown"
+                KnownMicrosoftIP = "Unknown"
+            }
     }
     # If not then we need to look it up and populate it into the cache
     else {
