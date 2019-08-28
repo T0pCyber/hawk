@@ -34,10 +34,10 @@ Function Search-HawkTenantActivityByIP {
         # Expand out the Data and convert from JSON
         [array]$ipeventsexpanded = $ipevents | Select-object -ExpandProperty AuditData | ConvertFrom-Json
         Out-LogFile ("Found " + $ipeventsexpanded.count + " related to provided IP" )
-        $ipeventsexpanded | Out-MultipleFileType -FilePrefix "All_Events" -csv -xml -User $DirectoryName
+        $ipeventsexpanded | Out-MultipleFileType -FilePrefix "All_Events" -csv -User $DirectoryName
 
         # Get the logon events that were a success
-        [array]$successipevents = $ipeventsexpanded | Where-Object {$_.ResultStatus -eq "success"}
+        [array]$successipevents = $ipeventsexpanded | Where-Object { $_.ResultStatus -eq "success" }
         Out-LogFile ("Found " + $successipevents.Count + " Successful logons related to provided IP")
         $successipevents | Out-MultipleFileType -FilePrefix "Success_Events" -csv -User $DirectoryName
 
@@ -46,9 +46,14 @@ Function Search-HawkTenantActivityByIP {
         Out-LogFile ("IP " + $ipaddress + " has tried to access " + $uniqueuserlogons.count + " users") -notice
         $uniqueuserlogons | Out-MultipleFileType -FilePrefix "Unique_Users_Attempted" -csv -User $DirectoryName -Notice
 
-        [array]$uniqueuserlogonssuccess = Select-UniqueObject -ObjectArray $successipevents -Property "UserID"
-        Out-LogFile ("IP " + $IpAddress + " SUCCESSFULLY accessed " + $uniqueuserlogonssuccess.count + " users") -notice
-        $uniqueuserlogonssuccess | Out-MultipleFileType -FilePrefix "Unique_Users_Success" -csv -xml -User $DirectoryName -Notice
+        if ($null -eq $uniqueuserlogonssuccess) {
+            Out-LogFile ("No Successful Logon Events found for this IP: " + $IpAddress)
+        }
+        else {
+            [array]$uniqueuserlogonssuccess = Select-UniqueObject -ObjectArray $successipevents -Property "UserID"
+            Out-LogFile ("IP " + $IpAddress + " SUCCESSFULLY accessed " + $uniqueuserlogonssuccess.count + " users") -notice
+            $uniqueuserlogonssuccess | Out-MultipleFileType -FilePrefix "Unique_Users_Success" -csv -User $DirectoryName -Notice
+        }
 	
     }	
 

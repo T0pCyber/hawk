@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.13.4'
+ModuleVersion = '1.13.6'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -150,6 +150,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.13.6 - Fixed null check issue with Search-HawkTenantActivityByIP that was generating an error when no successful logons were found.
         1.13.5 - Update Get IP code to not check Null IP Addresses.  Now puts country as "NULL IP" in those cases. (wiseleaf23)
         1.13.4 - Changed initilization order so that application insights is starting first
         1.13.3 - Fixed a Recursion with the upgrade funcationality.  If 1.13.2 was install a MANUAL update to 1.13.3 will be required. Update-Module Hawk
