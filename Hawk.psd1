@@ -150,6 +150,9 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.13.7 - Hawk Global object now stores datetime objects
+        1.13.7 - Cmdlets have been updated to support the change and should continue to work -- please report any issues
+        1.13.7 - Hawk should now properly handle US (mm/dd/yyyy) and non-US (dd/mm/yyyy) date formats
         1.13.6 - Fixed null check issue with Search-HawkTenantActivityByIP that was generating an error when no successful logons were found.
         1.13.5 - Update Get IP code to not check Null IP Addresses.  Now puts country as "NULL IP" in those cases. (wiseleaf23)
         1.13.4 - Changed initilization order so that application insights is starting first
