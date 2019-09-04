@@ -48,23 +48,22 @@ function Get-HawkUserMailboxAuditing {
     Function Get-MailboxAuditLogsFiveDaysAtATime {
         param(
             [Parameter(Mandatory = $true)]
-            $StartDate,
+            [datetime]$StartDate,
             [Parameter(Mandatory = $true)]
-            $EndDate,
+            [datetime]$EndDate,
             [Parameter(Mandatory = $true)]
             $User
         )
     
     
         # Setup the initial start date
-        $RangeStart = $StartDate
-    
-        # -UFormat %m/%d/%Y
+        $RangeStart = $StartDate        
     
         do {
             # Get the end of the Range we are going to gather data for
-            [string]$RangeEnd = get-date ((Get-date ([datetime]::ParseExact($RangeStart, "MM/dd/yyyy", $null))).AddDays(5)) -UFormat %m/%d/%Y
-    
+            #[string]$RangeEnd = get-date ((Get-date ([datetime]::ParseExact($RangeStart, "MM/dd/yyyy", $null))).AddDays(5)) -UFormat %m/%d/%Y
+            [string]$RangeEnd = ((get-date).AddDays(5))
+
             # Do the actual search
             Out-LogFile ("Searching Range " + $RangeStart + " To " + $RangeEnd)
             [array]$Results += Search-MailboxAuditLog -StartDate $RangeStart -EndDate $RangeEnd -identity $User -ShowDetails -ResultSize 250000

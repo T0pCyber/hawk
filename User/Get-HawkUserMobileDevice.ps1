@@ -59,13 +59,10 @@ Function Get-HawkUserMobileDevice {
         else {
             Out-Logfile ("Found " + $MobileDevices.count + " Devices")
 
-            # Convert the string date into a date object
-            $StartDate = Get-date $Hawk.StartDate
-
             # Check each device to see if it was NEW
             # If so flag it for investigation
             foreach ($Device in $MobileDevices){
-                if ($Device.FirstSyncTime -gt $StartDate){
+                if ($Device.FirstSyncTime -gt $Hawk.StartDate){
                     Out-Logfile ("Device found that was first synced inside investigation window") -notice
                     Out-LogFile ("DeviceID: " + $Device.DeviceID) -notice
                     $Device | Out-MultipleFileType -FilePreFix "_Investigate_MobileDevice" -user $user -csv -append -Notice

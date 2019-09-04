@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.13.6'
+ModuleVersion = '1.13.7'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()

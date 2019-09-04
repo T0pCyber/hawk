@@ -26,21 +26,21 @@ Function Get-HawkTenantAuthHistory {
 
     Param (
         [Parameter(Mandatory = $true)]
-        $StartDate,
+        [datetime]$StartDate,
         [int]$IntervalMinutes = 15
     )
 
-    # Try to convert the submitted date into [datetime] format
-    try {
-        [datetime]$DateToStartSearch = Get-Date $StartDate       
-    }
-    catch {
-        Out-Logfile "[ERROR] - Unable to convert submitted date"
-        break        
-    }
+    # # Try to convert the submitted date into [datetime] format
+    # try {
+    #     [datetime]$DateToStartSearch = Get-Date $StartDate       
+    # }
+    # catch {
+    #     Out-Logfile "[ERROR] - Unable to convert submitted date"
+    #     break        
+    # }
     
     # Make sure the start date isn't more than 90 days in the past
-    if ((Get-Date).adddays(-91) -gt $DateToStartSearch) {
+    if ((Get-Date).adddays(-91) -gt $StartDate) {
         Out-Logfile "[ERROR] - Start date is over 90 days in the past"
         break
     }
@@ -49,14 +49,14 @@ Function Get-HawkTenantAuthHistory {
     Send-AIEvent -Event "CmdRun"
 
     # Setup inial start and end time for the search
-    [datetime]$CurrentStart = $DateToStartSearch
-    [datetime]$CurrentEnd = $DateToStartSearch.AddMinutes($IntervalMinutes)
+    [datetime]$CurrentStart = $StartDate
+    [datetime]$CurrentEnd = $StartDate.AddMinutes($IntervalMinutes)
 
     # Hard stop for the end time for 48 hours this is to be a good citizen and to ensure that we actually get the data back
-    [datetime]$end = $DateToStartSearch.AddHours(48)
+    [datetime]$end = $StartDate.AddHours(48)
 
     # Setup our file prefix so we can run multiple times with out collision
-    [string]$prefix = Get-Date ($DateToStartSearch) -UFormat %Y_%d_%m
+    [string]$prefix = Get-Date ($StartDate) -UFormat %Y_%d_%m
 
     # Current count so we can setup a file name and other stuff
     [int]$CurrentCount = 0

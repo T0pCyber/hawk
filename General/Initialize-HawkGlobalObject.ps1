@@ -288,8 +288,8 @@ Function Initialize-HawkGlobalObject {
         # Build the output object from what we have collected
         $Output | Add-Member -MemberType NoteProperty -Name FilePath -Value $OutputPath
         $Output | Add-Member -MemberType NoteProperty -Name DaysToLookBack -Value $Days
-        $Output | Add-Member -MemberType NoteProperty -Name StartDate -Value (Get-Date ((Get-Date).adddays( - ([int]$Days))) -UFormat %m/%d/%Y)
-        $Output | Add-Member -MemberType NoteProperty -Name EndDate -Value (Get-Date ((Get-Date).adddays(1)) -UFormat %m/%d/%Y)
+        $Output | Add-Member -MemberType NoteProperty -Name StartDate -Value ((Get-Date).adddays( - ([int]$Days)))
+        $Output | Add-Member -MemberType NoteProperty -Name EndDate -Value ((Get-Date).adddays(1))
         $Output | Add-Member -MemberType NoteProperty -Name AdvancedAzureLicense -Value $AdvancedAzureLicense
         $Output | Add-Member -MemberType NoteProperty -Name WhenCreated -Value (Get-Date -Format g)
         $Output | Add-Member -MemberType NoteProperty -Name EULA -Value $Eula
