@@ -4,9 +4,16 @@ Function Start-HawkTenantInvestigation {
 	Out-LogFile "Starting Tenant Sweep"
 	Send-AIEvent -Event "CmdRun"
 	
-    Get-HawkTenantConfiguration
-    Get-HawkTenantEDiscoveryConfiguration
-    Search-HawkTenantEXOAuditLog
+	Out-Log "Running Get-HawkTenantConfiguration" -action
+	Get-HawkTenantConfiguration
+
+	Out-Log "Running Get-HawkTenantEDiscoveryConfiguration" -action
+	Get-HawkTenantEDiscoveryConfiguration
+	
+	Out-Log "Running Get-HawkTenantEXOAuditLog" -action
+	Search-HawkTenantEXOAuditLog
+	
+	Out-Log "Running Get-HawkTenantRBACChanges" -action
     Get-HawkTenantRBACChanges
 
     <#
