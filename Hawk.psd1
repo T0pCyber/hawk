@@ -150,6 +150,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.14.0 - Update Start-HawkTenantInvestigation and Start-HawkUserInvestigation to better log the cmdlets they are running.
         1.14.0 - Fixed issue with Get-HawkUserMailboxAuditing where it was not searching in 5 day increments like it was supposed to.
         1.14.0 - Updated Global Object code to handle new range input.
         1.14.0 - Added support for setting a date RANGE instead of X days until now.
