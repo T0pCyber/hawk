@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.13.7'
+ModuleVersion = '1.14.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -150,7 +150,10 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
-        1.13.7 - Hawk Global object now stores datetime objects
+        1.14.0 - Fixed issue with Get-HawkUserMailboxAuditing where it was not searching in 5 day increments like it was supposed to.
+        1.14.0 - Updated Global Object code to handle new range input.
+        1.14.0 - Added support for setting a date RANGE instead of X days until now.
+        1.13.7 - Hawk Global object now stores datetime objects.
         1.13.7 - Cmdlets have been updated to support the change and should continue to work -- please report any issues
         1.13.7 - Hawk should now properly handle US (mm/dd/yyyy) and non-US (dd/mm/yyyy) date formats
         1.13.6 - Fixed null check issue with Search-HawkTenantActivityByIP that was generating an error when no successful logons were found.
@@ -170,9 +173,6 @@ PrivateData = @{
         1.10.2 - Get-HawkUserPWNCheck is working for now, site is going to move to an API key so updates will need to be made in the future. (Absoblogginlutely)
         1.10.1 - Corrected issue with IP address lookup code that resulted in extensive errors
         1.10.0 - Updated Test-MSOLConnection to automatically connect using Connect-MSOLService
-        1.9.0 - Checked in to pull requests
-        1.9.0 - Added Get-HawkUserAutoReply to pull autoreply information (thx chrish012)
-        1.9.0 - Fix for mailbox audit logs and non us dates (thx imcfarla2003)
         '
         # External dependent modules of this module
         # ExternalModuleDependencies = ''

@@ -53,6 +53,8 @@ Function Initialize-HawkGlobalObject {
         [switch]$IAgreeToTheEula = $false,
         [switch]$SkipUpdate = $false,
         [int]$DaysToLookBack,
+        [DateTime]$StateDate,
+        [DateTime]$EndDate,
         [string]$FilePath
     )
 
@@ -243,33 +245,109 @@ Function Initialize-HawkGlobalObject {
             [string]$OutputPath = Set-LoggingPath -path $FilePath
         }
 
-        ### Setting up Days to Look Back ###
-        # Check if our value was passed in
-        if ($DaysToLookBack -gt 0) {
-            # Validate that the provided information is inside of the acceptable range
-            if ((1..365) -notcontains $DaysToLookBack) {
-                Write-Error ("Provided value is not inside allowed range" + $DaysToLookBack) -ErrorAction Stop
+        # We need to ask for start and end date if daystolookback was not set
+        if ($null -eq $StartDate) {
+
+            # Read in our # of days back or the actual start date
+            $StartRead = Read-Host "`nFirst Day of Search Window (1-90, Date, Default 90)"
+
+            # Determine if the input was a date time
+            # True means it was NOT a datetime
+            if ($Null -eq ($StartRead -as [DateTime])) {
+                #### Not a Date time ####
+
+                # if we have a null entry (just hit enter) then set startread to the default of 90
+                if ([string]::IsNullOrEmpty($StartRead)) { $StartRead = 90 }
+                elseif (($StartRead -gt 90) -or ($StartRead -lt 1)) {
+                    Write-Information "Value provided is outside of valid Range 1-90"
+                    Write-Information "Setting StartDate to default of Today - 90 days"
+                    $StartRead = 90
+                }
+
+                # Calculate our startdate setting it to midnight
+                Write-Information ("Calculating Start Date from current date minus " + $StartRead + " days.")
+                [DateTime]$StartDate = ((Get-Date).AddDays(-$StartRead)).Date
+                Write-Information ("Setting StartDate by Calculation to " + $StartDate + "`n")
             }
-            # If we are valid then put it into our final value
+            elseif (!($null -eq ($StartRead -as [DateTime]))) {
+                #### DATE TIME Provided ####
+             
+                # Convert the input to a date time object
+                [DateTime]$StartDate = (Get-Date $StartRead).Date
+                
+                # Test to make sure the date time is > 90 and < today
+                if ($StartDate -ge ((Get-date).AddDays(-90).Date) -and ($StartDate -le (Get-Date).Date)) {
+                    #Valid Date do nothing
+                }
+                else {
+                    Write-Information ("Date provided beyond acceptable range of 90 days.")
+                    Write-Information ("Setting date to default of Today - 90 days.")
+                    [DateTime]$StartDate = ((Get-Date).AddDays(-90)).Date
+                }
+
+                Write-Information ("Setting StartDate by Date to " + $StartDate + "`n")
+            }
             else {
-                $Days = $DaysToLookBack
+                Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
             }
-        }
-        # If not provided then we need to ask
-        else {
-            Do {
-                $Days = Read-Host "How far back in the past should we search? (1-90 Default 90)"
-    
-                # If nothing is entered default to 90
-                if ([string]::IsNullOrEmpty($Days)) { $Days = "90" }
-            }
-            while
-            (
-                #Validate that we have a number between 1 and 365 Input claims 90 but some will take >
-                (1..365) -notcontains $Days
-            )
         }
 
+        if ($null -eq $EndDate) {
+            # Read in the end date
+            $EndRead = Read-Host "`nLast Day of search Window (1-90, date, Default Today)"
+
+            # Determine if the input was a date time
+            # True means it was NOT a datetime
+            if ($Null -eq ($EndRead -as [DateTime])) {
+                #### Not a Date time ####
+
+                # if we have a null entry (just hit enter) then set startread to the default of 90
+                if ([string]::IsNullOrEmpty($EndRead)) {
+                    Write-Information ("Setting End Date to Today")
+                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                }
+                else {
+                    # Calculate our startdate setting it to midnight
+                    Write-Information ("Calculating End Date from current date minus " + $EndRead + " days.")
+                    # Subtract 1 from the EndRead entry so that we get one day less for the purpose of how searching works with times
+                    [DateTime]$EndDate = ((Get-Date).AddDays( - ($EndRead - 1))).Date
+                }
+
+                # Validate that the start date is further back in time than the end date
+                if ($StartDate -gt $EndDate) {
+                    Write-Error "StartDate Cannot be More Recent than EndDate" -ErrorAction Stop
+                }
+                else {
+                    Write-Information ("Setting EndDate by Calculation to " + $EndDate + "`n")
+                }
+            }
+            elseif (!($null -eq ($EndRead -as [DateTime]))) {
+                #### DATE TIME Provided ####
+             
+                # Convert the input to a date time object
+                [DateTime]$EndDate = ((Get-Date $EndRead).AddDays(1)).Date
+                
+                # Test to make sure the end date is newer than the start date
+                if ($StartDate -gt $EndDate) {
+                    Write-Information "EndDate Selected was older than start date."
+                    Write-Information "Setting EndDate to today."
+                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                }
+                elseif ($EndDate -gt (get-Date).AddDays(2)){
+                    Write-Information "EndDate to Far in the furture."
+                    Write-Information "Setting EndDate to Today."
+                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                }
+
+                Write-Information ("Setting EndDate by Date to " + $EndDate + "`n")
+            }
+                
+            else {
+                Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
+            }
+        }
+    
+    
         # Determine if we have access to a P1 or P2 Azure Ad License
         # EMS SKU contains Azure P1 as part of the sku
         if ([bool](Get-MsolAccountSku | Where-Object { ($_.accountskuid -like "*aad_premium*") -or ($_.accountskuid -like "*EMS*") })) {
@@ -288,8 +366,8 @@ Function Initialize-HawkGlobalObject {
         # Build the output object from what we have collected
         $Output | Add-Member -MemberType NoteProperty -Name FilePath -Value $OutputPath
         $Output | Add-Member -MemberType NoteProperty -Name DaysToLookBack -Value $Days
-        $Output | Add-Member -MemberType NoteProperty -Name StartDate -Value ((Get-Date).adddays( - ([int]$Days)))
-        $Output | Add-Member -MemberType NoteProperty -Name EndDate -Value ((Get-Date).adddays(1))
+        $Output | Add-Member -MemberType NoteProperty -Name StartDate -Value $StartDate
+        $Output | Add-Member -MemberType NoteProperty -Name EndDate -Value $EndDate
         $Output | Add-Member -MemberType NoteProperty -Name AdvancedAzureLicense -Value $AdvancedAzureLicense
         $Output | Add-Member -MemberType NoteProperty -Name WhenCreated -Value (Get-Date -Format g)
         $Output | Add-Member -MemberType NoteProperty -Name EULA -Value $Eula

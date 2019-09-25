@@ -60,34 +60,34 @@ Function Start-HawkUserInvestigation {
     foreach ($Object in $UserArray) {
         [string]$User = $Object.UserPrincipalName
 		
-        Out-LogFile "Running Get-HawkUserConfiguration"
+        Out-LogFile "Running Get-HawkUserConfiguration" -action
         Get-HawkTenantConfiguration
 			
-        Out-LogFile "Running Get-HawkUserConfiguration"
+        Out-LogFile "Running Get-HawkUserConfiguration" -action
         Get-HawkUserConfiguration -User $User
 			
-        Out-LogFile "Running Get-HawkUserInboxRule"
+        Out-LogFile "Running Get-HawkUserInboxRule" -action
         Get-HawkUserInboxRule -User $User
 			
-        Out-LogFile "Running Get-HawkUserEmailForwarding"
+        Out-LogFile "Running Get-HawkUserEmailForwarding" -action
 		Get-HawkUserEmailForwarding -User $User
 		
-		Out-LogFile "Running Get-HawkUserAutoReply"
+		Out-LogFile "Running Get-HawkUserAutoReply" -action
 		Get-HawkUserAutoReply -User $User
 			
-        Out-LogFile "Running Get-HawkUserAuthHistory"
+        Out-LogFile "Running Get-HawkUserAuthHistory" -action
         Get-HawkUserAuthHistory -User $user -ResolveIPLocations
 			
-        Out-LogFile "Running Get-HawkUserMailboxAuditing"
+        Out-LogFile "Running Get-HawkUserMailboxAuditing" -action
         Get-HawkUserMailboxAuditing -User $User
 			
-        Out-LogFile "Running Get-HawkUserAdminAudit"
+        Out-LogFile "Running Get-HawkUserAdminAudit" -action
 		Get-HawkUserAdminAudit -User $User
 		
-		Out-LogFile "Running Get-HawkUserMessageTrace"
+		Out-LogFile "Running Get-HawkUserMessageTrace" -action
 		Get-HawkUserMessageTrace -user $User
 
-		Out-LogFile "Running Get-HawkUserMobileDevice"
+		Out-LogFile "Running Get-HawkUserMobileDevice" -action
 		Get-HawkUserMobileDevice -user $User
     }
 }
