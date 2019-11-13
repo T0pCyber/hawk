@@ -4,7 +4,7 @@
 Everyone is welcome to contribute to this tool.  The goal of the Hawk tool is to be a community lead tool and provides
 security support professionals with the tools they need to quickly and easily gather data from O365.
 
-## What Hawk is an isn't
+## What Hawk is and isn't
 Hawk provides Limited analysis of the gathered data.  This is by design!
 Hawk is here to help get all of the data in a single place it is not designed to make any significant
 conclusions about this data.  This is intentional since it is impossible for the tool to know enough about
