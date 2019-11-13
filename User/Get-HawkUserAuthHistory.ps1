@@ -13,27 +13,27 @@ Function Get-HawkUserAuthHistory {
 	https://support.office.com/en-us/article/URLs-and-IP-address-ranges-for-Office-365-operated-by-21Vianet-5C47C07D-F9B6-4B78-A329-BFDC1B6DA7A0
 
 	.PARAMETER UserPrincipalName
-	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
+	Single UPN of a user, comma seperated list of UPNs, or array of objects that contain UPNs.
 
 	.OUTPUTS
 
     File: Converted_Authentication_Logs.csv
 	Path: \<User>
-	Description: All autentication activity for the user in a more readable form
+	Description: All authentication activity for the user in a more readable form
     	
 	.EXAMPLE
 
 	Get-HawkUserAuthHistory -UserPrincipalName user@contoso.com -ResolveIPLocations
 
-	Gathers authenication information for user@contoso.com.
-	Attempts to resolve the IP locations for all authetnication IPs found.
+	Gathers authentication information for user@contoso.com.
+	Attempts to resolve the IP locations for all authentication IPs found.
 
 	.EXAMPLE
 
 	Get-HawkUserAuthHistory -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"}) -ResolveIPLocations
 
-	Gathers authenication information for all users that have "C-Level" set in CustomAttribute1
-	Attempts to resolve the IP locations for all authetnication IPs found.
+	Gathers authentication information for all users that have "C-Level" set in CustomAttribute1
+	Attempts to resolve the IP locations for all authentication IPs found.
 	
 	#>	
     param
