@@ -1,4 +1,32 @@
-# hawk
+# HAWK + Github
+
+## Who can contribute:
+===========================================
+Everyone is welcome to contribute to this tool.  The goal of the Hawk tool is to be a community lead tool and provides
+security support professionals with the tools they need to quickly and easily gather data from O365.
+
+## What Hawk is an isn't
+===========================================
+Hawk provides Limited analysis of the gathered data.  This is by design!
+Hawk is here to help get all of the data in a single place it is not designed to make any significant
+conclusions about this data.  This is intentional since it is impossible for the tool to know enough about
+your environment or what you are concerned about to make a legitimate analysis of the data.
+
+Hawk's goal is to quickly get you the data that is needed to come to a conclusion; not to make the conclusion for you.
+
+## How can I contribute:
+===========================================
+Please post any issues you find to the Issue section.
+Pull requests are also VERY welcome.
+
+My goal is to review any new issues / pull requests every Wednesday.
+Most check-ins should also occur on that day.
+
+If something is critical or I seem to have not done anything in some time please feel free to send an email to the 
+Hawk support alias hawk_feedback@microsoft.com.
+
+
+# HAWK
 Powershell Based tool for gathering information related to O365 intrusions and potential Breaches
 
 ## PURPOSE:
@@ -30,3 +58,15 @@ given Hawk cmdlet.
 Some of the Hawk cmdlets will flag results that should be further reviewed.  These will appear
 in _Investigate files.  These are NOT indicative of unwanted activity but are simply things 
 that should reviewed.
+
+## Disclaimer
+===========================================
+Hawk is NOT an official MICROSOFT tool.  Therefore use of the tool is covered exclusively by the license associated with this github repository.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
