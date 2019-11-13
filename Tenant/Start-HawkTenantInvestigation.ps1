@@ -14,7 +14,8 @@ Function Start-HawkTenantInvestigation {
 	Search-HawkTenantEXOAuditLog
 	
 	Out-Log "Running Get-HawkTenantRBACChanges" -action
-    Get-HawkTenantRBACChanges
+	Get-HawkTenantRBACChanges
+	
 
     <#
  
