@@ -2,11 +2,13 @@
 
 ## Who can contribute:
 ===========================================
+
 Everyone is welcome to contribute to this tool.  The goal of the Hawk tool is to be a community lead tool and provides
 security support professionals with the tools they need to quickly and easily gather data from O365.
 
 ## What Hawk is an isn't
 ===========================================
+
 Hawk provides Limited analysis of the gathered data.  This is by design!
 Hawk is here to help get all of the data in a single place it is not designed to make any significant
 conclusions about this data.  This is intentional since it is impossible for the tool to know enough about
@@ -16,6 +18,7 @@ Hawk's goal is to quickly get you the data that is needed to come to a conclusio
 
 ## How can I contribute:
 ===========================================
+
 Please post any issues you find to the Issue section.
 Pull requests are also VERY welcome.
 
@@ -31,6 +34,7 @@ Powershell Based tool for gathering information related to O365 intrusions and p
 
 ## PURPOSE:
 ===========================================
+
 The Hawk module has been designed to ease the burden on O365 administrators who are performing 
 a forensic analysis in their organization.
 
@@ -39,6 +43,7 @@ data gathering easier.
 
 ## HOW TO USE:
 ===========================================
+
 Hawk is divided into two primary forms of cmdlets; user based Cmdlets and Tenant based cmdlets.
 
 User based cmdlets take the form Verb-HawkUser<action>.  They all expect a -user switch and 
@@ -61,6 +66,7 @@ that should reviewed.
 
 ## Disclaimer
 ===========================================
+
 Hawk is NOT an official MICROSOFT tool.  Therefore use of the tool is covered exclusively by the license associated with this github repository.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
