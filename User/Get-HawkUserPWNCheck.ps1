@@ -54,7 +54,7 @@ Function Get-HawkUserPWNCheck {
         $uriEncodeEmail = [uri]::EscapeDataString($($user))
 
         # Build and invoke the URL
-        $InvokeURL = 'https://haveibeenpwned.com/api/v3/breachedaccount/' + $uriEncodeEmail +?truncateResponse=false
+        $InvokeURL = 'https://haveibeenpwned.com/api/v3/breachedaccount/' + $uriEncodeEmail + '?truncateResponse=false'
         $Error.clear()
 
         try {
