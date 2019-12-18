@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.14.2'
+ModuleVersion = '1.14.3'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -150,6 +150,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.14.3 - Fixed issue with missing quote
         1.14.2 - Fixed issue with start-hawktenantinvestigation using the wrong cmdlet
         1.14.1 - Minor updates to logging etc.
         1.14.0 - Update Start-HawkTenantInvestigation and Start-HawkUserInvestigation to better log the cmdlets they are running.
