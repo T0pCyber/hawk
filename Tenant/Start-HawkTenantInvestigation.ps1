@@ -44,8 +44,8 @@ Function Start-HawkTenantInvestigation {
 	Out-LogFile "Running Get-HawkTenantRBACChanges" -action
 	Get-HawkTenantRBACChanges
 
-	Out-LogFile "Running Get-HawkTenantAzureAuditLogs" -action
-	Get-HawkTenantAzureAuditLogs
+	Out-LogFile "Running Get-HawkTenantAzureAuditLog" -action
+	Get-HawkTenantAzureAuditLog
 
 	Out-LogFile "Running Get-HawkTenantConsentGrants" -action
 	Get-HawkTenantConsentGrants
