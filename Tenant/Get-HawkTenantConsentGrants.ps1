@@ -36,7 +36,7 @@ Function Get-HawkTenantConsentGrants {
         Out-LogFile "Found at least one `'AllPrinciples`' Grant" -notice
         $flag = $true
     }
-    if ([true]($Grants.permission -match 'all')){
+    if ([bool]($Grants.permission -match 'all')){
         Out-LogFile "Found at lease one `'All`' Grant" -notice
         $flag = $true
     }
