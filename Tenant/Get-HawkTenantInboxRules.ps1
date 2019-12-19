@@ -6,7 +6,7 @@ Function Get-HawkTenantInboxRules {
 	Gets inbox rules and forwarding directly from all mailboxes in the org.
 
 	.DESCRIPTION
-	Uses start-robustcloudcommand.ps1 to gather data from each mailbox in the org.
+	Uses Start-RobustCloudCommand to gather data from each mailbox in the org.
 	Gathers inbox rules with Get-HawkUserInboxRule
 	Gathers forwarding with Get-HawkUserEmailForwarding
 
@@ -21,15 +21,15 @@ Function Get-HawkTenantInboxRules {
 
 	File: Robust.log
 	Path: \
-	Description: Logfile for Start-RobustCloudCommand.ps1
+	Description: Logfile for Start-RobustCloudCommand
 		
 	.EXAMPLE
-	Start-HawkTenantIndividualUserSearch
+	Start-HawkTenantInboxRules
 	
 	Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes in the org
 
 	.EXAMPLE
-	Start-HawkTenantIndividualUserSearch -csvpath c:\temp\myusers.csv
+	Start-HawkTenantInboxRules -csvpath c:\temp\myusers.csv
 
 	Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes listed in myusers.csv
 
@@ -102,43 +102,4 @@ Function Get-HawkTenantInboxRules {
     Invoke-Expression $cmd
 
     Out-LogFile "Process Complete"	
-
-    <#
- 
-	.SYNOPSIS
-	Gets inbox rules and forwarding directly from all mailboxes in the org.
-
-	.DESCRIPTION
-	Uses start-robustcloudcommand.ps1 to gather data from each mailbox in the org.
-	Gathers inbox rules with Get-HawkUserInboxRule
-	Gathers forwarding with Get-HawkUserEmailForwarding
-
-	.PARAMETER CSVPath
-	Path to a CSV file with a list of users to run against.
-	CSV header should have DisplayName,PrimarySMTPAddress at minimum
-
-	.OUTPUTS
-	
-	See Help for Get-HawkUserInboxRule for inbox rule output
-	See Help for Get-HawkUserEmailForwarding for email forwarding output
-
-	File: Robust.log
-	Path: \
-	Description: Logfile for Start-RobustCloudCommand.ps1
-		
-	.EXAMPLE
-	Start-HawkTenantIndividualUserSearch
-	
-	Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes in the org
-
-	.EXAMPLE
-	Start-HawkTenantIndividualUserSearch -csvpath c:\temp\myusers.csv
-
-	Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes listed in myusers.csv
-
-	.LINK
-	https://gallery.technet.microsoft.com/office/Start-RobustCloudCommand-69fb349e
-
-	
-	#>
 }

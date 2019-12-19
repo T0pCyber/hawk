@@ -1,23 +1,9 @@
+
+
 # Executes the series of Hawk cmdets that search the whole tenant
 Function Start-HawkTenantInvestigation {
 
-	Out-LogFile "Starting Tenant Sweep"
-	Send-AIEvent -Event "CmdRun"
-	
-	Out-LogFile "Running Get-HawkTenantConfiguration" -action
-	Get-HawkTenantConfiguration
-
-	Out-LogFile "Running Get-HawkTenantEDiscoveryConfiguration" -action
-	Get-HawkTenantEDiscoveryConfiguration
-	
-	Out-LogFile "Running Get-HawkTenantEXOAuditLog" -action
-	Search-HawkTenantEXOAuditLog
-	
-	Out-LogFile "Running Get-HawkTenantRBACChanges" -action
-	Get-HawkTenantRBACChanges
-	
-
-    <#
+	<#
  
 	.SYNOPSIS
 	Gathers common data about a tenant.
@@ -42,4 +28,21 @@ Function Start-HawkTenantInvestigation {
 	Runs all of the tenant investigation cmdlets.
 	
 	#>
+
+	Out-LogFile "Starting Tenant Sweep"
+	Send-AIEvent -Event "CmdRun"
+	
+	Out-LogFile "Running Get-HawkTenantConfiguration" -action
+	Get-HawkTenantConfiguration
+
+	Out-LogFile "Running Get-HawkTenantEDiscoveryConfiguration" -action
+	Get-HawkTenantEDiscoveryConfiguration
+	
+	Out-LogFile "Running Get-HawkTenantEXOAuditLog" -action
+	Search-HawkTenantEXOAuditLog
+	
+	Out-LogFile "Running Get-HawkTenantRBACChanges" -action
+	Get-HawkTenantRBACChanges
+	
+
 }
