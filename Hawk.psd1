@@ -85,7 +85,7 @@ NestedModules = @(
     'Tenant\Get-HawkTenantConfiguration.ps1',
     'Tenant\Get-HawkTenantEDiscoveryConfiguration.ps1',
     'Tenant\Get-HawkTenantInboxRules.ps1',
-    'Tenant\Get-HawkTenantOauthConsentGrants.ps1',
+    'Tenant\Get-HawkTenantConsentGrants.ps1',
     'Tenant\Get-HawkTenantRBACChanges.ps1',
     'Tenant\Get-HawkTenantAuthHistory.ps1',
     'Tenant\Search-HawkTenantActivityByIP.ps1',
@@ -108,7 +108,7 @@ NestedModules = @(
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfiguration','Get-HawkTenantEDiscoveryConfiguration',
-'Get-HawkTenantInboxRules','Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkTenantAzureAuditLog','Get-HawkUserAuthHistory','Get-HawkUserConfiguration',
+'Get-HawkTenantInboxRules','Get-HawkTenantConsentGrants','Get-HawkTenantRBACChanges','Get-HawkTenantAzureAuditLog','Get-HawkUserAuthHistory','Get-HawkUserConfiguration',
 'Get-HawkUserEmailForwarding','Get-HawkUserInboxRule','Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject',
 'Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation','Start-HawkUserInvestigation',
 'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader','Get-HawkUserPWNCheck','Get-HawkUserAutoReply',

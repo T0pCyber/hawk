@@ -27,6 +27,10 @@ Function Get-AzureADPSPermissions {
 .EXAMPLE
     PS C:\> .\Get-AzureADPSPermissions.ps1 -UserProperties @("DisplayName", "UserPrincipalName", "Mail") -ServicePrincipalProperties @("DisplayName", "AppId")
     Gets all permissions granted to all apps and includes additional properties for users and service principals.
+
+.LINK
+https://gist.github.com/psignoret/9d73b00b377002456b24fcb808265c23
+
 #>
 
 [CmdletBinding()]
@@ -183,7 +187,7 @@ if ($DelegatedPermissions -or (-not ($DelegatedPermissions -or $ApplicationPermi
                     }
                 }
 
-                New-Object PSObject -Property $grantDetails
+                Return New-Object PSObject -Property $grantDetails
             }
         }
     }
@@ -199,6 +203,10 @@ if ($ApplicationPermissions -or (-not ($DelegatedPermissions -or $ApplicationPer
             Write-Progress -Activity "Retrieving application permissions..." `
                         -Status ("Checked {0}/{1} apps" -f $i++, $servicePrincipalCount) `
                         -PercentComplete (($i / $servicePrincipalCount) * 100)
+
+            if ($i -eq $servicePrincipalCount){
+                Write-Progress -Completed -Activity "Retrieving application permissions..." `
+            }
         }
 
         $sp = $_.Value
@@ -232,7 +240,7 @@ if ($ApplicationPermissions -or (-not ($DelegatedPermissions -or $ApplicationPer
                 }
             }
 
-            New-Object PSObject -Property $grantDetails
+            Return New-Object PSObject -Property $grantDetails
         }
     }
 }

@@ -40,26 +40,30 @@ Function Get-HawkTenantAzureAuditLog {
 	# https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants
 	$AzureApplicationActivityEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Add OAuth2PermissionGrant.','Consent to application.' ")
 
+	# If null we found no changes to nothing to do here
 	if ($null -eq $AzureApplicationActivityEvents){
 		Out-LogFile "No Application related events found in the search time frame."
 	}
+
+	# If not null then we must have found some events so flag them
 	else {
 		Out-LogFile "Application Rights Activity found." -Notice
 		Out-LogFile "Please review these Azure_Application_Audit.csv to ensure any changes are legitimate." -Notice
-	}
 
-	Foreach ($event in $AzureApplicationActivityEvents){
+		# Go thru each even and prepare it to output to CSV
+		Foreach ($event in $AzureApplicationActivityEvents){
 		
-		$event.auditdata | ConvertFrom-Json | Select-Object -Property Id,
-			Operation,
-			ResultStatus,
-			Workload,
-			ClientIP,
-			UserID,
-			@{Name='ActorUPN';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'actorUPN'}).value}},
-			@{Name='targetName';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'targetName'}).value}},
-			@{Name='env_time';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'env_time'}).value}},
-			@{Name='correlationId';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'correlationId'}).value}}`
-			| Out-MultipleFileType -fileprefix "Azure_Appliction_Audit" -csv -append
+			$event.auditdata | ConvertFrom-Json | Select-Object -Property Id,
+				Operation,
+				ResultStatus,
+				Workload,
+				ClientIP,
+				UserID,
+				@{Name='ActorUPN';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'actorUPN'}).value}},
+				@{Name='targetName';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'targetName'}).value}},
+				@{Name='env_time';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'env_time'}).value}},
+				@{Name='correlationId';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'correlationId'}).value}}`
+				| Out-MultipleFileType -fileprefix "Azure_Appliction_Audit" -csv -append
+		}
 	}
 }
