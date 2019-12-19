@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.14.4'
+ModuleVersion = '1.15.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -152,6 +152,12 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.15.0 - Implemented functions to help with https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants
+        1.15.0 - Minor updates to cmdlet help
+        1.15.0 - Updated implementation of Get-HawkTenantConsentGrants to leverage new information
+        1.15.0 - Renamed Get-HawkTenantOauthConsentGrants to Get-HawkTenantConsentGrants to reflect new usage
+        1.15.0 - Implemented Get-HawkTenantAzureAuditLog to get Consent to application, and Add OAuth2PermissionGrant events
+        1.15.0 - Added Get-HawkTenantAzureAuditlog and Get-HawkTenantConsentGrants to Start-HawkTenantInvestigation
         1.14.3 - Fixed issue with missing quote
         1.14.2 - Fixed issue with start-hawktenantinvestigation using the wrong cmdlet
         1.14.1 - Minor updates to logging etc.
@@ -170,15 +176,6 @@ PrivateData = @{
         1.13.2 - Impoved version reporting to log file
         1.13.1 - Fixed Start-HawkUserInvestigation by removing (s) from a cmdlet name
         1.13.0 - Files output to the user directory now contain _<user> this is to allow excel to open multiple CSV files with the "same" name (Suggestion from Absoblogginlutely)
-        1.12.1 - Added Get-HawkUserMobileDevices to Start-HawkUserInvestigation
-        1.12.0 - Added Get-HawkUserMobileDevices to gather mobile devices and flag devices to investigate
-        1.11.0 - Added Get-HawkUserMessageTrace to Start-HawkUserInvestigation
-        1.11.0 - Added Get-HawkUserMessageTrace to pull all email sent by a user in the last 7 days (Suggestion from Absoblogginglutely)
-        1.10.2 - Fixed issue with Start-HawkUserInvestigation where there were duplicate parameters (TheSleepingFox)
-        1.10.2 - Fixed Issue with Get-HawkUserAdminAudit log where an output parameter was missing (TheSleepingFox) 
-        1.10.2 - Get-HawkUserPWNCheck is working for now, site is going to move to an API key so updates will need to be made in the future. (Absoblogginlutely)
-        1.10.1 - Corrected issue with IP address lookup code that resulted in extensive errors
-        1.10.0 - Updated Test-MSOLConnection to automatically connect using Connect-MSOLService
         '
         # External dependent modules of this module
         # ExternalModuleDependencies = ''
