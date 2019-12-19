@@ -1,5 +1,3 @@
-
-
 # RBAC Changes
 # Changes to impersonation
 Function Search-HawkTenantEXOAuditLog {
