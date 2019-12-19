@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.14.3'
+ModuleVersion = '1.14.4'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -79,6 +79,7 @@ RequiredModules = @(
 
 NestedModules = @(
     'General\Initialize-HawkGlobalObject.ps1',
+    'General\Get-AzureADPSPermissions.ps1',
     'Message\Get-HawkMessageHeader.ps1',
     'Tenant\Get-HawkTenantAzureAuthenticationLogs.ps1',
     'Tenant\Get-HawkTenantConfiguration.ps1',
@@ -90,6 +91,7 @@ NestedModules = @(
     'Tenant\Search-HawkTenantActivityByIP.ps1',
     'Tenant\Search-HawkTenantEXOAuditLog.ps1',
     'Tenant\Start-HawkTenantInvestigation.ps1',
+    'Tenant\Get-HawkTenantAzureAuditLog.ps1',
     'User\Get-HawkUserAuthHistory.ps1',
     'User\Get-HawkUserConfiguration.ps1',
     'User\Get-HawkUserEmailForwarding.ps1',
@@ -106,7 +108,7 @@ NestedModules = @(
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = 'Get-HawkTenantAzureAuthenticationLogs','Get-HawkTenantConfiguration','Get-HawkTenantEDiscoveryConfiguration',
-'Get-HawkTenantInboxRules','Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkUserAuthHistory','Get-HawkUserConfiguration',
+'Get-HawkTenantInboxRules','Get-HawkTenantOauthConsentGrants','Get-HawkTenantRBACChanges','Get-HawkTenantAzureAuditLog','Get-HawkUserAuthHistory','Get-HawkUserConfiguration',
 'Get-HawkUserEmailForwarding','Get-HawkUserInboxRule','Get-HawkUserMailboxAuditing','Initialize-HawkGlobalObject',
 'Search-HawkTenantActivityByIP','Search-HawkTenantEXOAuditLog','Show-HawkHelp','Start-HawkTenantInvestigation','Start-HawkUserInvestigation',
 'Update-HawkModule','Get-HawkUserAdminAudit','Get-HawkTenantAuthHistory','Get-HawkUserHiddenRule','Get-HawkMessageHeader','Get-HawkUserPWNCheck','Get-HawkUserAutoReply',
