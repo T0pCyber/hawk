@@ -194,10 +194,10 @@ Function Initialize-HawkGlobalObject {
 
     Function New-ApplicationInsight {
 
-        # Initilize Application Insights client
+        # Initialize Application Insights client
         $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
         if ($Null -eq $Client) {
-            Write-Information "Initilizing Application Insights" 
+            Write-Information "Initializing Application Insights" 
             $Client = New-AIClient -key $insightkey
         }   
     }
