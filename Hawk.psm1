@@ -260,7 +260,7 @@ Function Get-AllUnifiedAuditLogEntry {
     [string]$cmd = $null
 	
     # build our search command to execute
-    $cmd = $UnifiedSearch + " -StartDate `'" + $StartDate.ToShortDateString() + "`' -EndDate `'" + $EndDate.ToShortDateString() + "`' -SessionCommand ReturnLargeSet -resultsize 1000 -sessionid " + (Get-Date -UFormat %H%M%S)
+    $cmd = $UnifiedSearch + " -StartDate `'" + $StartDate.toString("MM/dd/yyyy") + "`' -EndDate `'" + $EndDate.toString("MM/dd/yyyy") + "`' -SessionCommand ReturnLargeSet -resultsize 1000 -sessionid " + (Get-Date -UFormat %H%M%S)
     Out-LogFile ("Running Unified Audit Log Search")
     Out-Logfile $cmd
 
