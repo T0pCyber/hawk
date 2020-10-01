@@ -304,13 +304,13 @@ Function Initialize-HawkGlobalObject {
                 # if we have a null entry (just hit enter) then set startread to the default of 90
                 if ([string]::IsNullOrEmpty($EndRead)) {
                     Write-Information ("Setting End Date to Today")
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                    [DateTime]$EndDate = Get-date -Format ("dd/MM/yyyy HH:mm:ss").Date
                 }
                 else {
                     # Calculate our startdate setting it to midnight
                     Write-Information ("Calculating End Date from current date minus " + $EndRead + " days.")
                     # Subtract 1 from the EndRead entry so that we get one day less for the purpose of how searching works with times
-                    [DateTime]$EndDate = ((Get-Date).AddDays( - ($EndRead - 1))).Date
+                    [DateTime]$EndDate = Get-date -Format ("dd/MM/yyyy HH:mm:ss").Date
                 }
 
                 # Validate that the start date is further back in time than the end date
