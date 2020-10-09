@@ -53,7 +53,7 @@ Function Initialize-HawkGlobalObject {
         [switch]$IAgreeToTheEula = $false,
         [switch]$SkipUpdate = $false,
         [int]$DaysToLookBack,
-        [DateTime]$StateDate,
+        [DateTime]$StartDate,
         [DateTime]$EndDate,
         [string]$FilePath
     )
