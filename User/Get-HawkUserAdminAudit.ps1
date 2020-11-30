@@ -39,23 +39,28 @@ Function Get-HawkUserAdminAudit {
 
         # Get the mailbox name since that is what we store in the admin audit log
         $MailboxName = (Get-Mailbox -identity $User).name
+	# Error Handling if user doesn't have a mailbox
+	if ($MailboxName -eq "") {
+		Out-LogFile "No mailbox found. No user changes collected."
+	}
+	# Otherwise collect user changes as normal
+	else {
+		Out-LogFile ("Searching for changes made to: " + $MailboxName) -action
 
-        Out-LogFile ("Searching for changes made to: " + $MailboxName) -action
-
-        # Get all changes to this user from the admin audit logs
-        [array]$UserChanges = Search-AdminAuditLog -ObjectIDs $MailboxName -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
+		# Get all changes to this user from the admin audit logs
+		[array]$UserChanges = Search-AdminAuditLog -ObjectIDs $MailboxName -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
 
 
-        # If there are any results push them to an output file 
-        if ($UserChanges.Count -gt 0) {
-            Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
-            $UserChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -user $User
-            $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -user $User
-        }
-        # Otherwise report no results found
-        else {
-            Out-LogFile "No User Changes found."
-        }
-
+		# If there are any results push them to an output file 
+		if ($UserChanges.Count -gt 0) {
+		    Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
+		    $UserChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -user $User
+		    $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -user $User
+		}
+		# Otherwise report no results found
+		else {
+		    Out-LogFile "No User Changes found."
+		}
+	}
     }
 }
