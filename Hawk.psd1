@@ -152,7 +152,7 @@ PrivateData = @{
 
         # ReleaseNotes of this module
         ReleaseNotes ='
-        1.15.0 - Update help and contact info
+        1.15.1 - Update help and contact info
         1.15.0 - Implemented functions to help with https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants
         1.15.0 - Minor updates to cmdlet help
         1.15.0 - Updated implementation of Get-HawkTenantConsentGrants to leverage new information
