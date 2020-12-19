@@ -12,7 +12,7 @@
 RootModule = '.\Hawk.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.15.0'
+ModuleVersion = '1.15.1'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -24,10 +24,10 @@ GUID = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
 Author = 'hawk_feedback@microsoft.com'
 
 # Company or vendor of this module
-CompanyName = 'Matt Byrd'
+CompanyName = 'Paul Navarro'
 
 # Copyright statement for this module
-Copyright = '(c) 2019 matbyrd@microsoft.com. All rights reserved.'
+Copyright = '(c) 2020 panavarr@microsoft.com. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'The Hawk module has been designed to ease the burden on O365 administrators who are performing a forensic analysis in their organization.  It accelerates the gathering of data from multiple sources in the service.
@@ -35,7 +35,7 @@ Description = 'The Hawk module has been designed to ease the burden on O365 admi
 It does NOT take the place of a human reviewing the data generated and is simply here to make data gathering easier.
 
 Hawk has moved to GitHub and is availble for all to contribute.
-https://github.com/Canthv0/hawk
+https://github.com/T0pcyber/hawk
 '
 
 # Minimum version of the Windows PowerShell engine required by this module
@@ -145,13 +145,14 @@ PrivateData = @{
         # LicenseUri = ''
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/Canthv0/hawk'
+        ProjectUri = 'https://github.com/t0pcyber/hawk'
 
         # A URL to an icon representing this module.
         IconUri = 'https://dexvla.ch.files.1drv.com/y4mGq6B9xSbwzTZ8s2gUov42TsJMlHVKP1SvXpt5tG9a2vfa7xdqFmhYnlNokiZMPD72HFySMAEC9VdMYpA3uV0ZOloHO93MZ81DAtpg5lbOd2h9v1cp1ey5t4syE9SGtbDdL-WggiVoOayWT1dJC4vaw_bRQbfH8GpBTAEZkzFdcCBkOnml4CTl4b0BMu7BRxaE2iaZEv_QbgKFx_eZwsiOg'
 
         # ReleaseNotes of this module
         ReleaseNotes ='
+        1.15.0 - Update help and contact info
         1.15.0 - Implemented functions to help with https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants
         1.15.0 - Minor updates to cmdlet help
         1.15.0 - Updated implementation of Get-HawkTenantConsentGrants to leverage new information
@@ -185,7 +186,7 @@ PrivateData = @{
 } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
-HelpInfoURI = 'https://github.com/Canthv0/hawk/tree/master/Help'
+HelpInfoURI = 'https://github.com/t0pcyber/hawk/tree/master/Help'
 
 # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
 # DefaultCommandPrefix = ''
