@@ -1,0 +1,22 @@
+﻿
+# ignore the settings folder and files for VSCode and PSS
+.vscode/*
+*.psproj
+*TempPoint*
+
+# Ignore staging info from Visual Studio
+library/Hawk/.vs/*
+library/Hawk/Hawk/bin/*
+library/Hawk/Hawk/obj/*
+
+# ignore PowerShell Studio MetaData
+Hawk/Hawk.psproj
+Hawk/Hawk.psproj.bak
+Hawk/Hawk.psprojs
+Hawk/Hawk.psproj
+
+# ignore the TestResults
+TestResults/*
+
+# ignore the publishing Directory
+publish/*
