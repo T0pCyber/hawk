@@ -1,0 +1,20 @@
+﻿pool:
+  name: Hosted VS2017
+steps:
+- task: PowerShell@2
+  displayName: Prerequisites
+  inputs:
+    targetType: filePath
+    filePath: './build/vsts-prerequisites.ps1'
+
+- task: PowerShell@2
+  displayName: Validate
+  inputs:
+    targetType: filePath
+    filePath: './build/vsts-validate.ps1'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results **/TEST-*.xml'
+  inputs:
+    testResultsFormat: NUnit
+  condition: always()

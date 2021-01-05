@@ -2,35 +2,31 @@
 
 ## Who can contribute:
 Everyone is welcome to contribute to this tool.  The goal of the Hawk tool is to be a community lead tool and provides
-security support professionals with the tools they need to quickly and easily gather data from O365 and Azure.
+security support professionals with the tools they need to quickly and easily gather data from O365.
 
 ## What Hawk is and isn't
 Hawk provides Limited analysis of the gathered data.  This is by design!
 Hawk is here to help get all of the data in a single place it is not designed to make any significant
-conclusions about this data. This is intentional since it is impossible for the tool to know enough about
+conclusions about this data.  This is intentional since it is impossible for the tool to know enough about
 your environment or what you are concerned about to make a legitimate analysis of the data.
 
 Hawk's goal is to quickly get you the data that is needed to come to a conclusion; not to make the conclusion for you.
-We've structured the exported data in a manner of which can help analysts quickly triage known malicious Indicators Of Compromise (IOC) but again
-is NOT an all exhaustive list.
-## How can I contribute:
-Please post any issues you find to the Issue section. Those issues will be incorporated into your future capability implementation.
 
-If something is critical or I seem to have not done anything in some time please feel free to send an email to the
-Hawk support alias hawk_feedback@microsoft.com.
+## How can I contribute:
+Please post any issues you find to the Issue section.
 
 # HAWK
-Powershell Based tool for gathering information related to O365 intrusions and potential Breaches
+Powershell Based tool for gathering information related to M365 intrusions and potential Breaches
 
 ## PURPOSE:
-The Hawk module has been designed to ease the burden on O365 administrators who are performing
-a forensic analysis in their organization.
+The Hawk module has been designed to ease the burden on M365 administrators who are performing
+a Cloud forensic analysis for their organization.
 
 It does NOT take the place of a human reviewing the data generated and is simply here to make
 data gathering easier.
 
 ## HOW TO USE:
-Hawk is divided into two primary forms of cmdlets; *user* based Cmdlets and *tenant* based cmdlets.
+Hawk is divided into two primary forms of cmdlets; user based Cmdlets and Tenant based cmdlets.
 
 User based cmdlets take the form Verb-HawkUser<action>.  They all expect a -user switch and
 will retrieve information specific to the user that is specified.  Tenant based cmdlets take
@@ -52,3 +48,11 @@ that should reviewed.
 
 ## Disclaimer
 Hawk is NOT an official MICROSOFT tool.  Therefore use of the tool is covered exclusively by the license associated with this github repository.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
