@@ -1,4 +1,4 @@
-# Searches the unified audit log for logon activity by IP address
+﻿# Searches the unified audit log for logon activity by IP address
 Function Search-HawkTenantActivityByIP {
     param
     (

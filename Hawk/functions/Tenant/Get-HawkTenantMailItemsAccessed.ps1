@@ -1,4 +1,4 @@
-Function Get-HawkTenantMailItemsAccessed {
+﻿Function Get-HawkTenantMailItemsAccessed {
     <#
     .SYNOPSIS
         This will export MailboxItemsAccessed operations from the Unified Audit Log (UAL). Must be connected to Exchange Online

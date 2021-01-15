@@ -1,4 +1,4 @@
-Function Get-HawkTenantAuthHistory {
+﻿Function Get-HawkTenantAuthHistory {
 
     <#
     

@@ -1,4 +1,4 @@
-Function Get-HawkTenantAzureADUsers{
+﻿Function Get-HawkTenantAzureADUsers{
     <#
     .SYNOPSIS
         This function will export all the Azure Active Directory users.

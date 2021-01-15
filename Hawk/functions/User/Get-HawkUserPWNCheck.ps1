@@ -1,4 +1,4 @@
-Function Get-HawkUserPWNCheck {
+﻿Function Get-HawkUserPWNCheck {
     <#
  
 	.SYNOPSIS

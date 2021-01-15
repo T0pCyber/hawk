@@ -1,4 +1,4 @@
-Function Get-HawkTenantAZAdmins{
+﻿Function Get-HawkTenantAZAdmins{
 <#
 .SYNOPSIS
     Tenant Azure Active Directory Administrator export. Must be connected to Azure-AD using the Connect-AzureAD cmdlet

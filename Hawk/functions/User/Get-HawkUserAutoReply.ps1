@@ -1,4 +1,4 @@
-# Gets user AutoReply Configuration and looks for Enabled state
+﻿# Gets user AutoReply Configuration and looks for Enabled state
 Function Get-HawkUserAutoReply {
     param
     (

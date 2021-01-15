@@ -1,4 +1,4 @@
-# Gets user inbox rules and looks for Investigate rules
+﻿# Gets user inbox rules and looks for Investigate rules
 Function Get-HawkUserInboxRule {
     <#
  

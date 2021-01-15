@@ -1,4 +1,4 @@
-Function Get-HawkUserAuthHistory {
+﻿Function Get-HawkUserAuthHistory {
     <#
 
 	.SYNOPSIS

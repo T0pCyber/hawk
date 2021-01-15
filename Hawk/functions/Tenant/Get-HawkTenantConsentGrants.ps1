@@ -1,4 +1,4 @@
-Function Get-HawkTenantConsentGrants {
+﻿Function Get-HawkTenantConsentGrants {
     
     <#
  

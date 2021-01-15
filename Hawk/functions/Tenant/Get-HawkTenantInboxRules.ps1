@@ -1,4 +1,4 @@
-Function Get-HawkTenantInboxRules {
+﻿Function Get-HawkTenantInboxRules {
 
     <#
  

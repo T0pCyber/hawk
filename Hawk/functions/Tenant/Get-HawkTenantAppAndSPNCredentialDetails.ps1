@@ -1,4 +1,4 @@
-Function Get-HawkTenantAppAndSPNCredentialDetails {
+﻿Function Get-HawkTenantAppAndSPNCredentialDetails {
 <#
 .SYNOPSIS
     Tenant Azure Active Directory Applications and Service Principal Credential details export. Must be connected to Azure-AD using the Connect-AzureAD cmdlet

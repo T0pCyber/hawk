@@ -1,4 +1,4 @@
-Function Get-HawkUserHiddenRule {
+﻿Function Get-HawkUserHiddenRule {
     <#
  
 	.SYNOPSIS

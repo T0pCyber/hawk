@@ -1,4 +1,4 @@
-
+﻿
 
 # Executes the series of Hawk cmdets that search the whole tenant
 Function Start-HawkTenantInvestigation {

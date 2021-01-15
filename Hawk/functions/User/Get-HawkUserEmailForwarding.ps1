@@ -1,4 +1,4 @@
-Function Get-HawkUserEmailForwarding {
+﻿Function Get-HawkUserEmailForwarding {
     <#
  
 	.SYNOPSIS

@@ -1,4 +1,4 @@
-Function Get-HawkUserMobileDevice {
+﻿Function Get-HawkUserMobileDevice {
     <#
  
 	.SYNOPSIS

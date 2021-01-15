@@ -1,4 +1,4 @@
-Function Get-HawkUserConfiguration {
+﻿Function Get-HawkUserConfiguration {
 
     <#
  

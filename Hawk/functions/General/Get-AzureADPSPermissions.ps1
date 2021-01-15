@@ -1,4 +1,4 @@
-Function Get-AzureADPSPermissions {
+﻿Function Get-AzureADPSPermissions {
 
 <#
 .SYNOPSIS

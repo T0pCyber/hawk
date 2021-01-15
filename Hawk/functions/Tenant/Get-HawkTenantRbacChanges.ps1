@@ -1,4 +1,4 @@
-# Search for any changes made to RBAC in the search window and report them
+﻿# Search for any changes made to RBAC in the search window and report them
 Function Get-HawkTenantRBACChanges {
 	
 	<#

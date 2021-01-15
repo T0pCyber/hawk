@@ -1,4 +1,4 @@
-Function Get-HawkMessageHeader {
+﻿Function Get-HawkMessageHeader {
     <#
  
 	.SYNOPSIS

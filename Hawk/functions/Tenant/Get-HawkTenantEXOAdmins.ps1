@@ -1,4 +1,4 @@
-Function Get-HawkTenantEXOAdmins{
+﻿Function Get-HawkTenantEXOAdmins{
     <#
     .SYNOPSIS
         Exchange Online Administrator export. Must be connected to Exchange Online using the Connect-EXO cmdlet

@@ -1,4 +1,4 @@
-function Get-HawkUserMailboxAuditing {
+﻿function Get-HawkUserMailboxAuditing {
 
     <#
 

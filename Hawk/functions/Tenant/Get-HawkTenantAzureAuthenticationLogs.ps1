@@ -1,4 +1,4 @@
-# Return logon information from the Azure Audit logs
+﻿# Return logon information from the Azure Audit logs
 Function Get-HawkTenantAzureAuthenticationLogs {
 
     <#

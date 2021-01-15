@@ -1,4 +1,4 @@
-# String together the hawk user functions to pull data for a single user
+﻿# String together the hawk user functions to pull data for a single user
 Function Start-HawkUserInvestigation {
 
     <#

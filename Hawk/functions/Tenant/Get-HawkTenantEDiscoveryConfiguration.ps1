@@ -1,4 +1,4 @@
-# Find any roles that have access to key edisocovery cmdlets and output the folks who have those rights
+﻿# Find any roles that have access to key edisocovery cmdlets and output the folks who have those rights
 Function Get-HawkTenantEDiscoveryConfiguration {
 
     Test-EXOConnection

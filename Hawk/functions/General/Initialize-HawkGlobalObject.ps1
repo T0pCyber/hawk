@@ -1,4 +1,4 @@
-# Create the hawk global object for use by other cmdlets in the hawk module
+﻿# Create the hawk global object for use by other cmdlets in the hawk module
 Function Initialize-HawkGlobalObject {
     <#
 

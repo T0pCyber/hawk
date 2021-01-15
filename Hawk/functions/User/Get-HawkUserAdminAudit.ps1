@@ -1,4 +1,4 @@
-Function Get-HawkUserAdminAudit {
+﻿Function Get-HawkUserAdminAudit {
 
     <#
 
