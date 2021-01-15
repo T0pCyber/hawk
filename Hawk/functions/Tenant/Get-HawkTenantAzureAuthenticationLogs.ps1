@@ -1,29 +1,22 @@
 ﻿# Return logon information from the Azure Audit logs
 Function Get-HawkTenantAzureAuthenticationLogs {
-
     <#
-
 	.SYNOPSIS
 	Retrieves Azure AD Sign in Logs
-
 	.DESCRIPTION
     Uses Graph API to retrieve Azure AD Signin Logs
     ** Requires that the tenant have an Azure AD P1 or P2 license or trial license
-
 	.OUTPUTS
 
 	File: Azure_AD_Signin.csv
 	Path: \
 	Description: Azure AD Signin Report
-
     .EXAMPLE
 	Get-HawkTenantAzureAuthenticationLogs
 
 	Returns all Azure AD Signin reports in CSV format
 
 	#>
-
-
     # Make sure we have a connection to MSOL since we will need it
     Test-MSOLConnection
 
@@ -82,7 +75,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             Out-LogFile $_
             Out-LogFile ("Status Code:" + $RawReport.StatusCode)
             $RawReport | Export-Clixml C:\raw_report.xml
-            
+
             # If status code is 503 then we had too many requests
             if ($RawReport.StatusCode -eq 503) {
                 Out-LogFile "[WARNING] - Endpoint Overwhelmed Sleeping 5 min"
@@ -101,7 +94,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
             elseif ($null -eq $RawReport) {
                 Out-LogFile "[WARNING] - No Data Returned"
                 Start-SleepWithProgress -sleeptime (300 * $BackoffCount)
-                $Backoff = $true                
+                $Backoff = $true
             }
 
             # In all other cases we are going to bail
@@ -125,7 +118,7 @@ Function Get-HawkTenantAzureAuthenticationLogs {
                 # Increment the backoffcount
                 [int]$BackoffCount++
                 Out-LogFile ("BackoffCount: " + $BackoffCount)
-            }            
+            }
         }
         else {
 

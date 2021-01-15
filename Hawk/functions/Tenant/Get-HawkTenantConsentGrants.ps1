@@ -1,26 +1,20 @@
 ﻿Function Get-HawkTenantConsentGrants {
-    
     <#
- 
 	.SYNOPSIS
 	Gathers application grants
-
 	.DESCRIPTION
     Used the script from https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants to gather information about
     application and delegate grants.  Attempts to detect high risk grants for review.
-
 	.OUTPUTS
 	File: Consent_Grants.csv
 	Path: \Tenant
 	Description: Output of all consent grants
-
 	.EXAMPLE
 	Get-HawkTenantConsentGrants
-	
-	Gathers Grants
 
+	Gathers Grants
     #>
-    
+
     Out-LogFile "Gathering Oauth / Application Grants"
 
     Test-AzureADConnection

@@ -1,5 +1,44 @@
-﻿# Searches the unified audit log for logon activity by IP address
-Function Search-HawkTenantActivityByIP {
+﻿Function Search-HawkTenantActivityByIP {
+    <#
+	.SYNOPSIS
+	Gathers logon activity based on a submitted IP Address.
+	.DESCRIPTION
+	Pulls logon activity from the Unified Audit log based on a provided IP address.
+    Processes the data to highlight successful logons and the number of users accessed by a given IP address.
+    .PARAMETER IPaddress
+    IP address to investigate
+	.OUTPUTS
+
+	File: All_Events.csv
+	Path: \<IP>
+	Description: All logon events
+
+	File: All_Events.xml
+	Path: \<IP>\xml
+	Description: Client XML of all logon events
+
+	File: Success_Events.csv
+	Path: \<IP>
+	Description: All logon events that were successful
+
+	File: Unique_Users_Attempted.csv
+	Path: \<IP>
+	Description: List of Unique users that this IP tried to log into
+
+	File: Unique_Users_Success.csv
+	Path: \<IP>
+	Description: Unique Users that this IP succesfully logged into
+
+	File: Unique_Users_Success.xml
+	Path: \<IP>\XML
+	Description: Client XML of unique users the IP logged into
+	.EXAMPLE
+
+	Search-HawkTenantActivityByIP -IPAddress 10.234.20.12
+
+	Searches for all Logon activity from IP 10.234.20.12.
+
+	#>
     param
     (
         [parameter(Mandatory = $true)]
@@ -16,7 +55,7 @@ Function Search-HawkTenantActivityByIP {
     if ($IpAddress -like "*,*") {
         Out-LogFile "Please provide a single IP address to search."
         Write-Error -Message "Please provide a single IP address to search." -ErrorAction Stop
-    }	
+    }
 
     Out-LogFile ("Searching for events related to " + $IpAddress) -action
 
@@ -54,51 +93,7 @@ Function Search-HawkTenantActivityByIP {
             Out-LogFile ("IP " + $IpAddress + " SUCCESSFULLY accessed " + $uniqueuserlogonssuccess.count + " users") -notice
             $uniqueuserlogonssuccess | Out-MultipleFileType -FilePrefix "Unique_Users_Success" -csv -User $DirectoryName -Notice
         }
-	
-    }	
 
-    <#
- 
-	.SYNOPSIS
-	Gathers logon activity based on a submitted IP Address.
-
-	.DESCRIPTION
-	Pulls logon activity from the Unified Audit log based on a provided IP address.
-	Processes the data to highlight successful logons and the number of users accessed by a given IP address.
-
-	.OUTPUTS
-	
-	File: All_Events.csv
-	Path: \<IP>
-	Description: All logon events
-
-	File: All_Events.xml
-	Path: \<IP>\xml
-	Description: Client XML of all logon events
-
-	File: Success_Events.csv
-	Path: \<IP>
-	Description: All logon events that were successful
-
-	File: Unique_Users_Attempted.csv
-	Path: \<IP>
-	Description: List of Unique users that this IP tried to log into
-
-	File: Unique_Users_Success.csv
-	Path: \<IP>
-	Description: Unique Users that this IP succesfully logged into
-
-	File: Unique_Users_Success.xml
-	Path: \<IP>\XML
-	Description: Client XML of unique users the IP logged into
-
-	
-	.EXAMPLE
-
-	Search-HawkTenantActivityByIP -IPAddress 10.234.20.12
-
-	Searches for all Logon activity from IP 10.234.20.12.
-	
-	#>
+    }
 
 }

@@ -1,7 +1,6 @@
 ﻿Function Get-HawkTenantAuthHistory {
 
     <#
-    
     .SYNOPSIS
     Gathers 48 hours worth of Unified Audit logs.
     Pulls everyting into a CSV file.
@@ -21,7 +20,7 @@
     Get-HawkTenantAuthHistory -StartDate "10/25/2018"
 
     Gathers 48 hours worth of audit data starting at midnight on October 25th 2018
-        
+
     #>
 
     Param (
@@ -32,13 +31,13 @@
 
     # # Try to convert the submitted date into [datetime] format
     # try {
-    #     [datetime]$DateToStartSearch = Get-Date $StartDate       
+    #     [datetime]$DateToStartSearch = Get-Date $StartDate
     # }
     # catch {
     #     Out-Logfile "[ERROR] - Unable to convert submitted date"
-    #     break        
+    #     break
     # }
-    
+
     # Make sure the start date isn't more than 90 days in the past
     if ((Get-Date).adddays(-91) -gt $StartDate) {
         Out-Logfile "[ERROR] - Start date is over 90 days in the past"

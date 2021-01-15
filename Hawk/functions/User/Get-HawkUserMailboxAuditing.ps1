@@ -1,19 +1,15 @@
 ﻿function Get-HawkUserMailboxAuditing {
-
     <#
 
 	.SYNOPSIS
 	Gathers Mailbox Audit data if enabled for the user.
-
 	.DESCRIPTION
 	Check if mailbox auditing is enabled for the user.
     If it is pulls the mailbox audit logs from the time period specified for the investigation.
 
     Will pull from the Unified Audit Log and the Mailbox Audit Log
-
 	.PARAMETER UserPrincipalName
 	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
-
 	.OUTPUTS
 
 	File: Exchange_UAL_Audit.csv
@@ -23,20 +19,16 @@
     File: Exchange_Mailbox_Audit.csv
 	Path: \<User>
 	Description: All Exchange related audit events found in the Mailbox Audit Log.
-
-
 	.EXAMPLE
 
 	Get-HawkUserMailboxAuditing -UserPrincipalName user@contoso.com
 
 	Search for all Mailbox Audit logs from user@contoso.com
-
 	.EXAMPLE
 
 	Get-HawkUserMailboxAuditing -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
 
 	Search for all Mailbox Audit logs for all users who have "C-Level" set in CustomAttribute1
-
     #>
 
     param

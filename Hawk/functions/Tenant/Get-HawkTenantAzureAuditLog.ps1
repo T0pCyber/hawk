@@ -1,11 +1,8 @@
 ﻿
-Function Get-HawkTenantAzureAuditLog {
-	
+Function Get-HawkTenantAzureAuditLog{
 	<#
- 
 	.SYNOPSIS
 	Gathers common data about a tenant.
-
 	.DESCRIPTION
 	Runs all Hawk Basic tenant related cmdlets and gathers the data.
 
@@ -15,25 +12,23 @@ Function Get-HawkTenantAzureAuditLog {
 	Get-HawkTenantEDiscoveryConfiguration	Looks for changes to ediscovery configuration
 	Search-HawkTenantEXOAuditLog			Searches the EXO audit log for activity
 	Get-HawkTenantRBACChanges				Looks for changes to Roles Based Access Control
-	
 	.OUTPUTS
 	See help from individual cmdlets for output list.
 	All outputs are placed in the $Hawk.FilePath directory
-
 	.EXAMPLE
 	Start-HawkTenantInvestigation
 
 	Runs all of the tenant investigation cmdlets.
-	
+
 	#>
 
 	Test-EXOConnection
 	Send-AIEvent -Event "CmdRun"
-	
+
 	# Make sure our variables are null
 	$AzureApplicationActivityEvents = $null
 
-    Out-LogFile "Searching Unified Audit Logs Azure Activities" -Action 
+    Out-LogFile "Searching Unified Audit Logs Azure Activities" -Action
 	Out-LogFile "Searching for Application Activities"
 
 	# Search the unified audit log for events related to applciation activity
@@ -52,7 +47,7 @@ Function Get-HawkTenantAzureAuditLog {
 
 		# Go thru each even and prepare it to output to CSV
 		Foreach ($event in $AzureApplicationActivityEvents){
-		
+
 			$event.auditdata | ConvertFrom-Json | Select-Object -Property Id,
 				Operation,
 				ResultStatus,
