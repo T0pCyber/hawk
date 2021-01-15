@@ -5,7 +5,7 @@ $global:BannedCommands = @(
 	#'Write-Warning'
 	#'Write-Error'
 	#'Write-Output'
-	'Write-Information'
+	#'Write-Information'
 	'Write-Debug'
 
 	# Use CIM instead where possible

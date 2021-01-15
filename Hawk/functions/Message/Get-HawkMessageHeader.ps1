@@ -1,41 +1,36 @@
 ﻿Function Get-HawkMessageHeader {
     <#
- 
 	.SYNOPSIS
 	Gathers the header from the an msg file prepares a report
-
 	.DESCRIPTION
     Gathers the header from the an msg file prepares a report
-    
+
     For Best Results:
     * Capture a message which was sent from the bad actor to an internal user.
     * Get a copy of the message from the internal user's mailbox.
     * For transfering the file ensure that the source msg is zipped before emailing.
     * On Recieve the admin should extract the MSG and run this cmdlet against it.
-
     .PARAMETER MSGFile
 	Path to an export MSG file.
-	
 	.OUTPUTS
     File: Message_Header.csv
 	Path: \<message name>
     Description: Message Header in CSV form
-    
+
     File: Message_Header_RAW.txt
 	Path: \<message name>
 	Description: Raw header sutible for going into other tools
-
 	.EXAMPLE
 	Get-HawkMessageHeader -msgfile 'c:\temp\my suspicious message.msg'
 
 	Pulls the header and reviews critical information
-	
+
     #>
-    
+
     param
     (
         [Parameter(Mandatory = $true)]
-        [string]$MSGFile	
+        [string]$MSGFile
     )
 
     # Create the outlook com object
@@ -47,25 +42,25 @@
         Out-LogFile "Unable to create outlook com object." -error
         Out-LogFile "Please make sure outlook is installed." -error
         Out-LogFile $Error[0]
-        
+
         Write-Error "Unable to create Outlook Com Object, please ensure outlook is installed" -ErrorAction Stop
-        
+
     }
 
     # Create the Hawk object if it isn't there already
     Initialize-HawkGlobalObject
     Send-AIEvent -Event "CmdRun"
 
-    
+
     # check to see if we have a valid file path
     if (Test-Path $MSGFile) {
-        
+
         # Convert a possible relative path to a full path
         $MSGFile = (Resolve-Path $MSGFile).Path
 
         # Store the file name for later use
         $MSGFileName = $MSGFile | Split-Path -Leaf
-        
+
         Out-LogFile ("Reading message header from file " + $MSGFile) -action
         # Import the message and start processing the header
         try {
@@ -85,7 +80,7 @@
         Out-LogFile ("Failed to find file " + $MSGFile) -error
         Write-Error -Message "Failed to find file " + $MSGFile -ErrorAction Stop
     }
-        
+
     # Make sure variables are empty
     [string]$CombinedString = $null
     [array]$Output = $null
@@ -94,7 +89,7 @@
     foreach ($string in $headersWithLines) {
         # If our string is not null and we have a leading whitespace then this needs to be added to the previous string as part of the same object.
         if (!([string]::IsNullOrEmpty($string)) -and ([char]::IsWhiteSpace($string[0]))) {
-            # Do some string clean up 
+            # Do some string clean up
             $string = $string.trimstart()
             $string = $string.trimend()
             $string = " " + $string
@@ -102,11 +97,11 @@
             # Push the string together
             [string]$CombinedString += $string
         }
-        
+
         # If we are here we do a null check just in case but we know the first char is not a whitespace
         # So we have a new "object" that we need to process in
         elseif (!([string]::IsNullOrEmpty($string))) {
-            
+
             # For the inital pass the string will be null or empty so we need to check for that
             if ([string]::IsNullOrEmpty($CombinedString)) {
                 # Create our new string and continue processing
@@ -116,7 +111,7 @@
                 # We should have everything now so create the object
                 $Object = $null
                 $Object = New-Object -TypeName PSObject
-                
+
                 # Split the string on the divider and add it to the object
                 [array]$StringSplit = $CombinedString -split ":", 2
                 $Object | Add-Member -MemberType NoteProperty -Name "Header" -Value $StringSplit[0].trim()
@@ -127,7 +122,7 @@
 
                 # Create our new string and continue processing
                 $CombinedString = $string.trimend()
-            }            
+            }
         }
         else { }
     }
@@ -163,7 +158,7 @@
         ### Output to the report the client that submitted
         $Findings += (Add-Finding -Name "Submitting Client" -Value $receivedHeadersObject[0].ReceivedWith -Conclusion "None" -MoreInformation "")
     }
-    
+
     ### Output the AuthAS type
     $AuthAs = $output | Where-Object { $_.header -like 'X-MS-Exchange-Organization-AuthAs' }
     # Make sure we got something back
@@ -177,7 +172,7 @@
             $Findings += (Add-Finding -Name "Authentication Method" -Value $AuthAs.value -Conclusion "Method used to authenticate" -MoreInformation "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help")
         }
     }
-    
+
     ### Determine the AuthMechanism
     $AuthMech = $output | Where-Object { $_.header -like 'X-MS-Exchange-Organization-AuthMechanism' }
     # Make sure we got something back
@@ -193,7 +188,7 @@
     }
 
     ### Do P1 and P2 match
-    $From = $output | Where-Object { $_.header -like 'From' }    
+    $From = $output | Where-Object { $_.header -like 'From' }
     $ReturnPath = $output | Where-Object { $_.header -like 'Return-Path' }
 
     # Pull out the from string since it can be formatted with a name
@@ -268,7 +263,7 @@ Function Convert-ReceiveHeader {
 
     # Find out different groups with the regex
     $headerMatches = $Header | Select-String -Pattern $HeaderRegex -AllMatches
-    
+
     # Check if we got back results
     if ($null -ne $headerMatches) {
         # Formatch our with
@@ -277,17 +272,17 @@ Function Convert-ReceiveHeader {
             "ESMTP*" { $with = "ESMTP" }
             default { $with = $headerMatches.Matches.groups[3].value.trim() }
         }
-        
+
         # Create the hash to generate the output object
         $fromhash = @{
             ReceivedFrom = $headerMatches.Matches.groups[1].value.trim()
             ReceivedBy   = $headerMatches.Matches.groups[2].value.trim()
             ReceivedWith = $with
             ReceivedTime = [datetime]($headerMatches.Matches.groups[4].value.trim())
-        }                 
-        
+        }
+
         # Put the data into an object and return it
-        $Output = New-Object -TypeName PSObject -Property $fromhash                  
+        $Output = New-Object -TypeName PSObject -Property $fromhash
         return $Output
     }
     # If we failed to match then return null

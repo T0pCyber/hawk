@@ -9,6 +9,8 @@
         logs that will be present if the attacker is using the Graph API for such actions. Note: NOT all graph API actions against
         a mailbox are malicious. Review the results of this function and look for Application IDs that are associated with a
         suspicious application ID.
+    .PARAMETER ApplicationID
+        Malicious Application ID that you're investigating
     .EXAMPLE
         PS C:\>Get-HawkTenantMailItemsAccessed
     .OUTPUTS
