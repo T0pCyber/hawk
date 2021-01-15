@@ -100,7 +100,7 @@ PROCESS{
     }
 }#End Process
 END{
-    Out-Logfile "Completed exporting Azure AD Serice Principal and App Registration Certificate and Password Details"
+    Out-Logfile "Completed exporting Azure AD Service Principal and App Registration Certificate and Password Details"
 } #End End
 
 }#End Function
