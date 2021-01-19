@@ -1,77 +1,75 @@
-﻿# RBAC Changes
-# Changes to impersonation
-Function Search-HawkTenantEXOAuditLog {
-    <#
-	.SYNOPSIS
-	Searches the admin audit logs for possible bad actor activities
-	.DESCRIPTION
-	Searches the Exchange admin audkit logs for a number of possible bad actor activies.
-	* New inbox rules
-	* Changes to user forwarding configurations
-	* Changes to user mailbox permissions
-	* Granting of impersonation rights
-	.OUTPUTS
+﻿Function Search-HawkTenantEXOAuditLog {
+<#
+.SYNOPSIS
+    Searches the admin audit logs for possible bad actor activities
+.DESCRIPTION
+    Searches the Exchange admin audkit logs for a number of possible bad actor activies.
+    * New inbox rules
+    * Changes to user forwarding configurations
+    * Changes to user mailbox permissions
+    * Granting of impersonation rights
+.OUTPUTS
 
-	File: Simple_New_InboxRule.csv
-	Path: \
-	Description: cmdlets to create any new inbox rules in a simple to read format
+    File: Simple_New_InboxRule.csv
+    Path: \
+    Description: cmdlets to create any new inbox rules in a simple to read format
 
-	File: New_InboxRules.xml
-	Path: \XML
-	Description: Search results for any new inbox rules in CLI XML format
+    File: New_InboxRules.xml
+    Path: \XML
+    Description: Search results for any new inbox rules in CLI XML format
 
-	File: _Investigate_Simple_New_InboxRule.csv
-	Path: \
-	Description: cmdlets to create inbox rules that forward or delete email in a simple format
+    File: _Investigate_Simple_New_InboxRule.csv
+    Path: \
+    Description: cmdlets to create inbox rules that forward or delete email in a simple format
 
-	File: _Investigate_New_InboxRules.xml
-	Path: \XML
-	Description: Search results for newly created inbox rules that forward or delete email in CLI XML
+    File: _Investigate_New_InboxRules.xml
+    Path: \XML
+    Description: Search results for newly created inbox rules that forward or delete email in CLI XML
 
-	File: _Investigate_New_InboxRules.txt
-	Path: \
-	Description: Search results of newly created inbox rules that forward or delete email
+    File: _Investigate_New_InboxRules.txt
+    Path: \
+    Description: Search results of newly created inbox rules that forward or delete email
 
-	File: Simple_Forwarding_Changes.csv
-	Path: \
-	Description: cmdlets that change forwarding settings in a simple to read format
+    File: Simple_Forwarding_Changes.csv
+    Path: \
+    Description: cmdlets that change forwarding settings in a simple to read format
 
-	File: Forwarding_Changes.xml
-	Path: \XML
-	Description: Search results for cmdlets that change forwarding settings in CLI XML
+    File: Forwarding_Changes.xml
+    Path: \XML
+    Description: Search results for cmdlets that change forwarding settings in CLI XML
 
-	File: Forwarding_Recipients.csv
-	Path: \
-	Description: List of unique Email addresses that were setup to recieve email via forwarding
+    File: Forwarding_Recipients.csv
+    Path: \
+    Description: List of unique Email addresses that were setup to recieve email via forwarding
 
-	File: Simple_Mailbox_Permissions.csv
-	Path: \
-	Description: Cmdlets that add permissions to users in a simple to read format
+    File: Simple_Mailbox_Permissions.csv
+    Path: \
+    Description: Cmdlets that add permissions to users in a simple to read format
 
-	File: Mailbox_Permissions.xml
-	Path: \XML
-	Description: Search results for cmdlets that change permissions in CLI XML
+    File: Mailbox_Permissions.xml
+    Path: \XML
+    Description: Search results for cmdlets that change permissions in CLI XML
 
-	File: _Investigate_Impersonation_Roles.csv
-	Path: \
-	Description: List all users with impersonation rights if we find more than the default of one
+    File: _Investigate_Impersonation_Roles.csv
+    Path: \
+    Description: List all users with impersonation rights if we find more than the default of one
 
-	File: _Investigate_Impersonation_Roles.csv
-	Path: \XML
-	Description: List all users with impersonation rights if we find more than the default of one as CLI XML
+    File: _Investigate_Impersonation_Roles.csv
+    Path: \XML
+    Description: List all users with impersonation rights if we find more than the default of one as CLI XML
 
-	File: Impersonation_Rights.csv
-	Path: \
-	Description: List all users with impersonation rights if we only find the default one
+    File: Impersonation_Rights.csv
+    Path: \
+    Description: List all users with impersonation rights if we only find the default one
 
-	File: Impersonation_Rights.csv
-	Path: \XML
-	Description: List all users with impersonation rights if we only find the default one as CLI XML
-	.EXAMPLE
-	Search-HawkTenantEXOAuditLog
+    File: Impersonation_Rights.csv
+    Path: \XML
+    Description: List all users with impersonation rights if we only find the default one as CLI XML
+.EXAMPLE
+    Search-HawkTenantEXOAuditLog
 
-	Searches the tenant audit logs looking for changes that could have been made in the tenant.
-	#>
+    Searches the tenant audit logs looking for changes that could have been made in the tenant.
+#>
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"

@@ -1,19 +1,14 @@
-﻿<#
+﻿Function Get-AllUnifiedAuditLogEntry {
+<#
 .SYNOPSIS
     Make sure we get back all of the unified audit log results for the search we are doing
 .DESCRIPTION
     Make sure we get back all of the unified audit log results for the search we are doing
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
+    Get-AllUnifiedAuditLog Entry
 .NOTES
     General notes
 #>
-Function Get-AllUnifiedAuditLogEntry {
     param
     (
         [Parameter(Mandatory = $true)]

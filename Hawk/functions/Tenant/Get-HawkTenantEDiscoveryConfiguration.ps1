@@ -1,32 +1,32 @@
 ﻿Function Get-HawkTenantEDiscoveryConfiguration {
 <#
-	.SYNOPSIS
+.SYNOPSIS
     Looks for users that have e-discovery rights.
     Find any roles that have access to key edisocovery cmdlets and output the users who have those rights
-	.DESCRIPTION
-	Searches for all roles that have e-discovery cmdlets.
-	Searches for all users / groups that have access to those roles.
-	.OUTPUTS
-	File: EDiscoveryRoles.csv
-	Path: \
-	Description: All roles that have access to the New-MailboxSearch and Search-Mailbox cmdlets
+.DESCRIPTION
+    Searches for all roles that have e-discovery cmdlets.
+    Searches for all users / groups that have access to those roles.
+.OUTPUTS
+    File: EDiscoveryRoles.csv
+    Path: \
+    Description: All roles that have access to the New-MailboxSearch and Search-Mailbox cmdlets
 
-	File: EDiscoveryRoles.xml
-	Path: \XML
-	Description: All roles that have access to the New-MailboxSearch and Search-Mailbox cmdlets as CLI XML
+    File: EDiscoveryRoles.xml
+    Path: \XML
+    Description: All roles that have access to the New-MailboxSearch and Search-Mailbox cmdlets as CLI XML
 
-	File: EDiscoveryRoleAssignments.csv
-	Path: \
-	Description: All users that are assigned one of the discovered roles
+    File: EDiscoveryRoleAssignments.csv
+    Path: \
+    Description: All users that are assigned one of the discovered roles
 
-	File: EDiscoveryRoleAssignments.xml
-	Path: \XML
-	Description: All users that are assigned one of the discovered roles as CLI XML
-	.EXAMPLE
-	Get-HawkTenantEDiscoveryConfiguration
+    File: EDiscoveryRoleAssignments.xml
+    Path: \XML
+    Description: All users that are assigned one of the discovered roles as CLI XML
+.EXAMPLE
+    Get-HawkTenantEDiscoveryConfiguration
 
-	Runs the cmdlet against the current logged in tenant and outputs ediscovery information
-    #>
+    Runs the cmdlet against the current logged in tenant and outputs ediscovery information
+#>
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"

@@ -4,9 +4,10 @@
     Get the Location of an IP using the freegeoip.net rest API
 .DESCRIPTION
     Get the Location of an IP using the freegeoip.net rest API
+.PARAMETER IPAddress
+    IP address of geolocation
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
+    Get-IPGeolocation
 .INPUTS
     Inputs (if any)
 .OUTPUTS

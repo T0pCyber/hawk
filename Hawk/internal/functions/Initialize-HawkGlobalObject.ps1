@@ -1,51 +1,44 @@
-﻿# Create the hawk global object for use by other cmdlets in the hawk module
-Function Initialize-HawkGlobalObject {
-    <#
-
-	.SYNOPSIS
-	Create global variable $Hawk for use by all Hawk cmdlets.
-
-	.DESCRIPTION
-	Creates the global variable $Hawk and populates it with information needed by the other Hawk cmdlets.
+﻿Function Initialize-HawkGlobalObject {
+<#
+.SYNOPSIS
+    Create global variable $Hawk for use by all Hawk cmdlets.
+.DESCRIPTION
+    Creates the global variable $Hawk and populates it with information needed by the other Hawk cmdlets.
 
     * Checks for latest version of the Hawk module
-	* Creates path for output files
-	* Records target start and end dates for searches
-
-    .PARAMETER Force
+    * Creates path for output files
+    * Records target start and end dates for searches
+.PARAMETER Force
     Switch to force the function to run and allow the variable to be recreated
-
-    .PARAMETER IAgreeToTheEula
+.PARAMETER IAgreeToTheEula
     Agrees to the EULA on the command line to skip the prompt.
-
-    .PARAMETER SkipUpdate
+.PARAMETER SkipUpdate
     Skips checking for the latest version of the Hawk Module
-
-    .PARAMETER DaysToLookBack
+.PARAMETER DaysToLookBack
     Defines the # of days to look back in the availible logs.
     Valid values are 1-90
+.PARAMETER StartDate
+    First day that data will be retrieved
+.PARAMETER EndDate
+    Last day that data will be retrieved
+.PARAMETER FilePath
+    Provide an output file path.
+.OUTPUTS
+    Creates the $Hawk global variable and populates it with a custom PS object with the following properties
 
-    .PARAMETER FilePath
-	Provide an output file path.
-
-	.OUTPUTS
-	Creates the $Hawk global variable and populates it with a custom PS object with the following properties
-
-	Property Name	Contents
-	==========		==========
-	FilePath		Path to output files
-	DaysToLookBack	Number of day back in time we are searching
-	StartDate		Calculated start date for searches based on DaysToLookBack
-	EndDate			One day in the future
-	WhenCreated		Date and time that the variable was created
-	EULA			If you have agreed to the EULA or not
-
-	.EXAMPLE
-	Initialize-HawkGlobalObject -Force
+    Property Name	Contents
+    ==========		==========
+    FilePath		Path to output files
+    DaysToLookBack	Number of day back in time we are searching
+    StartDate		Calculated start date for searches based on DaysToLookBack
+    EndDate			One day in the future
+    WhenCreated		Date and time that the variable was created
+    EULA			If you have agreed to the EULA or not
+.EXAMPLE
+    Initialize-HawkGlobalObject -Force
 
     This Command will force the creation of a new $Hawk variable even if one already exists.
-
-    #>
+#>
 	[CmdletBinding()]
     param
     (

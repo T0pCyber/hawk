@@ -1,9 +1,9 @@
 ﻿# String together the hawk user functions to pull data for a single user
 Function Start-HawkUserInvestigation {
-    <#
-	.SYNOPSIS
+<#
+.SYNOPSIS
 	Gathers common data about a provided user.
-	.DESCRIPTION
+.DESCRIPTION
 	Runs all Hawk users related cmdlets against the specified user and gathers the data.
 
 	Cmdlet								Information Gathered
@@ -17,21 +17,21 @@ Function Start-HawkUserInvestigation {
 	Get-HawkUserMailboxAuditing         Searches the unified audit log for mailbox auditing information
 	Get-HawkUserAdminAudit				Searches the EXO Audit logs for any commands that were run against the provided user object.
 	Get-HawkUserMessageTrace			Pulls the email sent by the user in the last 7 days.
-	.PARAMETER UserPrincipalName
+.PARAMETER UserPrincipalName
 	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
-	.OUTPUTS
+.OUTPUTS
 	See help from individual cmdlets for output list.
 	All outputs are placed in the $Hawk.FilePath directory
-	.EXAMPLE
+.EXAMPLE
 	Start-HawkUserInvestigation -UserPrincipalName bsmith@contoso.com
 
 	Runs all Get-HawkUser* cmdlets against the user with UPN bsmith@contoso.com
-	.EXAMPLE
+.EXAMPLE
 
 	Start-HawkUserInvestigation -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
 
 	Runs all Get-HawkUser* cmdlets against all users who have "C-Level" set in CustomAttribute1
-	#>
+#>
 
     param
     (

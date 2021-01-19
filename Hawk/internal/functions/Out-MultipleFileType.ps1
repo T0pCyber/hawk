@@ -3,15 +3,25 @@
     Sends the output of a cmdlet to a txt file and a clixml file
 .DESCRIPTION
     Sends the output of a cmdlet to a txt file and a clixml file
+.PARAMETER FilePrefix
+    File name
+.PARAMETER User
+    User that the data is being exported from
+.PARAMETER Append
+    Change existing file
+.PARAMETER xml
+    xml file format
+.PARAMETER csv
+    csv file formoat
+.PARAMETER txt
+    txt file format
+.PARAMETER Notice
+    Notification that data retrieved meets the investigation criteria
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
+    Out-MultipleFileTime
+    Determined what file is being used for export of data
 .NOTES
-    General notes
+    Need to review invesigation criteria of data being exported
 #>
 Function Out-MultipleFileType {
     param

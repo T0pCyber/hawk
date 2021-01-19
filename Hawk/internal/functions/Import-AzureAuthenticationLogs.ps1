@@ -1,19 +1,17 @@
-﻿<#
+﻿
+Function Import-AzureAuthenticationLogs {
+<#
 .SYNOPSIS
     Takes in a set of azure Authentication logs and combines them into a unified output
 .DESCRIPTION
     Takes in a set of azure Authentication logs and combines them into a unified output
+.PARAMETER JsonCovertedLogs
+    Logs that are converted
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
+    Import-AzureAuthenticationLogs
 .NOTES
     General notes
 #>
-Function Import-AzureAuthenticationLogs {
     Param([array]$JsonConvertedLogs)
 
     # Null out the output object

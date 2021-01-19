@@ -1,29 +1,29 @@
 ﻿Function Get-HawkUserMobileDevice {
-    <#
-	.SYNOPSIS
-	Gathers mobile devices that are connected to the account
-	.DESCRIPTION
+<#
+.SYNOPSIS
+    Gathers mobile devices that are connected to the account
+.DESCRIPTION
     Pulls all mobile devices attached to them mailbox using get-mobiledevice
 
     If any devices had their first sync inside of the investigation window it will flag them.
     Investigator should follow up on these devices
-	.PARAMETER UserPrincipalName
-	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
-	.OUTPUTS
+.PARAMETER UserPrincipalName
+    Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
+.OUTPUTS
 
-	File: MobileDevices.csv
-	Path: \<User>
+    File: MobileDevices.csv
+    Path: \<User>
     Description: All mobile devices attached to the mailbox
 
     File: _Investigate_MobileDevice.csv
     Path: \<User>
     Descriptoin: Any devices that were found to have their first sync inside of the investigation window
-	.EXAMPLE
+.EXAMPLE
 
-	Get-HawkUserMessageTrace -UserPrincipalName user@contoso.com
+    Get-HawkUserMessageTrace -UserPrincipalName user@contoso.com
 
-	Gets the message trace for user@contoso.com for the last 7 days
-	#>
+    Gets the message trace for user@contoso.com for the last 7 days
+#>
 
     param
     (

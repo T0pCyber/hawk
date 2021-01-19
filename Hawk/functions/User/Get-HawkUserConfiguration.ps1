@@ -1,16 +1,16 @@
 ﻿Function Get-HawkUserConfiguration {
-    <#
-	.SYNOPSIS
+<#
+.SYNOPSIS
 	Gathers baseline information about the provided user.
-	.DESCRIPTION
+.DESCRIPTION
 	Gathers and records baseline information about the provided user.
 	* Get-Mailbox
 	* Get-MailboxStatistics
 	* Get-MailboxFolderStatistics
 	* Get-CASMailbox
-	.PARAMETER UserPrincipalName
+.PARAMETER UserPrincipalName
 	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
-	.OUTPUTS
+.OUTPUTS
 
 	File: Mailbox_Info.txt
 	Path: \<User>
@@ -27,16 +27,16 @@
 	File: CAS_Mailbox_Info.txt
 	Path : \<User>
 	Description: Output of Get-CasMailbox for the user
-	.EXAMPLE
+.EXAMPLE
 	Get-HawkUserConfiguration -user bsmith@contoso.com
 
 	Gathers the user configuration for bsmith@contoso.com
-	.EXAMPLE
+.EXAMPLE
 
 	Get-HawkUserConfiguration -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
 
 	Gathers the user configuration for all users who have "C-Level" set in CustomAttribute1
-	#>
+#>
 
     param
     (

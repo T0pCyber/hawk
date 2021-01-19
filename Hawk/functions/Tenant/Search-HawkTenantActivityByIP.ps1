@@ -1,44 +1,43 @@
 ﻿Function Search-HawkTenantActivityByIP {
-    <#
-	.SYNOPSIS
-	Gathers logon activity based on a submitted IP Address.
-	.DESCRIPTION
-	Pulls logon activity from the Unified Audit log based on a provided IP address.
+<#
+.SYNOPSIS
+    Gathers logon activity based on a submitted IP Address.
+.DESCRIPTION
+    Pulls logon activity from the Unified Audit log based on a provided IP address.
     Processes the data to highlight successful logons and the number of users accessed by a given IP address.
-    .PARAMETER IPaddress
+.PARAMETER IPaddress
     IP address to investigate
-	.OUTPUTS
+.OUTPUTS
 
-	File: All_Events.csv
-	Path: \<IP>
-	Description: All logon events
+    File: All_Events.csv
+    Path: \<IP>
+    Description: All logon events
 
-	File: All_Events.xml
-	Path: \<IP>\xml
-	Description: Client XML of all logon events
+    File: All_Events.xml
+    Path: \<IP>\xml
+    Description: Client XML of all logon events
 
-	File: Success_Events.csv
-	Path: \<IP>
-	Description: All logon events that were successful
+    File: Success_Events.csv
+    Path: \<IP>
+    Description: All logon events that were successful
 
-	File: Unique_Users_Attempted.csv
-	Path: \<IP>
-	Description: List of Unique users that this IP tried to log into
+    File: Unique_Users_Attempted.csv
+    Path: \<IP>
+    Description: List of Unique users that this IP tried to log into
 
-	File: Unique_Users_Success.csv
-	Path: \<IP>
-	Description: Unique Users that this IP succesfully logged into
+    File: Unique_Users_Success.csv
+    Path: \<IP>
+    Description: Unique Users that this IP succesfully logged into
 
-	File: Unique_Users_Success.xml
-	Path: \<IP>\XML
-	Description: Client XML of unique users the IP logged into
-	.EXAMPLE
+    File: Unique_Users_Success.xml
+    Path: \<IP>\XML
+    Description: Client XML of unique users the IP logged into
+.EXAMPLE
 
-	Search-HawkTenantActivityByIP -IPAddress 10.234.20.12
+    Search-HawkTenantActivityByIP -IPAddress 10.234.20.12
 
-	Searches for all Logon activity from IP 10.234.20.12.
-
-	#>
+    Searches for all Logon activity from IP 10.234.20.12.
+#>
     param
     (
         [parameter(Mandatory = $true)]

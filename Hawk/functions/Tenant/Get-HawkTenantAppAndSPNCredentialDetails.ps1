@@ -8,16 +8,14 @@
     used to access corporate data, then knowing the key creation time will intrumental to determing the time frame of when an attacker
     had access to data.
 .EXAMPLE
-    PS C:\>Get=HawkTenantAppAndSPNCredentialDetals
+    Get-HawkTenantAppAndSPNCredentialDetals
 .OUTPUTS
     SPNCertsAndSecrets.csv
     ApplicationCertsAndSecrets
 .LINK
     https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals
     https://docs.microsoft.com/en-us/powershell/module/azuread/get-azureadapplicationkeycredential?view=azureadps-2.0
-
 .NOTES
-
 #>
 BEGIN{
     Out-LogFile "Collecting Azure AD Service Principals"

@@ -1,19 +1,17 @@
-﻿<#
+﻿Function Update-HawkModule {
+<#
 .SYNOPSIS
     Hawk upgrade check
 .DESCRIPTION
     Hawk upgrade check
+.PARAMETER ElevatedUpdate
+    Update Module
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
+    Update-HawkModule
+    Checks for update to Hawk Module on PowerShell Gallery
 .NOTES
     General notes
 #>
-Function Update-HawkModule {
     param
     (
         [switch]$ElevatedUpdate
@@ -108,4 +106,4 @@ Function Update-HawkModule {
     else {
         Write-Output "Skipping Upgrade"
     }
-}		
+}
