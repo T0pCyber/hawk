@@ -5,7 +5,7 @@ Function Import-AzureAuthenticationLogs {
     Takes in a set of azure Authentication logs and combines them into a unified output
 .DESCRIPTION
     Takes in a set of azure Authentication logs and combines them into a unified output
-.PARAMETER JsonCovertedLogs
+.PARAMETER JsonConvertedLogs
     Logs that are converted
 .EXAMPLE
     Import-AzureAuthenticationLogs

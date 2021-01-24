@@ -5,7 +5,7 @@
     Convert a reportxml to html
 .PARAMETER xml
     XML format
-.PARAMETER xls
+.PARAMETER xsl
     XLS format
 .EXAMPLE
     PS C:\> <example usage>
