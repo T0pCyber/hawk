@@ -3,6 +3,8 @@
     Sleeps X seconds and displays a progress bar
 .DESCRIPTION
     Sleeps X seconds and displays a progress bar
+.PARAMETER sleeptime
+    Lengthe of sleep time
 .EXAMPLE
     PS C:\> <example usage>
     Explanation of what the example does

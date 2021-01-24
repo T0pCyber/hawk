@@ -44,8 +44,7 @@
     (
         [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName,
-        [switch]$UseImpersonation,
-        $EWSCredential
+        [switch]$EWSCredential
 
     )
 

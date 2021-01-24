@@ -8,6 +8,7 @@
     Recipient object ID that is being retrieved
 .EXAMPLE
     Test-RecipientAge
+    Will test to see if the recipient object was created since the start date
 .NOTES
     General notes
 #>

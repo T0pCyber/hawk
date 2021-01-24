@@ -9,6 +9,7 @@
     Property of the collection of unique objects
 .EXAMPLE
     Select-UniqueObject
+    Selects unique objects for investigation
 .INPUTS
     Inputs (if any)
 .OUTPUTS

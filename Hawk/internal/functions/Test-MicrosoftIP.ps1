@@ -9,6 +9,7 @@
     Checking for ipv 6 or ipv4
 .EXAMPLE
     Test-MicrosoftIP
+    Test wether or not the IP retrieved is a Microsoft IP
 .INPUTS
     Inputs (if any)
 .OUTPUTS

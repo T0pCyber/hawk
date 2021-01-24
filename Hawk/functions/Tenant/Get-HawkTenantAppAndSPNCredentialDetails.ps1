@@ -8,7 +8,8 @@
     used to access corporate data, then knowing the key creation time will intrumental to determing the time frame of when an attacker
     had access to data.
 .EXAMPLE
-    Get-HawkTenantAppAndSPNCredentialDetals
+    Get-HawkTenantAppAndSPNCredentialDetails
+    Gets all Tenant Application and Service Principal Details
 .OUTPUTS
     SPNCertsAndSecrets.csv
     ApplicationCertsAndSecrets

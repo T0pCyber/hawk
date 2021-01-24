@@ -3,6 +3,10 @@
     Add objects to the hawk app data
 .DESCRIPTION
     Add objects to the hawk app data
+.PARAMETER Name
+    Name variable
+.PARAMETER Value
+    Value of of retieved data
 .EXAMPLE
     PS C:\> <example usage>
     Explanation of what the example does

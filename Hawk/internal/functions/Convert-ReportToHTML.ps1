@@ -3,6 +3,10 @@
     Convert a reportxml to html
 .DESCRIPTION
     Convert a reportxml to html
+.PARAMETER xml
+    XML format
+.PARAMETER xls
+    XLS format
 .EXAMPLE
     PS C:\> <example usage>
     Explanation of what the example does

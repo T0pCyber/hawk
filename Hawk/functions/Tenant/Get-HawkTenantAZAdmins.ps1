@@ -7,6 +7,7 @@
     to the tenant and conduct other administrative actions to users and applications.
 .EXAMPLE
     Get-HawkTenantAZAdmins
+    Gets all Azure AD Admins
 .OUTPUTS
     AzureADAdministrators.csv
 .LINK

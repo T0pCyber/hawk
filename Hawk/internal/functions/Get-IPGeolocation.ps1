@@ -8,10 +8,7 @@
     IP address of geolocation
 .EXAMPLE
     Get-IPGeolocation
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
+    Gets all IP Geolocation data of IPs that recieved
 .NOTES
     General notes
 #>

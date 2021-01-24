@@ -13,6 +13,7 @@
     Sillent notification
 .EXAMPLE
     Out-LogFile
+    Sends messages to the log file
 .NOTES
     This is will depracted soon.
 #>

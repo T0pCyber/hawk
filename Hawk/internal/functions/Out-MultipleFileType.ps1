@@ -3,6 +3,8 @@
     Sends the output of a cmdlet to a txt file and a clixml file
 .DESCRIPTION
     Sends the output of a cmdlet to a txt file and a clixml file
+.PARAMETER Object
+    Incoming object data
 .PARAMETER FilePrefix
     File name
 .PARAMETER User
@@ -12,7 +14,7 @@
 .PARAMETER xml
     xml file format
 .PARAMETER csv
-    csv file formoat
+    csv file format
 .PARAMETER txt
     txt file format
 .PARAMETER Notice

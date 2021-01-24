@@ -13,6 +13,7 @@
     Malicious Application ID that you're investigating
 .EXAMPLE
     Get-HawkTenantMailItemsAccessed
+    Gets MailItemsAccess from Unified Audit Log (UAL) that corresponds to the App ID that is provided
 .OUTPUTS
     MailItemsAccessed.csv
 

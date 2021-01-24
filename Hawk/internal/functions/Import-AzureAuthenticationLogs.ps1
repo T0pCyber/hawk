@@ -9,6 +9,7 @@ Function Import-AzureAuthenticationLogs {
     Logs that are converted
 .EXAMPLE
     Import-AzureAuthenticationLogs
+    Imprts Azure Auth logs
 .NOTES
     General notes
 #>

@@ -4,8 +4,15 @@
     Make sure we get back all of the unified audit log results for the search we are doing
 .DESCRIPTION
     Make sure we get back all of the unified audit log results for the search we are doing
+.PARAMETER UnifiedSearch
+    The search parameters
+.PARAMETER StartDate
+    The start date provided by user during Hawk Object Initialization
+.PARAMETER EndDate
+    The end date provide by the user during Hawk Object Initialization
 .EXAMPLE
-    Get-AllUnifiedAuditLog Entry
+    Get-AllUnifiedAuditLogEntry
+    Gets all unified auditlog entries
 .NOTES
     General notes
 #>
