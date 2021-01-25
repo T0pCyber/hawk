@@ -20,7 +20,7 @@
 R	uns all of the tenant investigation cmdlets.
 #>
 
-	Out-LogFile "Starting Tenant Sweep"
+	Out-LogFile "Starting Tenant Sweep" -action
 	Send-AIEvent -Event "CmdRun"
 
 	Out-LogFile "Running Get-HawkTenantConfiguration" -action
