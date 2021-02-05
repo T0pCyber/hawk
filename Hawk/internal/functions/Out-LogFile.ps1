@@ -3,15 +3,19 @@
     Writes output to a log file with a time date stamp
 .DESCRIPTION
     Writes output to a log file with a time date stamp
+.PARAMETER string
+    Log Message
+.PARAMETER action
+    What is happening
+.PARAMETER notice
+    Verbose notification
+.PARAMETER silentnotice
+    Sillent notification
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
+    Out-LogFile
+    Sends messages to the log file
 .NOTES
-    General notes
+    This is will depracted soon.
 #>
 Function Out-LogFile {
     Param
@@ -21,7 +25,7 @@ Function Out-LogFile {
         [switch]$notice,
         [switch]$silentnotice
 	)
-	
+
 	Write-PSFMessage -Message $string -ModuleName Hawk -FunctionName (Get-PSCallstack)[1].FunctionName
 
     # Make sure we have the Hawk Global Object

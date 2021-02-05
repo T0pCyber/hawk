@@ -1,44 +1,33 @@
-Function Get-HawkTenantInboxRules {
+﻿Function Get-HawkTenantInboxRules {
+<#
+.SYNOPSIS
+    Gets inbox rules and forwarding directly from all mailboxes in the org.
+.DESCRIPTION
+    Uses Start-RobustCloudCommand to gather data from each mailbox in the org.
+    Gathers inbox rules with Get-HawkUserInboxRule
+    Gathers forwarding with Get-HawkUserEmailForwarding
+.PARAMETER CSVPath
+    Path to a CSV file with a list of users to run against.
+    CSV header should have DisplayName,PrimarySMTPAddress at minimum
+.OUTPUTS
+    See Help for Get-HawkUserInboxRule for inbox rule output
+    See Help for Get-HawkUserEmailForwarding for email forwarding output
 
-    <#
- 
-	.SYNOPSIS
-	Gets inbox rules and forwarding directly from all mailboxes in the org.
+    File: Robust.log
+    Path: \
+    Description: Logfile for Start-RobustCloudCommand
+.EXAMPLE
+    Start-HawkTenantInboxRules
 
-	.DESCRIPTION
-	Uses Start-RobustCloudCommand to gather data from each mailbox in the org.
-	Gathers inbox rules with Get-HawkUserInboxRule
-	Gathers forwarding with Get-HawkUserEmailForwarding
+    Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes in the org
+.EXAMPLE
+    Start-HawkTenantInboxRules -csvpath c:\temp\myusers.csv
 
-	.PARAMETER CSVPath
-	Path to a CSV file with a list of users to run against.
-	CSV header should have DisplayName,PrimarySMTPAddress at minimum
+    Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes listed in myusers.csv
+.LINK
+    https://gallery.technet.microsoft.com/office/Start-RobustCloudCommand-69fb349e
+#>
 
-	.OUTPUTS
-	
-	See Help for Get-HawkUserInboxRule for inbox rule output
-	See Help for Get-HawkUserEmailForwarding for email forwarding output
-
-	File: Robust.log
-	Path: \
-	Description: Logfile for Start-RobustCloudCommand
-		
-	.EXAMPLE
-	Start-HawkTenantInboxRules
-	
-	Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes in the org
-
-	.EXAMPLE
-	Start-HawkTenantInboxRules -csvpath c:\temp\myusers.csv
-
-	Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes listed in myusers.csv
-
-	.LINK
-	https://gallery.technet.microsoft.com/office/Start-RobustCloudCommand-69fb349e
-
-	
-    #>
-    
     param ([string]$CSVPath)
 
 
@@ -51,7 +40,7 @@ Function Get-HawkTenantInboxRules {
     $yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes", "Continue operation"
     $no = New-Object System.Management.Automation.Host.ChoiceDescription "&No", "Exit Cmdlet"
     $options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
-    $result = $host.ui.PromptForChoice($title, $message, $options, 0) 
+    $result = $host.ui.PromptForChoice($title, $message, $options, 0)
     # If yes log and continue
     # If no log error and exit
     switch ($result) {
@@ -64,7 +53,7 @@ Function Get-HawkTenantInboxRules {
 
     # Gather all of the mailboxes
     Out-LogFile "Getting all Mailboxes"
-	
+
     # If we don't have a value for csvpath then gather all users in the tenant
     if ([string]::IsNullOrEmpty($CSVPath)) {
         $AllMailboxes = Invoke-Command -Session $exopssession -ScriptBlock { Get-Recipient -RecipientTypeDetails UserMailbox -ResultSize Unlimited | Select-Object -Property DisplayName, PrimarySMTPAddress }
@@ -79,13 +68,13 @@ Function Get-HawkTenantInboxRules {
             Write-Error "Problem importing csv file aborting" -ErrorAction Stop
         }
     }
-	
+
     # Report how many mailboxes we are going to operate on
     Out-LogFile ("Found " + $AllMailboxes.count + " Mailboxes")
 
     # Get the path to start-robustcloudcommand
     # [string]$scriptpath = "& `'" + (Join-Path (Split-path ((get-module Hawk).path) -Parent) "Start-RobustCloudCommand.ps1") + "`'"
-    
+
     # get EXO Credentials
     # Out-LogFile "Gathering EXO Admin Credentials"
     # $cred = Get-Credential -Message "EXO Credentials"
@@ -95,11 +84,11 @@ Function Get-HawkTenantInboxRules {
 
     # Build the command we are going to need to run with start-robustcloudcommand
     $cmd = "Start-RobustCloudCommand -logfile `$RobustLog -recipients `$AllMailboxes -scriptblock {Get-HawkUserInboxRule -UserPrincipalName `$input.PrimarySmtpAddress.tostring()}"
-       
+
     # Invoke our Start-Robust command to get all of the inbox rules
     Out-LogFile "===== Starting Robust Cloud Command to Gather User Specific information from all tenant users ====="
     Out-LogFile $cmd
     Invoke-Expression $cmd
 
-    Out-LogFile "Process Complete"	
+    Out-LogFile "Process Complete"
 }

@@ -1,4 +1,4 @@
-Function Get-HawkTenantAppAndSPNCredentialDetails {
+﻿Function Get-HawkTenantAppAndSPNCredentialDetails {
 <#
 .SYNOPSIS
     Tenant Azure Active Directory Applications and Service Principal Credential details export. Must be connected to Azure-AD using the Connect-AzureAD cmdlet
@@ -8,16 +8,15 @@ Function Get-HawkTenantAppAndSPNCredentialDetails {
     used to access corporate data, then knowing the key creation time will intrumental to determing the time frame of when an attacker
     had access to data.
 .EXAMPLE
-    PS C:\>Get=HawkTenantAppAndSPNCredentialDetals
+    Get-HawkTenantAppAndSPNCredentialDetails
+    Gets all Tenant Application and Service Principal Details
 .OUTPUTS
     SPNCertsAndSecrets.csv
     ApplicationCertsAndSecrets
 .LINK
     https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals
     https://docs.microsoft.com/en-us/powershell/module/azuread/get-azureadapplicationkeycredential?view=azureadps-2.0
-
 .NOTES
-
 #>
 BEGIN{
     Out-LogFile "Collecting Azure AD Service Principals"

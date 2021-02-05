@@ -3,9 +3,13 @@
     Determine if an IP listed in on the O365 XML list
 .DESCRIPTION
     Determine if an IP listed in on the O365 XML list
+.PARAMETER IPtoTest
+    IP that is being tested against the Microsoft IP List
+.PARAMETER Type
+    Checking for ipv 6 or ipv4
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
+    Test-MicrosoftIP
+    Test wether or not the IP retrieved is a Microsoft IP
 .INPUTS
     Inputs (if any)
 .OUTPUTS

@@ -109,7 +109,7 @@
 			ProjectUri = 'https://github.com/T0pCyber/Hawk'
 
 			# A URL to an icon representing this module.
-			# IconUri = ''
+			 IconUri = 'https://i.ibb.co/XXH4500/Hawk.png'
 
 			# ReleaseNotes of this module
 			ReleaseNotes = 'https://github.com/T0pCyber/Hawk/Hawk/changelog.md'

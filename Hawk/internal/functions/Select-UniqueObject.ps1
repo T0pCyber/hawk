@@ -3,9 +3,13 @@
     Returns a collection of unique objects filtered by a single property
 .DESCRIPTION
     Returns a collection of unique objects filtered by a single property
+.PARAMETER ObjectArray
+    Array of objects
+.PARAMETER Property
+    Property of the collection of unique objects
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
+    Select-UniqueObject
+    Selects unique objects for investigation
 .INPUTS
     Inputs (if any)
 .OUTPUTS
@@ -25,7 +29,7 @@ Function Select-UniqueObject {
     # Null out our output array
     [array]$Output = $null
 
-    # Get the ID of the unique objects based ont he sort property
+    # Get the ID of the unique objects based on the sort property
     [array]$UniqueObjectID = $ObjectArray | Select-Object -Unique -ExpandProperty $Property
 
     # Select the whole object based on the unique names found
