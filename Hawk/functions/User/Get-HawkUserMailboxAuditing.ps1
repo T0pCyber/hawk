@@ -88,7 +88,7 @@
             Out-LogFile "Mailbox Auditing is enabled."
             Out-LogFile "Searching Unified Audit Log for Exchange Related Events"
 
-            $UnifiedAuditLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -UserIDs " + $User + " -RecordType ExchangeItem")
+            $UnifiedAuditLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -UserIDs " + $User + " -RecordType ExchangeItem") | select-object -Expandproperty AuditData | convertfrom-json
             Out-LogFile ("Found " + $UnifiedAuditLogs.Count + " Exchange audit records.")
 
             # Output the data we found

@@ -10,7 +10,7 @@
 .PARAMETER notice
     Verbose notification
 .PARAMETER silentnotice
-    Sillent notification
+    Silent notification
 .EXAMPLE
     Out-LogFile
     Sends messages to the log file
