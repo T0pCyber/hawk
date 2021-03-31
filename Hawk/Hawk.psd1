@@ -3,7 +3,7 @@
 	RootModule = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion = '2.0.0'
+	ModuleVersion = '2.0.1'
 
 	# ID used to uniquely identify this module
 	GUID = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
