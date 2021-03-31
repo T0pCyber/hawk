@@ -5,4 +5,5 @@
 ## 2.0.1 (2021-02-07)
 - Incorporated workflow and pester tests
 - Readme file updated with https://cloudforensicator.com link
+- Updated Azure AD SKU options that identity "Premium Licensing"
 - Issue #25 - Unified Audit Log AuditData JSON parsing added to "Exchange_UAL_Audit.csv"

@@ -347,7 +347,7 @@
 
         # Determine if we have access to a P1 or P2 Azure Ad License
         # EMS SKU contains Azure P1 as part of the sku
-        if ([bool](Get-MsolAccountSku | Where-Object { ($_.accountskuid -like "*aad_premium*") -or ($_.accountskuid -like "*EMS*") })) {
+        if ([bool](Get-MsolAccountSku | Where-Object { ($_.accountskuid -like "*aad_premium*") -or ($_.accountskuid -like "*EMS*") -or ($_.accountskuid -like "*E5*") -or ($_.accountskuid -like "*G5*") })) {
             Write-Information "Advanced Azure AD License Found"
             [bool]$AdvancedAzureLicense = $true
         }
