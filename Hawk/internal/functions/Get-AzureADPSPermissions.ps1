@@ -1,8 +1,10 @@
-Function Get-AzureADPSPermissions {
+﻿Function Get-AzureADPSPermissions {
 
 <#
 .SYNOPSIS
     Lists delegated permissions (OAuth2PermissionGrants) and application permissions (AppRoleAssignments).
+.DESCRIPTION
+    ists delegated permissions (OAuth2PermissionGrants) and application permissions (AppRoleAssignments).
 .PARAMETER DelegatedPermissions
     If set, will return delegated permissions. If neither this switch nor the ApplicationPermissions switch is set,
     both application and delegated permissions will be returned.

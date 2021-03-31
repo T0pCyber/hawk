@@ -3,6 +3,8 @@
     Determine if we have an array with UPNs or just a single UPN / UPN array unlabeled
 .DESCRIPTION
     Determine if we have an array with UPNs or just a single UPN / UPN array unlabeled
+.PARAMETER ToTest
+    Object which is being tested
 .EXAMPLE
     PS C:\> <example usage>
     Explanation of what the example does

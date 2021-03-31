@@ -1,5 +1,28 @@
-# Gets user AutoReply Configuration and looks for Enabled state
-Function Get-HawkUserAutoReply {
+﻿Function Get-HawkUserAutoReply {
+<#
+.SYNOPSIS
+    Pulls AutoReply Configuration for the specified user.
+.DESCRIPTION
+    Gathers AutoReply configuration for the provided users.
+    Looks for AutoReplyState of Enabled and exports the config.
+.PARAMETER UserPrincipalName
+    Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
+.OUTPUTS
+
+    File: AutoReply.txt
+    Path: \<User>
+    Description: AutoReplyConfiguration for the user.
+.EXAMPLE
+
+    Get-HawkUserAutoReply -UserPrincipalName user@contoso.com
+
+    Pulls AutoReplyConfiguration for user@contoso.com and looks for AutoReplyState Enabled.
+.EXAMPLE
+
+    Get-HawkUserAutoReply -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
+
+    Gathers AutoReplyConfiguration for all users who have "C-Level" set in CustomAttribute1
+#>
     param
     (
         [Parameter(Mandatory = $true)]
@@ -33,36 +56,4 @@ Function Get-HawkUserAutoReply {
         }
     }
 
-    <#
-
-	.SYNOPSIS
-	Pulls AutoReply Configuration for the specified user.
-
-	.DESCRIPTION
-	Gathers AutoReply configuration for the provided users.
-	Looks for AutoReplyState of Enabled and exports the config.
-
-	.PARAMETER UserPrincipalName
-	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
-
-	.OUTPUTS
-
-	File: AutoReply.txt
-	Path: \<User>
-	Description: AutoReplyConfiguration for the user.
-
-	.EXAMPLE
-
-	Get-HawkUserAutoReply -UserPrincipalName user@contoso.com
-
-	Pulls AutoReplyConfiguration for user@contoso.com and looks for AutoReplyState Enabled.
-
-	.EXAMPLE
-
-	Get-HawkUserAutoReply -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
-
-	Gathers AutoReplyConfiguration for all users who have "C-Level" set in CustomAttribute1
-
-
-	#>
 }

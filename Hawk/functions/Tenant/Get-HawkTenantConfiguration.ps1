@@ -1,44 +1,21 @@
-# Gathers basic tenant information and generates output
-## TODO: Put in some analysis ... flag some key things that we know we should
-## Auditing Off
-## Dig thru transport rules and look for ones forwarding or turfing mail
-Function Get-HawkTenantConfiguration {
-	
-	Test-EXOConnection
-	Send-AIEvent -Event "CmdRun"
-	
-    #Check Audit Log Config Setting and make sure it is enabled
-    Out-LogFile "Gathering Tenant Configuration Information" -action
-	
-    Out-LogFile "Admin Audit Log"
-    Get-AdminAuditLogConfig | Out-MultipleFileType -FilePrefix "AdminAuditLogConfig" -txt -xml
-	
-    Out-LogFile "Organization Configuration"
-    Get-OrganizationConfig| Out-MultipleFileType -FilePrefix "OrgConfig" -xml -txt
-	
-    Out-LogFile "Remote Domains"
-    Get-RemoteDomain | Out-MultipleFileType -FilePrefix "RemoteDomain" -xml -csv
-	
-    Out-LogFile "Transport Rules"
-    Get-TransportRule | Out-MultipleFileType -FilePrefix "TransportRules" -xml -csv
-	
-    Out-LogFile "Transport Configuration"
-    Get-TransportConfig | Out-MultipleFileType -FilePrefix "TransportConfig" -xml -csv	
-	
-    <#
- 
-	.SYNOPSIS
-	Gathers basic tenant information.
-
-	.DESCRIPTION
+﻿Function Get-HawkTenantConfiguration {
+<#
+.SYNOPSIS
+	Gather basic tenant configuration and saves the output to a text file
+.DESCRIPTION
+	Gather basic tenant configuration and saves the output to a text file
 	Gathers information about tenant wide settings
 	* Admin Audit Log Configuration
 	* Organization Configuration
 	* Remote domains
 	* Transport Rules
 	* Transport Configuration
-	
-	.OUTPUTS
+.EXAMPLE
+	PS C:\> Get-HawkTenantConfiguration
+	Explanation of what the example does
+.INPUTS
+	Inputs (if any)
+.OUTPUTS
 	File: AdminAuditLogConfig.txt
 	Path: \
 	Description: Output of Get-AdminAuditlogConfig
@@ -78,7 +55,27 @@ Function Get-HawkTenantConfiguration {
 	File: TransportConfig.xml
 	Path: \XML
 	Description: Output of Get-TransportConfig as CLI XML
-	
-	#>
-	
+.NOTES
+	TODO: Put in some analysis ... flag some key things that we know we should
+#>
+	Test-EXOConnection
+	Send-AIEvent -Event "CmdRun"
+
+    #Check Audit Log Config Setting and make sure it is enabled
+    Out-LogFile "Gathering Tenant Configuration Information" -action
+
+    Out-LogFile "Admin Audit Log"
+    Get-AdminAuditLogConfig | Out-MultipleFileType -FilePrefix "AdminAuditLogConfig" -txt -xml
+
+    Out-LogFile "Organization Configuration"
+    Get-OrganizationConfig| Out-MultipleFileType -FilePrefix "OrgConfig" -xml -txt
+
+    Out-LogFile "Remote Domains"
+    Get-RemoteDomain | Out-MultipleFileType -FilePrefix "RemoteDomain" -xml -csv
+
+    Out-LogFile "Transport Rules"
+    Get-TransportRule | Out-MultipleFileType -FilePrefix "TransportRules" -xml -csv
+
+    Out-LogFile "Transport Configuration"
+    Get-TransportConfig | Out-MultipleFileType -FilePrefix "TransportConfig" -xml -csv
 }

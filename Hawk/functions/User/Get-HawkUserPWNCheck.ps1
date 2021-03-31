@@ -1,30 +1,23 @@
-Function Get-HawkUserPWNCheck {
-    <#
- 
-	.SYNOPSIS
-	Checks an email address against haveibeenpwned.com
-
-	.DESCRIPTION
-	Checks a single email address against HaveIBeenPwned. An API key is required and can be obtained from https://haveibeenpwned.com/API/Key for $3.50 a month.
-	This script will prompt for the key if $hibpkey is not set as a variable.
-
-	.PARAMETER Email
+﻿Function Get-HawkUserPWNCheck {
+<#
+.SYNOPSIS
+    Checks an email address against haveibeenpwned.com
+.DESCRIPTION
+    Checks a single email address against HaveIBeenPwned. An API key is required and can be obtained from https://haveibeenpwned.com/API/Key for $3.50 a month.
+    This script will prompt for the key if $hibpkey is not set as a variable.
+.PARAMETER Email
     Accepts since EMail address or array of Email address strings.
     DOES NOT Accept an array of objects (it will end up checked the UPN and not the email address)
-
-    .OUTPUTS
+.OUTPUTS
     File: Have_I_Been_Pwned.txt
-	Path: \<user>
-	Description: Information returned from the pwned database
-	
+    Path: \<user>
+    Description: Information returned from the pwned database
+.EXAMPLE
+    Start-HawkUserPWNCheck -Email user@company.com
 
-	.EXAMPLE
-	Start-HawkUserPWNCheck -Email user@company.com
+    Returns the pwn state of the email address provided
+#>
 
-	Returns the pwn state of the email address provided
-
-	#>
-    
     param([array]$Email)
 
     # if there is no value of hibpkey then we need to get it from the user
@@ -41,7 +34,7 @@ Function Get-HawkUserPWNCheck {
         # get the access key from the user
         $hibpkey = Read-Host "haveibeenpwned.com apikey"
     }
-    
+
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $Email
     $headers=@{'hibp-api-key' = $hibpkey}
@@ -73,10 +66,10 @@ Function Get-HawkUserPWNCheck {
                 }
             }
         }
-    
+
         # Convert the result into a PS object
         $Pwned = $Result.content | ConvertFrom-Json
-    
+
         # Output the value
         Out-LogFile ("Email Address found in " + $pwned.count)
         $Pwned | Out-MultipleFileType -FilePreFix "Have_I_Been_Pwned" -user $user -txt

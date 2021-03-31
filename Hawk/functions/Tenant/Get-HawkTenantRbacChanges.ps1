@@ -1,12 +1,9 @@
-# Search for any changes made to RBAC in the search window and report them
+﻿# Search for any changes made to RBAC in the search window and report them
 Function Get-HawkTenantRBACChanges {
-	
-	<#
- 
-	.SYNOPSIS
+<#
+.SYNOPSIS
 	Looks for any changes made to Roles Based Access Control
-
-	.DESCRIPTION
+.DESCRIPTION
 	Searches the EXO Audit logs for the following commands being run.
 	New-ManagementRole
 	Remove-ManagementRole
@@ -15,9 +12,8 @@ Function Get-HawkTenantRBACChanges {
 	Set-MangementRoleAssignment
 	New-ManagementScope
 	Remove-ManagementScope
-	Set-ManagementScope	
-		
-	.OUTPUTS
+	Set-ManagementScope
+.OUTPUTS
 
 	File: Simple_RBAC_Changes.csv
 	Path: \
@@ -30,14 +26,11 @@ Function Get-HawkTenantRBACChanges {
 	File: RBAC_Changes.xml
 	Path: \XML
 	Description: All RBAC changes as a CLI XML
-
-	.EXAMPLE
+.EXAMPLE
 	Get-HawkTenantRBACChanges
 
 	Looks for all RBAC changes in the tenant within the search window
-	
-	#>
-	
+#>
 
 	Test-EXOConnection
 	Send-AIEvent -Event "CmdRun"
@@ -47,7 +40,7 @@ Function Get-HawkTenantRBACChanges {
 	# Search EXO audit logs for any RBAC changes
 	[array]$RBACChanges = Search-AdminAuditLog -Cmdlets New-ManagementRole, New-ManagementRoleAssignment, New-ManagementScope, Remove-ManagementRole, Remove-ManagementRoleAssignment, Set-MangementRoleAssignment, Remove-ManagementScope, Set-ManagementScope -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
 
-	# If there are any results push them to an output file 
+	# If there are any results push them to an output file
 	if ($RBACChanges.Count -gt 0) {
 		Out-LogFile ("Found " + $RBACChanges.Count + " Changes made to Roles Based Access Control")
 		$RBACChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_RBAC_Changes" -csv

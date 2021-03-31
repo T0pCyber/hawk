@@ -1,19 +1,27 @@
-﻿<#
+﻿Function Out-Report {
+<#
 .SYNOPSIS
     Adds the data to an XML report
 .DESCRIPTION
     Adds the data to an XML report
+.PARAMETER Identity
+    User Identity for the report
+.PARAMETER Property
+    xml property
+.PARAMETER Value
+    Value of xml element
+.PARAMETER Description
+    Description of element
+.PARAMETER State
+    Color mapping
+.PARAMETER Link
+    Element link
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
+    Out-Report
+    Add the data to an XML report
 .NOTES
     General notes
 #>
-Function Out-Report {
     Param
     (
         [Parameter(Mandatory = $true)]

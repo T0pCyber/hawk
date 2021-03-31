@@ -1,4 +1,4 @@
-Function Get-HawkTenantAZAdmins{
+﻿Function Get-HawkTenantAZAdmins{
 <#
 .SYNOPSIS
     Tenant Azure Active Directory Administrator export. Must be connected to Azure-AD using the Connect-AzureAD cmdlet
@@ -6,13 +6,13 @@ Function Get-HawkTenantAZAdmins{
     Tenant Azure Active Directory Administrator export. Reviewing administrator access is key to knowing who can make changes
     to the tenant and conduct other administrative actions to users and applications.
 .EXAMPLE
-    PS C:\>Get=HawkTenantAZAdmins
+    Get-HawkTenantAZAdmins
+    Gets all Azure AD Admins
 .OUTPUTS
     AzureADAdministrators.csv
 .LINK
     https://docs.microsoft.com/en-us/powershell/module/azuread/get-azureaddirectoryrolemember?view=azureadps-2.0
 .NOTES
-
 #>
 BEGIN{
     Out-LogFile "Gathering Azure AD Administrators"

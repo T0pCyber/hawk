@@ -1,28 +1,25 @@
-Function Get-HawkTenantAuthHistory {
-
-    <#
-    
-    .SYNOPSIS
+﻿Function Get-HawkTenantAuthHistory {
+<#
+.SYNOPSIS
     Gathers 48 hours worth of Unified Audit logs.
     Pulls everyting into a CSV file.
-
-    .DESCRIPTION
+.DESCRIPTION
     Connects to EXO and searches the unified audit log file only a date time filter.
     Searches in 15 minute increments to ensure that we gather all data.
-
     Should be used once you have used other commands to determine a "window" that needs more review.
-
-    .OUTPUTS
+.PARAMETER StartDate
+    Start date of authentication audit log search
+.PARAMETER IntervalMinutes
+    Time interval for increments
+.OUTPUTS
     File: Audit_Log_Full_<date>.csv
     Path: \Tenant
     Description: Audit data for ALL users over a 48 hour period
-
-    .EXAMPLE
+.EXAMPLE
     Get-HawkTenantAuthHistory -StartDate "10/25/2018"
 
     Gathers 48 hours worth of audit data starting at midnight on October 25th 2018
-        
-    #>
+#>
 
     Param (
         [Parameter(Mandatory = $true)]
@@ -32,13 +29,13 @@ Function Get-HawkTenantAuthHistory {
 
     # # Try to convert the submitted date into [datetime] format
     # try {
-    #     [datetime]$DateToStartSearch = Get-Date $StartDate       
+    #     [datetime]$DateToStartSearch = Get-Date $StartDate
     # }
     # catch {
     #     Out-Logfile "[ERROR] - Unable to convert submitted date"
-    #     break        
+    #     break
     # }
-    
+
     # Make sure the start date isn't more than 90 days in the past
     if ((Get-Date).adddays(-91) -gt $StartDate) {
         Out-Logfile "[ERROR] - Start date is over 90 days in the past"

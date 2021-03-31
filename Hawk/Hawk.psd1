@@ -3,7 +3,7 @@
 	RootModule = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion = '2.0.0'
+	ModuleVersion = '2.0.1'
 
 	# ID used to uniquely identify this module
 	GUID = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
@@ -109,7 +109,7 @@
 			ProjectUri = 'https://github.com/T0pCyber/Hawk'
 
 			# A URL to an icon representing this module.
-			# IconUri = ''
+			 IconUri = 'https://i.ibb.co/XXH4500/Hawk.png'
 
 			# ReleaseNotes of this module
 			ReleaseNotes = 'https://github.com/T0pCyber/Hawk/Hawk/changelog.md'
