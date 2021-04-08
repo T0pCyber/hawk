@@ -44,7 +44,7 @@
     (
         [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName,
-        [switch]$EWSCredential
+        [System.Management.Automation.PSCredential]$EWSCredential
 
     )
 
