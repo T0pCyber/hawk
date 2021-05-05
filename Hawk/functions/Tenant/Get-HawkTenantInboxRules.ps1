@@ -22,14 +22,16 @@
     Description: Logfile for Start-RobustCloudCommand
 
 .EXAMPLE
-    Start-HawkTenantInboxRules
+    Start-HawkTenantInboxRules -UserPrincipalName userx@tenantdomain.onmicrosoft.com
 
-    Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes in the org
+    Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes in the org. The UserPrincipalName
+    is the Admin/User who is running the cmdlet.
 
 .EXAMPLE
     Start-HawkTenantInboxRules -csvpath c:\temp\myusers.csv
 
-    Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes listed in myusers.csv
+    Runs Get-HawkUserInboxRule and Get-HawkUserEmailForwarding against all mailboxes listed in myusers.csv.The UserPrincipalName
+    is the Admin/User who is running the cmdlet.
 
 .LINK
     https://gallery.technet.microsoft.com/office/Start-RobustCloudCommand-69fb349e
@@ -89,7 +91,7 @@
     $cmd = "Start-RobustCloudCommand -UserPrincipalName " + $UserPrincipalName + " -logfile `$RobustLog -recipients `$AllMailboxes -scriptblock {Get-HawkUserInboxRule -UserPrincipalName `$input.PrimarySmtpAddress.tostring()}"
 
     # Invoke our Start-Robust command to get all of the inbox rules
-    Out-LogFile "===== Starting Robust Cloud Command to Gather User Specific information from all tenant users ====="
+    Out-LogFile "===== Starting Robust Cloud Command to gather user inbox rules for all tenant users ====="
     Out-LogFile $cmd
     Invoke-Expression $cmd
 
