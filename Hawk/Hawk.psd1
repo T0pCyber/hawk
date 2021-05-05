@@ -30,8 +30,8 @@
 	RequiredModules = @(
 		@{ModuleName = 'PSFramework'; ModuleVersion='1.4.150' },
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'; },
-   	@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '2.0.4'; },
-   	@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1';}
+		@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '2.0.4'; },
+		@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1';}
 	)
 
 	# Assemblies that must be loaded prior to importing this module
@@ -45,7 +45,6 @@
 
 	# Functions to export from this module
 	FunctionsToExport =
-		'Get-HawkTenantAzureAuthenticationLogs',
 		'Get-HawkTenantConfiguration',
 		'Get-HawkTenantEDiscoveryConfiguration',
 		'Get-HawkTenantInboxRules',
