@@ -3,7 +3,7 @@
 	RootModule = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion = '2.0.1'
+	ModuleVersion = '2.0.2'
 
 	# ID used to uniquely identify this module
 	GUID = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
@@ -31,7 +31,7 @@
 		@{ModuleName = 'PSFramework'; ModuleVersion='1.4.150' },
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'; },
     	@{ModuleName = 'CloudConnect'; ModuleVersion = '1.1.2'; },
-    	@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '1.1.3';}
+    	@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1';}
 	)
 
 	# Assemblies that must be loaded prior to importing this module
