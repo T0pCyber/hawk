@@ -30,8 +30,8 @@
 	RequiredModules = @(
 		@{ModuleName = 'PSFramework'; ModuleVersion='1.4.150' },
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'; },
-    	@{ModuleName = 'CloudConnect'; ModuleVersion = '1.1.2'; },
-    	@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1';}
+   	@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '2.0.4'; },
+   	@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1';}
 	)
 
 	# Assemblies that must be loaded prior to importing this module
