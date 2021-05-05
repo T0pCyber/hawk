@@ -57,7 +57,7 @@
     $ConnectGraph = Invoke-RestMethod -Uri ("https://login.microsoftonline.com/" + $TenantDomain + "/oauth2/v2.0/token") -Method POST -Body $Body
     
     $Header = @{'Authorization' = "Bearer $($ConnectGraph.access_token)" }
-
+    $Body = $Null
 
     # Null out report and setup our counter
     $Report = $null
