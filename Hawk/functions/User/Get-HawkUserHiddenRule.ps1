@@ -1,50 +1,50 @@
 ﻿Function Get-HawkUserHiddenRule {
     <#
-	.SYNOPSIS
-	Pulls inbox rules for the specified user using EWS.
-	.DESCRIPTION
-	Pulls inbox rules for the specified user using EWS.
-	Searches the resulting rules looking for "hidden" rules.
+    .SYNOPSIS
+    Pulls inbox rules for the specified user using EWS.
+    .DESCRIPTION
+    Pulls inbox rules for the specified user using EWS.
+    Searches the resulting rules looking for "hidden" rules.
 
-	Requires impersonation:
-	https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-configure-impersonation
+    Requires impersonation:
+    https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/how-to-configure-impersonation
 
-	Since the rules are hidden we have to pull it as a message instead of a rule.
-	That means that the only information we can get back is the ID and Priority of the rule.
-	Once a mailbox has been identified as having a hidden rule please use MFCMapi to review and remove the rule as needed.
+    Since the rules are hidden we have to pull it as a message instead of a rule.
+    That means that the only information we can get back is the ID and Priority of the rule.
+    Once a mailbox has been identified as having a hidden rule please use MFCMapi to review and remove the rule as needed.
 
-	https://blogs.msdn.microsoft.com/hkong/2015/02/27/how-to-delete-corrupted-hidden-inbox-rules-from-a-mailbox-using-mfcmapi/
-	.PARAMETER UserPrincipalName
-	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
-	.PARAMETER EWSCredential
-	Credentials of a user that can impersonate the target user/users.
-	Gather using (get-credential)
-	Does NOT work with MFA protected accounts at this time.
-	.OUTPUTS
+    https://blogs.msdn.microsoft.com/hkong/2015/02/27/how-to-delete-corrupted-hidden-inbox-rules-from-a-mailbox-using-mfcmapi/
+    .PARAMETER UserPrincipalName
+    Single UPN of a user, comma separated list of UPNs, or array of objects that contain UPNs.
+    .PARAMETER EWSCredential
+    Credentials of a user that can impersonate the target user/users.
+    Gather using (get-credential)
+    Does NOT work with MFA protected accounts at this time.
+    .OUTPUTS
 
-	File: _Investigate.txt
-	Path: \
-	Description: Adds any hidden rules found here to be investigated
+    File: _Investigate.txt
+    Path: \
+    Description: Adds any hidden rules found here to be investigated
 
-	File: EWS_Inbox_rule.csv
-	Path: \<User>
-	Description: Inbox rules that were found with EWS
-	.EXAMPLE
+    File: EWS_Inbox_rule.csv
+    Path: \<User>
+    Description: Inbox rules that were found with EWS
+    .EXAMPLE
 
-	Get-HawkUserHiddenRules -UserPrincipalName user@contoso.com -EWSCredential (get-credential)
+    Get-HawkUserHiddenRule -UserPrincipalName user@contoso.com -EWSCredential (get-credential)
 
-	Searches user@contoso.com looking for hidden inbox rules using the provided credentials
-	.EXAMPLE
+    Searches user@contoso.com looking for hidden inbox rules using the provided credentials
+    .EXAMPLE
 
-	Get-HawkUserHiddenRules -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
+    Get-HawkUserHiddenRule -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
 
-	Looks for hidding inbox rules for all users who have "C-Level" set in CustomAttribute1
-	#>
+    Looks for hidden inbox rules for all users who have "C-Level" set in CustomAttribute1
+    #>
     param
     (
         [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName,
-        [switch]$EWSCredential
+        [System.Management.Automation.PSCredential]$EWSCredential
 
     )
 
@@ -158,7 +158,7 @@
             if ([string]::IsNullOrEmpty($rule.ExtendedProperties[0].value) -or [string]::IsNullOrEmpty($rule.ExtendedProperties[1].value)) {
                 $priority = ($rule.ExtendedProperties | Where-Object { $_.propertydefinition.tag -eq 38 }).value
                 Out-LogFile ("Possible Hidden Rule found in mailbox: " + $EmailAddress + " -- Rule Priority: " + $priority) -notice
-                $RuleOutput = $rule | Select-Object -Property ID, @{Name = "Priority"; Expression = { ($rule.ExtendedProperties | where { $_.propertydefinition -like "*38*" }).value } }
+                $RuleOutput = $rule | Select-Object -Property ID, @{Name = "Priority"; Expression = { ($rule.ExtendedProperties | Where-Object { $_.propertydefinition -like "*38*" }).value } }
                 $RuleOutput | Out-MultipleFileType -FilePrefix "EWS_Inbox_rule" -txt -user $user -append
                 $FoundHidden = $true
             }
@@ -172,9 +172,4 @@
 
         # return $ruleArray
     }
-
-
-
-
 }
-
