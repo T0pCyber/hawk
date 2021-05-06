@@ -36,7 +36,7 @@ PROCESS{
                 }
             }
     }
-    $users | Sort-Object -property UserPrincipalname | Export-csv $folder\AzureADUPNS.csv -Append -NoTypeInformation
+    $users | Sort-Object -property UserPrincipalname | Out-MultipleFileType -FilePrefix "AzureADUsers" -csv
 }#End PROCESS
 END{
     Out-Logfile "Completed exporting Azure AD users"
