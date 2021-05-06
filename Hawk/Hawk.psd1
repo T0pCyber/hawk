@@ -31,7 +31,8 @@
 		@{ModuleName = 'PSFramework'; ModuleVersion='1.4.150' },
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'; },
 		@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '2.0.4'; },
-		@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1';}
+		@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1';},
+		@{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.130'}
 	)
 
 	# Assemblies that must be loaded prior to importing this module
