@@ -16,7 +16,7 @@
 Function Test-AzureADConnection {
 
     $TestModule = Get-Module AzureAD -ListAvailable -ErrorAction SilentlyContinue
-    $MinimumVersion = New-Object -TypeName Version -ArgumentList "2.0.0.131"
+    $MinimumVersion = New-Object -TypeName Version -ArgumentList "2.0.0.130"
 
     if ($null -eq $TestModule) {
         Out-LogFile "Please Install the AzureAD Module with the following command:"
@@ -28,7 +28,7 @@ Function Test-AzureADConnection {
         $TestModuleVersion = ($TestModule | Sort-Object -Property Version -Descending)[0].version
     }
 
-    # Test the version we need at least 2.0.0.131
+    # Test the version we need at least 2.0.0.130
     if ($TestModuleVersion -lt $MinimumVersion) {
         Out-LogFile ("AzureAD Module Installed Version: " + $TestModuleVersion)
         Out-LogFile ("Miniumum Required Version: " + $MinimumVersion)
@@ -42,8 +42,8 @@ Function Test-AzureADConnection {
         $Null = Get-AzureADTenantDetail -ErrorAction Stop
     }
     catch [Microsoft.Open.Azure.AD.CommonLibrary.AadNeedAuthenticationException] {
-        Out-LogFile "Please connect to AzureAD prior to running this cmdlet"
-        Out-LogFile "Connect-AzureAD"
-        break
+        #Out-LogFile "Please connect to AzureAD prior to running this cmdlet"
+        Out-LogFile "Connecting-AzureAD"
+        Connect-AzureAD
     }
 }

@@ -38,15 +38,18 @@ R	uns all of the tenant investigation cmdlets.
 	Out-LogFile "Running Get-HawkTenantAzureAuditLog" -action
 	Get-HawkTenantAzureAuditLog
 
+	Out-LogFile "Running Get-HawkTenantEXOAdmins" -action
+	Get-HawkTenantEXOAdmins
+
 	Out-LogFile "Running Get-HawkTenantConsentGrants" -action
 	Get-HawkTenantConsentGrants
 
 	Out-LogFile "Running Get-HawkTenantAZAdmins" -action
 	Get-HawkTenantAZAdmins
 
-	Out-LogFile "Running Get-HawkTenantEXOAdmins" -action
-	Get-HawkTenantEXOAdmins
-
 	Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetails" -action
 	Get-HawkTenantAppAndSPNCredentialDetails
+
+	Out-Logfile "Running Get-HawkTenantAzureADUsers" -action
+	Get-HawkTenantAzureADUsers
 }
