@@ -52,9 +52,6 @@ Function Start-HawkUserInvestigation {
         [string]$User = $Object.UserPrincipalName
 
         Out-LogFile "Running Get-HawkUserConfiguration" -action
-        Get-HawkTenantConfiguration
-
-        Out-LogFile "Running Get-HawkUserConfiguration" -action
         Get-HawkUserConfiguration -User $User
 
         Out-LogFile "Running Get-HawkUserInboxRule" -action

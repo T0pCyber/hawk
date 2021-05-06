@@ -19,6 +19,8 @@
 .NOTES
 #>
 BEGIN{
+    Test-AzureADConnection
+    
     Out-LogFile "Collecting Azure AD Service Principals"
     $spns = get-azureadserviceprincipal -all $true | Sort-Object -Property DisplayName
     Out-LogFile "Collecting Azure AD Registered Applications"

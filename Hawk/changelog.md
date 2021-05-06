@@ -7,3 +7,12 @@
 - Readme file updated with https://cloudforensicator.com link
 - Updated Azure AD SKU options that identity "Premium Licensing"
 - Issue #25 - Unified Audit Log AuditData JSON parsing added to "Exchange_UAL_Audit.csv"
+
+## 2.0.2 (2021-05-05)
+- Fixed Hidden Mailbox Rule EWS Credential
+- Updated Robust Cloud Command version to 2.0.1
+- Updated Get-HawkTenantInboxRules.ps1 to new switch in update Robust Cloud Command
+- Deprecate "Get-HawkTenantAzureAuthenticationLogs" from Hawk. Azure AD Graph was deprecated and no longer supported. Currently
+seeking alternate solution to retrieve Azure AD Sign-in logs.
+- Removed dependency of Cloud Connect
+- Added dependency of Exchange Online Management V2 PowerShell module and updated functions to reflect
