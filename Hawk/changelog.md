@@ -16,3 +16,6 @@
 seeking alternate solution to retrieve Azure AD Sign-in logs.
 - Removed dependency of Cloud Connect
 - Added dependency of Exchange Online Management V2 PowerShell module and updated functions to reflect
+
+## 2.0.3.1 (2021-05-05)
+- Fixed MSOnline Requirement to manifest
