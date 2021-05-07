@@ -32,7 +32,7 @@
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'},
 		@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '2.0.4'},
 		@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1'},
-		@{ModuleName = 'MSOnline'; ModuleVersion = '1.1.183.17' }
+		@{ModuleName = 'MSOnline'; ModuleVersion = '1.1.183.17' },
 		@{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.130'}
 	)
 
