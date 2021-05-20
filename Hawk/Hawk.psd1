@@ -3,7 +3,7 @@
 	RootModule = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion = '2.0.2'
+	ModuleVersion = '2.0.3.2'
 
 	# ID used to uniquely identify this module
 	GUID = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
@@ -32,6 +32,7 @@
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'},
 		@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '2.0.4'},
 		@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1'},
+		@{ModuleName = 'MSOnline'; ModuleVersion = '1.1.183.17' },
 		@{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.130'}
 	)
 
