@@ -70,10 +70,22 @@ Function Get-HawkUserInboxRule {
                 # If we have set the Investigate flag then report it and output it to a seperate file
                 if ($Investigate -eq $true) {
                     Out-LogFile ("Possible Investigate inbox rule found ID:" + $Rule.Identity + " Rule:" + $Rule.Name) -notice
+					# Description is multiline
+					$Rule.Description = $Rule.Description.replace("`r`n", " ").replace("`t", "")
                     $Rule | Out-MultipleFileType -FilePreFix "_Investigate_InboxRules" -user $user -csv -append -Notice
                 }
             }
 
+			# Description is multiline
+			$inboxrulesRawDescription = $InboxRules
+			$InboxRules = New-Object -TypeName "System.Collections.ArrayList"
+			
+			$inboxrulesRawDescription | ForEach-Object {
+				$_.Description = $_.Description.Replace("`r`n", " ").replace("`t", "")
+			
+				$null = $InboxRules.Add($_)
+			}
+			
             # Output all of the inbox rules to a generic csv
             $InboxRules | Out-MultipleFileType -FilePreFix "InboxRules" -User $user -csv
 

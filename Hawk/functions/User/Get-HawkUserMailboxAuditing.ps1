@@ -51,8 +51,11 @@
         [datetime]$RangeStart = $StartDate
 
         do {
-            # Get the end of the Range we are going to gather data for
-            [string]$RangeEnd =[datetime]::parse($RangeStart, [CultureInfo]::CreateSpecificCulture("en-US")).AddDays(5).toString("MM/dd/yyyy")
+            # Get the end of the Range we are going to gather data for            
+            [datetime] $RangeEnd = $RangeStart.AddDays(5)
+            if ($RangeEnd -gt $EndDate) {
+                $RangeEnd = $EndDate
+            }
 
             # Do the actual search
             Out-LogFile ("Searching Range " + [string]$RangeStart + " To " + [string]$RangeEnd)
