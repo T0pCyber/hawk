@@ -19,3 +19,6 @@ seeking alternate solution to retrieve Azure AD Sign-in logs.
 
 ## 2.0.3.1 (2021-05-05)
 - Fixed MSOnline Requirement to manifest
+
+## 3.0.0 (2022-01-21)
+- Updated community pull requests
