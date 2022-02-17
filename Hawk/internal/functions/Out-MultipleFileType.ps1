@@ -135,13 +135,13 @@ Function Out-MultipleFileType {
                     Out-LogFile ("Appending Data to " + $filename)
 
                     # Write it out to csv making sture to append
-                    $AllObject | Export-Csv $filename -NoTypeInformation -Append -Encoding Unicode
+                    $AllObject | Export-Csv $filename -NoTypeInformation -Append
                 }
 
                 # Otherwise overwrite
                 else {
                     Out-LogFile ("Writing Data to " + $filename)
-                    $AllObject | Export-Csv $filename -NoTypeInformation -Encoding Unicode
+                    $AllObject | Export-Csv $filename -NoTypeInformation
                 }
 
                 # If notice is set we need to write the file name to _Investigate.txt
