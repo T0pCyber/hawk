@@ -79,13 +79,13 @@ Function Get-HawkUserInboxRule {
 			# Description is multiline
 			$inboxrulesRawDescription = $InboxRules
 			$InboxRules = New-Object -TypeName "System.Collections.ArrayList"
-			
+
 			$inboxrulesRawDescription | ForEach-Object {
 				$_.Description = $_.Description.Replace("`r`n", " ").replace("`t", "")
-			
+
 				$null = $InboxRules.Add($_)
 			}
-			
+
             # Output all of the inbox rules to a generic csv
             $InboxRules | Out-MultipleFileType -FilePreFix "InboxRules" -User $user -csv
 
@@ -98,7 +98,7 @@ Function Get-HawkUserInboxRule {
         Out-LogFile ("Gathering Sweep Rules: " + $User) -action
         $SweepRules = Get-SweepRule -Mailbox $User
 
-        if ($null -eq $SweeRules) { Out-LogFile "No Sweep Rules found" }
+        if ($null -eq $SweepRules) { Out-LogFile "No Sweep Rules found" }
         else {
 
             # Output all rules to a user CSV

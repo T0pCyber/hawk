@@ -51,13 +51,9 @@
         [datetime]$RangeStart = $StartDate
 
         do {
-            # Get the end of the Range we are going to gather data for            
-            [datetime] $RangeEnd = $RangeStart.AddDays(5)
-            if ($RangeEnd -gt $EndDate) {
-                $RangeEnd = $EndDate
-            }
-
-            # Do the actual search
+            # Get the end of the Range we are going to gather data for
+            [datetime] $RangeEnd = ($RangeStart.AddDays(5))
+                        # Do the actual search
             Out-LogFile ("Searching Range " + [string]$RangeStart + " To " + [string]$RangeEnd)
             [array]$Results += Search-MailboxAuditLog -StartDate $RangeStart -EndDate $RangeEnd -identity $User -ShowDetails -ResultSize 250000
 

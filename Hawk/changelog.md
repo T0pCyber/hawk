@@ -22,3 +22,7 @@ seeking alternate solution to retrieve Azure AD Sign-in logs.
 
 ## 3.0.0 (2022-01-21)
 - Updated community pull requests
+a. Encoding to UTF8 - TakayukiTomatsuri
+b. Updated $RangeEnd to datetime - cfc-zcarter
+c. Updated Sweep variable - Bug
+d. 

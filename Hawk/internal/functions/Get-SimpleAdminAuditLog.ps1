@@ -26,7 +26,7 @@ Function Get-SimpleAdminAuditLog {
         $SearchResults
     )
 
-    # Setup to process incomming results
+    # Setup to process incoming results
     Begin {
 
         # Make sure the array is null
@@ -50,7 +50,7 @@ Function Get-SimpleAdminAuditLog {
             if ([string]::IsNullOrEmpty($user)) { $user = "***" }
 
             # if we have 'on behalf of' then we need to do some more processing to get the right value
-            elseif ($_.caller -like "*on ehalf of*") {
+            elseif ($_.caller -like "*on behalf of*") {
                 $split = $_.caller.split("/")
                 $Start = (($Split[3].split(" "))[0]).TrimEnd('"')
                 $End = $Split[-1].trimend('"')
