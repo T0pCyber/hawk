@@ -3,7 +3,7 @@
 	RootModule = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion = '2.0.3.2'
+	ModuleVersion = '3.0.0'
 
 	# ID used to uniquely identify this module
 	GUID = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
@@ -15,7 +15,7 @@
 	CompanyName = 'Cloud Forensicator'
 
 	# Copyright statement for this module
-	Copyright = 'Copyright (c) 2020 Paul Navarro'
+	Copyright = 'Copyright (c) 2022 Paul Navarro'
 
 	# Description of the functionality provided by this module
 	Description = 'Microsoft 365 Incident Response and Threat Hunting PowerShell tool.

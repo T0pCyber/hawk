@@ -19,6 +19,9 @@
 
 R	uns all of the tenant investigation cmdlets.
 #>
+	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+		Initialize-HawkGlobalObject
+	}
 
 	Out-LogFile "Starting Tenant Sweep" -action
 	Send-AIEvent -Event "CmdRun"

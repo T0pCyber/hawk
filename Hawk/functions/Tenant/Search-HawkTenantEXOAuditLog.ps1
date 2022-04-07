@@ -221,7 +221,7 @@
     }
 
     if ($Output.count -gt 1) {
-        Out-LogFile ("Found " + $Output.cout + " Users/Groups with Impersonation rights.  Default is 1") -notice
+        Out-LogFile ("Found " + $Output.count + " Users/Groups with Impersonation rights.  Default is 1") -notice
         $Output | Out-MultipleFileType -fileprefix "Impersonation_Rights" -csv -xml
         $Output | Out-MultipleFileType -fileprefix "_Investigate_Impersonation_Rights" -csv -xml -Notice
     }
@@ -231,4 +231,12 @@
     }
     else { }
 
+        # Look for EXO Powershell logins
+        Out-LogFile "Searching for EXO Powershell logins" -action
+        [array]$InvestigateEXOPSLogins = Search-AdminAuditLog -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -operations MailboxLogin
+
+        if ($InvestigateEXOPSLogins -gt 0) {
+            Out-LogFile ("Found " + $InvestigateEXOPSLogins.count + " Powershell logins")
+            $InvestigateEXOPSLogins | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_EXO_Powershell_Logins" -csv
+        }   $InvestigateEXOPSLogins | Out-MultipleFileType -fileprefix "EXO_Powershell_Logins" -xml
 }
