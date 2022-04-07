@@ -25,4 +25,4 @@ seeking alternate solution to retrieve Azure AD Sign-in logs.
 a. Encoding to UTF8 - TakayukiTomatsuri
 b. Updated $RangeEnd to datetime - cfc-zcarter
 c. Updated Sweep variable - Bug
-d. 
+d. Search-HawkTenantEXOAuditLogs.ps1 - Added EXO PS Login enumeration
