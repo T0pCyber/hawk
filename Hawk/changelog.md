@@ -20,9 +20,10 @@ seeking alternate solution to retrieve Azure AD Sign-in logs.
 ## 2.0.3.1 (2021-05-05)
 - Fixed MSOnline Requirement to manifest
 
-## 3.0.0 (2022-01-21)
+## 3.0.0 (2022-04-09)
 - Updated community pull requests
-a. Encoding to UTF8 - TakayukiTomatsuri
-b. Updated $RangeEnd to datetime - cfc-zcarter
+a. Encoding to UTF8 - Enhancement - TakayukiTomatsuri
+b. Updated $RangeEnd to datetime - Bug - cfc-zcarter
 c. Updated Sweep variable - Bug
-d. Search-HawkTenantEXOAuditLogs.ps1 - Added EXO PS Login enumeration
+d. Added Default Tenant Name to Hawk folder name - Issue#86 - Enhancement - Snickasaurus
+e. Updated Get-HawkTenantEXOAdmins to accurately list admins that is a group

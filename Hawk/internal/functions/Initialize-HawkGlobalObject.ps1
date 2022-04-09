@@ -78,7 +78,8 @@
         param([string]$RootPath)
 
         # Create a folder ID based on date
-        [string]$FolderID = "Hawk_" + (Get-Date -UFormat %Y%m%d_%H%M).tostring()
+        [string]$TenantName = (Get-MSolDomain | Where-Object {$_.isDefault}).Name
+        [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date -UFormat %Y%m%d_%H%M).tostring()
 
         # Add that ID to the given path
         $FullOutputPath = Join-Path $RootPath $FolderID
