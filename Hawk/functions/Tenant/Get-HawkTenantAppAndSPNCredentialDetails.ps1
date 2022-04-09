@@ -19,8 +19,12 @@
 .NOTES
 #>
 BEGIN{
+    #Initializing Hawk Object if not present
+    if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+		Initialize-HawkGlobalObject
+	}
     Test-AzureADConnection
-    
+
     Out-LogFile "Collecting Azure AD Service Principals"
     $spns = get-azureadserviceprincipal -all $true | Sort-Object -Property DisplayName
     Out-LogFile "Collecting Azure AD Registered Applications"

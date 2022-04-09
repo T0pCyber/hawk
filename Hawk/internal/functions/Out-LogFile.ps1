@@ -48,7 +48,7 @@ Function Out-LogFile {
         [string]$logstring = ( "[" + $date + "] - [ACTION] - " + $string)
 
     }
-    # If notice is true the we should write this to intersting.txt as well
+    # If notice is true the we should write this to interesting.txt as well
     elseif ($notice) {
         [string]$logstring = ( "[" + $date + "] - ## INVESTIGATE ## - " + $string)
 

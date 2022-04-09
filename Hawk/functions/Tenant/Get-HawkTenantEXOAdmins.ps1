@@ -26,7 +26,7 @@ PROCESS{
                 if([string]::IsNullOrWhiteSpace($admin.WindowsLiveId)){
                     [PSCustomObject]@{
                         ExchangeAdminGroup = $Role.Name
-                        Members= $admin.name
+                        Members= $admin.DisplayName
                         RecipientType = $admin.RecipientType
                     }
                 }

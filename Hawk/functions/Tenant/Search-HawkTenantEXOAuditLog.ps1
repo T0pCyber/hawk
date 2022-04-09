@@ -221,7 +221,7 @@
     }
 
     if ($Output.count -gt 1) {
-        Out-LogFile ("Found " + $Output.cout + " Users/Groups with Impersonation rights.  Default is 1") -notice
+        Out-LogFile ("Found " + $Output.count + " Users/Groups with Impersonation rights.  Default is 1") -notice
         $Output | Out-MultipleFileType -fileprefix "Impersonation_Rights" -csv -xml
         $Output | Out-MultipleFileType -fileprefix "_Investigate_Impersonation_Rights" -csv -xml -Notice
     }

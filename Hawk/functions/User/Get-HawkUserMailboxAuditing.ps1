@@ -52,9 +52,8 @@
 
         do {
             # Get the end of the Range we are going to gather data for
-            [string]$RangeEnd =[datetime]::parse($RangeStart, [CultureInfo]::CreateSpecificCulture("en-US")).AddDays(5).toString("MM/dd/yyyy")
-
-            # Do the actual search
+            [datetime] $RangeEnd = ($RangeStart.AddDays(5))
+                        # Do the actual search
             Out-LogFile ("Searching Range " + [string]$RangeStart + " To " + [string]$RangeEnd)
             [array]$Results += Search-MailboxAuditLog -StartDate $RangeStart -EndDate $RangeEnd -identity $User -ShowDetails -ResultSize 250000
 
