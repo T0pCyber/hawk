@@ -39,7 +39,7 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
 
         [string]$User = $Object.UserPrincipalName
 
-        [string]$PrimarySMTP = (Get-Mailbox -identity $User).primarysmtpaddress
+        [string]$PrimarySMTP = (Get-EXOMailbox -identity $User).primarysmtpaddress
 
         if ([string]::IsNullOrEmpty($PrimarySMTP)) {
             Out-LogFile ("[ERROR] - Failed to find Primary SMTP Address for user: " + $User)

@@ -27,7 +27,7 @@
 
     .EXAMPLE
 
-	Get-HawkUserEmailForwarding -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
+	Get-HawkUserEmailForwarding -UserPrincipalName (Get-EXOMailbox -Filter {Customattribute1 -eq "C-level"})
 
 	Gathers possible email forwarding configured for all users who have "C-Level" set in CustomAttribute1
     #>
@@ -51,7 +51,7 @@
         # Looking for email forwarding stored in AD
         Out-LogFile ("Gathering possible Forwarding changes for: " + $User) -action
         Out-LogFile "Collecting AD Forwarding Settings" -action
-        $mbx = Get-Mailbox -identity $User
+        $mbx = Get-EXOMailbox -identity $User
 
         # Check if forwarding is configured by user or admin
         if ([string]::IsNullOrEmpty($mbx.ForwardingSMTPAddress) -and [string]::IsNullOrEmpty($mbx.ForwardingAddress)) {
