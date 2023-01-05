@@ -16,7 +16,7 @@
 Function Test-AzureADConnection {
 
     $TestModule = Get-Module AzureAD -ListAvailable -ErrorAction SilentlyContinue
-    $MinimumVersion = New-Object -TypeName Version -ArgumentList "2.0.0.130"
+    $MinimumVersion = New-Object -TypeName Version -ArgumentList "2.0.2.140"
 
     if ($null -eq $TestModule) {
         Out-LogFile "Please Install the AzureAD Module with the following command:"
@@ -28,7 +28,7 @@ Function Test-AzureADConnection {
         $TestModuleVersion = ($TestModule | Sort-Object -Property Version -Descending)[0].version
     }
 
-    # Test the version we need at least 2.0.0.130
+    # Test the version we need at least 2.0.2.140
     if ($TestModuleVersion -lt $MinimumVersion) {
         Out-LogFile ("AzureAD Module Installed Version: " + $TestModuleVersion)
         Out-LogFile ("Miniumum Required Version: " + $MinimumVersion)

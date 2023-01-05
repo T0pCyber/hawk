@@ -29,7 +29,7 @@ $AzureApplicationActivityEvents = $null
 Out-LogFile "Searching Unified Audit Logs Azure Activities" -Action
 Out-LogFile "Searching for Application Activities"
 
-# Search the unified audit log for events related to applciation activity
+# Search the unified audit log for events related to application activity
 # https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants
 $AzureApplicationActivityEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Add OAuth2PermissionGrant.','Consent to application.' ")
 
@@ -56,7 +56,7 @@ else {
 			@{Name='targetName';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'targetName'}).value}},
 			@{Name='env_time';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'env_time'}).value}},
 			@{Name='correlationId';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'correlationId'}).value}}`
-			| Out-MultipleFileType -fileprefix "Azure_Appliction_Audit" -csv -append
+			| Out-MultipleFileType -fileprefix "Azure_Application_Audit" -csv -append
 	}
 }
 }
