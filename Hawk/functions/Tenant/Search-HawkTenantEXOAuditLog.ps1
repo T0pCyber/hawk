@@ -1,4 +1,4 @@
-﻿Function Search-HawkTenantEXOAuditLog {
+Function Search-HawkTenantEXOAuditLog {
 <#
 .SYNOPSIS
     Searches the admin audit logs for possible bad actor activities
@@ -161,7 +161,7 @@
             else {
                 # Here we get back a recipient object in EXO not an SMTP address
                 # So we need to go track down the recipient object
-                $recipient = Get-Recipient (($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value) -ErrorAction SilentlyContinue
+                $recipient = Get-EXORecipient (($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value) -ErrorAction SilentlyContinue
 
                 # If we can't resolve the recipient we need to log that
                 if ($null -eq $recipient) {
