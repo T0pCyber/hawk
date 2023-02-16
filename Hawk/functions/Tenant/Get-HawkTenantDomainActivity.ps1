@@ -2,7 +2,8 @@
 Function Get-HawkTenantDomainActivity {
 <#
 .SYNOPSIS
-	Looks for any changes made to M365 Domains
+	Looks for any changes made to M365 Domains. Permissions required to make the changes that thsi function is
+	looking for is "Domain Name Administrator" or "Global Administrator
 .DESCRIPTION
 	Searches the EXO Audit logs for the following commands being run.
 	Set-AccpetedDomain
@@ -32,7 +33,7 @@ Function Get-HawkTenantDomainActivity {
 	Out-LogFile "Gathering any changes to Domain configuration settings" -action
 
 	# Search UAL audit logs for any Domain configuration changes
-	$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'ExchangeAdmin' -Operations 'Set-AcceptedDomain','Add-FederatedDomain.','Update Domain','Add verified domain', 'Add unverified domain' ")
+	$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain.','Update Domain','Add verified domain', 'Add unverified domain' ")
 	# If null we found no changes to nothing to do here
 if ($null -eq $DomainConfigurationEvents){
 	Out-LogFile "No Domain configuration changes found."
