@@ -77,7 +77,8 @@
 		'Get-HawkTenantEXOAdmins',
 		'Get-HawkTenantMailItemsAccessed',
 		'Get-HawkTenantAppAndSPNCredentialDetails',
-		'Get-HawkTenantAzureADUsers'
+		'Get-HawkTenantAzureADUsers',
+		'Get-HawkTenantDomainActivity'
 
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''

@@ -1,4 +1,4 @@
-﻿Function Get-HawkTenantAzureAuditLog{
+﻿Function Get-HawkTenantAzureAppAuditLog{
 <#
 .SYNOPSIS
 	Gathers common data about a tenant.
