@@ -345,10 +345,11 @@
             }
         }
 
-
         # Determine if we have access to a P1 or P2 Azure Ad License
         # EMS SKU contains Azure P1 as part of the sku
-        if ([bool](Get-MsolAccountSku | Where-Object { ($_.accountskuid -like "*aad_premium*") -or ($_.accountskuid -like "*EMS*") -or ($_.accountskuid -like "*E5*") -or ($_.accountskuid -like "*G5*") })) {
+        # This uses Graph instead of MSOL
+        Test-GraphConnection
+        if ([bool] (Get-MgSubscribedSku | Where-Object { ($_.SkuId -like "*aad_premium*") -or ($_.SkuId -like "*EMS*") -or ($_.SkuId -like "*E5*") -or ($_.SkuId -like "*G5*") } )) {
             Write-Information "Advanced Azure AD License Found"
             [bool]$AdvancedAzureLicense = $true
         }
@@ -356,6 +357,7 @@
             Write-Information "Advanced Azure AD License NOT Found"
             [bool]$AdvancedAzureLicense = $false
         }
+
 
 		# Configuration Example, currently not used
 		#TODO: Implement Configuration system across entire project
