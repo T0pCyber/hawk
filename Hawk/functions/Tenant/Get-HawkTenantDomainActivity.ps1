@@ -33,7 +33,7 @@ Function Get-HawkTenantDomainActivity {
 	Out-LogFile "Gathering any changes to Domain configuration settings" -action
 
 	# Search UAL audit logs for any Domain configuration changes
-	$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain.','Update Domain','Add verified domain', 'Add unverified domain' ")
+	$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain','Update Domain','Add verified domain', 'Add unverified domain' ")
 	# If null we found no changes to nothing to do here
 if ($null -eq $DomainConfigurationEvents){
 	Out-LogFile "No Domain configuration changes found."
@@ -46,17 +46,18 @@ else {
 
 	# Go thru each even and prepare it to output to CSV
 	Foreach ($event in $DomainConfigurationEvents){
-
-		$event.auditdata | ConvertFrom-Json | Select-Object -Property Id,
+		$log1 = $event.auditdata | ConvertFrom-Json
+		foreach ($Prop1 in $log1.ModifiedProperties.NewValue) {$result1 += $Prop1.Split('"')
+		}
+		foreach ($Prop2 in $log1.ExtendedProperties.Value) {$result2 += $Prop2.Split('"')
+		}
+	$log1  | Select-Object -Property Id,
 			Operation,
 			ResultStatus,
 			Workload,
-			ClientIP,
 			UserID,
-			@{Name='ActorUPN';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'actorUPN'}).value}},
-			@{Name='targetName';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'targetName'}).value}},
-			@{Name='env_time';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'env_time'}).value}},
-			@{Name='correlationId';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'correlationId'}).value}}`
+			@{Name='Domain';Expression={$result1[1]}},
+			@{Name='User Agent String';Expression={$result2[3]}}
 			| Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -append
 	}
 }
