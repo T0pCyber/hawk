@@ -47,8 +47,10 @@ else {
 	# Go thru each even and prepare it to output to CSV
 	Foreach ($event in $DomainConfigurationEvents){
 		$log1 = $event.auditdata | ConvertFrom-Json
+		$result1 = $null
 		foreach ($Prop1 in $log1.ModifiedProperties.NewValue) {$result1 += $Prop1.Split('"')
 		}
+		$result2 = $null
 		foreach ($Prop2 in $log1.ExtendedProperties.Value) {$result2 += $Prop2.Split('"')
 		}
 	$report = $log1  | Select-Object -Property Id,
