@@ -51,14 +51,14 @@ else {
 		}
 		foreach ($Prop2 in $log1.ExtendedProperties.Value) {$result2 += $Prop2.Split('"')
 		}
-	$log1  | Select-Object -Property Id,
+	$report = $log1  | Select-Object -Property Id,
 			Operation,
 			ResultStatus,
 			Workload,
 			UserID,
 			@{Name='Domain';Expression={$result1[1]}},
 			@{Name='User Agent String';Expression={$result2[3]}}
-			| Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -append
 	}
+	$report | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -append
 }
 }
