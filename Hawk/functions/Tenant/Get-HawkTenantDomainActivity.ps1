@@ -48,11 +48,10 @@ else {
 	Foreach ($event in $DomainConfigurationEvents){
 		$log1 = $event.auditdata | ConvertFrom-Json
 		$result1 = $null
-		foreach ($Prop1 in $log1.ModifiedProperties.NewValue) {$result1 += $Prop1.Split('"')
-		}
-		$result2 = $null
-		foreach ($Prop2 in $log1.ExtendedProperties.Value) {$result2 += $Prop2.Split('"')
-		}
+		$result1 =($log1.ModifiedProperties.NewValue).Split('"')
+
+		$result2 = ($log1.ExtendedProperties.Value).Split('"')
+
 	$report = $log1  | Select-Object -Property Id,
 			Operation,
 			ResultStatus,
@@ -60,7 +59,8 @@ else {
 			UserID,
 			@{Name='Domain';Expression={$result1[1]}},
 			@{Name='User Agent String';Expression={$result2[3]}}
-	}
 	$report | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -append
+	}
+
 }
 }
