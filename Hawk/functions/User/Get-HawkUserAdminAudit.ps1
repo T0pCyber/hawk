@@ -34,7 +34,7 @@
         [string]$User = $Object.UserPrincipalName
 
         # Get the mailbox name since that is what we store in the admin audit log
-        $MailboxName = (Get-Mailbox -identity $User).name
+        $MailboxName = (Get-EXOMailbox -Identity $User).name
 
         Out-LogFile ("Searching for changes made to: " + $MailboxName) -action
 
