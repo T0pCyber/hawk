@@ -32,14 +32,14 @@ R	uns all of the tenant investigation cmdlets.
 	Out-LogFile "Running Get-HawkTenantEDiscoveryConfiguration" -action
 	Get-HawkTenantEDiscoveryConfiguration
 
-	Out-LogFile "Running Get-HawkTenantEXOAuditLog" -action
+	Out-LogFile "Running Search-HawkTenantEXOAuditLog" -action
 	Search-HawkTenantEXOAuditLog
 
 	Out-LogFile "Running Get-HawkTenantRBACChanges" -action
 	Get-HawkTenantRBACChanges
 
-	Out-LogFile "Running Get-HawkTenantAzureAuditLog" -action
-	Get-HawkTenantAzureAuditLog
+	Out-LogFile "Running Get-HawkTenantAzureAppAuditLog" -action
+	Get-HawkTenantAzureAppAuditLog
 
 	Out-LogFile "Running Get-HawkTenantEXOAdmins" -action
 	Get-HawkTenantEXOAdmins

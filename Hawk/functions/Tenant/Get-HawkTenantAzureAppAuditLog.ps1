@@ -1,4 +1,4 @@
-﻿Function Get-HawkTenantAzureAuditLog{
+﻿Function Get-HawkTenantAzureAppAuditLog{
 <#
 .SYNOPSIS
 	Gathers common data about a tenant.
@@ -29,7 +29,7 @@ $AzureApplicationActivityEvents = $null
 Out-LogFile "Searching Unified Audit Logs Azure Activities" -Action
 Out-LogFile "Searching for Application Activities"
 
-# Search the unified audit log for events related to applciation activity
+# Search the unified audit log for events related to application activity
 # https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants
 $AzureApplicationActivityEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Add OAuth2PermissionGrant.','Consent to application.' ")
 

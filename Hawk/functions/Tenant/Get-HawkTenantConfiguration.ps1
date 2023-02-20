@@ -70,8 +70,12 @@
     Out-LogFile "Organization Configuration"
     Get-OrganizationConfig| Out-MultipleFileType -FilePrefix "OrgConfig" -xml -txt
 
+	# https://learn.microsoft.com/en-us/exchange/mail-flow-best-practices/remote-domains/remote-domains
     Out-LogFile "Remote Domains"
     Get-RemoteDomain | Out-MultipleFileType -FilePrefix "RemoteDomain" -xml -csv
+
+	Out-LogFile "Accepted Domains"
+	Get-AcceptedDomain | Out-MultipleFileType -FilePrefix "Accepted Domain" -xml -csv
 
     Out-LogFile "Transport Rules"
     Get-TransportRule | Out-MultipleFileType -FilePrefix "TransportRules" -xml -csv
