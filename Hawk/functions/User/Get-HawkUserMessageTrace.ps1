@@ -39,7 +39,7 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
 
         [string]$User = $Object.UserPrincipalName
 
-        [string]$PrimarySMTP = (Get-EXOMailbox -identity $User).primarysmtpaddress
+        [string]$PrimarySMTP = (Get-Mailbox -identity $User).primarysmtpaddress
 
         if ([string]::IsNullOrEmpty($PrimarySMTP)) {
             Out-LogFile ("[ERROR] - Failed to find Primary SMTP Address for user: " + $User)
@@ -49,7 +49,7 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
             # Get the 7 day message trace for the primary SMTP address as the sender
             Out-LogFile ("Gathering messages sent by: " + $PrimarySMTP) -action
 
-            (Get-MessageTrace -Sender $PrimarySMTP) | Out-MultipleFileType -FilePreFix "Message_Trace" -user $User -csv
+            (Get-MessageTrace -Sender $PrimarySMTP) | Out-MultipleFileType -FilePreFix "Message_Trace" -user $User -csv -json
         }
     }
 }

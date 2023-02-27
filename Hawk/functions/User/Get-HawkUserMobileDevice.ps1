@@ -59,12 +59,12 @@
                 if ($Device.FirstSyncTime -gt $Hawk.StartDate){
                     Out-Logfile ("Device found that was first synced inside investigation window") -notice
                     Out-LogFile ("DeviceID: " + $Device.DeviceID) -notice
-                    $Device | Out-MultipleFileType -FilePreFix "_Investigate_MobileDevice" -user $user -csv -append -Notice
+                    $Device | Out-MultipleFileType -FilePreFix "_Investigate_MobileDevice" -user $user -csv -json -append -Notice
                 }
             }
 
             # Output all devices found
-            $MobileDevices | Out-MultipleFileType -FilePreFix "MobileDevices" -user $user -csv
+            $MobileDevices | Out-MultipleFileType -FilePreFix "MobileDevices" -user $user -csv -json
         }
     }
 }

@@ -34,7 +34,7 @@
         [string]$User = $Object.UserPrincipalName
 
         # Get the mailbox name since that is what we store in the admin audit log
-        $MailboxName = (Get-EXOMailbox -Identity $User).name
+        $MailboxName = (Get-Mailbox -identity $User).name
 
         Out-LogFile ("Searching for changes made to: " + $MailboxName) -action
 
@@ -45,8 +45,8 @@
         # If there are any results push them to an output file
         if ($UserChanges.Count -gt 0) {
             Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
-            $UserChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -user $User
-            $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -user $User
+            $UserChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -json -user $User
+            $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -user $User
         }
         # Otherwise report no results found
         else {

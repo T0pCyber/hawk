@@ -50,7 +50,7 @@
     $UniqueRoles = Select-UniqueObject -ObjectArray $Roles -Property Role
 
     Out-LogFile ("Found " + $UniqueRoles.count + " Roles with E-Discovery Rights")
-    $UniqueRoles | Out-MultipleFileType -FilePrefix "EDiscoveryRoles" -csv -xml
+    $UniqueRoles | Out-MultipleFileType -FilePrefix "EDiscoveryRoles" -csv -xml -json
 
     # Get everyone who is assigned one of these roles
     Foreach ($Role in $UniqueRoles) {
@@ -58,7 +58,7 @@
     }
 
     Out-LogFile ("Found " + $RoleAssignements.count + " Role Assignements for these Roles")
-    $RoleAssignements | Out-MultipleFileType -FilePreFix "EDiscoveryRoleAssignments" -csv -xml
+    $RoleAssignements | Out-MultipleFileType -FilePreFix "EDiscoveryRoleAssignments" -csv -xml -json
 
 
 }

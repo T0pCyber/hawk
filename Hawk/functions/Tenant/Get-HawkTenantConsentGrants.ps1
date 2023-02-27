@@ -44,5 +44,5 @@
         Out-LogFile "https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants#inventory-apps-with-access-in-your-organization"
     }
 
-    $Grants | Out-MultipleFileType -FilePrefix "Consent_Grants" -csv
+    $Grants | Out-MultipleFileType -FilePrefix "Consent_Grants" -csv -json
 }

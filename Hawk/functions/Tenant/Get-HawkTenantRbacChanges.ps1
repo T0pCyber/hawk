@@ -43,8 +43,8 @@ Function Get-HawkTenantRBACChanges {
 	# If there are any results push them to an output file
 	if ($RBACChanges.Count -gt 0) {
 		Out-LogFile ("Found " + $RBACChanges.Count + " Changes made to Roles Based Access Control")
-		$RBACChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_RBAC_Changes" -csv
-		$RBACChanges | Out-MultipleFileType -FilePrefix "RBAC_Changes" -csv -xml
+		$RBACChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_RBAC_Changes" -csv -json
+		$RBACChanges | Out-MultipleFileType -FilePrefix "RBAC_Changes" -csv -xml -json
 	}
 	# Otherwise report no results found
 	else {
