@@ -56,7 +56,7 @@ else {
 			@{Name='targetName';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'targetName'}).value}},
 			@{Name='env_time';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'env_time'}).value}},
 			@{Name='correlationId';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'correlationId'}).value}}`
-			| Out-MultipleFileType -fileprefix "Azure_Application_Audit" -csv -append
+			| Out-MultipleFileType -fileprefix "Azure_Application_Audit" -csv -json -append
 	}
 }
 }
