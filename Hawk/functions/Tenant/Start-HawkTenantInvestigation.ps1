@@ -35,6 +35,12 @@ R	uns all of the tenant investigation cmdlets.
 	Out-LogFile "Running Search-HawkTenantEXOAuditLog" -action
 	Search-HawkTenantEXOAuditLog
 
+	Out-LogFile "Running Get-HawkTenantEDiscoveryLogs"
+	Get-HawkTenantEDiscoveryLogs -action
+
+	Out-LogFile "Running Get-HawkTenantDomainActivity" -action
+	Get-HawkTenantDomainActivity
+
 	Out-LogFile "Running Get-HawkTenantRBACChanges" -action
 	Get-HawkTenantRBACChanges
 

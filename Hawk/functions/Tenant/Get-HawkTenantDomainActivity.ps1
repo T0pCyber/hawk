@@ -33,7 +33,8 @@ Function Get-HawkTenantDomainActivity {
 	Out-LogFile "Gathering any changes to Domain configuration settings" -action
 
 	# Search UAL audit logs for any Domain configuration changes
-	$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain','Update Domain','Add verified domain', 'Add unverified domain' ")
+	$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain','Update Domain','Add verified domain', 'Add unverified domain',
+	remove unverified domain' ") -ResultStatus Success
 	# If null we found no changes to nothing to do here
 if ($null -eq $DomainConfigurationEvents){
 	Out-LogFile "No Domain configuration changes found."
@@ -47,12 +48,13 @@ else {
 	# Go thru each even and prepare it to output to CSV
 	Foreach ($event in $DomainConfigurationEvents){
 		$log1 = $event.auditdata | ConvertFrom-Json
-		$result1 = $null
+		$report = $null
 		$result1 =($log1.ModifiedProperties.NewValue).Split('"')
 
 		$result2 = ($log1.ExtendedProperties.Value).Split('"')
 
-	$report = $log1  | Select-Object -Property Id,
+	$report = $log1  | Select-Object -Property CreationTime,
+			Id,
 			Operation,
 			ResultStatus,
 			Workload,
