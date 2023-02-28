@@ -65,7 +65,7 @@ Function Start-HawkUserInvestigation {
 
         Out-LogFile "Running Get-HawkUserAuthHistory" -action
         Get-HawkUserAuthHistory -User $user -ResolveIPLocations
-
+		
         Out-LogFile "Running Get-HawkUserMailboxAuditing" -action
         Get-HawkUserMailboxAuditing -User $User
 
