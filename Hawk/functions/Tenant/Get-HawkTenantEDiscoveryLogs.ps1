@@ -34,7 +34,11 @@
                 Workload,
                 UserID,
                 Case,
+<<<<<<< HEAD
                 @{Name='CaseID';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'CaseId'}).value}},
+=======
+                @{Name='CaseID';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'CaseId'}).value}}
+>>>>>>> 90567e2... Fixed Domain Activity Pull
                 @{Name='Cmdlet';Expression={($_.Parameters | Where-Object {$_.Name -eq 'Cmdlet'}).value}}
 
             $report | Out-MultipleFileType -fileprefix "eDiscoveryLogs" -csv -append
