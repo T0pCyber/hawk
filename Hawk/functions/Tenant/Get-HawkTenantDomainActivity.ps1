@@ -33,8 +33,7 @@ Function Get-HawkTenantDomainActivity {
 	Out-LogFile "Gathering any changes to Domain configuration settings" -action
 
 	# Search UAL audit logs for any Domain configuration changes
-	$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain','Update Domain','Add verified domain', 'Add unverified domain',
-	remove unverified domain' ") -ResultStatus Success
+	$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain','Update Domain','Add verified domain', 'Add unverified domain', 'remove unverified domain'")
 	# If null we found no changes to nothing to do here
 if ($null -eq $DomainConfigurationEvents){
 	Out-LogFile "No Domain configuration changes found."
