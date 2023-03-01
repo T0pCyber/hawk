@@ -62,7 +62,7 @@
 
         # Determine if the email address is null or empty
         # If it is write a warning and skip the rest of the script
-        [string]$EmailAddress = (get-mailbox $user).primarysmtpaddress
+        [string]$EmailAddress = (Get-EXOMailbox $user).primarysmtpaddress
         if ([string]::IsNullOrEmpty($EmailAddress)) {
             Write-Warning "No SMTP Address found Skipping"
             Return $null
