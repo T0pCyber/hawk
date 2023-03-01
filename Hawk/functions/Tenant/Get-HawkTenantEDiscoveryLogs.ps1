@@ -28,13 +28,14 @@
         # Go thru each even and prepare it to output to CSV
         Foreach ($log in $eDiscoveryLogs){
             $log1 = $log.auditdata | ConvertFrom-Json
-            $report = $log1  | Select-Object -Property Id,
+            $report = $log1  | Select-Object -Property CreationTime,
+                Id,
                 Operation,
                 Workload,
-                ObjectID,
                 UserID,
                 Case,
                 @{Name='CaseID';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'CaseId'}).value}}
+                @{Name='Cmdlet';Expression={($_.Parameters | Where-Object {$_.Name -eq 'Cmdlet'}).value}}
 
             $report | Out-MultipleFileType -fileprefix "eDiscoveryLogs" -csv -append
         }
