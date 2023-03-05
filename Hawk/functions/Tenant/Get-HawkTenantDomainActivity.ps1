@@ -72,6 +72,6 @@ Function Get-HawkTenantDomainActivity {
 	}
 
 END{
-	Write-Verbose "Completed gathering Domain configuration changes"
+	Out-LogFile "Completed gathering Domain configuration changes"
 }
 }#End Function Get-HawkTenantDomainActivity
