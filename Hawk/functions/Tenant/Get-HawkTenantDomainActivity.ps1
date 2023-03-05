@@ -94,19 +94,52 @@ if ($null -eq $DomainConfigurationEvents){
 else {
 	Out-LogFile "Domain configuration changes found." -Notice
 	Out-LogFile "Please review these Domain_Changes_Audit to ensure any changes are legitimate." -Notice
+	BEGIN{
+		Test-EXOConnection
+		Send-AIEvent -Event "CmdRun"
+		Out-LogFile "Gathering any changes to Domain configuration settings" -action
+	}
+	PROCESS{
+		# Search UAL audit logs for any Domain configuration changes
+		$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain','Update Domain','Add verified domain', 'Add unverified domain', 'remove unverified domain'")
+		# If null we found no changes to nothing to do here
+			if ($null -eq $DomainConfigurationEvents){
+			Out-LogFile "No Domain configuration changes found."
+		}
+		# If not null then we must have found some events so flag them
+		else{
+			Out-LogFile "Domain configuration changes found." -Notice
+			Out-LogFile "Please review these Domain_Changes_Audit to ensure any changes are legitimate." -Notice
 
-	# Go thru each even and prepare it to output to CSV
-	Foreach ($event in $DomainConfigurationEvents){
-		$log1 = $event.auditdata | ConvertFrom-Json
-		$report = $null
-		$result1 =($log1.ModifiedProperties.NewValue).Split('"')
-
-		$result2 = ($log1.ExtendedProperties.Value).Split('"')
->>>>>>> 90567e2... Fixed Domain Activity Pull
+			# Go thru each even and prepare it to output to CSV
+			Foreach ($event in $DomainConfigurationEvents){
+				$log1 = $event.auditdata | ConvertFrom-Json
+				$array = $log1.ModifiedProperties
+				if ($null -ne $array) {
+					$result1 = ($log1.ModifiedProperties.NewValue).Split('"')
+					$Domain = $result1[1]<# Action to perform if the condition is true #>
+				}
+				else {
+					$Domain = "No Value Found"
+				}
+				$result2 = ($log1.ExtendedProperties.Value).Split('"')
+				$UserAgentString = $result2[3]
+			$newlog = $log1  | Select-Object -Property CreationTime,
+				Id,
+				Workload,
+				Operation,
+				ResultStatus,
+				UserID,
+				@{Name='Domain';Expression={$Domain}},
+        		@{Name='User Agent String';Expression={$UserAgentString}},
+				@{Name='Target';Expression={($_.Target.ID)}}
+			$newlog | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -append
+			}
+		}
 
 	}
 
 END{
-	Out-LogFile "Completed gathering Domain configuration changes"
+	Write-Verbose "Completed gathering Domain configuration changes"
 }
 }#End Function Get-HawkTenantDomainActivity
