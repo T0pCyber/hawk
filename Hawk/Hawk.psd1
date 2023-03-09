@@ -1,4 +1,4 @@
-@{
+﻿@{
 	# Script module or binary module file associated with this manifest
 	RootModule = 'Hawk.psm1'
 
@@ -31,10 +31,10 @@
 		@{ModuleName = 'PSFramework'; ModuleVersion = '1.4.150'},
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'},
 		@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '3.0.0'},
-		@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '3.0.0'},
 		@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1'},
 		@{ModuleName = 'MSOnline'; ModuleVersion = '1.1.183.17' },
 		@{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.140'}
+		@{ModuleName = 'Microsoft.Graph.Authentication'; ModuleVersion = '1.23.0'}
 	)
 
 	# Assemblies that must be loaded prior to importing this module
