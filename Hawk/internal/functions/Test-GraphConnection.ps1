@@ -12,6 +12,7 @@
     Output (if any)
 .NOTES
     https://learn.microsoft.com/en-us/powershell/microsoftgraph/get-started?view=graph-powershell-1.0
+    https://learn.microsoft.com/en-us/powershell/microsoftgraph/get-started?view=graph-powershell-1.0
 #>
 
 Function Test-GraphConnection {
@@ -27,8 +28,9 @@ Function Test-GraphConnection {
         else {
             Out-LogFile "Connecting to MGGraph using MGGraph Module"
         }
-        # Connect to the MG Graph. The following scopes allow to retrieve Domain, Organization, and Sku data from the Graph.
+        # Connect to the MG Graph (This should have been installed with the CloudConnect Module)
         Connect-MGGraph -Scopes "User.Read.All","Directory.Read.All"
         Select-MgProfile -Name "v1.0"
     }
+}#End Function Test-GraphConnection
 }#End Function Test-GraphConnection

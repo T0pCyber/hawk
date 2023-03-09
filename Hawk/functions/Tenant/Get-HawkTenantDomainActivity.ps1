@@ -114,16 +114,24 @@ else {
 			# Go thru each even and prepare it to output to CSV
 			Foreach ($event in $DomainConfigurationEvents){
 				$log1 = $event.auditdata | ConvertFrom-Json
-				$array = $log1.ModifiedProperties
-				if ($null -ne $array) {
+				$domainarray = $log1.ModifiedProperties
+				$useragentarray = $log1.ExtendedProperties
+				if ($domainarray){
 					$result1 = ($log1.ModifiedProperties.NewValue).Split('"')
 					$Domain = $result1[1]<# Action to perform if the condition is true #>
 				}
 				else {
-					$Domain = "No Value Found"
+					$Domain = "No Domain Value Found"
 				}
-				$result2 = ($log1.ExtendedProperties.Value).Split('"')
-				$UserAgentString = $result2[3]
+				if ($useragentarray){
+					$result2 = ($log1.ExtendedProperties.Value).Split('"')
+					$UserAgentString = $result2[3]
+				}
+				else {
+					$UserAgentString = "No User Agent String Found"
+				}
+				#$result2 = ($log1.ExtendedProperties.Value).Split('"')
+				#$UserAgentString = $result2[3]
 			$newlog = $log1  | Select-Object -Property CreationTime,
 				Id,
 				Workload,
