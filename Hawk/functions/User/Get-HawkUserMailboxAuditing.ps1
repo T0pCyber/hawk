@@ -91,7 +91,7 @@
             Out-LogFile ("Found " + $UnifiedAuditLogs.Count + " Exchange audit records.")
 
             # Output the data we found
-            $UnifiedAuditLogs | Out-MultipleFileType -FilePrefix "Exchange_UAL_Audit" -User $User -csv
+            $UnifiedAuditLogs | Out-MultipleFileType -FilePrefix "Exchange_UAL_Audit" -User $User -csv -json
 
             # Search the MailboxAuditLogs as well since they may have different/more information
             Out-LogFile "Searching Exchange Mailbox Audit Logs (this can take some time)"
@@ -100,7 +100,7 @@
             Out-LogFile ("Found " + $MailboxAuditLogs.Count + " Exchange Mailbox audit records.")
 
             # Output the data we found
-            $MailboxAuditLogs | Out-MultipleFileType -FilePrefix "Exchange_Mailbox_Audit" -User $User -csv
+            $MailboxAuditLogs | Out-MultipleFileType -FilePrefix "Exchange_Mailbox_Audit" -User $User -csv -json
 
         }
         # If auditing is not enabled log it and move on
