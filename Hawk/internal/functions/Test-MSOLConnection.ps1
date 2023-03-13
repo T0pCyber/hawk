@@ -14,7 +14,6 @@
     General notes
 #>
 Function Test-MSOLConnection {
-
     try { $null = Get-MsolCompanyInformation -ErrorAction Stop }
     catch [Microsoft.Online.Administration.Automation.MicrosoftOnlineException] {
 
