@@ -6,8 +6,6 @@
         Searches the UAL for eDiscovery events
 
     #>
-
-
         # Search UAL audit logs for any Domain configuration changes
     Test-EXOConnection
 	Send-AIEvent -Event "CmdRun"

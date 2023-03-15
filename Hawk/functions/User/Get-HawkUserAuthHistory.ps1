@@ -104,9 +104,13 @@
                         Write-Progress -Activity "Looking Up Ip Address Locations" -CurrentOperation $i -PercentComplete (($i / $ExpandedUserLogonLogs.count) * 100)
                     }
 
-
                     # Get the location information for this IP address
+                    if($ExpandedUserLogonLogs.item($i).clientip){
                     $Location = Get-IPGeolocation -ipaddress $ExpandedUserLogonLogs.item($i).clientip
+                    }
+                    else {
+                        $Location = "IP Address Null"
+                    }
 
                     # Combine the connection object and the location object so that we have a single output ready
                     $ExpandedUserLogonLogs.item($i) = ($ExpandedUserLogonLogs.item($i) | Select-Object -Property *, @{Name = "CountryName"; Expression = { $Location.CountryName } }, @{Name = "RegionCode"; Expression = { $Location.RegionCode } }, @{Name = "RegionName"; Expression = { $Location.RegionName } }, @{Name = "City"; Expression = { $Location.City } }, @{Name = "ZipCode"; Expression = { $Location.ZipCode } }, @{Name = "KnownMicrosoftIP"; Expression = { $Location.KnownMicrosoftIP } })

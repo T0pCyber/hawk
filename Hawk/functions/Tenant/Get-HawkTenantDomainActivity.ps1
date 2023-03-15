@@ -43,7 +43,6 @@ Function Get-HawkTenantDomainActivity {
 			Out-LogFile "Domain configuration changes found." -Notice
 			Out-LogFile "Please review these Domain_Changes_Audit to ensure any changes are legitimate." -Notice
 
-<<<<<<< HEAD
 			# Go thru each even and prepare it to output to CSV
 			Foreach ($event in $DomainConfigurationEvents){
 				$log1 = $event.auditdata | ConvertFrom-Json
@@ -63,8 +62,6 @@ Function Get-HawkTenantDomainActivity {
 				else {
 					$UserAgentString = "No User Agent String Found"
 				}
-				#$result2 = ($log1.ExtendedProperties.Value).Split('"')
-				#$UserAgentString = $result2[3]
 			$newlog = $log1  | Select-Object -Property CreationTime,
 				Id,
 				Workload,
@@ -77,76 +74,7 @@ Function Get-HawkTenantDomainActivity {
 			$newlog | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -append
 			}
 		}
-=======
-	Test-EXOConnection
-	Send-AIEvent -Event "CmdRun"
-
-	Out-LogFile "Gathering any changes to Domain configuration settings" -action
-
-	# Search UAL audit logs for any Domain configuration changes
-	$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain','Update Domain','Add verified domain', 'Add unverified domain', 'remove unverified domain'")
-	# If null we found no changes to nothing to do here
-if ($null -eq $DomainConfigurationEvents){
-	Out-LogFile "No Domain configuration changes found."
-}
-
-# If not null then we must have found some events so flag them
-else {
-	Out-LogFile "Domain configuration changes found." -Notice
-	Out-LogFile "Please review these Domain_Changes_Audit to ensure any changes are legitimate." -Notice
-	BEGIN{
-		Test-EXOConnection
-		Send-AIEvent -Event "CmdRun"
-		Out-LogFile "Gathering any changes to Domain configuration settings" -action
 	}
-	PROCESS{
-		# Search UAL audit logs for any Domain configuration changes
-		$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain','Update Domain','Add verified domain', 'Add unverified domain', 'remove unverified domain'")
-		# If null we found no changes to nothing to do here
-			if ($null -eq $DomainConfigurationEvents){
-			Out-LogFile "No Domain configuration changes found."
-		}
-		# If not null then we must have found some events so flag them
-		else{
-			Out-LogFile "Domain configuration changes found." -Notice
-			Out-LogFile "Please review these Domain_Changes_Audit to ensure any changes are legitimate." -Notice
-
-			# Go thru each even and prepare it to output to CSV
-			Foreach ($event in $DomainConfigurationEvents){
-				$log1 = $event.auditdata | ConvertFrom-Json
-				$domainarray = $log1.ModifiedProperties
-				$useragentarray = $log1.ExtendedProperties
-				if ($domainarray){
-					$result1 = ($log1.ModifiedProperties.NewValue).Split('"')
-					$Domain = $result1[1]<# Action to perform if the condition is true #>
-				}
-				else {
-					$Domain = "No Domain Value Found"
-				}
-				if ($useragentarray){
-					$result2 = ($log1.ExtendedProperties.Value).Split('"')
-					$UserAgentString = $result2[3]
-				}
-				else {
-					$UserAgentString = "No User Agent String Found"
-				}
-				#$result2 = ($log1.ExtendedProperties.Value).Split('"')
-				#$UserAgentString = $result2[3]
-			$newlog = $log1  | Select-Object -Property CreationTime,
-				Id,
-				Workload,
-				Operation,
-				ResultStatus,
-				UserID,
-				@{Name='Domain';Expression={$Domain}},
-        		@{Name='User Agent String';Expression={$UserAgentString}},
-				@{Name='Target';Expression={($_.Target.ID)}}
-			$newlog | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -append
-			}
-		}
-
-	}
-
 END{
 	Out-LogFile "Completed gathering Domain configuration changes"
 }
