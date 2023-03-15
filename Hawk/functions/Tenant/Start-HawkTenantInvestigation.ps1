@@ -47,9 +47,6 @@ R	uns all of the tenant investigation cmdlets.
 	Out-LogFile "Running Get-HawkTenantAzureAppAuditLog" -action
 	Get-HawkTenantAzureAppAuditLog
 
-	Out-LogFile "Running Get-HawkTenantDomainActivity" -action
-	Get-HawkTenantDomainActivity
-
 	Out-LogFile "Running Get-HawkTenantEXOAdmins" -action
 	Get-HawkTenantEXOAdmins
 

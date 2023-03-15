@@ -71,18 +71,9 @@ Function Get-HawkTenantDomainActivity {
 				@{Name='Domain';Expression={$Domain}},
         		@{Name='User Agent String';Expression={$UserAgentString}},
 				@{Name='Target';Expression={($_.Target.ID)}}
-			$newlog | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -append
+			$newlog | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -json -append
 			}
 		}
-
-  $report = $log1  | Select-Object -Property Id,
-			Operation,
-			ResultStatus,
-			Workload,
-			UserID,
-			@{Name='Domain';Expression={$result1[1]}},
-			@{Name='User Agent String';Expression={$result2[3]}}
-	$report | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -json -append
 	}
 END{
 	Out-LogFile "Completed gathering Domain configuration changes"
