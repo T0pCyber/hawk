@@ -40,7 +40,7 @@ PROCESS{
             }
         }
     }
-    $roles | Out-MultipleFileType -FilePrefix "AzureADAdministrators" -csv
+    $roles | Out-MultipleFileType -FilePrefix "AzureADAdministrators" -csv -json
 
 }
 END{

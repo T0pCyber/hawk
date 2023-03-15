@@ -39,7 +39,7 @@ PROCESS{
                 }
             }
         }
-    $roles | Out-MultipleFileType -FilePrefix "ExchangeOnlineAdministrators" -csv
+    $roles | Out-MultipleFileType -FilePrefix "ExchangeOnlineAdministrators" -csv -json
 
 }
 END{
