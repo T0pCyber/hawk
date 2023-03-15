@@ -62,8 +62,6 @@ Function Get-HawkTenantDomainActivity {
 				else {
 					$UserAgentString = "No User Agent String Found"
 				}
-				#$result2 = ($log1.ExtendedProperties.Value).Split('"')
-				#$UserAgentString = $result2[3]
 			$newlog = $log1  | Select-Object -Property CreationTime,
 				Id,
 				Workload,
@@ -86,7 +84,6 @@ Function Get-HawkTenantDomainActivity {
 			@{Name='User Agent String';Expression={$result2[3]}}
 	$report | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -json -append
 	}
-
 END{
 	Out-LogFile "Completed gathering Domain configuration changes"
 }
