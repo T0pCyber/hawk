@@ -46,21 +46,22 @@ Function Get-HawkTenantDomainActivity {
 			# Go thru each even and prepare it to output to CSV
 			Foreach ($event in $DomainConfigurationEvents){
 				$log1 = $event.auditdata | ConvertFrom-Json
+				<#
 				$domainarray = $log1.ModifiedProperties
 				$useragentarray = $log1.ExtendedProperties
 				if ($domainarray){
 					$result1 = ($log1.ModifiedProperties.NewValue).Split('"')
-					$Domain = $result1[1]<# Action to perform if the condition is true #>
+					$Domain = $result1[1]
 				}
 				else {
-					$Domain = "No Domain Value Found"
+					$Domain = "Domain Not Provided by Audit Log"
 				}
 				if ($useragentarray){
 					$result2 = ($log1.ExtendedProperties.Value).Split('"')
 					$UserAgentString = $result2[3]
 				}
 				else {
-					$UserAgentString = "No User Agent String Found"
+					$UserAgentString = "User Agent String Found"
 				}
 			$newlog = $log1  | Select-Object -Property CreationTime,
 				Id,
@@ -71,7 +72,9 @@ Function Get-HawkTenantDomainActivity {
 				@{Name='Domain';Expression={$Domain}},
         		@{Name='User Agent String';Expression={$UserAgentString}},
 				@{Name='Target';Expression={($_.Target.ID)}}
-			$newlog | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -json -append
+			#>
+			$event | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -csv -append
+			$log1 | Out-MultipleFileType -fileprefix "Domain_Changes_Audit" -json -append
 			}
 		}
 	}
