@@ -16,6 +16,10 @@
 .NOTES
 #>
 BEGIN{
+    #Initializing Hawk Object if not present
+    if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+		Initialize-HawkGlobalObject
+	}
     Out-LogFile "Gathering Azure AD Users"
 
     Test-AzureADConnection
@@ -36,7 +40,7 @@ PROCESS{
                 }
             }
     }
-    $users | Sort-Object -property UserPrincipalname | Out-MultipleFileType -FilePrefix "AzureADUsers" -csv
+    $users | Sort-Object -property UserPrincipalname | Out-MultipleFileType -FilePrefix "AzureADUsers" -csv -json
 }#End PROCESS
 END{
     Out-Logfile "Completed exporting Azure AD users"

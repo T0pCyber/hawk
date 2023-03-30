@@ -72,25 +72,25 @@ Function Get-HawkUserInboxRule {
                     Out-LogFile ("Possible Investigate inbox rule found ID:" + $Rule.Identity + " Rule:" + $Rule.Name) -notice
 					# Description is multiline
 					$Rule.Description = $Rule.Description.replace("`r`n", " ").replace("`t", "")
-                    $Rule | Out-MultipleFileType -FilePreFix "_Investigate_InboxRules" -user $user -csv -append -Notice
+                    $Rule | Out-MultipleFileType -FilePreFix "_Investigate_InboxRules" -user $user -csv -json -append -Notice
                 }
             }
 
 			# Description is multiline
 			$inboxrulesRawDescription = $InboxRules
 			$InboxRules = New-Object -TypeName "System.Collections.ArrayList"
-			
+
 			$inboxrulesRawDescription | ForEach-Object {
 				$_.Description = $_.Description.Replace("`r`n", " ").replace("`t", "")
-			
+
 				$null = $InboxRules.Add($_)
 			}
-			
+
             # Output all of the inbox rules to a generic csv
-            $InboxRules | Out-MultipleFileType -FilePreFix "InboxRules" -User $user -csv
+            $InboxRules | Out-MultipleFileType -FilePreFix "InboxRules" -User $user -csv -json
 
             # Add all of the inbox rules to a generic collection file
-            $InboxRules | Out-MultipleFileType -FilePrefix "All_InboxRules" -csv -Append
+            $InboxRules | Out-MultipleFileType -FilePrefix "All_InboxRules" -csv -json -Append
         }
 
         # Get any Sweep Rules
@@ -98,14 +98,14 @@ Function Get-HawkUserInboxRule {
         Out-LogFile ("Gathering Sweep Rules: " + $User) -action
         $SweepRules = Get-SweepRule -Mailbox $User
 
-        if ($null -eq $SweeRules) { Out-LogFile "No Sweep Rules found" }
+        if ($null -eq $SweepRules) { Out-LogFile "No Sweep Rules found" }
         else {
 
             # Output all rules to a user CSV
-            $SweepRules | Out-MultipleFileType -FilePreFix "SweepRules" -user $User -csv
+            $SweepRules | Out-MultipleFileType -FilePreFix "SweepRules" -user $User -csv -json
 
             # Add any found to the whole tenant list
-            $SweepRules | Out-MultipleFileType -FilePreFix "All_SweepRules" -csv -append
+            $SweepRules | Out-MultipleFileType -FilePreFix "All_SweepRules" -csv -json -append
 
         }
     }

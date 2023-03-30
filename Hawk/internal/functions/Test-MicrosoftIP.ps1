@@ -31,7 +31,7 @@ Function Test-MicrosoftIP {
         Out-Logfile "Building MSFTIPList"
 
         # Load our networking dll pulled from https://github.com/lduchosal/ipnetwork
-        [string]$dll = join-path (Split-path (((get-module Hawk)[0]).path) -Parent) "System.Net.IPNetwork.dll"
+        [string]$dll = join-path (Split-path (((get-module Hawk)[0]).path) -Parent) "\bin\System.Net.IPNetwork.dll"
 
         $Error.Clear()
         Out-LogFile ("Loading Networking functions from " + $dll)

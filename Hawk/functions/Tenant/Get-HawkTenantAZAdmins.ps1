@@ -15,6 +15,10 @@
 .NOTES
 #>
 BEGIN{
+    #Initializing Hawk Object if not present
+    if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+        Initialize-HawkGlobalObject
+    }
     Out-LogFile "Gathering Azure AD Administrators"
 
     Test-AzureADConnection
@@ -36,7 +40,7 @@ PROCESS{
             }
         }
     }
-    $roles | Out-MultipleFileType -FilePrefix "AzureADAdministrators" -csv
+    $roles | Out-MultipleFileType -FilePrefix "AzureADAdministrators" -csv -json
 
 }
 END{

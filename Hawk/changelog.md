@@ -20,5 +20,15 @@ seeking alternate solution to retrieve Azure AD Sign-in logs.
 ## 2.0.3.1 (2021-05-05)
 - Fixed MSOnline Requirement to manifest
 
-## 3.0.0 (2022-01-21)
+## 3.0.0 (2022-04-09)
 - Updated community pull requests
+a. Encoding to UTF8 - Enhancement - TakayukiTomatsuri
+b. Updated $RangeEnd to datetime - Bug - cfc-zcarter
+c. Updated Sweep variable - Bug
+d. Added Default Tenant Name to Hawk folder name - Issue#86 - Enhancement - Snickasaurus
+e. Updated Get-HawkTenantEXOAdmins to accurately list admins that is a group
+
+## 3.0.1 (2023-02-01)
+- Updated community pull requests fixing typo
+a. Updated Get-HawkTenantAuditLog.ps1 to Get-HawkTenantAppAuditLog.ps1
+b. Added "Get-HawkTenantDomainActivity" function - This function will pull domain config changes from the UAL

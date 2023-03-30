@@ -27,7 +27,7 @@
 
     .EXAMPLE
 
-	Get-HawkUserEmailForwarding -UserPrincipalName (Get-EXOMailbox -Filter {Customattribute1 -eq "C-level"})
+	Get-HawkUserEmailForwarding -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
 
 	Gathers possible email forwarding configured for all users who have "C-Level" set in CustomAttribute1
     #>
@@ -51,7 +51,7 @@
         # Looking for email forwarding stored in AD
         Out-LogFile ("Gathering possible Forwarding changes for: " + $User) -action
         Out-LogFile "Collecting AD Forwarding Settings" -action
-        $mbx = Get-EXOMailbox -identity $User
+        $mbx = Get-Mailbox -identity $User
 
         # Check if forwarding is configured by user or admin
         if ([string]::IsNullOrEmpty($mbx.ForwardingSMTPAddress) -and [string]::IsNullOrEmpty($mbx.ForwardingAddress)) {
@@ -60,13 +60,13 @@
         # If populated report it and add to a CSV file of positive finds
         else {
             Out-LogFile ("Found Email forwarding User:" + $mbx.primarySMTPAddress + " ForwardingSMTPAddress:" + $mbx.ForwardingSMTPAddress + " ForwardingAddress:" + $mbx.ForwardingAddress) -notice
-            $mbx | Select-Object DisplayName, UserPrincipalName, PrimarySMTPAddress, ForwardingSMTPAddress, ForwardingAddress, DeliverToMailboxAndForward, WhenChangedUTC | Out-MultipleFileType -FilePreFix "_Investigate_Users_WithForwarding" -append -csv -notice
+            $mbx | Select-Object DisplayName, UserPrincipalName, PrimarySMTPAddress, ForwardingSMTPAddress, ForwardingAddress, DeliverToMailboxAndForward, WhenChangedUTC | Out-MultipleFileType -FilePreFix "_Investigate_Users_WithForwarding" -append -csv -json -notice
         }
 
         # Add all users searched to a generic output
-        $mbx | Select-Object DisplayName, UserPrincipalName, PrimarySMTPAddress, ForwardingSMTPAddress, ForwardingAddress, DeliverToMailboxAndForward, WhenChangedUTC | Out-MultipleFileType -FilePreFix "User_ForwardingReport" -append -csv
+        $mbx | Select-Object DisplayName, UserPrincipalName, PrimarySMTPAddress, ForwardingSMTPAddress, ForwardingAddress, DeliverToMailboxAndForward, WhenChangedUTC | Out-MultipleFileType -FilePreFix "User_ForwardingReport" -append -csv -json
         # Also add to an output specific to this user
-        $mbx | Select-Object DisplayName, UserPrincipalName, PrimarySMTPAddress, ForwardingSMTPAddress, ForwardingAddress, DeliverToMailboxAndForward, WhenChangedUTC | Out-MultipleFileType -FilePreFix "ForwardingReport" -user $user -csv
+        $mbx | Select-Object DisplayName, UserPrincipalName, PrimarySMTPAddress, ForwardingSMTPAddress, ForwardingAddress, DeliverToMailboxAndForward, WhenChangedUTC | Out-MultipleFileType -FilePreFix "ForwardingReport" -user $user -csv -json
 
     }
 }

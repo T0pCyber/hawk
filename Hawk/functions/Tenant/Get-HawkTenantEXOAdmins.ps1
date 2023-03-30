@@ -26,7 +26,7 @@ PROCESS{
                 if([string]::IsNullOrWhiteSpace($admin.WindowsLiveId)){
                     [PSCustomObject]@{
                         ExchangeAdminGroup = $Role.Name
-                        Members= $admin.name
+                        Members= $admin.DisplayName
                         RecipientType = $admin.RecipientType
                     }
                 }
@@ -39,7 +39,7 @@ PROCESS{
                 }
             }
         }
-    $roles | Out-MultipleFileType -FilePrefix "ExchangeOnlineAdministrators" -csv
+    $roles | Out-MultipleFileType -FilePrefix "ExchangeOnlineAdministrators" -csv -json
 
 }
 END{

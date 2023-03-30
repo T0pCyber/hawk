@@ -68,7 +68,7 @@
             Out-LogFile ("No results found for time period " + $CurrentStart + " - " + $CurrentEnd)
         }
         else {
-            $output | Out-MultipleFileType -FilePrefix "Audit_Log_Full_$prefix" -Append -csv
+            $output | Out-MultipleFileType -FilePrefix "Audit_Log_Full_$prefix" -Append -csv -json
         }
 
         # Move our start and end times forward
