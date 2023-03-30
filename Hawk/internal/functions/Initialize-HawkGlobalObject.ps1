@@ -78,7 +78,7 @@
         param([string]$RootPath)
 
         # Create a folder ID based on date
-        [string]$TenantName = (Get-MSolDomain | Where-Object {$_.isDefault}).Name
+        [string]$TenantName = (Get-MGDomain | Where-Object {$_.isDefault}).ID
         [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date -UFormat %Y%m%d_%H%M).tostring()
 
         # Add that ID to the given path
@@ -191,7 +191,6 @@
     }
 
     Function New-ApplicationInsight {
-
         # Initialize Application Insights client
         $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
         if ($Null -eq $Client) {
@@ -199,7 +198,6 @@
             $Client = New-AIClient -key $insightkey
         }
     }
-
 
     ### Main ###
     $InformationPreference = "Continue"
@@ -219,9 +217,12 @@
             Update-HawkModule
         }
 
-        # Test if we have a connection to msol
-        Test-MSOLConnection
-
+        # Test if we have a connection to Microsoft Graph
+        $notification = New-Object -ComObject Wscript.Shell
+        $Output =$notification.Popup("Hawk has been updated to support MGGraph due to MSONLINE deprecation. Please click OK to continue", 0, "Hawk Update", 0x00000040)
+        Write-Information "Testing Graph Connection"
+        Test-GraphConnection
+        
         # If the global variable Hawk doesn't exist or we have -force then set the variable up
         Write-Information "Setting Up initial Hawk environment variable"
 
@@ -345,10 +346,11 @@
             }
         }
 
-
         # Determine if we have access to a P1 or P2 Azure Ad License
         # EMS SKU contains Azure P1 as part of the sku
-        if ([bool](Get-MsolAccountSku | Where-Object { ($_.accountskuid -like "*aad_premium*") -or ($_.accountskuid -like "*EMS*") -or ($_.accountskuid -like "*E5*") -or ($_.accountskuid -like "*G5*") })) {
+        # This uses Graph instead of MSOL
+        Test-GraphConnection
+        if ([bool] (Get-MgSubscribedSku | Where-Object { ($_.SkuPartNumber -like "*aad_premium*") -or ($_.SkuPartNumber -like "*EMS*") -or ($_.SkuPartNumber -like "*E5*") -or ($_.SkuPartNumber -like "*G5*") } )) {
             Write-Information "Advanced Azure AD License Found"
             [bool]$AdvancedAzureLicense = $true
         }

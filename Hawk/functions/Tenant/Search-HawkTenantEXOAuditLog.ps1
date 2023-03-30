@@ -1,4 +1,4 @@
-﻿Function Search-HawkTenantEXOAuditLog {
+Function Search-HawkTenantEXOAuditLog {
 <#
 .SYNOPSIS
     Searches the admin audit logs for possible bad actor activities
@@ -91,8 +91,8 @@
     if ($TenantInboxRules.count -gt 0) {
 
         Out-LogFile ("Found " + $TenantInboxRules.count + " Inbox Rule(s) created from PowerShell")
-        $TenantInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_New_InboxRule" -csv
-        $TenantInboxRules | Out-MultipleFileType -fileprefix "New_InboxRules" -csv
+        $TenantInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_New_InboxRule" -csv -json
+        $TenantInboxRules | Out-MultipleFileType -fileprefix "New_InboxRules" -csv -json
     }
 
     # Search for the Modification of ANY inbox rules
@@ -103,8 +103,8 @@
     if ($TenantSetInboxRules.count -gt 0) {
 
         Out-LogFile ("Found " + $TenantSetInboxRules.count + " Inbox Rule(s) created from PowerShell")
-        $TenantSetInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_Set_InboxRule" -csv
-        $TenantSetInboxRules | Out-MultipleFileType -fileprefix "Set_InboxRules" -csv
+        $TenantSetInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_Set_InboxRule" -csv -json
+        $TenantSetInboxRules | Out-MultipleFileType -fileprefix "Set_InboxRules" -csv -json
     }
 
     # Search for the Modification of ANY inbox rules
@@ -115,8 +115,8 @@
     if ($TenantRemoveInboxRules.count -gt 0) {
 
         Out-LogFile ("Found " + $TenantRemoveInboxRules.count + " Inbox Rule(s) created from PowerShell")
-        $TenantRemoveInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_Remove_InboxRule" -csv
-        $TenantRemoveInboxRules | Out-MultipleFileType -fileprefix "Remove_InboxRules" -csv
+        $TenantRemoveInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_Remove_InboxRule" -csv -json
+        $TenantRemoveInboxRules | Out-MultipleFileType -fileprefix "Remove_InboxRules" -csv -json
     }
 
     # Searching for interesting inbox rules
@@ -126,7 +126,7 @@
     # if we found a rule report it and output it to the _Investigate files
     if ($InvestigateInboxRules.count -gt 0) {
         Out-LogFile ("Found " + $InvestigateInboxRules.count + " Inbox Rules that should be investigated further.") -notice
-        $InvestigateInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "_Investigate_Simple_New_InboxRule" -csv -Notice
+        $InvestigateInboxRules | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "_Investigate_Simple_New_InboxRule" -csv -json -Notice
         $InvestigateInboxRules | Out-MultipleFileType -fileprefix "_Investigate_New_InboxRules" -xml -txt -Notice
     }
 
@@ -136,7 +136,7 @@
 
     if ($TenantForwardingChanges.count -gt 0) {
         Out-LogFile ("Found " + $TenantForwardingChanges.count + " Change(s) to user Email Forwarding") -notice
-        $TenantForwardingChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_Forwarding_Changes" -csv -Notice
+        $TenantForwardingChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_Forwarding_Changes" -csv -json -Notice
         $TenantForwardingChanges | Out-MultipleFileType -FilePrefix "Forwarding_Changes" -xml -Notice
 
         # Make sure our output array is null
@@ -161,7 +161,7 @@
             else {
                 # Here we get back a recipient object in EXO not an SMTP address
                 # So we need to go track down the recipient object
-                $recipient = Get-Recipient (($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value) -ErrorAction SilentlyContinue
+                $recipient = Get-EXORecipient (($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value) -ErrorAction SilentlyContinue
 
                 # If we can't resolve the recipient we need to log that
                 if ($null -eq $recipient) {
@@ -186,7 +186,7 @@
 
         # Output our email address user modified pairs
         Out-logfile ("Found " + $Output.count + " email addresses set to be forwarded mail") -notice
-        $Output | Out-MultipleFileType -FilePrefix "Forwarding_Recipients" -csv -Notice
+        $Output | Out-MultipleFileType -FilePrefix "Forwarding_Recipients" -csv -json -Notice
 
     }
 
@@ -196,7 +196,7 @@
 
     if ($TenantMailboxPermissionChanges.count -gt 0) {
         Out-LogFile ("Found " + $TenantMailboxPermissionChanges.count + " changes to mailbox permissions")
-        $TenantMailboxPermissionChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_Mailbox_Permissions" -csv
+        $TenantMailboxPermissionChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -fileprefix "Simple_Mailbox_Permissions" -csv -json
         $TenantMailboxPermissionChanges | Out-MultipleFileType -fileprefix "Mailbox_Permissions" -xml
 
         ## TODO: Possibly check who was added with permissions and see how old their accounts are
@@ -207,11 +207,11 @@
     [array]$TenantImpersonatingRoles = Get-ManagementRoleEntry "*\Impersonate-ExchangeUser"
     if ($TenantImpersonatingRoles.count -gt 1) {
         Out-LogFile ("Found " + $TenantImpersonatingRoles.count + " Impersonation Roles.  Default is 1") -notice
-        $TenantImpersonatingRoles | Out-MultipleFileType -fileprefix "_Investigate_Impersonation_Roles" -csv -xml -Notice
+        $TenantImpersonatingRoles | Out-MultipleFileType -fileprefix "_Investigate_Impersonation_Roles" -csv -json -xml -Notice
     }
     elseif ($TenantImpersonatingRoles.count -eq 0) { }
     else {
-        $TenantImpersonatingRoles | Out-MultipleFileType -fileprefix "Impersonation_Roles" -csv -xml
+        $TenantImpersonatingRoles | Out-MultipleFileType -fileprefix "Impersonation_Roles" -csv -json -xml
     }
 
     $Output = $null
@@ -222,12 +222,12 @@
 
     if ($Output.count -gt 1) {
         Out-LogFile ("Found " + $Output.count + " Users/Groups with Impersonation rights.  Default is 1") -notice
-        $Output | Out-MultipleFileType -fileprefix "Impersonation_Rights" -csv -xml
-        $Output | Out-MultipleFileType -fileprefix "_Investigate_Impersonation_Rights" -csv -xml -Notice
+        $Output | Out-MultipleFileType -fileprefix "Impersonation_Rights" -csv -json -xml
+        $Output | Out-MultipleFileType -fileprefix "_Investigate_Impersonation_Rights" -csv -json -xml -Notice
     }
     elseif ($Output.count -eq 1) {
         Out-LogFile ("Found default number of Impersonation users")
-        $Output | Out-MultipleFileType -fileprefix "Impersonation_Rights" -csv -xml
+        $Output | Out-MultipleFileType -fileprefix "Impersonation_Rights" -csv -json -xml
     }
     else { }
 

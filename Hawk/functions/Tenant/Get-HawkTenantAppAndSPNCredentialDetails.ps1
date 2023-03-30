@@ -46,7 +46,7 @@ PROCESS{
                 CredType = "X509Certificate"
 
             }
-            $newapp | Out-MultipleFileType -FilePrefix "SPNCertsAndSecrets" -csv -append
+            $newapp | Out-MultipleFileType -FilePrefix "SPNCertsAndSecrets" -csv -json -append
 
         }
     }
@@ -62,7 +62,7 @@ PROCESS{
                 KeyType = $null
                 CredType = "PasswordSecret"
             }
-            $newapp | Out-MultipleFileType -FilePrefix "SPNCertsAndSecrets" -csv -append
+            $newapp | Out-MultipleFileType -FilePrefix "SPNCertsAndSecrets" -csv -json -append
 
         }
 
@@ -81,7 +81,7 @@ PROCESS{
                 CredType = "X509Certificate"
 
             }
-            $newapp | Out-MultipleFileType -FilePrefix "ApplicationCertsAndSecrets" -csv -append
+            $newapp | Out-MultipleFileType -FilePrefix "ApplicationCertsAndSecrets" -csv -json -append
 
         }
 
@@ -99,7 +99,7 @@ PROCESS{
                 CredType = "PasswordSecret"
 
             }
-            $newapp | Out-MultipleFileType -FilePrefix "ApplicationCertsAndSecrets" -csv -append
+            $newapp | Out-MultipleFileType -FilePrefix "ApplicationCertsAndSecrets" -csv -json -append
 
         }
     }

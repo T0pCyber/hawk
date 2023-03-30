@@ -37,6 +37,7 @@ Function Out-MultipleFileType {
         [switch]$xml = $false,
         [Switch]$csv = $false,
         [Switch]$txt = $false,
+        [Switch]$json = $false,
         [Switch]$Notice
 
     )
@@ -44,7 +45,7 @@ Function Out-MultipleFileType {
     begin {
 
         # If no file types were specified then we need to error out here
-        if (($xml -eq $false) -and ($csv -eq $false) -and ($txt -eq $false)) {
+        if (($xml -eq $false) -and ($csv -eq $false) -and ($txt -eq $false) -and ($json -eq $false)) {
             Out-LogFile "[ERROR] - No output type specified on object"
             Write-Error -Message "No output type specified on object" -ErrorAction Stop
         }
@@ -168,6 +169,35 @@ Function Out-MultipleFileType {
                 else {
                     Out-LogFile ("Writing Data to " + $filename)
                     $AllObject | Format-List * | Out-File $filename
+                }
+
+                # If notice is set we need to write the file name to _Investigate.txt
+                if ($Notice) { Out-LogFile -string ($filename) -silentnotice }
+            }
+
+            # Output JSON file
+            if ($json -eq $true) {
+                # Build the file name
+                if ($UserOutput) {
+                    $filename = Join-Path $Path ($FilePrefix + "_" + $ShortUser + ".json")
+                }
+                else {
+                    $filename = Join-Path $Path ($FilePrefix + ".json")
+                }
+
+                # If we have -append then append the data
+                if ($append) {
+
+                    Out-LogFile ("Appending Data to " + $filename)
+
+                    # Write it out to json making sture to append
+                    $AllObject | ConvertTo-Json -Depth 100 | Out-File -FilePath $filename -Append
+                }
+
+                # Otherwise overwrite
+                else {
+                    Out-LogFile ("Writing Data to " + $filename)
+                    $AllObject | ConvertTo-Json -Depth 100 | Out-File -FilePath $filename
                 }
 
                 # If notice is set we need to write the file name to _Investigate.txt

@@ -69,7 +69,7 @@
     # If we don't have a value for csvpath then gather all users in the tenant
     if ([string]::IsNullOrEmpty($CSVPath)) {
         $AllMailboxes = Invoke-Command -Session $exopssession -ScriptBlock { Get-Recipient -RecipientTypeDetails UserMailbox -ResultSize Unlimited | Select-Object -Property DisplayName, PrimarySMTPAddress }
-        $Allmailboxes | Out-MultipleFileType -FilePrefix "All_Mailboxes" -csv
+        $Allmailboxes | Out-MultipleFileType -FilePrefix "All_Mailboxes" -csv -json
     }
     # If we do read that in
     else {

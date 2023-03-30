@@ -71,11 +71,11 @@
     Get-OrganizationConfig| Out-MultipleFileType -FilePrefix "OrgConfig" -xml -txt
 
     Out-LogFile "Remote Domains"
-    Get-RemoteDomain | Out-MultipleFileType -FilePrefix "RemoteDomain" -xml -csv
+    Get-RemoteDomain | Out-MultipleFileType -FilePrefix "RemoteDomain" -xml -csv -json
 
     Out-LogFile "Transport Rules"
-    Get-TransportRule | Out-MultipleFileType -FilePrefix "TransportRules" -xml -csv
+    Get-TransportRule | Out-MultipleFileType -FilePrefix "TransportRules" -xml -csv -json
 
     Out-LogFile "Transport Configuration"
-    Get-TransportConfig | Out-MultipleFileType -FilePrefix "TransportConfig" -xml -csv
+    Get-TransportConfig | Out-MultipleFileType -FilePrefix "TransportConfig" -xml -csv -json
 }
