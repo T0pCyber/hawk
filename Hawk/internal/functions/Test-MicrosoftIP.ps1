@@ -3,6 +3,7 @@
     Determine if an IP listed in on the O365 XML list
 .DESCRIPTION
     Determine if an IP listed in on the O365 XML list
+    This function uses the System.Net.IPNetwork.dll to parse the IP Addresses. This is the only use for this DLL
 .PARAMETER IPtoTest
     IP that is being tested against the Microsoft IP List
 .PARAMETER Type

@@ -93,6 +93,7 @@
 
             # Add IP Geo Location information to the data
             if ($ResolveIPLocations) {
+                Out-File "Resolving IP Locations"
                 # Setup our counter
                 $i = 0
 
@@ -113,7 +114,7 @@
                     }
 
                     # Combine the connection object and the location object so that we have a single output ready
-                    $ExpandedUserLogonLogs.item($i) = ($ExpandedUserLogonLogs.item($i) | Select-Object -Property *, @{Name = "CountryName"; Expression = { $Location.CountryName } }, @{Name = "RegionCode"; Expression = { $Location.RegionCode } }, @{Name = "RegionName"; Expression = { $Location.RegionName } }, @{Name = "City"; Expression = { $Location.City } }, @{Name = "ZipCode"; Expression = { $Location.ZipCode } }, @{Name = "KnownMicrosoftIP"; Expression = { $Location.KnownMicrosoftIP } })
+                    $ExpandedUserLogonLogs.item($i) = ($ExpandedUserLogonLogs.item($i) | Select-Object -Property *, @{Name = "CountryName"; Expression = { $Location.CountryName } }, @{Name = "RegionCode"; Expression = { $Location.RegionCode } }, @{Name = "RegionName"; Expression = { $Location.RegionName } }, @{Name = "City"; Expression = { $Location.City } }, @{Name = "KnownMicrosoftIP"; Expression = { $Location.KnownMicrosoftIP } })
 
                     # increment our counter for the progress bar
                     $i++

@@ -37,3 +37,8 @@ e. Added Export of JSON to "Out-Multifileype" function. This will export returne
 f. Remove MSOnline requirements
 g. Added MS Graph requirements to replace MSOnline
 h. Fixed path for System.Net.IPNetwork.dll
+
+## 3.1.1 (2023-03-30)
+a. Removed Cloud Connect references
+b. Removed Zipcode from Get-HawkUserAuthHistory.ps1 - IPStack doesn't retrieve Zipcode
+c. Removed Continent Code from Get-IPGeoLocation

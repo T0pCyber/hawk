@@ -26,7 +26,7 @@ Function Test-MSOLConnection {
             Out-LogFile "Connecting to MSOLService using MSOnline Module"
         }
 
-        # Connect to the MSOl Service (This should have been installed with the CloudConnect Module)
+        # Connect to the MSOl Service
         Connect-MsolService
 
     }
