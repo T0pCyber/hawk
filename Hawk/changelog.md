@@ -28,7 +28,12 @@ c. Updated Sweep variable - Bug
 d. Added Default Tenant Name to Hawk folder name - Issue#86 - Enhancement - Snickasaurus
 e. Updated Get-HawkTenantEXOAdmins to accurately list admins that is a group
 
-## 3.0.1 (2023-02-01)
-- Updated community pull requests fixing typo
-a. Updated Get-HawkTenantAuditLog.ps1 to Get-HawkTenantAppAuditLog.ps1
-b. Added "Get-HawkTenantDomainActivity" function - This function will pull domain config changes from the UAL
+## 3.1.0 (2023-03-30)
+a. Updated community pull requests fixing typo
+b. Updated Get-HawkTenantAuditLog.ps1 to Get-HawkTenantAppAuditLog.ps1
+c. Added "Get-HawkTenantDomainActivity" function - This function will pull domain config changes from the UAL
+d. Added "Get-HawkTenantEDiscoveryLogs" function - This function will pull EDiscovery logs from the UAL
+e. Added Export of JSON to "Out-Multifileype" function. This will export returned results to JSON file for further ingestion into a SIEM or other data analysis platform
+f. Remove MSOnline requirements
+g. Added MS Graph requirements to replace MSOnline
+h. Fixed path for System.Net.IPNetwork.dll
