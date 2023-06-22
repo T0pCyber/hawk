@@ -52,12 +52,18 @@
     
     # Get tenant details to test that Connect-AzureAD has been called
     try {
-        $tenant_details = Get-AzureADTenantDetail
+       ## $tenant_details = Get-AzureADTenantDetail
+       $tenant_details = Get-MgOrganization
     } catch {
-        throw "You must call Connect-AzureAD before running this script."
+        ## throw "You must call Connect-AzureAD before running this script."
+        throw "You must call Connect-MgGraph before running this script."
     }
-    Write-Verbose ("TenantId: {0}, InitialDomain: {1}" -f `
+<#     Write-Verbose ("TenantId: {0}, InitialDomain: {1}" -f `
                     $tenant_details.ObjectId, `
+                    ($tenant_details.VerifiedDomains | Where-Object { $_.Initial }).Name) #>
+    
+    Write-Verbose ("TenantId: {0}, InitialDomain: {1}" -f `
+                    $tenant_details.Id, `
                     ($tenant_details.VerifiedDomains | Where-Object { $_.Initial }).Name)
     
     # An in-memory cache of objects by {object ID} andy by {object class, object ID}
@@ -80,7 +86,8 @@
         if (-not $script:ObjectByObjectId.ContainsKey($ObjectId)) {
             Write-Verbose ("Querying Azure AD for object '{0}'" -f $ObjectId)
             try {
-                $object = Get-AzureADObjectByObjectId -ObjectId $ObjectId
+                ## $object = Get-AzureADObjectByObjectId -ObjectId $ObjectId
+                $object = Get-MgDirectoryObjectById -Ids $ObjectId
                 CacheObject -Object $object
             } catch {
                 Write-Verbose "Object not found."
@@ -94,7 +101,8 @@
     # 999 OAuth2PermissionGrants in the tenant, due to a bug in Azure AD.
     function GetOAuth2PermissionGrants ([switch]$FastMode) {
         if ($FastMode) {
-            Get-AzureADOAuth2PermissionGrant -All $true
+            ## Get-AzureADOAuth2PermissionGrant -All $true
+            Get-MgOauth2PermissionGrant -All $true
         } else {
             $script:ObjectByObjectClassId['ServicePrincipal'].GetEnumerator() | ForEach-Object { $i = 0 } {
                 if ($ShowProgress) {
@@ -104,7 +112,8 @@
                 }
     
                 $client = $_.Value
-                Get-AzureADServicePrincipalOAuth2PermissionGrant -ObjectId $client.ObjectId
+                ## Get-AzureADServicePrincipalOAuth2PermissionGrant -ObjectId $client.ObjectId
+                Get-MgServicePrincipalOAuth2PermissionGrant -ObjectId $client.ObjectId
             }
         }
     }
@@ -113,7 +122,10 @@
     
     # Get all ServicePrincipal objects and add to the cache
     Write-Verbose "Retrieving all ServicePrincipal objects..."
-    Get-AzureADServicePrincipal -All $true | ForEach-Object {
+<#     Get-AzureADServicePrincipal -All $true | ForEach-Object {
+        CacheObject -Object $_
+    } #>
+    Get-MgServicePrincipal -All $true | ForEach-Object {
         CacheObject -Object $_
     }
     $servicePrincipalCount = $script:ObjectByObjectClassId['ServicePrincipal'].Count
@@ -122,7 +134,10 @@
     
         # Get one page of User objects and add to the cache
         Write-Verbose ("Retrieving up to {0} User objects..." -f $PrecacheSize)
-        Get-AzureADUser -Top $PrecacheSize | Where-Object {
+        <# Get-AzureADUser -Top $PrecacheSize | Where-Object {
+            CacheObject -Object $_
+        } #>
+        Get-MgUser -Top $PrecacheSize | Where-Object {
             CacheObject -Object $_
         }
     
@@ -132,7 +147,8 @@
             # There's a bug in Azure AD Graph which does not allow for directly listing
             # oauth2PermissionGrants if there are more than 999 of them. The following line will
             # trigger this bug (if it still exists) and throw an exception.
-            $null = Get-AzureADOAuth2PermissionGrant -Top 999
+            ## $null = Get-AzureADOAuth2PermissionGrant -Top 999
+            $null = Get-MgOAuth2PermissionGrant -Top 999
             $fastQueryMode = $true
         } catch {
             if ($_.Exception.Message -and $_.Exception.Message.StartsWith("Unexpected end when deserializing array.")) {
@@ -213,9 +229,12 @@
     
             $sp = $_.Value
     
-            Get-AzureADServiceAppRoleAssignedTo -ObjectId $sp.ObjectId -All $true `
+            <# Get-AzureADServiceAppRoleAssignedTo -ObjectId $sp.ObjectId -All $true `
             | Where-Object { $_.PrincipalType -eq "ServicePrincipal" } | ForEach-Object {
-                $assignment = $_
+                $assignment = $_ #>
+                Get-MgServicePrincipalAppRoleAssignment -ServicePrincipalId $sp.ObjectId -All $true `
+                | Where-Object { $_.PrincipalType -eq "ServicePrincipal" } | ForEach-Object {
+                    $assignment = $_
     
                 $resource = GetObjectByObjectId -ObjectId $assignment.ResourceId
                 $appRole = $resource.AppRoles | Where-Object { $_.Id -eq $assignment.Id }
