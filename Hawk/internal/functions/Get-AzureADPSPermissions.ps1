@@ -87,11 +87,7 @@
             Write-Verbose ("Querying Azure AD for object '{0}'" -f $ObjectId)
             try {
                 ## $object = Get-AzureADObjectByObjectId -ObjectId $ObjectId
-<<<<<<< HEAD
                 $object = Get-MgDirectoryObjectById -Ids $ObjectId
-=======
-                $object = Get0MgDirectoryObjectById -Ids $ObjectId
->>>>>>> fea6e1770e50401ba0c60e1caa15753b44815178
                 CacheObject -Object $object
             } catch {
                 Write-Verbose "Object not found."
