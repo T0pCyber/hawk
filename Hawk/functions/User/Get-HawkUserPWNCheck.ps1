@@ -18,7 +18,7 @@
     Returns the pwn state of the email address provided
 #>
 
-    param([array]$Email)
+    param([Alias("User","UPN")][array]$Email)
 
     # if there is no value of hibpkey then we need to get it from the user
     if ($null -eq $hibpkey) {
