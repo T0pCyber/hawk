@@ -148,6 +148,8 @@ Function Search-HawkTenantEXOAuditLog {
 
             # Get the user object modified
             $user = ($Change.CmdletParameters | Where-Object ($_.name -eq "Identity")).value
+            ####STUB
+            $user
 
             # Check the ForwardingSMTPAddresses first
             if ([string]::IsNullOrEmpty(($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingSMTPAddress" }).value)) { }
@@ -161,7 +163,7 @@ Function Search-HawkTenantEXOAuditLog {
             else {
                 # Here we get back a recipient object in EXO not an SMTP address
                 # So we need to go track down the recipient object
-                $recipient = Get-EXORecipient (($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value) -ErrorAction SilentlyContinue
+                $recipient = Get-Recipient (($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value) -ErrorAction SilentlyContinue
 
                 # If we can't resolve the recipient we need to log that
                 if ($null -eq $recipient) {
@@ -170,6 +172,7 @@ Function Search-HawkTenantEXOAuditLog {
                 # If we can resolve it then we need to push the address the mail was being set to into $output
                 else {
                     # Determine the type of recipient and handle as needed to get out the SMTP address
+                    Write-Host $recipient.RecipientType
                     Switch ($recipient.RecipientType) {
                         # For mailcontact we needed the external email address
                         MailContact {
