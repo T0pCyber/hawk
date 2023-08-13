@@ -38,6 +38,10 @@ Function Start-HawkUserInvestigation {
         [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName
     )
+	#Checking to see if Logging filepath is set
+	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+		Initialize-HawkGlobalObject
+	}
 
     Out-LogFile "Investigating Users"
     Send-AIEvent -Event "CmdRun"
@@ -65,7 +69,7 @@ Function Start-HawkUserInvestigation {
 
         Out-LogFile "Running Get-HawkUserAuthHistory" -action
         Get-HawkUserAuthHistory -User $user -ResolveIPLocations
-		
+
         Out-LogFile "Running Get-HawkUserMailboxAuditing" -action
         Get-HawkUserMailboxAuditing -User $User
 

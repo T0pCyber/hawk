@@ -38,7 +38,11 @@ seeking alternate solution to retrieve Azure AD Sign-in logs.
 - Added MS Graph requirements to replace MSOnline
 - Fixed path for System.Net.IPNetwork.dll
 
-## 3.1.1 (2023-03-30)
+## 3.1.1 (2023-08-12)
+
 - Removed Cloud Connect references
 - Removed Zipcode from Get-HawkUserAuthHistory.ps1 - IPStack doesn't retrieve Zipcode
 - Removed Continent Code from Get-IPGeoLocation
+- Removed Test-MSOnlineConnection.ps1 - MSOnline requirements have been removed from Hawk
+- Added logging filepath checking the Start-HawkUserInvestigation.ps1
+- Updated Get-HawkTenantAZAdmins.ps1. Removed AzureAD module. Added MS Graph cmdlets.
