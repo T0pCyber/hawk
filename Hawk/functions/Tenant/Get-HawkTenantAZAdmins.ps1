@@ -22,7 +22,6 @@ BEGIN{
     Out-LogFile "Gathering Azure AD Administrators"
 
     Test-AzureADConnection
-    Send-AIEvent -Event "CmdRun"
 }
 PROCESS{
     $roles = foreach ($role in Get-MgDirectoryRole){
