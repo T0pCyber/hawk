@@ -43,7 +43,6 @@
     }
 
     Test-EXOConnection
-    Send-AIEvent -Event "CmdRun"
 
     # Setup inial start and end time for the search
     [datetime]$CurrentStart = $StartDate
