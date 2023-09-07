@@ -46,3 +46,4 @@ seeking alternate solution to retrieve Azure AD Sign-in logs.
 - Removed Test-MSOnlineConnection.ps1 - MSOnline requirements have been removed from Hawk
 - Added logging filepath checking the Start-HawkUserInvestigation.ps1
 - Updated Get-HawkTenantAZAdmins.ps1. Removed AzureAD module. Added MS Graph cmdlets.
+- Updated contact email

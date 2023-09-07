@@ -29,7 +29,7 @@ BEGIN{
     Out-LogFile "Gathering Azure AD Audit Logs events"
 }
 PROCESS{
-        $auditLogsResponse = Get-MgAuditLogDirectoryAudit -All $true
+        $auditLogsResponse = Get-MgAuditLogDirectoryAudit -All
         foreach ($auditLog in $auditLogsResponse) {
             $auditLogs += [PSCustomObject]@{
                 Id = $auditLog.Id
@@ -38,9 +38,9 @@ PROCESS{
                 ResultReason = $auditLog.ResultReason
                 ActivityDisplayName = $auditLog.ActivityDisplayName
                 ActivityDateTime = $auditLog.ActivityDateTime
-                ClientIPAddress = $auditLog.ClientIPAddress
-                UserDisplayName = $auditLog.UserDisplayName
-                UserPrincipalName = $auditLog.UserPrincipalName
+                Target = $auditLog.TargetResources[0].DisplayName
+                Type = $auditLog.Target.TargetResources[0].Type
+                UserPrincipalName = $auditLog.TargetResources[0].UserPrincipalName
                 UserType = $auditLog.UserType
             }
         }
