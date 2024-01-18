@@ -25,8 +25,13 @@ Function Get-IPGeolocation {
         Read-HawkAppData
     }
 
+	$APIKey = ''
+    # look for IP2Location.io API key
+    if ($null -ne $HawkAppData.ip2locationio_api_key) {
+        $APIKey = $HawkAppData.ip2locationio_api_key
+    }
     # if there is no value of access_key then we need to get it from the user
-    if ($null -eq $HawkAppData.access_key) {
+    elseif ($null -eq $HawkAppData.access_key) {
 
         Write-Host -ForegroundColor Green "
         IpStack.com now requires an API access key to gather GeoIP information from their API.
@@ -48,7 +53,7 @@ Function Get-IPGeolocation {
         return ($IPLocationCache | Where-Object { $_.ip -eq $IPAddress } )
         Write-Verbose ("IP Cache Hit: " + [string]$IPAddress)
     }
-    elseif ($IPAddress -eq "<null>"){
+    elseif ($IPAddress -eq "<null>") {
         write-Verbose ("Null IP Provided: " + $IPAddress)
                 $hash = @{
                 IP               = $IPAddress
@@ -61,39 +66,69 @@ Function Get-IPGeolocation {
     }
     # If not then we need to look it up and populate it into the cache
     else {
-        # URI to pull the data from
-        $resource = "http://api.ipstack.com/" + $ipaddress + "?access_key=" + $Accesskey
+		$hasdata = 0
+		if ($APIKey) {
+			
+			# URI to pull the data from
+			$resource = "http://api.ip2location.io?ip=" + $ipaddress + "&key=" + $APIKey
+			$Error.Clear()
+			$geoip = Invoke-RestMethod -Method Get -URI $resource -ErrorAction SilentlyContinue
+			
+			if (($Error.Count -eq 0) -and ($null -ne $geoip.continent.name)) {
+				$hasdata = 1
+				# Push return into a response object
+				$hash = @{
+					IP               = $geoip.ip
+					CountryName      = $geoip.country_name
+					Continent        = $geoip.continent.code
+					ContinentName    = $geoip.continent.name
+					City             = $geoip.city_name
+					KnownMicrosoftIP = $(If ('Microsoft Corporation' -eq $geoip.as) {$true} Else {$false})
+				}
+				$result = New-Object PSObject -Property $hash
+			}
+		}
+		
+		if ($hasdata -eq 0) {
+			# URI to pull the data from
+			$resource = "http://api.ipstack.com/" + $ipaddress + "?access_key=" + $Accesskey
 
-        # Return Data from web
-        $Error.Clear()
-        $geoip = Invoke-RestMethod -Method Get -URI $resource -ErrorAction SilentlyContinue
+			# Return Data from web
+			$Error.Clear()
+			$geoip = Invoke-RestMethod -Method Get -URI $resource -ErrorAction SilentlyContinue
 
-        if (($Error.Count -gt 0) -or ($null -eq $geoip.type)) {
-            Out-LogFile ("Failed to retreive location for IP " + $IPAddress)
-            $hash = @{
-                IP               = $IPAddress
-                CountryName      = "Failed to Resolve"
-                Continent        = "Unknown"
-                ContinentName    = "Unknown"
-                City             = "Unknown"
-                KnownMicrosoftIP = "Unknown"
-            }
-        }
-        else {
-            # Determine if this IP is known to be owned by Microsoft
-            [string]$isMSFTIP = Test-MicrosoftIP -IP $IPAddress -type $geoip.type
+			if (($Error.Count -gt 0) -or ($null -eq $geoip.type)) {
+				Out-LogFile ("Failed to retreive location for IP " + $IPAddress)
+				
+				$Error.Clear()
+				# Secondary URI to pull the data from
+				$resource = "http://api.ip2lcation.io?ip" + $ipaddress + "?access_key=" + $Accesskey
+				
+				$hash = @{
+					IP               = $IPAddress
+					CountryName      = "Failed to Resolve"
+					Continent        = "Unknown"
+					ContinentName    = "Unknown"
+					City             = "Unknown"
+					KnownMicrosoftIP = "Unknown"
+				}
+			}
+			else {
+				# Determine if this IP is known to be owned by Microsoft
+				[string]$isMSFTIP = Test-MicrosoftIP -IP $IPAddress -type $geoip.type
 
-            # Push return into a response object
-            $hash = @{
-                IP               = $geoip.ip
-                CountryName      = $geoip.country_name
-                Continent        = $geoip.continent_code
-                ContinentName    = $geoip.continent_name
-                City             = $geoip.City
-                KnownMicrosoftIP = $isMSFTIP
-            }
-            $result = New-Object PSObject -Property $hash
-        }
+				# Push return into a response object
+				$hash = @{
+					IP               = $geoip.ip
+					CountryName      = $geoip.country_name
+					Continent        = $geoip.continent_code
+					ContinentName    = $geoip.continent_name
+					City             = $geoip.City
+					KnownMicrosoftIP = $isMSFTIP
+				}
+				$result = New-Object PSObject -Property $hash
+			}
+		}
 
         # Push the result to the global IPLocationCache
         [array]$Global:IPlocationCache += $result
