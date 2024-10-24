@@ -85,7 +85,7 @@ Function Search-HawkTenantEXOAuditLog {
 
     # Search for the creation of ANY inbox rules
     Out-LogFile "Searching for ALL Inbox Rules Created in the Shell" -action
-    [array]$TenantInboxRules = Search-AdminAuditLog -Cmdlets New-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
+    [array]$TenantInboxRules = Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations New-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
 
     # If we found anything report it and log it
     if ($TenantInboxRules.count -gt 0) {

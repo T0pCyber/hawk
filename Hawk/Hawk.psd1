@@ -28,11 +28,11 @@
 	# Modules that must be imported into the global environment prior to importing
 	# this module
 	RequiredModules = @(
-		@{ModuleName = 'PSFramework'; ModuleVersion = '1.4.150'},
+		@{ModuleName = 'PSFramework'; ModuleVersion = '1.12.346'},
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6'},
 		@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '3.0.0'},
 		@{ModuleName = 'RobustCloudCommand'; ModuleVersion = '2.0.1'},
-		@{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.140'},
+		#@{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.182'},
 		@{ModuleName = 'Microsoft.Graph.Authentication'; ModuleVersion = '1.23.0'},
 		@{ModuleName = 'Microsoft.Graph.Identity.DirectoryManagement'; ModuleVersion = '1.23.0'}
 	)

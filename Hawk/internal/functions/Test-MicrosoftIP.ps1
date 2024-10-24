@@ -44,9 +44,6 @@ Function Test-MicrosoftIP {
         }
 
         $Error.clear()
-        # Read in the XML file from the internet
-        # Out-LogFile ("Reading XML for MSFT IP Addresses https://support.content.office.net/en-us/static/O365IPAddresses.xml")
-        # [xml]$msftxml = (Invoke-webRequest -Uri https://support.content.office.net/en-us/static/O365IPAddresses.xml).content
 
         $MSFTJSON = (Invoke-WebRequest -uri ("https://endpoints.office.com/endpoints/Worldwide?ClientRequestId=" + (new-guid).ToString())).content | ConvertFrom-Json
 
