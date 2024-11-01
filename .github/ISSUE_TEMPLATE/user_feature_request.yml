@@ -24,12 +24,6 @@ body:
 ### ⚙️ Developer Section (For Hawk Team Members Only)
 
 *The following sections are for internal use by the Hawk development team. Users can ignore these fields.*"
-  - type: input
-    id: external-issue
-    attributes:
-      label: "Related Feature Request"
-      description: "Link to user feature request (if applicable)"
-      placeholder: "#123"
   - type: textarea
     id: technical-requirements
     attributes:
