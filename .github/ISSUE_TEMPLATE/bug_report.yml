@@ -42,12 +42,6 @@ body:
         ### 🔧 Developer Section (For Hawk Team Members Only)
 
         *The following sections are for internal use by the Hawk development team. Users can ignore these fields.*
-  - type: input
-    id: external-issue
-    attributes:
-      label: "Related External Issue"
-      description: "Link to user-reported issue (if applicable)"
-      placeholder: "#123"
   - type: textarea
     id: technical-analysis
     attributes:
