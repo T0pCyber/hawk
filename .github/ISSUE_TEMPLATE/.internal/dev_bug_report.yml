@@ -1,0 +1,37 @@
+name: "🔧 Internal Bug Report"
+description: "For Hawk team members only"
+title: "Fix: "
+labels: ["bug", "internal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Internal Team Members Only
+        This template is for Hawk development team use.
+  - type: input
+    id: external-issue
+    attributes:
+      label: Related External Issue
+      description: Link to user-reported issue (if applicable)
+      placeholder: "#123"
+  - type: textarea
+    id: technical-analysis
+    attributes:
+      label: Technical Analysis
+      description: Root cause analysis
+    validations:
+      required: true
+  - type: textarea
+    id: implementation-plan
+    attributes:
+      label: Implementation Plan
+      description: Proposed fix approach
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What needs to be true for this to be resolved?
+    validations:
+      required: true
