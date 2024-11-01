@@ -3,7 +3,7 @@ contact_links:
   - name: "🐛 Report a Bug"
     url: https://github.com/T0pcyber/Hawk/issues/new?template=bug_report.yml
     about: "Found a bug? Report it here"
-  - name: "💡 Suggest a Feature"
+  - name: "💡 Request a Feature"
     url: https://github.com/T0pcyber/Hawk/issues/new?template=feature_request.yml
     about: "Have an idea for improvement? Let us know"
   - name: "📚 Documentation Issue"

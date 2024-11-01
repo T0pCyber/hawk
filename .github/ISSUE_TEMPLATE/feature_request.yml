@@ -1,4 +1,4 @@
-name: "💡 Suggest a Feature"
+name: "💡 Request a Feature"
 description: "Suggest a new feature or improvement for Hawk"
 title: "Feature: "
 labels: ["type/feature", "status/backlog"]
