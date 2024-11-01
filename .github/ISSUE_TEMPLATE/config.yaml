@@ -9,3 +9,6 @@ contact_links:
   - name: "📚 Documentation Issue"
     url: https://github.com/T0pcyber/Hawk/issues/new?template=documentation.yml
     about: "Report issues with documentation"
+  - name: "❓ Ask a Question"
+    url: https://github.com/T0pcyber/Hawk/issues/new?template=question_form.yml
+    about: "Have a question about Hawk? Ask it here!"

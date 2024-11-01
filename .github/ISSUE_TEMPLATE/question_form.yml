@@ -1,0 +1,13 @@
+name: "❓ Ask a Question"
+description: "Have a question about Hawk? Ask it here!"
+title: "Question: "
+labels: ["type/question", "status/backlog"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: "Your Question"
+      description: "Please provide a clear and concise question."
+      placeholder: "Type your question here..."
+    validations:
+      required: true
