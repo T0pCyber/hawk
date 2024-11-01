@@ -6,11 +6,6 @@ contact_links:
   - name: "💡 Suggest a Feature"
     url: https://github.com/T0pcyber/Hawk/issues/new?template=user_feature_request.yml
     about: "Have an idea for improvement? Let us know"
-  - name: "💡 Dev Feature Request Form"
-    url: https://github.com/T0pcyber/Hawk/issues/new?template=dev_feature_request.yml
-  - name: "💡 Dev Feature Request Form"
-    url: https://github.com/T0pcyber/Hawk/issues/new?template=dev_bug_report.yml
-    about: "Have an idea for improvement? Let us know"
   - name: "📚 Documentation Issue"
     url: https://github.com/T0pcyber/Hawk/issues/new?template=documentation.yml
     about: "Report issues with documentation"
