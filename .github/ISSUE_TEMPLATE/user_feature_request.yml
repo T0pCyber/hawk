@@ -1,0 +1,19 @@
+name: "💡 Suggest a Feature"
+description: "Suggest a new feature or improvement for Hawk"
+title: "Feature: "
+labels: ["enhancement", "triage", "external"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this feature solve?
+      placeholder: Clear description of the current limitation/problem
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this to work?
+    validations:
+      required: true
