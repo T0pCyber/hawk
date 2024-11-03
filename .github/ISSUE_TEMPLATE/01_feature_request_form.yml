@@ -1,0 +1,47 @@
+name: "💡 Request a Feature"
+description: "Suggest a new feature or improvement for Hawk"
+title: "Feature: "
+labels: ["type/feature", "status/backlog"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this feature solve?
+      placeholder: "Clear description of the current limitation/problem"
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Proposed Solution"
+      description: "How would you like this to work?"
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: "---
+
+### ⚙️ Developer Section (For Hawk Team Members Only)
+
+*The following sections are for internal use by the Hawk development team. Users can ignore these fields.*"
+  - type: textarea
+    id: technical-requirements
+    attributes:
+      label: "Technical Requirements"
+      description: "Detailed feature requirements"
+    validations:
+      required: false
+  - type: textarea
+    id: implementation-approach
+    attributes:
+      label: "Implementation Approach"
+      description: "Technical approach and architecture changes"
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: "Acceptance Criteria"
+      description: "Specific conditions that must be met"
+    validations:
+      required: false

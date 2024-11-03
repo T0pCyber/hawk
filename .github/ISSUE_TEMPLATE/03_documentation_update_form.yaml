@@ -1,0 +1,65 @@
+# documentation.yml
+name: "📚 Documentation Update"
+description: "Report issues with documentation or request updates"
+title: "Docs: "
+labels: ["type/documentation", "status/backlog"]
+body:
+  - type: textarea
+    id: documentation-issue
+    attributes:
+      label: "What needs to be updated?"
+      description: "Describe what documentation needs to be added, updated, or fixed"
+      placeholder: "Clear description of documentation changes needed"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-changes
+    attributes:
+      label: "Proposed Changes"
+      description: "What changes would you like to see?"
+      placeholder: "Specific suggestions for documentation updates"
+    validations:
+      required: true
+
+  - type: input
+    id: current-page
+    attributes:
+      label: "Current Documentation Link"
+      description: "If this is about existing documentation, provide the link"
+      placeholder: "https://github.com/T0pcyber/Hawk/wiki/page-name"
+    validations:
+      required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+        ### 📝 Developer Section (For Hawk Team Members Only)
+
+        *The following sections are for internal use by the Hawk development team. Users can ignore these fields.*
+
+  - type: textarea
+    id: implementation-plan
+    attributes:
+      label: "Implementation Plan"
+      description: "How should these documentation changes be implemented?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-resources
+    attributes:
+      label: "Additional Resources"
+      description: "Related documents, screenshots, or examples needed"
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: "Acceptance Criteria"
+      description: "What needs to be true for this documentation update to be complete?"
+    validations:
+      required: false

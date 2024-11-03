@@ -1,0 +1,65 @@
+name: "🐛 Report a Bug"
+description: "Report a bug or problem with Hawk"
+title: "Bug: "
+labels: ["type/bug", "status/backlog"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug in Hawk!
+  - type: textarea
+    id: description
+    attributes:
+      label: "What happened?"
+      description: "Describe what you were doing and what went wrong"
+      placeholder: "Clear, concise description of the issue"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: "Steps to Reproduce"
+      description: "How can we reproduce this issue?"
+      placeholder: |
+        1. Run command '...'
+        2. With parameters '...'
+        3. See error
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "Hawk Version"
+      description: "What version of Hawk are you running?"
+      placeholder: "e.g., 1.2.0"
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        ---
+
+        ### 🔧 Developer Section (For Hawk Team Members Only)
+
+        *The following sections are for internal use by the Hawk development team. Users can ignore these fields.*
+  - type: textarea
+    id: technical-analysis
+    attributes:
+      label: "Technical Analysis"
+      description: "Root cause analysis"
+    validations:
+      required: false
+  - type: textarea
+    id: implementation-plan
+    attributes:
+      label: "Implementation Plan"
+      description: "Proposed fix approach"
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: "Acceptance Criteria"
+      description: "What needs to be true for this to be resolved?"
+    validations:
+      required: false

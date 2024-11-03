@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "💡 Request a Feature"
+    url: https://github.com/T0pcyber/Hawk/issues/new?template=01_feature_request_form.yml
+    about: "Have an idea for improvement? Let us know"
+  - name: "🐛 Report a Bug"
+    url: https://github.com/T0pcyber/Hawk/issues/new?template=02_bug_report_form.yml
+    about: "Found a bug? Report it here"
+  - name: "📚 Documentation Issue"
+    url: https://github.com/T0pcyber/Hawk/issues/new?template=03_documentation_update_form.yml
+    about: "Report issues with documentation or request updates"
+  - name: "❓ Ask a Question"
+    url: https://github.com/T0pcyber/Hawk/issues/new?template=04_question_form.yml
+    about: "Have a question about Hawk? Ask it here!"
