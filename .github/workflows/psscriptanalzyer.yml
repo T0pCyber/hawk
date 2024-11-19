@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - main
-      - Development
+      - development
       - "feature/144-implement-dual-validation-psscriptanalyzer-with-standardized-settings"
     paths:
       - "**.ps1"
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install PSScriptAnalyzer
         shell: pwsh
@@ -44,8 +44,10 @@ jobs:
               }
           }
 
-          # Output results
+          # Create results file if there are any issues
           if ($results) {
+              $resultPath = Join-Path $env:GITHUB_WORKSPACE "psscriptanalyzer-results.txt"
+              $results | Format-Table -AutoSize | Out-File -FilePath $resultPath
               $results | Format-Table -AutoSize
               Write-Output "::error::PSScriptAnalyzer found $($results.Count) issues"
               exit 1
@@ -55,7 +57,8 @@ jobs:
 
       - name: Upload PSScriptAnalyzer Results
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: psscriptanalyzer-results
           path: psscriptanalyzer-results.txt
+          if-no-files-found: warn
