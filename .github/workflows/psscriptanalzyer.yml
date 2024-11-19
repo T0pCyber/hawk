@@ -32,13 +32,22 @@ jobs:
       - name: Run PSScriptAnalyzer
         shell: pwsh
         run: |
-          $settings = Join-Path $env:GITHUB_WORKSPACE '.github/psscriptanalyzer/PSScriptAnalyzerSettings.psd1'
+          # Verify settings file exists
+          $settingsPath = Join-Path $env:GITHUB_WORKSPACE '.github/psscriptanalyzer/PSScriptAnalyzerSettings.psd1'
+          if (-not (Test-Path $settingsPath)) {
+              Write-Error "PSScriptAnalyzer settings file not found at: $settingsPath"
+              Write-Host "Directory contents:"
+              Get-ChildItem -Path $env:GITHUB_WORKSPACE/.github -Recurse
+              exit 1
+          }
+
           $results = @()
 
           # Analyze all PowerShell files
           Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Include *.ps1,*.psm1,*.psd1 | 
           ForEach-Object {
-              $analysis = Invoke-ScriptAnalyzer -Path $_.FullName -Settings $settings
+              Write-Host "Analyzing $($_.FullName)"
+              $analysis = Invoke-ScriptAnalyzer -Path $_.FullName -Settings $settingsPath
               if ($analysis) {
                   $results += $analysis
               }
