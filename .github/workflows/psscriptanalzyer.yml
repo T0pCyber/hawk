@@ -1,0 +1,61 @@
+name: PSScriptAnalyzer
+on:
+  pull_request:
+    paths:
+      - "**.ps1"
+      - "**.psm1"
+      - "**.psd1"
+  push:
+    branches:
+      - main
+      - Development
+      - "feature/144-implement-dual-validation-psscriptanalyzer-with-standardized-settings"
+    paths:
+      - "**.ps1"
+      - "**.psm1"
+      - "**.psd1"
+
+jobs:
+  analyze:
+    name: PSScriptAnalyzer
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Force
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $settings = Join-Path $env:GITHUB_WORKSPACE '.github/psscriptanalyzer/PSScriptAnalyzerSettings.psd1'
+          $results = @()
+
+          # Analyze all PowerShell files
+          Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Include *.ps1,*.psm1,*.psd1 | 
+          ForEach-Object {
+              $analysis = Invoke-ScriptAnalyzer -Path $_.FullName -Settings $settings
+              if ($analysis) {
+                  $results += $analysis
+              }
+          }
+
+          # Output results
+          if ($results) {
+              $results | Format-Table -AutoSize
+              Write-Output "::error::PSScriptAnalyzer found $($results.Count) issues"
+              exit 1
+          } else {
+              Write-Output "No PSScriptAnalyzer issues found"
+          }
+
+      - name: Upload PSScriptAnalyzer Results
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: psscriptanalyzer-results
+          path: psscriptanalyzer-results.txt
