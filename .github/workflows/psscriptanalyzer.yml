@@ -29,11 +29,11 @@ jobs:
           Write-Host "Current location: $(Get-Location)"
           Write-Host "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
           
-          $settingsPath = Join-Path $env:GITHUB_WORKSPACE '.github' 'psscriptanalyzer' 'PSScriptAnalyzerSettings.psd1'
+          $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'tests' 'psscriptanalyzer' 'PSScriptAnalyzerSettings.psd1'
           Write-Host "Settings path: $settingsPath"
           
-          Write-Host "`nVerifying .github structure:"
-          Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE '.github') -Recurse | 
+          Write-Host "`nVerifying tests structure:"
+          Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'tests') -Recurse | 
               Select-Object FullName
 
       - name: Install PSScriptAnalyzer
@@ -45,7 +45,7 @@ jobs:
       - name: Run PSScriptAnalyzer
         shell: pwsh
         run: |
-          $settingsPath = Join-Path $env:GITHUB_WORKSPACE '.github' 'psscriptanalyzer' 'PSScriptAnalyzerSettings.psd1'
+          $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'tests' 'psscriptanalyzer' 'PSScriptAnalyzerSettings.psd1'
           
           Write-Host "Using settings file: $settingsPath"
           if (-not (Test-Path $settingsPath)) {
