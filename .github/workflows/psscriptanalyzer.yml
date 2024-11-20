@@ -17,7 +17,7 @@ on:
 jobs:
   analyze:
     name: PSScriptAnalyzer
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -27,8 +27,13 @@ jobs:
         run: |
           Write-Host "Current location: $(Get-Location)"
           Write-Host "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
-          Write-Host "Directory contents:"
-          Get-ChildItem -Path . -Recurse | Select-Object FullName
+          
+          $settingsPath = Join-Path $env:GITHUB_WORKSPACE '.github' 'psscriptanalyzer' 'PSScriptAnalyzerSettings.psd1'
+          Write-Host "Settings path: $settingsPath"
+          
+          Write-Host "`nVerifying .github structure:"
+          Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE '.github') -Recurse | 
+              Select-Object FullName
 
       - name: Install PSScriptAnalyzer
         shell: pwsh
@@ -39,21 +44,20 @@ jobs:
       - name: Run PSScriptAnalyzer
         shell: pwsh
         run: |
-          $settingsPath = "./.github/psscriptanalyzer/PSScriptAnalyzerSettings.psd1"
+          $settingsPath = Join-Path $env:GITHUB_WORKSPACE '.github' 'psscriptanalyzer' 'PSScriptAnalyzerSettings.psd1'
           
-          Write-Host "Looking for settings file..."
-          Write-Host "Settings path: $settingsPath"
-          Write-Host "`n.github folder contents:"
-          Get-ChildItem -Path "./.github" -Recurse | Select-Object FullName
-
+          Write-Host "Using settings file: $settingsPath"
           if (-not (Test-Path $settingsPath)) {
               Write-Error "PSScriptAnalyzer settings file not found at: $settingsPath"
               exit 1
           }
 
           $results = @()
-          $files = Get-ChildItem -Path . -Recurse -Include *.ps1,*.psm1,*.psd1 |
-                  Where-Object { $_.FullName -notlike '*\node_modules\*' }
+          $files = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Include *.ps1,*.psm1,*.psd1 |
+                  Where-Object { 
+                      $_.FullName -notlike '*\node_modules\*' -and
+                      $_.FullName -notlike '*/.git/*' 
+                  }
 
           foreach ($file in $files) {
               Write-Host "Analyzing $($file.FullName)"
@@ -66,7 +70,7 @@ jobs:
           if ($results) {
               Write-Host "Found $($results.Count) issues"
               $results | Format-Table -AutoSize | Out-String | Write-Host
-              $results | Format-Table -AutoSize | Out-File psscriptanalyzer-results.txt
+              $results | Format-Table -AutoSize | Out-File (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
               exit 1
           } else {
               Write-Host "No PSScriptAnalyzer issues found"
