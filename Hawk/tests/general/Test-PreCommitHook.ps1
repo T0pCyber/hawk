@@ -52,7 +52,7 @@ function Test-AdvancedFunction {
 #region Bad Code Examples - Uncomment to test PSScriptAnalyzer
 # NOTE: The following code is intentionally written with issues to demonstrate PSScriptAnalyzer rules
 
-
+<#
 # Bad function - Multiple issues
 function test-badfunction {    # Wrong capitalization
     param([string]$param1)    # Missing CmdletBinding
@@ -78,8 +78,7 @@ function Test-BadValidation {
 
 # Aliases and positional parameters
 dir C:\ | where {$_.Length -gt 1000}    # Using aliases instead of full cmdlet names
-
-
+#>
 #endregion
 
 #region Testing Instructions
