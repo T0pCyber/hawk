@@ -5,7 +5,7 @@
 # 3. Observe the PSScriptAnalyzer warnings/errors
 
 #region Good Code Examples - These will pass PSScriptAnalyzer
-# add comment to testss
+# add comment to tests
 function Test-GoodFunction {
     [CmdletBinding()]
     param (
