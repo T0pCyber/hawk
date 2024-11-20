@@ -22,19 +22,27 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Required for getting changed files
 
-      - name: Debug Paths
+      - name: Get changed files
         shell: pwsh
         run: |
-          Write-Host "Current location: $(Get-Location)"
-          Write-Host "GITHUB_WORKSPACE: $env:GITHUB_WORKSPACE"
+          if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
+              $baseCommit = git rev-parse $env:GITHUB_EVENT.pull_request.base.sha
+              $headCommit = git rev-parse HEAD
+              $changedFiles = git diff --name-only $baseCommit..$headCommit
+          } else {
+              $changedFiles = git diff --name-only HEAD^1 HEAD
+          }
           
-          $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'tests' 'psscriptanalyzer' 'PSScriptAnalyzerSettings.psd1'
-          Write-Host "Settings path: $settingsPath"
+          $powershellFiles = $changedFiles | Where-Object { 
+              $_ -match '\.(ps1|psm1|psd1)$' 
+          }
           
-          Write-Host "`nVerifying tests structure:"
-          Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'tests') -Recurse | 
-              Select-Object FullName
+          $powershellFiles | Out-File -FilePath $env:GITHUB_WORKSPACE/changed_files.txt
+          Write-Host "Changed PowerShell files:"
+          $powershellFiles | ForEach-Object { Write-Host "  $_" }
 
       - name: Install PSScriptAnalyzer
         shell: pwsh
@@ -53,28 +61,31 @@ jobs:
               exit 1
           }
 
-          $results = @()
-          $files = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Include *.ps1,*.psm1,*.psd1 |
-                  Where-Object { 
-                      $_.FullName -notlike '*\node_modules\*' -and
-                      $_.FullName -notlike '*/.git/*' 
-                  }
+          $changedFiles = Get-Content -Path "$env:GITHUB_WORKSPACE/changed_files.txt"
+          if (-not $changedFiles) {
+              Write-Host "No PowerShell files were changed"
+              exit 0
+          }
 
-          foreach ($file in $files) {
-              Write-Host "Analyzing $($file.FullName)"
-              $fileResults = Invoke-ScriptAnalyzer -Path $file.FullName -Settings $settingsPath
-              if ($fileResults) {
-                  $results += $fileResults
+          $results = @()
+          foreach ($file in $changedFiles) {
+              $fullPath = Join-Path $env:GITHUB_WORKSPACE $file
+              if (Test-Path $fullPath) {
+                  Write-Host "Analyzing $fullPath"
+                  $fileResults = Invoke-ScriptAnalyzer -Path $fullPath -Settings $settingsPath
+                  if ($fileResults) {
+                      $results += $fileResults
+                  }
               }
           }
 
           if ($results) {
-              Write-Host "Found $($results.Count) issues"
+              Write-Host "Found $($results.Count) issues in changed files:"
               $results | Format-Table -AutoSize | Out-String | Write-Host
               $results | Format-Table -AutoSize | Out-File (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
               exit 1
           } else {
-              Write-Host "No PSScriptAnalyzer issues found"
+              Write-Host "No PSScriptAnalyzer issues found in changed files"
           }
 
       - name: Upload Results
