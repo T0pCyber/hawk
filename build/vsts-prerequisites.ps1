@@ -8,7 +8,7 @@ param (
 $modules = @("Pester", "PSFramework", "PSModuleDevelopment")
 
 # Automatically add missing dependencies
-# Do we need to keep this?
+# TODO: uncomment this block of code below and fix RobustCloudCommand error.
 
 # $data = Import-PowerShellDataFile -Path "$PSScriptRoot\..\Hawk\Hawk.psd1"
 # foreach ($dependency in $data.RequiredModules) {
@@ -23,7 +23,8 @@ $modules = @("Pester", "PSFramework", "PSModuleDevelopment")
 # }
 
 foreach ($module in $modules) {
-    Write-Output "Installing module: $module"
+    # Write-Output "Installing module: $module"
+    Write-Output "Installing $module"
     Install-Module $module -Force -SkipPublisherCheck -Repository $Repository
     Import-Module $module -Force -PassThru
 }
