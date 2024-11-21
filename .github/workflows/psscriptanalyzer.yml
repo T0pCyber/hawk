@@ -53,7 +53,7 @@ jobs:
       - name: Run PSScriptAnalyzer
         shell: pwsh
         run: |
-          $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'tests' 'psscriptanalyzer' 'PSScriptAnalyzerSettings.psd1'
+          $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'internal' 'configurations' 'PSScriptAnalyzerSettings.psd1'
           
           Write-Host "Using settings file: $settingsPath"
           if (-not (Test-Path $settingsPath)) {

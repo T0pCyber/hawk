@@ -11,7 +11,7 @@ repos:
           - -Command
           - |
             $ErrorActionPreference = 'Stop'
-            $settings = Join-Path (Get-Location) 'Hawk/tests/psscriptanalyzer/PSScriptAnalyzerSettings.psd1'
+            $settings = Join-Path (Get-Location) 'Hawk/internal/configurations/PSScriptAnalyzerSettings.psd1'
             $files = git diff --cached --name-only --diff-filter=AM | Where-Object { $_ -match '\.(ps1|psm1|psd1)$' }
             $hasErrors = $false
             foreach ($file in $files) {
