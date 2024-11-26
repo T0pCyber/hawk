@@ -29,9 +29,10 @@ jobs:
         shell: pwsh
         run: |
           if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
-              $baseCommit = git rev-parse $env:GITHUB_EVENT.pull_request.base.sha
-              $headCommit = git rev-parse HEAD
-              $changedFiles = git diff --name-only $baseCommit..$headCommit
+              $eventJson = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
+              $baseCommit = $eventJson.pull_request.base.sha
+              $headCommit = $eventJson.pull_request.head.sha
+              $changedFiles = git diff --name-only $baseCommit $headCommit
           } else {
               $changedFiles = git diff --name-only HEAD^1 HEAD
           }
@@ -40,7 +41,7 @@ jobs:
               $_ -match '\.(ps1|psm1|psd1)$' 
           }
 
-          $powershellFiles | Out-File -FilePath $env:GITHUB_WORKSPACE/changed_files.txt
+          $powershellFiles | Out-File -FilePath $env:GITHUB_WORKSPACE/changed_files.txt -Encoding utf8
           Write-Host "Changed PowerShell files:"
           $powershellFiles | ForEach-Object { Write-Host "  $_" }
 
@@ -54,14 +55,14 @@ jobs:
         shell: pwsh
         run: |
           $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'internal' 'configurations' 'PSScriptAnalyzerSettings.psd1'
-          $changedFiles = Get-Content -Path "$env:GITHUB_WORKSPACE/changed_files.txt"
+          $changedFilesPath = "$env:GITHUB_WORKSPACE/changed_files.txt"
           $scriptPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'internal' 'scripts' 'git_hub_action_scripts' 'Invoke-GitHubPSScriptAnalyzer.ps1'
-          . $scriptPath -SettingsPath $settingsPath -ChangedFiles $changedFiles
+          . $scriptPath -SettingsPath $settingsPath -ChangedFiles $changedFilesPath
 
       - name: Upload Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: psscriptanalyzer-results
-          path: psscriptanalyzer-results.txt
+          path: ${{ github.workspace }}/psscriptanalyzer-results.txt
           if-no-files-found: warn
