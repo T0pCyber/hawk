@@ -47,11 +47,13 @@ function Invoke-GitHubPSScriptAnalyzer {
 
     if ($results) {
         Write-Output "Found $($results.Count) issues in changed files:"
-        $results | Format-Table -AutoSize | Out-String | Write-Output
+        $results | Format-Table -AutoSize | Out-String | Write-Host
         $results | Format-Table -AutoSize | Out-File (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
         exit 1
     }
     else {
         Write-Output "No PSScriptAnalyzer issues found in changed files"
+        $null > (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
+        exit 0
     }
 }
