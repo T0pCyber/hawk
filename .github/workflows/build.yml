@@ -2,8 +2,6 @@ on:
   push:
     branches:
       - master
-      - "feature/144-implement-dual-validation-psscriptanalyzer-with-standardized-settings"
-
 jobs:
   build:
     runs-on: windows-2019

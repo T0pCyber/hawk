@@ -9,6 +9,7 @@ on:
     branches:
       - main
       - development
+      - Development
       - "feature/144-implement-dual-validation-psscriptanalyzer-with-standardized-settings"
     paths:
       - "**.ps1"
