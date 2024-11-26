@@ -1,11 +1,5 @@
 $ErrorActionPreference = 'Stop'
 
-# Ensure PSScriptAnalyzer is installed and available
-if (-not (Get-Module -ListAvailable PSScriptAnalyzer)) {
-    Write-Output "Installing PSScriptAnalyzer..."
-    Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
-}
-
 # Import the module
 Import-Module PSScriptAnalyzer
 
