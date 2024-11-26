@@ -1,5 +1,4 @@
 name: PSScriptAnalyzer
-
 on:
   pull_request:
     paths:
@@ -55,9 +54,42 @@ jobs:
         shell: pwsh
         run: |
           $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'internal' 'configurations' 'PSScriptAnalyzerSettings.psd1'
+
+          Write-Output "Using settings file: $settingsPath"
+          if (-not (Test-Path $settingsPath)) {
+              Write-Error "PSScriptAnalyzer settings file not found at: $settingsPath"
+              exit 1
+          }
+
           $changedFiles = Get-Content -Path "$env:GITHUB_WORKSPACE/changed_files.txt"
-          $scriptPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'internal' 'scripts' 'git_hub_action_scripts' 'Invoke-GitHubPSScriptAnalyzer.ps1'
-          . $scriptPath -SettingsPath $settingsPath -ChangedFiles $changedFiles
+          if (-not $changedFiles) {
+              Write-Output "No PowerShell files were changed"
+              $null > (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
+              exit 0
+          }
+
+          $results = @()
+          foreach ($file in $changedFiles) {
+              $fullPath = Join-Path $env:GITHUB_WORKSPACE $file
+              if (Test-Path $fullPath) {
+                  Write-Output "Analyzing $fullPath"
+                  $fileResults = Invoke-ScriptAnalyzer -Path $fullPath -Settings $settingsPath
+                  if ($fileResults) {
+                      $results += $fileResults
+                  }
+              }
+          }
+
+          if ($results) {
+              Write-Output "Found $($results.Count) issues in changed files:"
+              $results | Format-Table -AutoSize | Out-String | Write-Output
+              $results | Format-Table -AutoSize | Out-File (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
+              exit 1
+          } else {
+              Write-Output "No PSScriptAnalyzer issues found in changed files"
+              $null > (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
+              exit 0
+          }
 
       - name: Upload Results
         if: always()
