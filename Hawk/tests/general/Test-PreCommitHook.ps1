@@ -5,7 +5,7 @@
 # 3. Observe the PSScriptAnalyzer warnings/errors
 
 #region Good Code Examples - These will pass PSScriptAnalyzer
-# testssssssss
+# test
 function Test-GoodFunction {
     [CmdletBinding()]
     param (
@@ -52,9 +52,10 @@ function Test-AdvancedFunction {
 #region Bad Code Examples - Uncomment to test PSScriptAnalyzer
 # NOTE: The following code is intentionally written with issues to demonstrate PSScriptAnalyzer rules
 
-<#
+
 # Bad function - Multiple issues
-function test-badfunction {    # Wrong capitalization
+function test-badfunction {
+    # Wrong capitalization
     param([string]$param1)    # Missing CmdletBinding
     
     $Global:badVariable = $param1    # Using global variable
@@ -77,8 +78,8 @@ function Test-BadValidation {
 }
 
 # Aliases and positional parameters
-dir C:\ | where {$_.Length -gt 1000}    # Using aliases instead of full cmdlet names
-#>
+dir C:\ | where { $_.Length -gt 1000 }    # Using aliases instead of full cmdlet names
+
 #endregion
 
 #region Testing Instructions
