@@ -9,6 +9,6 @@ repos:
           - -ExecutionPolicy
           - Bypass
           - -File
-          - Hawk/internal/scripts/Invoke-PowerShellScriptAnalyzer.ps1
+          - Hawk/internal/scripts/pre_commit_hook_scripts/Invoke-PowerShellScriptAnalyzer.ps1
         language: system
         types: [powershell]
