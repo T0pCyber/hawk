@@ -55,7 +55,8 @@ jobs:
         run: |
           $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'internal' 'configurations' 'PSScriptAnalyzerSettings.psd1'
           $changedFiles = Get-Content -Path "$env:GITHUB_WORKSPACE/changed_files.txt"
-          Invoke-GitHubPSScriptAnalyzer -SettingsPath $settingsPath -ChangedFiles $changedFiles
+          $scriptPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'internal' 'scripts' 'git_hub_action_scripts' 'Invoke-PowerShellScriptAnalyzer.ps1'
+          . $scriptPath -SettingsPath $settingsPath -ChangedFiles $changedFiles
 
       - name: Upload Results
         if: always()
