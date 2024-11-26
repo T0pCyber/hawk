@@ -30,6 +30,7 @@ function Invoke-GitHubPSScriptAnalyzer {
     $changedFiles = Get-Content -Path $ChangedFiles
     if (-not $changedFiles) {
         Write-Output "No PowerShell files were changed"
+        $null > (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
         exit 0
     }
 
@@ -47,7 +48,7 @@ function Invoke-GitHubPSScriptAnalyzer {
 
     if ($results) {
         Write-Output "Found $($results.Count) issues in changed files:"
-        $results | Format-Table -AutoSize | Out-String | Write-Host
+        $results | Format-Table -AutoSize | Out-String | Write-Output
         $results | Format-Table -AutoSize | Out-File (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
         exit 1
     }
