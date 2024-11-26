@@ -1,34 +1,25 @@
-if ($MyInvocation.ScriptName -eq (Join-Path $PSScriptRoot 'Invoke-PowerShellScriptAnalyzer.ps1')) {
-    $excludedFiles = @(
-        'C:\Users\xxbut\code\hawk\Hawk\tests\general\Test-PreCommitHook.ps1'
-    )
+$ErrorActionPreference = 'Stop'
+$settings = Join-Path (Get-Location) 'Hawk/internal/configurations/PSScriptAnalyzerSettings.psd1'
 
-    $files = git diff --cached --name-only --diff-filter=AM | Where-Object { $_ -match '\.(ps1|psm1|psd1)$' }
-    $hasErrors = $false
+# Define the list of files to exclude
+$excludedFiles = @(
+    'none'
+)
 
-    foreach ($file in $files) {
-        if ($excludedFiles -contains $file) {
-            Write-Output "Skipping analysis for excluded file: $file"
+$files = git diff --cached --name-only --diff-filter=AM | Where-Object { $_ -match '\.(ps1|psm1|psd1)$' }
+$hasErrors = $false
+
+foreach ($file in $files) {
+    if ($excludedFiles -notcontains $file) {
+        Write-Output "Analyzing $file..."
+        $results = Invoke-ScriptAnalyzer -Path $file -Settings $settings
+        if ($results) {
+            $results | Format-Table -AutoSize
+            $hasErrors = $true
         }
-        else {
-            Write-Output "Analyzing $file..."
-            $results = Invoke-ScriptAnalyzer -Path $file -Settings $settings
-            if ($results) {
-                $results | Format-Table -AutoSize
-                $hasErrors = $true
-            }
-        }
-    }
-
-    if ($hasErrors) {
-        Write-Output "PSScriptAnalyzer found errors. Exiting with error code 1."
-        exit 1
     }
     else {
-        Write-Output "No PSScriptAnalyzer issues found. Exiting with code 0."
-        exit 0
+        Write-Output "Skipping analysis for excluded file: $file"
     }
 }
-else {
-    # Original script content
-}
+if ($hasErrors) { exit 1 }
