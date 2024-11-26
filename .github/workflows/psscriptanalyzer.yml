@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required for getting changed files
+          fetch-depth: 0 # Required for getting changed files
 
       - name: Get changed files
         shell: pwsh
@@ -35,11 +35,11 @@ jobs:
           } else {
               $changedFiles = git diff --name-only HEAD^1 HEAD
           }
-          
+
           $powershellFiles = $changedFiles | Where-Object { 
               $_ -match '\.(ps1|psm1|psd1)$' 
           }
-          
+
           $powershellFiles | Out-File -FilePath $env:GITHUB_WORKSPACE/changed_files.txt
           Write-Host "Changed PowerShell files:"
           $powershellFiles | ForEach-Object { Write-Host "  $_" }
@@ -54,39 +54,8 @@ jobs:
         shell: pwsh
         run: |
           $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'internal' 'configurations' 'PSScriptAnalyzerSettings.psd1'
-          
-          Write-Host "Using settings file: $settingsPath"
-          if (-not (Test-Path $settingsPath)) {
-              Write-Error "PSScriptAnalyzer settings file not found at: $settingsPath"
-              exit 1
-          }
-
           $changedFiles = Get-Content -Path "$env:GITHUB_WORKSPACE/changed_files.txt"
-          if (-not $changedFiles) {
-              Write-Host "No PowerShell files were changed"
-              exit 0
-          }
-
-          $results = @()
-          foreach ($file in $changedFiles) {
-              $fullPath = Join-Path $env:GITHUB_WORKSPACE $file
-              if (Test-Path $fullPath) {
-                  Write-Host "Analyzing $fullPath"
-                  $fileResults = Invoke-ScriptAnalyzer -Path $fullPath -Settings $settingsPath
-                  if ($fileResults) {
-                      $results += $fileResults
-                  }
-              }
-          }
-
-          if ($results) {
-              Write-Host "Found $($results.Count) issues in changed files:"
-              $results | Format-Table -AutoSize | Out-String | Write-Host
-              $results | Format-Table -AutoSize | Out-File (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
-              exit 1
-          } else {
-              Write-Host "No PSScriptAnalyzer issues found in changed files"
-          }
+          Invoke-GitHubPSScriptAnalyzer -SettingsPath $settingsPath -ChangedFiles $changedFiles
 
       - name: Upload Results
         if: always()
