@@ -18,7 +18,7 @@
     Returns the pwn state of the email address provided
 #>
 
-    param([array]$Email)
+    param([Alias("User","UPN")][array]$Email)
 
     # if there is no value of hibpkey then we need to get it from the user
     if ($null -eq $hibpkey) {
@@ -27,12 +27,17 @@
 
         HaveIBeenPwned.com now requires an API access key to gather Stats with from their API.
 
-        Please purchase an API key for $3.50 a month from get a Free access key from https://haveibeenpwned.com/API/Key and provide it below.
+        Please purchase an API key for `$3.50 a month from get a Free access key from https://haveibeenpwned.com/API/Key and provide it below.
 
         "
 
         # get the access key from the user
         $hibpkey = Read-Host "haveibeenpwned.com apikey"
+    }
+
+    #check for Email passed into cmdlet
+    if ($null -eq $email){
+        $email = Read-Host "Please enter the SMTP Address of the user account you are investigating."
     }
 
     # Verify our UPN input
@@ -41,7 +46,7 @@
 
     foreach ($Object in $UserArray) {
 
-        $[string]$User = $Object.UserPrincipalName
+        [string]$User = $Object.UserPrincipalName
 
         # Convert the email to URL encoding
         $uriEncodeEmail = [uri]::EscapeDataString($($user))

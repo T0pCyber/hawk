@@ -1,5 +1,5 @@
 Function Search-HawkTenantEXOAuditLog {
-<#
+    <#
 .SYNOPSIS
     Searches the admin audit logs for possible bad actor activities
 .DESCRIPTION
@@ -85,7 +85,7 @@ Function Search-HawkTenantEXOAuditLog {
 
     # Search for the creation of ANY inbox rules
     Out-LogFile "Searching for ALL Inbox Rules Created in the Shell" -action
-    [array]$TenantInboxRules = Search-AdminAuditLog -Cmdlets New-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
+    [array]$TenantInboxRules = Search-AdminAuditLog -Cmdlets New-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -ResultSize 250000
 
     # If we found anything report it and log it
     if ($TenantInboxRules.count -gt 0) {
@@ -97,7 +97,7 @@ Function Search-HawkTenantEXOAuditLog {
 
     # Search for the Modification of ANY inbox rules
     Out-LogFile "Searching for ALL Inbox Rules Modified in the Shell" -action
-    [array]$TenantSetInboxRules = Search-AdminAuditLog -Cmdlets Set-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
+    [array]$TenantSetInboxRules = Search-AdminAuditLog -Cmdlets Set-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -ResultSize 250000
 
     # If we found anything report it and log it
     if ($TenantSetInboxRules.count -gt 0) {
@@ -109,7 +109,7 @@ Function Search-HawkTenantEXOAuditLog {
 
     # Search for the Modification of ANY inbox rules
     Out-LogFile "Searching for ALL Inbox Rules Removed in the Shell" -action
-    [array]$TenantRemoveInboxRules = Search-AdminAuditLog -Cmdlets Remove-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
+    [array]$TenantRemoveInboxRules = Search-AdminAuditLog -Cmdlets Remove-InboxRule -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -ResultSize 250000
 
     # If we found anything report it and log it
     if ($TenantRemoveInboxRules.count -gt 0) {
@@ -121,7 +121,7 @@ Function Search-HawkTenantEXOAuditLog {
 
     # Searching for interesting inbox rules
     Out-LogFile "Searching for Interesting Inbox Rules Created in the Shell" -action
-    [array]$InvestigateInboxRules = Search-AdminAuditLog -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -cmdlets New-InboxRule -Parameters ForwardTo, ForwardAsAttachmentTo, RedirectTo, DeleteMessage
+    [array]$InvestigateInboxRules = Search-AdminAuditLog -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -cmdlets New-InboxRule -Parameters ForwardTo, ForwardAsAttachmentTo, RedirectTo, DeleteMessage -ResultSize 250000
 
     # if we found a rule report it and output it to the _Investigate files
     if ($InvestigateInboxRules.count -gt 0) {
@@ -132,7 +132,7 @@ Function Search-HawkTenantEXOAuditLog {
 
     # Look for changes to user forwarding
     Out-LogFile "Searching for user Forwarding Changes" -action
-    [array]$TenantForwardingChanges = Search-AdminAuditLog -Cmdlets Set-Mailbox -Parameters ForwardingAddress, ForwardingSMTPAddress -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
+    [array]$TenantForwardingChanges = Search-AdminAuditLog -Cmdlets Set-Mailbox -Parameters ForwardingAddress, ForwardingSMTPAddress -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -ResultSize 250000
 
     if ($TenantForwardingChanges.count -gt 0) {
         Out-LogFile ("Found " + $TenantForwardingChanges.count + " Change(s) to user Email Forwarding") -notice
@@ -147,7 +147,7 @@ Function Search-HawkTenantEXOAuditLog {
         Foreach ($Change in $TenantForwardingChanges) {
 
             # Get the user object modified
-            $user = ($Change.CmdletParameters | Where-Object ($_.name -eq "Identity")).value
+            $user = ($Change.CmdletParameters | Where-Object { $_.name -eq "Identity" }).value
 
             # Check the ForwardingSMTPAddresses first
             if ([string]::IsNullOrEmpty(($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingSMTPAddress" }).value)) { }
@@ -161,7 +161,7 @@ Function Search-HawkTenantEXOAuditLog {
             else {
                 # Here we get back a recipient object in EXO not an SMTP address
                 # So we need to go track down the recipient object
-                $recipient = Get-EXORecipient (($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value) -ErrorAction SilentlyContinue
+                $recipient = Get-Recipient (($Change.CmdletParameters | Where-Object { $_.name -eq "ForwardingAddress" }).value) -ErrorAction SilentlyContinue
 
                 # If we can't resolve the recipient we need to log that
                 if ($null -eq $recipient) {
@@ -173,13 +173,14 @@ Function Search-HawkTenantEXOAuditLog {
                     Switch ($recipient.RecipientType) {
                         # For mailcontact we needed the external email address
                         MailContact {
-                            [array]$Output += $recipient | Select-Object -Property @{Name = "UserModified"; Expression = { $user } }; @{Name = "TargetSMTPAddress"; Expression = { $_.ExternalEmailAddress.split(":")[1] } }
+                            [array]$Output += $recipient | Select-Object -Property @{Name = "UserModified"; Expression = { $user } }, @{Name = "TargetSMTPAddress"; Expression = { $_.ExternalEmailAddress.split(":")[1] } }
                         }
                         # For all others I believe primary will work
                         Default {
-                            [array]$Output += $recipient | Select-Object -Property @{Name = "UserModified"; Expression = { $user } }; @{Name = "TargetSMTPAddress"; Expression = { $_.PrimarySmtpAddress } }
+                            [array]$Output += $recipient | Select-Object -Property @{Name = "UserModified"; Expression = { $user } }, @{Name = "TargetSMTPAddress"; Expression = { $_.PrimarySmtpAddress } }
                         }
                     }
+                    $recipient.RecipientType
                 }
             }
         }
@@ -192,7 +193,7 @@ Function Search-HawkTenantEXOAuditLog {
 
     # Look for changes to mailbox permissions
     Out-LogFile "Searching for Mailbox Permissions Changes" -Action
-    [array]$TenantMailboxPermissionChanges = Search-AdminAuditLog -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -cmdlets Add-MailboxPermission
+    [array]$TenantMailboxPermissionChanges = Search-AdminAuditLog -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -cmdlets Add-MailboxPermission -ResultSize 250000
 
     if ($TenantMailboxPermissionChanges.count -gt 0) {
         Out-LogFile ("Found " + $TenantMailboxPermissionChanges.count + " changes to mailbox permissions")
