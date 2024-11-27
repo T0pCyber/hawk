@@ -23,20 +23,18 @@ BEGIN{
     Out-LogFile "Gathering Azure AD Users"
 
     Test-AzureADConnection
-    Send-AIEvent -Event "CmdRun"
 
 }#End BEGIN
 PROCESS{
-    $users = foreach ($user in (Get-AzureADUser -All $True)){
-        $userproperties = $user | Select-Object userprincipalname, objectid, usertype, userstatechangedon, DirSyncEnabled, ExtensionProperty
+    $users = foreach ($user in (Get-MGUser -All $True)){
+        $userproperties = $user | Select-Object userprincipalname, id, usertype, CreatedDateTime, AccountEnabled
             foreach ($properties in $userproperties){
                 [PSCustomObject]@{
                 UserPrincipalname = $userproperties.userprincipalname
-                ObjectID = $userproperties.objectid
+                ObjectID = $userproperties.id
                 UserType = $userproperties.UserType
-                DateCreated = $userproperties.ExtensionProperty.createdDateTime
-                UserStateChangedOn = $userproperties.UserStateChangedOn
-                DirSyncEnabled = $userproperties.DirSyncEnabled
+                DateCreated = $userproperties.createdDateTime
+                AccountEnabled = $userproperties.AccountEnabled
                 }
             }
     }
@@ -48,3 +46,4 @@ END{
 
 
 }#End Function
+

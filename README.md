@@ -25,7 +25,7 @@ is NOT an all exhaustive list.
 Please post any issues you find to the Issue section. Those issues will be incorporated into your future capability implementation.
 
 If something is critical or I seem to have not done anything in some time please feel free to send an email to the
-Hawk support alias hawk_feedback@microsoft.com.
+Hawk support alias hawkpsmodule@gmail.com.
 
 # HAWK
 

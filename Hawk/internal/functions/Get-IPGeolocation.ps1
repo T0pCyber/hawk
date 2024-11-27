@@ -53,7 +53,8 @@ Function Get-IPGeolocation {
                 $hash = @{
                 IP               = $IPAddress
                 CountryName      = "NULL IP"
-                Continent        = "Unknown"
+                RegionName       = "Unknown"
+                RegionCode       = "Unknown"
                 ContinentName    = "Unknown"
                 City             = "Unknown"
                 KnownMicrosoftIP = "Unknown"
@@ -73,7 +74,8 @@ Function Get-IPGeolocation {
             $hash = @{
                 IP               = $IPAddress
                 CountryName      = "Failed to Resolve"
-                Continent        = "Unknown"
+                RegionName       = "Unknown"
+                RegionCode       = "Unknown"
                 ContinentName    = "Unknown"
                 City             = "Unknown"
                 KnownMicrosoftIP = "Unknown"
@@ -81,16 +83,19 @@ Function Get-IPGeolocation {
         }
         else {
             # Determine if this IP is known to be owned by Microsoft
-            [string]$isMSFTIP = Test-MicrosoftIP -IP $IPAddress -type $geoip.type
-
+            [string]$isMSFTIP = Test-MicrosoftIP -IPToTest $IPAddress -type $geoip.type
+            if ($isMSFTIP){
+                $MSFTIP =  $isMSFTIP
+            }
             # Push return into a response object
             $hash = @{
                 IP               = $geoip.ip
                 CountryName      = $geoip.country_name
-                Continent        = $geoip.continent_code
                 ContinentName    = $geoip.continent_name
+                RegionName       = $geoip.region_name
+                RegionCode       = $geoip.region_code
                 City             = $geoip.City
-                KnownMicrosoftIP = $isMSFTIP
+                KnownMicrosoftIP = $MSFTIP
             }
             $result = New-Object PSObject -Property $hash
         }

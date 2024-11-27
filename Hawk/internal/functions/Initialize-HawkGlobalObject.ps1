@@ -222,7 +222,7 @@
         $Output =$notification.Popup("Hawk has been updated to support MGGraph due to MSONLINE deprecation. Please click OK to continue", 0, "Hawk Update", 0x00000040)
         Write-Information "Testing Graph Connection"
         Test-GraphConnection
-        
+
         # If the global variable Hawk doesn't exist or we have -force then set the variable up
         Write-Information "Setting Up initial Hawk environment variable"
 

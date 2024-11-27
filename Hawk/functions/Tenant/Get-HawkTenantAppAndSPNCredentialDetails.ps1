@@ -26,9 +26,9 @@ BEGIN{
     Test-AzureADConnection
 
     Out-LogFile "Collecting Azure AD Service Principals"
-    $spns = get-azureadserviceprincipal -all $true | Sort-Object -Property DisplayName
+    $spns = Get-MgServicePrincipal -all | Sort-Object -Property DisplayName
     Out-LogFile "Collecting Azure AD Registered Applications"
-    $apps = Get-AzureADApplication -all $true | Sort-Object -Property DisplayName
+    $apps = Get-MgApplication -all $true | Sort-Object -Property DisplayName
 }
 
 PROCESS{

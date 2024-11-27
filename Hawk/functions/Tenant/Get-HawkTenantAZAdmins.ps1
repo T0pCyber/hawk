@@ -22,11 +22,10 @@ BEGIN{
     Out-LogFile "Gathering Azure AD Administrators"
 
     Test-AzureADConnection
-    Send-AIEvent -Event "CmdRun"
 }
 PROCESS{
-    $roles = foreach ($role in Get-AzureADDirectoryRole){
-        $admins = (Get-AzureADDirectoryRoleMember -ObjectId $role.objectid).userprincipalname
+    $roles = foreach ($role in Get-MgDirectoryRole){
+        $admins = (Get-MGDirectoryRoleMember -DirectoryRoleId $role.id)
             if ([string]::IsNullOrWhiteSpace($admins)) {
                 [PSCustomObject]@{
                     AdminGroupName = $role.DisplayName
@@ -34,9 +33,17 @@ PROCESS{
                 }
             }
         foreach ($admin in $admins){
-            [PSCustomObject]@{
-                AdminGroupName = $role.DisplayName
-                Members = $admin
+            if($admin.AdditionalProperties.'@odata.type' -eq "#microsoft.graph.user"){
+                [PSCustomObject]@{
+                    AdminGroupName = $role.DisplayName
+                    Members = $admin.AdditionalProperties.userPrincipalName
+                }
+            }
+            else{
+                [PSCustomObject]@{
+                    AdminGroupName = $role.DisplayName
+                    Members = $admin.AdditionalProperties.displayName
+                }
             }
         }
     }
