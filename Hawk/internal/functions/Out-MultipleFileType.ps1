@@ -17,6 +17,8 @@
     csv file format
 .PARAMETER txt
     txt file format
+.PARAMETER json
+    Export data in JSON format. The data will be converted using ConvertTo-Json with a depth of 100 to preserve object structure.
 .PARAMETER Notice
     Notification that data retrieved meets the investigation criteria
 .EXAMPLE
