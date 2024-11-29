@@ -6,9 +6,6 @@ on:
       - "**.psm1"
       - "**.psd1"
   push:
-    branches:
-      - master
-      - Development
     paths:
       - "**.ps1"
       - "**.psm1"
