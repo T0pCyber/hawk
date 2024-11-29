@@ -7,7 +7,6 @@ on:
     branches:
       - master
       - Development
-      - "bugfix/117-fails-to-install-due-to-no-robustcloudcommand"
 jobs:
   validate:
     runs-on: windows-2019
