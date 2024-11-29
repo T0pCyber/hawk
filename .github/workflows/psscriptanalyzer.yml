@@ -7,10 +7,8 @@ on:
       - "**.psd1"
   push:
     branches:
-      - main
-      - development
+      - master
       - Development
-      - "feature/144-implement-dual-validation-psscriptanalyzer-with-standardized-settings"
     paths:
       - "**.ps1"
       - "**.psm1"
