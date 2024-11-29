@@ -1,31 +1,37 @@
 ﻿Function Start-HawkTenantInvestigation {
+	<#
+.SYNOPSIS
+    Gathers common data about a tenant.
+.DESCRIPTION
+    Runs all Hawk Basic tenant related cmdlets and gathers data about the tenant's configuration,
+    security settings, and audit logs. This comprehensive investigation helps identify potential
+    security issues and configuration changes.
+
+.PARAMETER Confirm
+    Prompts for confirmation before running operations that could modify system state.
+
+.PARAMETER WhatIf
+    Shows what would happen if the command runs. The command is not run.
+
+.EXAMPLE
+    PS C:\> Start-HawkTenantInvestigation
+    Runs a complete tenant investigation, gathering all available data.
+
+.EXAMPLE
+    PS C:\> Start-HawkTenantInvestigation -WhatIf
+    Shows what data gathering operations would be performed without executing them.
+
+.EXAMPLE
+    PS C:\> Start-HawkTenantInvestigation -Confirm
+    Prompts for confirmation before running each data gathering operation.
+
+.OUTPUTS
+    Various CSV, JSON, and XML files containing investigation results.
+    See help from individual cmdlets for specific output details.
+    All outputs are placed in the $Hawk.FilePath directory.
+#>
 	[CmdletBinding(SupportsShouldProcess)]
 	param()
-    
-	<#
-    .SYNOPSIS
-        Gathers common data about a tenant.
-    .DESCRIPTION
-        Runs all Hawk Basic tenant related cmdlets and gathers the data.
-
-        Cmdlet                                  Information Gathered
-        -------------------------               -------------------------
-        Get-HawkTenantConfigurationn           Basic Tenant information
-        Get-HawkTenantEDiscoveryConfiguration  Looks for changes to ediscovery configuration
-        Search-HawkTenantEXOAuditLog          Searches the EXO audit log for activity
-        Get-HawkTenantRBACChanges             Looks for changes to Roles Based Access Control
-    .OUTPUTS
-        See help from individual cmdlets for output list.
-        All outputs are placed in the $Hawk.FilePath directory
-    .EXAMPLE
-        Start-HawkTenantInvestigation
-
-        Runs all of the tenant investigation cmdlets.
-    .EXAMPLE
-        Start-HawkTenantInvestigation -WhatIf
-
-        Shows what actions would be performed without actually executing them.
-    #>
 
 	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
 		Initialize-HawkGlobalObject

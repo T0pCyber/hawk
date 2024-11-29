@@ -3,9 +3,9 @@
     .SYNOPSIS
         Gets Unified Audit Logs (UAL) data for eDiscovery
     .DESCRIPTION
-        Searches the Unified Audit Log (UAL) for eDiscovery events and activities. 
-        This includes searches, exports, and management activities related to 
-        eDiscovery cases. The function checks for any eDiscovery activities within 
+        Searches the Unified Audit Log (UAL) for eDiscovery events and activities.
+        This includes searches, exports, and management activities related to
+        eDiscovery cases. The function checks for any eDiscovery activities within
         the timeframe specified in the Hawk global configuration object.
         
         The results can help identify:
