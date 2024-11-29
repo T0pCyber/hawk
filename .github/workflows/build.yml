@@ -2,7 +2,6 @@ on:
   pull_request:
     branches:
       - master
-      - Development
 jobs:
   build:
     runs-on: windows-2019
@@ -12,9 +11,9 @@ jobs:
       - name: Install Prerequisites
         run: .\build\vsts-prerequisites.ps1
         shell: powershell
-      #   - name: Validate#
-      #     run: .\build\vsts-validate.ps1
-      #     shell: powershell
+      - name: Validate
+        run: .\build\vsts-validate.ps1
+        shell: powershell
       - name: Build
         run: .\build\vsts-build.ps1 -ApiKey $env:APIKEY
         shell: powershell
