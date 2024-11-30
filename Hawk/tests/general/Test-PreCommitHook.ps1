@@ -5,7 +5,7 @@
 # 3. Observe the PSScriptAnalyzer warnings/errors
 
 #region Good Code Examples - These will pass PSScriptAnalyzer
-# tests
+# testss
 function Test-GoodFunction {
     [CmdletBinding()]
     param (
@@ -13,7 +13,7 @@ function Test-GoodFunction {
             HelpMessage = "Enter a string parameter")]
         [string]$Parameter
     )
-    
+
     Write-Output $Parameter
 }
 
@@ -25,7 +25,7 @@ function Test-ValidatedFunction {
         [ValidateNotNullOrEmpty()]
         [string]$Path
     )
-    
+
     $items = Get-ChildItem -Path $Path
     Write-Output $items
 }
@@ -37,13 +37,13 @@ function Test-AdvancedFunction {
         [ValidateRange(0, [int]::MaxValue)]
         [int]$SizeInBytes
     )
-    
+
     $result = [PSCustomObject]@{
         SizeInBytes = $SizeInBytes
         SizeInKB    = [math]::Round($SizeInBytes / 1KB, 2)
         SizeInMB    = [math]::Round($SizeInBytes / 1MB, 2)
     }
-    
+
     Write-Output $result
 }
 
@@ -56,12 +56,12 @@ function Test-AdvancedFunction {
 # Bad function - Multiple issues
 function test-badfunction {    # Wrong capitalization
     param([string]$param1)    # Missing CmdletBinding
-    
+
     $Global:badVariable = $param1    # Using global variable
-    
+
     write-output $badVariable        # Incorrect capitalization
-    
-} # Trailing whitespace after this line    
+
+} # Trailing whitespace after this line
 
 # More issues
 $unusedVariable = "test"    # Variable declared but never used
@@ -72,7 +72,7 @@ function Test-BadValidation {
         [string]
         $Parameter    # Missing mandatory and help message
     )
-    
+
     Write-host $Parameter    # Write-Host instead of Write-Output
 }
 
