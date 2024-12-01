@@ -1,5 +1,5 @@
-Function Search-HawkTenantEXOAuditLog {
-<#
+﻿Function Search-HawkTenantEXOAuditLog {
+    <#
 .SYNOPSIS
     Searches the admin audit logs for possible bad actor activities
 .DESCRIPTION

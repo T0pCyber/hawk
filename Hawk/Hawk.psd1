@@ -52,13 +52,12 @@
 	'Get-HawkTenantInboxRules',
 	'Get-HawkTenantConsentGrants',
 	'Get-HawkTenantRBACChanges',
-	'Get-HawkTenantAzureAuditLog',
+	'Get-HawkTenantAzureAppAuditLog',
 	'Get-HawkUserAuthHistory',
 	'Get-HawkUserConfiguration',
 	'Get-HawkUserEmailForwarding',
 	'Get-HawkUserInboxRule',
 	'Get-HawkUserMailboxAuditing',
-	'Initialize-HawkGlobalObject',
 	'Search-HawkTenantActivityByIP',
 	'Search-HawkTenantEXOAuditLog',
 	'Show-HawkHelp',
@@ -80,7 +79,7 @@
 	'Get-HawkTenantAppAndSPNCredentialDetails',
 	'Get-HawkTenantAzureADUsers',
 	'Get-HawkTenantDomainActivity',
-	'Get-HawkTenantEDiscoveryLogs'
+	'Get-HawkTenantEDiscoveryLog'
 
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''

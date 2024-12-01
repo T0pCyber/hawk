@@ -7,6 +7,8 @@ on:
     branches:
       - master
       - Development
+      - bugfix/157-bug-multiple-failed-tests-after-fixing-workflow
+
 jobs:
   validate:
     runs-on: windows-2019
@@ -16,6 +18,6 @@ jobs:
       - name: Install Prerequisites
         run: .\build\vsts-prerequisites.ps1
         shell: powershell
-    #   - name: Validate
-    #     run: .\build\vsts-validate.ps1
-    #     shell: powershell
+      - name: Validate
+        run: .\build\vsts-validate.ps1
+        shell: powershell
