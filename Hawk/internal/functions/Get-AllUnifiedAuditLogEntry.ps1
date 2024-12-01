@@ -36,16 +36,66 @@
 
     # build our search command to execute
     $cmd = $UnifiedSearch + " -StartDate `'" + (get-date ($StartDate) -UFormat %m/%d/%Y) + "`' -EndDate `'" + (get-date ($endDate) -UFormat %m/%d/%Y) + "`' -SessionCommand ReturnLargeSet -resultsize 5000 -sessionid " + (Get-Date -UFormat %H%M%S)
-    Out-LogFile ("Running Unified Audit Log Search")
+    Out-LogFile ("Running Unified Audit Log Search (" + (get-date ($StartDate) -UFormat %m/%d/%Y) + " to " + (get-date ($endDate) -UFormat %m/%d/%Y) + ")")
     Out-Logfile $cmd
 
-    # Run the initial command
+    
     $Output = $null
     # $Output = New-Object System.Collections.ArrayList
 
-    # Setup our run variable
-    $Run = $true
+    try {
+        # Run the initial command
+        $Output += Invoke-UnifiedAuditLogSearch -cmd $cmd
+    }
+    catch [System.Management.Automation.PSInvalidOperationException] {
+        Out-LogFile ("[ERROR] $_")
+        Out-LogFile ("Let's try to get the data ​​for each day. It may take a while")
+        $Daily = $true
+        $Output = $null
+    }
 
+    # IF the InvokeY-UnifiedAuditLogSearch-UnifiedAuditLogSearch result is > 50000, split daily
+    if ($Daily) {
+
+        # Check if the dates are 1 day or less different
+        $DifferenceDate = ($EndDate - $StartDate).Days
+
+        if ($DifferenceDate -le 1) {
+
+            Out-LogFile ("Running Unified Audit Log Search (" + (get-date ($StartDate) -UFormat %m/%d/%Y) + " to " + (get-date ($endDate) -UFormat %m/%d/%Y) + ")")
+            Out-Logfile $cmd
+            Out-Logfile("[ERROR] The distance between dates is less than 1 day and the number of results is more than 50000. Consider retrieving values manually.")
+        }
+        else {
+            # Loop through every dates
+            $Count = 1
+            for ([datetime]$Date = $StartDate; $Date -lt $EndDate; $Date = $Date.AddDays(1)) {
+                [datetime]$NextDate = $Date.AddDays(1)
+                $cmd = $UnifiedSearch + " -StartDate `'$Date`' -EndDate `'$NextDate`' -SessionCommand ReturnLargeSet -resultsize 5000 -sessionid " + (Get-Date -UFormat %H%M%S) + $Count
+                Out-LogFile ("Running Unified Audit Log Search (" + (get-date ($Date) -UFormat %m/%d/%Y) + " to " + (get-date ($NextDate) -UFormat %m/%d/%Y) + ")")
+                Out-Logfile $cmd
+                $Output += Invoke-UnifiedAuditLogSearch -cmd $cmd
+                $count += 1
+            }
+        }
+    }
+
+    # Convert our list to an array and return it
+    [array]$Output = $Output
+    return $Output
+}
+
+Function Invoke-UnifiedAuditLogSearch {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [string] $cmd
+    )
+
+    # Run the initial command
+    $Output = $null
+
+    $Run = $true
     # Since we have more than 1k results we need to keep returning results until we have them all
     while ($Run) {
         $Output += (Invoke-Expression $cmd)
@@ -65,6 +115,10 @@
                 Out-LogFile ("[WARNING] - Returned Result count was 0")
                 $Run = $false
             }
+            # Verification if its > 50000 total result, if its yes, throw an exception
+            elseif (50000 -lt $Output[-1].ResultCount){
+                throw [System.Management.Automation.PSInvalidOperationException]::new("ResultCount(Total: " + $Output[-1].ResultCount + ") is either greater than or equal to 50000.")
+            }
             # if our resultindex = our resultcount then we have everything and should stop
             elseif ($Output[-1].Resultindex -ge $Output[-1].ResultCount) {
                 Out-LogFile ("Retrieved all results.")
@@ -75,8 +129,5 @@
             Out-LogFile ("Retrieved:" + $Output[-1].ResultIndex.tostring().PadRight(5, " ") + " Total: " + $Output[-1].ResultCount)
         }
     }
-
-    # Convert our list to an array and return it
-    [array]$Output = $Output
     return $Output
 }
