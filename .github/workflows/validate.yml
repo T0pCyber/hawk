@@ -7,8 +7,6 @@ on:
     branches:
       - master
       - Development
-      - bugfix/157-bug-multiple-failed-tests-after-fixing-workflow
-
 jobs:
   validate:
     runs-on: windows-2019
