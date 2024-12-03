@@ -1,4 +1,4 @@
-# This file contains examples of both good and bad PowerShell code for testing PSScriptAnalyzer.
+﻿# This file contains examples of both good and bad PowerShell code for testing PSScriptAnalyzer.
 # To test the pre-commit hook or VS Code integration:
 # 1. Uncomment the "Bad Code Examples" section
 # 2. Try to commit the changes

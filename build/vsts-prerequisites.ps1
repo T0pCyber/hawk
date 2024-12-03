@@ -5,7 +5,11 @@ param (
     $Repository = 'PSGallery'
 )
 
-$modules = @("Pester", "PSFramework", "PSModuleDevelopment")
+$modules = @(
+    @{ Name = "Pester"; Version = "5.6.1" },
+    "PSFramework",
+    "PSModuleDevelopment"
+)
 
 # Automatically add missing dependencies
 # TODO: uncomment this block of code below and fix RobustCloudCommand error.
