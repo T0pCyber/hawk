@@ -45,7 +45,6 @@
         [switch]$Force,
         [switch]$IAgreeToTheEula,
         [switch]$SkipUpdate,
-        [int]$DaysToLookBack,
         [DateTime]$StartDate,
         [DateTime]$EndDate,
         [string]$FilePath
@@ -75,6 +74,7 @@
     }
 
     Function New-LoggingFolder {
+        [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
 
         # Create a folder ID based on date
@@ -98,6 +98,7 @@
     }
 
     Function Set-LoggingPath {
+        [CmdletBinding(SupportsShouldProcess)]
         param ([string]$Path)
 
         # If no value of Path is provided prompt and gather from the user
@@ -191,6 +192,8 @@
     }
 
     Function New-ApplicationInsight {
+        [CmdletBinding(SupportsShouldProcess)]
+        param()
         # Initialize Application Insights client
         $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
         if ($Null -eq $Client) {
@@ -218,8 +221,6 @@
         }
 
         # Test if we have a connection to Microsoft Graph
-        $notification = New-Object -ComObject Wscript.Shell
-        $Output =$notification.Popup("Hawk has been updated to support MGGraph due to MSONLINE deprecation. Please click OK to continue", 0, "Hawk Update", 0x00000040)
         Write-Information "Testing Graph Connection"
         Test-GraphConnection
 
@@ -383,7 +384,6 @@
         Out-LogFile "Script Variable Configured"
         Out-LogFile ("*** Version " + (Get-Module Hawk).version + " ***")
         Out-LogFile $Hawk
-
         #### End of IF
     }
 
