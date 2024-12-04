@@ -1,18 +1,27 @@
 ﻿Function Get-HawkTenantConsentGrant {
-    <#
-    .SYNOPSIS
-        Gathers application grants
-    .DESCRIPTION
-        Uses Microsoft Graph to gather information about application and delegate grants.
-        Attempts to detect high risk grants for review.
-    .OUTPUTS
-        File: Consent_Grants.csv
-        Path: \Tenant
-        Description: Output of all consent grants
-    .EXAMPLE
-        Get-HawkTenantConsentGrant
-        Gathers Grants
-    #>
+<#
+.SYNOPSIS
+    Gathers application grants using Microsoft Graph
+
+.DESCRIPTION
+    Uses Microsoft Graph to gather information about application and delegate grants.
+    Attempts to detect high risk grants for review. This function is used to identify
+    potentially risky application permissions and consent grants in your tenant.
+
+.EXAMPLE
+    Get-HawkTenantConsentGrant
+    Gathers and analyzes all OAuth grants in the tenant.
+
+.OUTPUTS
+    File: Consent_Grants.csv
+    Path: \Tenant
+    Description: Output of all consent grants with details about permissions and access
+
+.NOTES
+    This function requires the following Microsoft Graph permissions:
+    - Application.Read.All
+    - Directory.Read.All
+#>
         [CmdletBinding()]
         param()
 

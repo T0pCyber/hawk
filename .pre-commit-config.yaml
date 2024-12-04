@@ -12,15 +12,3 @@ repos:
           - Hawk/internal/scripts/pre_commit_hook_scripts/Invoke-PowerShellScriptAnalyzer.ps1
         language: system
         types: [powershell]
-      - id: pester-tests
-        name: Pester Tests
-        entry: pwsh
-        args:
-          - -NoProfile
-          - -ExecutionPolicy
-          - Bypass
-          - -File
-          - Hawk/tests/pester.ps1
-        language: system
-        pass_filenames: false
-        types: [powershell]

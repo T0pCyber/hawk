@@ -1,4 +1,52 @@
 ﻿Function Get-AzureADPSPermission {
+<#
+.SYNOPSIS
+    Lists delegated permissions (OAuth2PermissionGrants) and application permissions (AppRoleAssignments).
+
+.DESCRIPTION
+    Lists delegated permissions (OAuth2PermissionGrants) and application permissions (AppRoleAssignments)
+    using Microsoft Graph API. This function retrieves and formats permission information for analysis
+    of application and delegated permissions in your tenant.
+
+.PARAMETER DelegatedPermissions
+    If set, will return delegated permissions. If neither this switch nor the ApplicationPermissions
+    switch is set, both application and delegated permissions will be returned.
+
+.PARAMETER ApplicationPermissions
+    If set, will return application permissions. If neither this switch nor the DelegatedPermissions
+    switch is set, both application and delegated permissions will be returned.
+
+.PARAMETER UserProperties
+    The list of properties of user objects to include in the output. Defaults to DisplayName only.
+
+.PARAMETER ServicePrincipalProperties
+    The list of properties of service principals (i.e. apps) to include in the output.
+    Defaults to DisplayName only.
+
+.PARAMETER ShowProgress
+    Whether or not to display a progress bar when retrieving application permissions (which could take some time).
+
+.PARAMETER PrecacheSize
+    The number of users to pre-load into a cache. For tenants with over a thousand users,
+    increasing this may improve performance of the script.
+
+.EXAMPLE
+    PS C:\> Get-AzureADPSPermission | Export-Csv -Path "permissions.csv" -NoTypeInformation
+    Generates a CSV report of all permissions granted to all apps.
+
+.EXAMPLE
+    PS C:\> Get-AzureADPSPermission -ApplicationPermissions -ShowProgress | Where-Object { $_.Permission -eq "Directory.Read.All" }
+    Get all apps which have application permissions for Directory.Read.All.
+
+.EXAMPLE
+    PS C:\> Get-AzureADPSPermission -UserProperties @("DisplayName", "UserPrincipalName", "Mail") -ServicePrincipalProperties @("DisplayName", "AppId")
+    Gets all permissions granted to all apps and includes additional properties for users and service principals.
+
+.NOTES
+    This function requires Microsoft.Graph PowerShell module and appropriate permissions:
+    - Application.Read.All
+    - Directory.Read.All
+#>
     [CmdletBinding()]
     param(
         [switch] $DelegatedPermissions,
@@ -6,7 +54,7 @@
         [string[]] $UserProperties = @("DisplayName"),
         [string[]] $ServicePrincipalProperties = @("DisplayName"),
         [switch] $ShowProgress,
-        [int] $PrecacheSize = 999
+        [System.Int32] $PrecacheSize = 999
     )
 
     # Verify Graph connection
