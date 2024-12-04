@@ -1,5 +1,5 @@
 ﻿Function Initialize-HawkGlobalObject {
-<#
+    <#
 .SYNOPSIS
     Create global variable $Hawk for use by all Hawk cmdlets.
 .DESCRIPTION
@@ -39,7 +39,7 @@
 
     This Command will force the creation of a new $Hawk variable even if one already exists.
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param
     (
         [switch]$Force,
@@ -78,7 +78,7 @@
         param([string]$RootPath)
 
         # Create a folder ID based on date
-        [string]$TenantName = (Get-MGDomain | Where-Object {$_.isDefault}).ID
+        [string]$TenantName = (Get-MGDomain | Where-Object { $_.isDefault }).ID
         [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date -UFormat %Y%m%d_%H%M).tostring()
 
         # Add that ID to the given path
@@ -333,7 +333,7 @@
                     Write-Information "Setting EndDate to today."
                     [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
                 }
-                elseif ($EndDate -gt (get-Date).AddDays(2)){
+                elseif ($EndDate -gt (get-Date).AddDays(2)) {
                     Write-Information "EndDate to Far in the furture."
                     Write-Information "Setting EndDate to Today."
                     [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
@@ -360,23 +360,23 @@
             [bool]$AdvancedAzureLicense = $false
         }
 
-		# Configuration Example, currently not used
-		#TODO: Implement Configuration system across entire project
-		Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value $Days -PassThru | Register-PSFConfig
-		if ($OutputPath) {
-			Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
-		}
+        # Configuration Example, currently not used
+        #TODO: Implement Configuration system across entire project
+        Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value $Days -PassThru | Register-PSFConfig
+        if ($OutputPath) {
+            Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
+        }
 
-		#TODO: Discard below once migration to configuration is completed
+        #TODO: Discard below once migration to configuration is completed
         $Output = [PSCustomObject]@{
-			FilePath = $OutputPath
-			DaysToLookBack = $Days
-			StartDate = $StartDate
-			EndDate = $EndDate
-			AdvancedAzureLicense = $AdvancedAzureLicense
-			WhenCreated = (Get-Date -Format g)
-			EULA = $Eula
-		}
+            FilePath             = $OutputPath
+            DaysToLookBack       = $Days
+            StartDate            = $StartDate
+            EndDate              = $EndDate
+            AdvancedAzureLicense = $AdvancedAzureLicense
+            WhenCreated          = (Get-Date -Format g)
+            EULA                 = $Eula
+        }
 
         # Create the script hawk variable
         Write-Information "Setting up Script Hawk environment variable`n"

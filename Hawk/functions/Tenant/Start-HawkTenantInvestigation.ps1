@@ -82,8 +82,8 @@
 	}
 
 	if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {
-		Out-LogFile "Running Get-HawkTenantConsentGrants" -action
-		Get-HawkTenantConsentGrants
+		Out-LogFile "Running Get-HawkTenantConsentGrant" -action
+		Get-HawkTenantConsentGrant
 	}
 
 	if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Azure admin list")) {
