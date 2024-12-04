@@ -73,7 +73,7 @@
 	'Get-HawkUserAutoReply',
 	'Get-HawkUserMessageTrace',
 	'Get-HawkUserMobileDevice',
-	'Get-HawkTenantAZAdmins',
+	'Get-HawkTenantAZAdmin',
 	'Get-HawkTenantEXOAdmins',
 	'Get-HawkTenantMailItemsAccessed',
 	'Get-HawkTenantAppAndSPNCredentialDetails',

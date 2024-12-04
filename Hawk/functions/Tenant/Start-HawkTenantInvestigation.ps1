@@ -87,8 +87,8 @@
 	}
 
 	if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Azure admin list")) {
-		Out-LogFile "Running Get-HawkTenantAZAdmins" -action
-		Get-HawkTenantAZAdmins
+		Out-LogFile "Running Get-HawkTenantAZAdmin" -action
+		Get-HawkTenantAZAdmin
 	}
 
 	if ($PSCmdlet.ShouldProcess("App and SPN Credentials", "Get credential details")) {
