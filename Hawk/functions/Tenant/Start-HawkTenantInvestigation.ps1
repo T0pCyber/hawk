@@ -97,7 +97,7 @@
 	}
 
 	if ($PSCmdlet.ShouldProcess("Azure AD Users", "Get Azure AD user list")) {
-		Out-LogFile "Running Get-HawkTenantAzureADUsers" -action
-		Get-HawkTenantAzureADUsers
+		Out-LogFile "Running Get-HawkTenantEntraIDUser" -action
+		Get-HawkTenantEntraIDUser
 	}
 }

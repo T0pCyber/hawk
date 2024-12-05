@@ -77,7 +77,7 @@
 	'Get-HawkTenantEXOAdmins',
 	'Get-HawkTenantMailItemsAccessed',
 	'Get-HawkTenantAppAndSPNCredentialDetails',
-	'Get-HawkTenantAzureADUsers',
+	'Get-HawkTenantEntraIDUser',
 	'Get-HawkTenantDomainActivity',
 	'Get-HawkTenantEDiscoveryLog'
 
