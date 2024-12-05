@@ -1,19 +1,18 @@
-﻿<#
+<#
 .SYNOPSIS
-    Convert output from search-adminauditlog to be more human readable
+    Convert output from Search-UnifiedAuditLog to be more human-readable.
 .DESCRIPTION
-    Convert output from search-adminauditlog to be more human readable
+    Parse and convert JSON-based AuditData field from Search-UnifiedAuditLog results.
 .PARAMETER SearchResults
-    Results from query
+    Results from the Search-UnifiedAuditLog query.
 .EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
+    PS C:\> Get-SimpleAdminAuditLog -SearchResults $results
 .INPUTS
-    Inputs (if any)
+    Objects from Search-UnifiedAuditLog.
 .OUTPUTS
-    Output (if any)
+    Human-readable audit log entries.
 .NOTES
-    General notes
+    Updated to handle JSON data from the AuditData field.
 #>
 Function Get-SimpleAdminAuditLog {
     Param (
@@ -26,117 +25,65 @@ Function Get-SimpleAdminAuditLog {
         $SearchResults
     )
 
-    # Setup to process incoming results
     Begin {
-
-        # Make sure the array is null
-        [array]$ResultSet = $null
-
+        [array]$ResultSet = @()
     }
 
-    # Process thru what ever is comming into the script
     Process {
-
-        # Deal with each object in the input
-        $searchresults | ForEach-Object {
-
-            # Reset the result object
+        $SearchResults | ForEach-Object {
             $Result = New-Object PSObject
 
-            # Get the alias of the User that ran the command
-            [string]$user = $_.caller
+            # Parse the AuditData field if it exists
+            if ($_.AuditData) {
+                try {
+                    $parsedAuditData = $_.AuditData | ConvertFrom-Json -ErrorAction Stop
 
-            # If it is null then replace with *** for admin call
-            if ([string]::IsNullOrEmpty($user)) { $user = "***" }
-
-            # if we have 'on behalf of' then we need to do some more processing to get the right value
-            elseif ($_.caller -like "*on behalf of*") {
-                $split = $_.caller.split("/")
-                $Start = (($Split[3].split(" "))[0]).TrimEnd('"')
-                $End = $Split[-1].trimend('"')
-
-                [string]$User = $Start + " on behalf of " + $end
-            }
-            # If there is a / in the username lests simply it
-            elseif ($_.caller -contains "/") {
-                [string]$user = ($_.caller.split("/"))[-1]
-            }
-            # If none of the above or true just pass it thru
-            else {
-                [string]$user = $_.caller
-            }
-
-            # Build the command that was run
-            $switches = $_.cmdletparameters
-            [string]$FullCommand = $_.cmdletname
-
-            # Get all of the switchs and add them in "human" form to the output
-            foreach ($parameter in $switches) {
-
-                # Format our values depending on what they are so that they are as close
-                # a match as possible for what would have been entered
-                switch -regex ($parameter.value) {
-
-                    # If we have a multi value array put in then we need to break it out and add quotes as needed
-                    '[;]'	{
-
-                        # Reset the formatted value string
-                        $FormattedValue = $null
-
-                        # Split it into an array
-                        $valuearray = $switch.current.split(";")
-
-                        # For each entry in the array add quotes if needed and add it to the formatted value string
-                        $valuearray | ForEach-Object {
-                            if ($_ -match "[ \t]") { $FormattedValue = $FormattedValue + "`"" + $_ + "`";" }
-                            else { $FormattedValue = $FormattedValue + $_ + ";" }
-                        }
-
-                        # Clean up the trailing ;
-                        $FormattedValue = $FormattedValue.trimend(";")
-
-                        # Add our switch + cleaned up value to the command string
-                        $FullCommand = $FullCommand + " -" + $parameter.name + " " + $FormattedValue
+                    # Extract fields from parsed AuditData
+                    $CmdletName = $parsedAuditData.Operation
+                    $Parameters = if ($parsedAuditData.Parameters) {
+                        $parsedAuditData.Parameters | ForEach-Object {
+                            if ($_ -is [PSCustomObject]) {
+                                "$($_.Name): $($_.Value)"
+                            } else {
+                                $_
+                            }
+                        } -join "; "
+                    } else {
+                        "None"
                     }
+                    $UserId = $parsedAuditData.UserId
+                    $ObjectId = $parsedAuditData.ObjectId
+                    $CreationDate = $parsedAuditData.CreationTime
 
-                    # If we have a value with spaces add quotes
-                    '[ \t]' { $FullCommand = $FullCommand + " -" + $parameter.name + " `"" + $switch.current + "`"" }
-
-                    # If we have a true or false format them with :$ in front ( -allow:$true )
-                    '^True$|^False$'	{ $FullCommand = $FullCommand + " -" + $parameter.name + ":`$" + $switch.current }
-
-                    # Otherwise just put the switch and the value
-                    default { $FullCommand = $FullCommand + " -" + $parameter.name + " " + $switch.current }
-
+                } catch {
+                    Write-Warning "Failed to parse AuditData for record: $($_.AuditData)"
+                    $CmdletName = "ParseError"
+                    $Parameters = "ParseError"
+                    $UserId = "Unknown"
+                    $ObjectId = "Unknown"
+                    $CreationDate = "Unknown"
                 }
+            } else {
+                # Default values if AuditData is missing
+                $CmdletName = "MissingAuditData"
+                $Parameters = "None"
+                $UserId = "Unknown"
+                $ObjectId = "Unknown"
+                $CreationDate = "Unknown"
             }
 
-            # Format our modified object
-            if ([string]::IsNullOrEmpty($_.objectModified)) { $ObjModified = "" }
-            else {
-                $ObjModified = ($_.objectmodified.split("/"))[-1]
-                $ObjModified = ($ObjModified.split("\"))[-1]
-            }
+            # Build the result object
+            $Result | Add-Member -MemberType NoteProperty -Value $CmdletName -Name Cmdlet
+            $Result | Add-Member -MemberType NoteProperty -Value $Parameters -Name Parameters
+            $Result | Add-Member -MemberType NoteProperty -Value $UserId -Name UserId
+            $Result | Add-Member -MemberType NoteProperty -Value $ObjectId -Name ObjectId
+            $Result | Add-Member -MemberType NoteProperty -Value $CreationDate -Name 'CreationDate(UTC)'
 
-            # Get just the name of the cmdlet that was run
-            [string]$cmdlet = $_.CmdletName
-
-            # Build the result object to return our values
-            $Result | Add-Member -MemberType NoteProperty -Value $user -Name Caller
-            $Result | Add-Member -MemberType NoteProperty -Value $cmdlet -Name Cmdlet
-            $Result | Add-Member -MemberType NoteProperty -Value $FullCommand -Name FullCommand
-            $Result | Add-Member -MemberType NoteProperty -Value ($_.rundate).ToUniversalTime() -Name 'RunDate(UTC)'
-            $Result | Add-Member -MemberType NoteProperty -Value $ObjModified -Name ObjectModified
-
-            # Add the object to the array to be returned
-            $ResultSet = $ResultSet + $Result
-
+            $ResultSet += $Result
         }
     }
 
-    # Final steps
     End {
-        # Return the array set
         Return $ResultSet
     }
 }
