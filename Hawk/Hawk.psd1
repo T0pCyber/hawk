@@ -31,7 +31,6 @@
 		@{ModuleName = 'PSFramework'; ModuleVersion = '1.12.346' },
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6' },
 		@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '3.0.0' },
-		@{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.182' },
 		@{ModuleName = 'Microsoft.Graph.Authentication'; ModuleVersion = '2.25.0' },
 		@{ModuleName = 'Microsoft.Graph.Identity.DirectoryManagement'; ModuleVersion = '2.25.0' }
 	)
