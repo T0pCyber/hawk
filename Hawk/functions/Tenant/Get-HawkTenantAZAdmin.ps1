@@ -26,7 +26,6 @@
             Out-LogFile "Gathering Azure AD Administrators"
 
             Test-GraphConnection
-            Send-AIEvent -Event "CmdRun"
         }
 
         PROCESS {

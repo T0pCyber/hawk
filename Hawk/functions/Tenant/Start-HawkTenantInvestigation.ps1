@@ -96,7 +96,7 @@
 		Get-HawkTenantAppAndSPNCredentialDetail
 	}
 
-	if ($PSCmdlet.ShouldProcess("Azure AD Users", "Get Azure AD user list")) {
+	if ($PSCmdlet.ShouldProcess("Entra ID Users", "Get Entra ID user list")) {
 		Out-LogFile "Running Get-HawkTenantEntraIDUser" -action
 		Get-HawkTenantEntraIDUser
 	}
