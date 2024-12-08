@@ -2,53 +2,79 @@
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        $UALRecord
+        [PSObject]$UALRecord
     )
 
     Begin {
+        Write-Verbose "Starting Get-SimpleUnifiedAuditLog processing"
         $Results = @()
     }
 
     Process {
-        try {
-            # The AuditData is already JSON in the UALRecord object
-            $AuditRecord = $UALRecord.AuditData | ConvertFrom-Json
+        foreach ($record in $UALRecord) {
+            try {
+                Write-Verbose "Processing record with ID: $($record.Identity)"
 
-            # Check if we got valid data
-            if ($AuditRecord) {
-                # Extract the user who ran the command
-                $User = if ([string]::IsNullOrEmpty($AuditRecord.UserId)) {
-                    "***"
-                } else {
-                    $AuditRecord.UserId
+                # The AuditData is a JSON string, so convert it
+                if ($record.AuditData) {
+                    $AuditRecord = $record.AuditData | ConvertFrom-Json
+
+                    # Create result object with data from audit record
+                    $obj = [PSCustomObject]@{
+                        Caller         = if ($AuditRecord.UserId) { $AuditRecord.UserId } else { "***" }
+                        Cmdlet         = $AuditRecord.Operation
+                        FullCommand    = $AuditRecord.Operation
+                        'RunDate(UTC)' = $AuditRecord.CreationTime
+                        ObjectModified = $AuditRecord.ObjectId
+                    }
+
+                    # Add parameters to FullCommand if they exist
+                    if ($AuditRecord.Parameters) {
+                        $paramString = foreach ($param in $AuditRecord.Parameters) {
+                            # Handle different parameter value types appropriately
+                            $value = if ($param.Value -match '\s') {
+                                # If value contains spaces, quote it
+                                "'$($param.Value)'"
+                            } elseif ($param.Value -match '^(True|False)$') {
+                                # If boolean, format with $
+                                "`$$($param.Value.ToLower())"
+                            } else {
+                                $param.Value
+                            }
+                            "-$($param.Name) $value"
+                        }
+                        $obj.FullCommand = "$($obj.Cmdlet) $($paramString -join ' ')"
+                    }
+
+                    $Results += $obj
+                    Write-Verbose "Successfully processed record"
                 }
-
-                # Create result object
-                $obj = [PSCustomObject]@{
-                    Caller         = $User
-                    Cmdlet         = $AuditRecord.Operation
-                    FullCommand    = "$($AuditRecord.Operation) $(($AuditRecord.Parameters | ForEach-Object { "-$($_.Name) '$($_.Value)'" }) -join ' ')"
-                    'RunDate(UTC)' = $AuditRecord.CreationTime
-                    ObjectModified = $AuditRecord.ObjectId
+                else {
+                    Write-Verbose "No AuditData found for record"
+                    $Results += [PSCustomObject]@{
+                        Caller         = "***"
+                        Cmdlet         = "Unknown"
+                        FullCommand    = "No audit data available"
+                        'RunDate(UTC)' = $null
+                        ObjectModified = $null
+                    }
                 }
-
-                $Results += $obj
             }
-        }
-        catch {
-            Write-Verbose "Error processing record: $_"
-            # Add empty record to maintain count
-            $Results += [PSCustomObject]@{
-                Caller         = "***"
-                Cmdlet         = $null
-                FullCommand    = $null
-                'RunDate(UTC)' = $null
-                ObjectModified = $null
+            catch {
+                Write-Verbose "Error processing record: $_"
+                $Results += [PSCustomObject]@{
+                    Caller         = "***"
+                    Cmdlet         = "Error"
+                    FullCommand    = "Error processing audit record: $_"
+                    'RunDate(UTC)' = $null
+                    ObjectModified = $null
+                }
             }
         }
     }
 
     End {
-        $Results
+        Write-Verbose "Completed processing. Returning $($Results.Count) records"
+        return $Results
     }
 }
