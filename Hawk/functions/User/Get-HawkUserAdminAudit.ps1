@@ -62,11 +62,6 @@
             $RawJsonPath = Join-Path -Path $UserFolder -ChildPath "User_Changes_Raw.json"
             $UserChanges | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
 
-            $RawTxtPath = Join-Path -Path $UserFolder -ChildPath "User_Changes_Raw.txt"
-            "User: $User" | Out-File -FilePath $RawTxtPath
-            $UserChanges | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawTxtPath -Append
-            "------------------------------------" | Out-File -FilePath $RawTxtPath -Append
-
             # Parse and format the changes using Get-SimpleUnifiedAuditLog
             $ParsedChanges = $UserChanges | Get-SimpleUnifiedAuditLog
 

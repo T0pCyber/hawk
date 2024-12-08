@@ -12,24 +12,42 @@
     Process {
         try {
             # Convert the AuditData JSON string to an object
-            $AuditData = $Record | Select-Object -ExpandProperty AuditData | ConvertFrom-Json
+            $AuditData = $Record.AuditData | ConvertFrom-Json
 
             if ($AuditData) {
+                # Create base object with common fields
                 $obj = [PSCustomObject]@{
-                    Caller         = $AuditData.UserId
-                    Cmdlet         = $AuditData.Operation
-                    FullCommand    = $AuditData.Operation
+                    # Standard fields from old AdminAuditLog
+                    Caller = $AuditData.UserId
+                    Cmdlet = $AuditData.Operation
+                    FullCommand = $AuditData.Operation # Will be populated with parameters below
                     'RunDate(UTC)' = $AuditData.CreationTime
                     ObjectModified = $AuditData.ObjectId
+
+                    # Additional UAL fields that are valuable for investigations
+                    ResultStatus = $AuditData.ResultStatus
+                    WorkLoad = $AuditData.Workload
+                    ClientIP = $AuditData.ClientIP
+                    AppId = $AuditData.AppId
+                    AppPoolName = $AuditData.AppPoolName
+                    ExternalAccess = $AuditData.ExternalAccess
+                    OrganizationName = $AuditData.OrganizationName
+                    OriginatingServer = $AuditData.OriginatingServer
+                    RequestId = $AuditData.RequestId
+                    SessionId = $AuditData.SessionId
                 }
 
-                # Add parameters to FullCommand
+                # Build FullCommand including parameters
                 if ($AuditData.Parameters) {
                     $paramStrings = foreach ($param in $AuditData.Parameters) {
                         $value = switch -Regex ($param.Value) {
-                            '^\s+|\s+$' { "'$($param.Value)'" } # Has leading/trailing spaces
-                            '\s' { "'$($param.Value)'" }        # Contains spaces
-                            '^True$|^False$' { "`$$($param.Value.ToLower())" } # Boolean
+                            # Has spaces - quote it
+                            '\s' { "'$($param.Value)'" }
+                            # Boolean - add $ prefix
+                            '^True$|^False$' { "`$$($param.Value.ToLower())" }
+                            # Contains semicolons - handle as array
+                            ';' { "'$($param.Value)'" }
+                            # Default - use as is
                             default { $param.Value }
                         }
                         "-$($param.Name) $value"
@@ -42,6 +60,24 @@
         }
         catch {
             Write-Verbose "Error processing record: $_"
+            # Return a blank record on error to maintain object count
+            $Results += [PSCustomObject]@{
+                Caller = "***"
+                Cmdlet = "Error"
+                FullCommand = "Error processing audit record: $_"
+                'RunDate(UTC)' = $null
+                ObjectModified = $null
+                ResultStatus = "Error"
+                WorkLoad = $null
+                ClientIP = $null
+                AppId = $null
+                AppPoolName = $null
+                ExternalAccess = $null
+                OrganizationName = $null
+                OriginatingServer = $null
+                RequestId = $null
+                SessionId = $null
+            }
         }
     }
 
