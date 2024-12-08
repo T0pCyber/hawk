@@ -92,8 +92,8 @@
 	}
 
 	if ($PSCmdlet.ShouldProcess("App and SPN Credentials", "Get credential details")) {
-		Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetails" -action
-		Get-HawkTenantAppAndSPNCredentialDetails
+		Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetail" -action
+		Get-HawkTenantAppAndSPNCredentialDetail
 	}
 
 	if ($PSCmdlet.ShouldProcess("Azure AD Users", "Get Azure AD user list")) {
