@@ -1,4 +1,53 @@
 ﻿function Get-SimpleUnifiedAuditLog {
+    <#
+    .SYNOPSIS
+        Formats unified audit log records into a flat structure for analysis.
+
+    .DESCRIPTION
+        Processes unified audit log records by extracting all properties from both the base record
+        and the nested AuditData JSON. It flattens nested objects like AppAccessContext and Parameters
+        into individual columns, making the data easier to analyze in CSV format.
+
+        The function handles:
+        - Base record properties
+        - Nested AuditData JSON
+        - Parameter arrays
+        - AppAccessContext data
+        - Full command reconstruction
+        - Error cases with appropriate logging
+
+    .PARAMETER Record
+        A PowerShell object representing a unified audit log record. This should be the output
+        from Search-UnifiedAuditLog and should contain both base properties and an AuditData
+        property containing a JSON string of additional audit information.
+
+    .EXAMPLE
+        $auditLogs = Search-UnifiedAuditLog -StartDate $startDate -EndDate $endDate -RecordType ExchangeAdmin
+        $auditLogs | Get-SimpleUnifiedAuditLog
+
+        Processes Exchange admin audit logs, expanding all properties into a flat structure.
+
+    .EXAMPLE
+        $userChanges = Search-UnifiedAuditLog -UserIds user@domain.com -Operations "Add-*"
+        $userChanges | Get-SimpleUnifiedAuditLog | Export-Csv -Path "UserChanges.csv" -NoTypeInformation
+
+        Gets all "Add" operations for a specific user and exports the processed results to CSV.
+
+    .OUTPUTS
+        Outputs a collection of PSCustomObjects with flattened properties from the audit logs.
+        Each object contains:
+        - Base record properties (RecordType, CreationDate, etc.)
+        - Expanded AuditData properties
+        - Individual parameter columns prefixed with "Param_"
+        - Consolidated parameter view
+        - Formatted full command string
+        - AppAccessContext data in separate columns
+
+    .NOTES
+        The function focuses on complete data visibility by exposing all available properties
+        from the audit logs. This helps administrators and security professionals analyze
+        the full context of audit events for incident response and compliance purposes.
+    #>
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
