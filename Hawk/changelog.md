@@ -54,3 +54,24 @@
 - Added logging filepath checking the Start-HawkUserInvestigation.ps1
 - Updated Get-HawkTenantAZAdmins.ps1. Removed AzureAD module. Added MS Graph cmdlets.
 - Updated contact email
+
+## 3.1.2 (2024-12-01)
+
+- Removed Robust Cloud Command from build as it was not being used in the code base anymore
+- Updated PowerShell API key in GitHub to fix build.yml issue where the Hawk would not publish to gallery on merge to main
+
+## 3.2.3 (2024-12-09)
+
+- **Migration to Microsoft Graph**: Replaced all AzureAD functionality with Microsoft Graph commands, including updates to functions like `Get-HawkTenantAppAndSPNCredentialDetails` (now using `Get-MgServicePrincipal` and `Get-MgApplication`).
+
+- **Directory Role Management**: Updated `Get-HawkTenantAZAdmins` to use Microsoft Graph (`Get-MgRoleDefinition` and `Get-MgRoleAssignment`), renamed to `Get-HawkTenantEntraIDAdmin`, and enhanced output for better role tracking.
+
+- **Consent Grant Updates**: Migrated `Get-HawkTenantConsentGrant` to Graph commands (`Get-MgOauth2PermissionGrant` and `Get-MgServicePrincipalAppRoleAssignment`), ensuring consistent output and backward compatibility.
+
+- **Removed AzureAD Dependencies**: Eliminated AzureAD references in the Hawk.psd1 manifest and removed the deprecated `Test-AzureADConnection.ps1`. Updated manifest to rely solely on Microsoft Graph modules (v2.25.0).
+
+- **Simplified Authentication**: Streamlined Graph API connections by removing unnecessary commands like `Select-MgProfile` and improving `Test-GraphConnection` for default behaviors.
+
+- **Improved Logging and Naming**: Standardized log outputs (e.g., `AzureADUsers` to `EntraIDUsers`) and aligned function outputs with updated naming conventions.
+
+- This release completes the migration to Microsoft Graph, fully deprecating AzureAD and aligning Hawk with modern Microsoft standards.

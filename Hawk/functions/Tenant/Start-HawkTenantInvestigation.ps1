@@ -86,9 +86,9 @@
 		Get-HawkTenantConsentGrant
 	}
 
-	if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Azure admin list")) {
-		Out-LogFile "Running Get-HawkTenantAZAdmin" -action
-		Get-HawkTenantAZAdmin
+	if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Entra ID admin list")) {
+		Out-LogFile "Running Get-HawkTenantEntraIDAdmin" -action
+		Get-HawkTenantEntraIDAdmin
 	}
 
 	if ($PSCmdlet.ShouldProcess("App and SPN Credentials", "Get credential details")) {

@@ -1,15 +1,16 @@
-﻿Function Get-HawkTenantAZAdmin {
+﻿Function Get-HawkTenantEntraIDAdmin {
     <#
     .SYNOPSIS
-        Tenant Azure Active Directory Administrator export using Microsoft Graph.
+        Tenant Microsoft Entra ID Administrator export using Microsoft Graph.
     .DESCRIPTION
-        Tenant Azure Active Directory Administrator export. Reviewing administrator access is key to knowing who can make changes
+        Tenant Microsoft Entra ID Administrator export. Reviewing administrator access is key to knowing who can make changes
         to the tenant and conduct other administrative actions to users and applications.
     .EXAMPLE
-        Get-HawkTenantAZAdmin
-        Gets all Azure AD Admins
+        Get-HawkTenantEntraIDAdmin
+        Gets all Entra ID Admins
     .OUTPUTS
-        AzureADAdministrators.csv
+        EntraIDAdministrators.csv
+        EntraIDAdministrators.json
     .LINK
         https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.directorymanagement/get-mgdirectoryrole
     .NOTES
@@ -23,68 +24,75 @@
             if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
                 Initialize-HawkGlobalObject
             }
-            Out-LogFile "Gathering Azure AD Administrators"
+            Out-LogFile "Gathering Microsoft Entra ID Administrators"
 
+            # Verify Graph API connection
             Test-GraphConnection
+            Send-AIEvent -Event "CmdRun"
         }
 
         PROCESS {
             try {
-                # Get all directory roles
+                # Retrieve all directory roles from Microsoft Graph
                 $directoryRoles = Get-MgDirectoryRole -ErrorAction Stop
                 Out-LogFile "Retrieved $(($directoryRoles | Measure-Object).Count) directory roles"
 
+                # Process each role and its members
                 $roles = foreach ($role in $directoryRoles) {
-                    # Get members for each role
+                    # Get all members assigned to current role
                     $members = Get-MgDirectoryRoleMember -DirectoryRoleId $role.Id -ErrorAction Stop
 
+                    # Handle roles with no members
                     if (-not $members) {
                         [PSCustomObject]@{
                             AdminGroupName = $role.DisplayName
                             Members = "No Members"
                             MemberType = "None"  # Added member type for better analysis
-                            MemberId = $null
+                            ObjectId = $null
                         }
                     }
                     else {
+                        # Process each member of the role
                         foreach ($member in $members) {
-                            # Determine member type and get appropriate properties
+                            # Check if member is a user
                             if ($member.AdditionalProperties.'@odata.type' -eq "#microsoft.graph.user") {
                                 [PSCustomObject]@{
                                     AdminGroupName = $role.DisplayName
                                     Members = $member.AdditionalProperties.userPrincipalName
                                     MemberType = "User"
-                                    MemberId = $member.Id
+                                    ObjectId = $member.Id
                                 }
                             }
                             else {
-                                # Groups or Service Principals
+                                # Handle groups and service principals
                                 [PSCustomObject]@{
                                     AdminGroupName = $role.DisplayName
                                     Members = $member.AdditionalProperties.displayName
                                     MemberType = ($member.AdditionalProperties.'@odata.type' -replace '#microsoft.graph.', '')
-                                    MemberId = $member.Id
+                                    ObjectId = $member.Id
                                 }
                             }
                         }
                     }
                 }
 
+                # Export results if any roles were found
                 if ($roles) {
-                    $roles | Out-MultipleFileType -FilePrefix "AzureADAdministrators" -csv -json
-                    Out-LogFile "Successfully exported Azure AD Administrators data"
+                    $roles | Out-MultipleFileType -FilePrefix "EntraIDAdministrators" -csv -json
+                    Out-LogFile "Successfully exported Microsoft Entra ID Administrators data"
                 }
                 else {
                     Out-LogFile "No administrator roles found or accessible" -notice
                 }
             }
             catch {
-                Out-LogFile "Error retrieving Azure AD Administrators: $($_.Exception.Message)" -notice
+                # Handle and log any errors during execution
+                Out-LogFile "Error retrieving Microsoft Entra ID Administrators: $($_.Exception.Message)" -notice
                 Write-Error -ErrorRecord $_ -ErrorAction Continue
             }
         }
 
         END {
-            Out-LogFile "Completed exporting Azure AD Admins"
+            Out-LogFile "Completed exporting Microsoft Entra ID Admins"
         }
     }

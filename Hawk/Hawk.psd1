@@ -3,7 +3,7 @@
 	RootModule         = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion      = '3.1.2'
+	ModuleVersion      = '3.2.3'
 
 	# ID used to uniquely identify this module
 	GUID               = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
@@ -72,7 +72,7 @@
 	'Get-HawkUserAutoReply',
 	'Get-HawkUserMessageTrace',
 	'Get-HawkUserMobileDevice',
-	'Get-HawkTenantAZAdmin',
+	'Get-HawkTenantEntraIDAdmin',
 	'Get-HawkTenantEXOAdmins',
 	'Get-HawkTenantMailItemsAccessed',
 	'Get-HawkTenantAppAndSPNCredentialDetail',
