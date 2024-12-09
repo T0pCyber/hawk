@@ -1,4 +1,4 @@
-﻿Function Get-SimpleUnifiedAuditLog {
+﻿function Get-SimpleUnifiedAuditLog {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
@@ -15,68 +15,102 @@
             $AuditData = $Record.AuditData | ConvertFrom-Json
 
             if ($AuditData) {
-                # Create base object with common fields
-                $obj = [PSCustomObject]@{
-                    # Standard fields from old AdminAuditLog
-                    Caller = $AuditData.UserId
-                    Cmdlet = $AuditData.Operation
-                    FullCommand = $AuditData.Operation # Will be populated with parameters below
-                    'RunDate(UTC)' = $AuditData.CreationTime
-                    ObjectModified = $AuditData.ObjectId
+                # Create hashtable for all properties
+                $properties = @{
+                    # Base record properties
+                    RecordType = $Record.RecordType
+                    CreationDate = $Record.CreationDate
+                    UserIds = $Record.UserIds
+                    Operations = $Record.Operations
+                    ResultIndex = $Record.ResultIndex
+                    ResultCount = $Record.ResultCount
+                    Identity = $Record.Identity
+                    IsValid = $Record.IsValid
+                    ObjectState = $Record.ObjectState
 
-                    # Additional UAL fields that are valuable for investigations
+                    # AppAccessContext properties
+                    AADSessionId = $AuditData.AppAccessContext.AADSessionId
+                    AppAccessContextIssuedAtTime = $AuditData.AppAccessContext.IssuedAtTime
+                    AppAccessContextUniqueTokenId = $AuditData.AppAccessContext.UniqueTokenId
+
+                    # Common AuditData properties
+                    AuditCreationTime = $AuditData.CreationTime
+                    AuditId = $AuditData.Id
+                    Operation = $AuditData.Operation
+                    OrganizationId = $AuditData.OrganizationId
+                    AuditRecordType = $AuditData.RecordType
                     ResultStatus = $AuditData.ResultStatus
-                    WorkLoad = $AuditData.Workload
+                    UserKey = $AuditData.UserKey
+                    UserType = $AuditData.UserType
+                    Version = $AuditData.Version
+                    Workload = $AuditData.Workload
                     ClientIP = $AuditData.ClientIP
+                    ObjectId = $AuditData.ObjectId
+                    UserId = $AuditData.UserId
                     AppId = $AuditData.AppId
                     AppPoolName = $AuditData.AppPoolName
+                    ClientAppId = $AuditData.ClientAppId
+                    CorrelationID = $AuditData.CorrelationID
                     ExternalAccess = $AuditData.ExternalAccess
                     OrganizationName = $AuditData.OrganizationName
                     OriginatingServer = $AuditData.OriginatingServer
                     RequestId = $AuditData.RequestId
                     SessionId = $AuditData.SessionId
+                    DeviceId = $AuditData.DeviceId
                 }
 
-                # Build FullCommand including parameters
+                # Add each parameter as its own column
+                if ($AuditData.Parameters) {
+                    foreach ($param in $AuditData.Parameters) {
+                        $properties["Param_$($param.Name)"] = $param.Value
+                    }
+
+                    # Also add consolidated parameters view
+                    $properties["Parameters"] = ($AuditData.Parameters | ForEach-Object {
+                        "$($_.Name)=$($_.Value)"
+                    }) -join ' | '
+                }
+
+                # Create full command string
                 if ($AuditData.Parameters) {
                     $paramStrings = foreach ($param in $AuditData.Parameters) {
                         $value = switch -Regex ($param.Value) {
-                            # Has spaces - quote it
                             '\s' { "'$($param.Value)'" }
-                            # Boolean - add $ prefix
                             '^True$|^False$' { "`$$($param.Value.ToLower())" }
-                            # Contains semicolons - handle as array
                             ';' { "'$($param.Value)'" }
-                            # Default - use as is
                             default { $param.Value }
                         }
                         "-$($param.Name) $value"
                     }
-                    $obj.FullCommand = "$($AuditData.Operation) $($paramStrings -join ' ')"
+                    $properties["FullCommand"] = "$($AuditData.Operation) $($paramStrings -join ' ')"
+                }
+                else {
+                    $properties["FullCommand"] = $AuditData.Operation
                 }
 
-                $Results += $obj
+                # Check for any other properties in AuditData and add them
+                foreach ($prop in $AuditData.PSObject.Properties) {
+                    if (-not $properties.ContainsKey($prop.Name) -and $prop.Name -ne 'Parameters' -and $prop.Name -ne 'AppAccessContext') {
+                        $properties[$prop.Name] = $prop.Value
+                    }
+                }
+
+                $Results += [PSCustomObject]$properties
             }
         }
         catch {
             Write-Verbose "Error processing record: $_"
-            # Return a blank record on error to maintain object count
             $Results += [PSCustomObject]@{
-                Caller = "***"
-                Cmdlet = "Error"
-                FullCommand = "Error processing audit record: $_"
-                'RunDate(UTC)' = $null
-                ObjectModified = $null
-                ResultStatus = "Error"
-                WorkLoad = $null
-                ClientIP = $null
-                AppId = $null
-                AppPoolName = $null
-                ExternalAccess = $null
-                OrganizationName = $null
-                OriginatingServer = $null
-                RequestId = $null
-                SessionId = $null
+                RecordType = "Error"
+                CreationDate = Get-Date
+                UserIds = "Error"
+                Operations = "Error processing audit record: $_"
+                ResultIndex = 0
+                ResultCount = 0
+                Identity = "Error"
+                IsValid = $false
+                ObjectState = "Error"
+                ErrorDetails = $_.Exception.Message
             }
         }
     }
