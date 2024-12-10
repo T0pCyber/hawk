@@ -67,8 +67,8 @@
 	}
 
 	if ($PSCmdlet.ShouldProcess("RBAC Changes", "Get RBAC changes")) {
-		Out-LogFile "Running Get-HawkTenantRBACChanges" -action
-		Get-HawkTenantRBACChanges
+		Out-LogFile "Running Get-HawkTenantRBACChange" -action
+		Get-HawkTenantRBACChange
 	}
 
 	if ($PSCmdlet.ShouldProcess("Azure App Audit Log", "Get app audit logs")) {
