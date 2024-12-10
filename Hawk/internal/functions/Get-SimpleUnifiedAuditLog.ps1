@@ -1,170 +1,230 @@
 ﻿function Get-SimpleUnifiedAuditLog {
     <#
     .SYNOPSIS
-        Formats unified audit log records into a flat structure for analysis.
+        Flattens nested Microsoft 365 Unified Audit Log records into a simplified format.
 
     .DESCRIPTION
-        Processes unified audit log records by extracting all properties from both the base record
-        and the nested AuditData JSON. It flattens nested objects like AppAccessContext and Parameters
-        into individual columns, making the data easier to analyze in CSV format.
+        This function processes Microsoft 365 Unified Audit Log records by converting nested JSON data
+        (stored in the AuditData property) into a flat structure suitable for analysis and export.
+        It handles complex nested objects, arrays, and special cases like parameter collections.
 
-        The function handles:
-        - Base record properties
-        - Nested AuditData JSON
-        - Parameter arrays
-        - AppAccessContext data
-        - Full command reconstruction
-        - Error cases with appropriate logging
+        The function:
+        - Preserves base record properties
+        - Flattens nested JSON structures
+        - Provides special handling for Parameters collections
+        - Creates human-readable command reconstructions
+        - Supports type preservation for data analysis
 
     .PARAMETER Record
-        A PowerShell object representing a unified audit log record. This should be the output
+        A PowerShell object representing a unified audit log record. Typically, this is the output
         from Search-UnifiedAuditLog and should contain both base properties and an AuditData
         property containing a JSON string of additional audit information.
 
+    .PARAMETER PreserveTypes
+        When specified, maintains the original data types of values instead of converting them
+        to strings. This is useful when the output will be used for further PowerShell processing
+        rather than export to CSV/JSON.
+
     .EXAMPLE
         $auditLogs = Search-UnifiedAuditLog -StartDate $startDate -EndDate $endDate -RecordType ExchangeAdmin
-        $auditLogs | Get-SimpleUnifiedAuditLog
+        $auditLogs | Get-SimpleUnifiedAuditLog | Export-Csv -Path "AuditLogs.csv" -NoTypeInformation
 
-        Processes Exchange admin audit logs, expanding all properties into a flat structure.
+        Processes Exchange admin audit logs and exports them to CSV with all nested properties flattened.
 
     .EXAMPLE
         $userChanges = Search-UnifiedAuditLog -UserIds user@domain.com -Operations "Add-*"
-        $userChanges | Get-SimpleUnifiedAuditLog | Export-Csv -Path "UserChanges.csv" -NoTypeInformation
+        $userChanges | Get-SimpleUnifiedAuditLog -PreserveTypes |
+            Where-Object { $_.ResultStatus -eq $true } |
+            Select-Object CreationTime, Operation, FullCommand
 
-        Gets all "Add" operations for a specific user and exports the processed results to CSV.
+        Gets all "Add" operations for a specific user, preserves data types, filters for successful operations,
+        and selects specific columns.
 
     .OUTPUTS
-        Outputs a collection of PSCustomObjects with flattened properties from the audit logs.
-        Each object contains:
-        - Base record properties (RecordType, CreationDate, etc.)
-        - Expanded AuditData properties
-        - Individual parameter columns prefixed with "Param_"
-        - Consolidated parameter view
-        - Formatted full command string
-        - AppAccessContext data in separate columns
+        Collection of PSCustomObjects with flattened properties from both the base record and AuditData.
+        Properties include:
+        - All base record properties (RecordType, CreationDate, etc.)
+        - Flattened nested objects with property names using dot notation
+        - Individual parameters as Param_* properties
+        - ParameterString containing all parameters in a readable format
+        - FullCommand showing reconstructed PowerShell command (when applicable)
 
     .NOTES
-        The function focuses on complete data visibility by exposing all available properties
-        from the audit logs. This helps administrators and security professionals analyze
-        the full context of audit events for incident response and compliance purposes.
+        Author: Jonathan Butler
+        Version: 2.0
+        Development Date: December 2024
+
+        The function is designed to handle any RecordType from the Unified Audit Log and will
+        automatically adapt to changes in the audit log schema. Special handling is implemented
+        for common patterns like Parameters collections while maintaining flexibility for
+        other nested structures.
     #>
     [CmdletBinding()]
-    Param(
+    param (
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [PSObject]$Record
+        [PSObject]$Record,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$PreserveTypes
     )
 
-    Begin {
+    begin {
+        # Collection to store processed results
         $Results = @()
+
+        function ConvertTo-FlatObject {
+            <#
+            .SYNOPSIS
+                Recursively flattens nested objects into a single-level hashtable.
+
+            .DESCRIPTION
+                Internal helper function that converts complex nested objects into a flat structure
+                using dot notation for property names. Handles special cases like Parameters arrays
+                and preserves type information when requested.
+            #>
+            param (
+                [Parameter(Mandatory = $true)]
+                [PSObject]$InputObject,
+
+                [Parameter(Mandatory = $false)]
+                [string]$Prefix = "",
+
+                [Parameter(Mandatory = $false)]
+                [switch]$PreserveTypes
+            )
+
+            # Initialize hashtable for flattened properties
+            $flatProperties = @{}
+
+            # Process each property of the input object
+            foreach ($prop in $InputObject.PSObject.Properties) {
+                # Build the property key name, incorporating prefix if provided
+                $key = if ($Prefix) { "${Prefix}_$($prop.Name)" } else { $prop.Name }
+
+                # Special handling for Parameters array - common in UAL records
+                if ($prop.Name -eq 'Parameters' -and $prop.Value -is [Array]) {
+                    # Create human-readable parameter string
+                    $paramStrings = foreach ($param in $prop.Value) {
+                        "$($param.Name)=$($param.Value)"
+                    }
+                    $flatProperties['ParameterString'] = $paramStrings -join ' | '
+
+                    # Create individual parameter properties
+                    foreach ($param in $prop.Value) {
+                        $paramKey = "Param_$($param.Name)"
+                        $flatProperties[$paramKey] = $param.Value
+                    }
+
+                    # Reconstruct full command if Operation property exists
+                    if ($InputObject.Operation) {
+                        $paramStrings = foreach ($param in $prop.Value) {
+                            # Format parameter values based on content
+                            $value = switch -Regex ($param.Value) {
+                                '\s' { "'$($param.Value)'" } # Quote values containing spaces
+                                '^True$|^False$' { "`$$($param.Value.ToLower())" } # Format booleans
+                                ';' { "'$($param.Value)'" } # Quote values containing semicolons
+                                default { $param.Value }
+                            }
+                            "-$($param.Name) $value"
+                        }
+                        $flatProperties['FullCommand'] = "$($InputObject.Operation) $($paramStrings -join ' ')"
+                    }
+                    continue
+                }
+
+                # Handle different value types
+                switch ($prop.Value) {
+                    # Recursively process nested hashtables
+                    { $_ -is [System.Collections.IDictionary] } {
+                        $nestedObject = ConvertTo-FlatObject -InputObject $_ -Prefix $key -PreserveTypes:$PreserveTypes
+                        $flatProperties += $nestedObject
+                    }
+                    # Process arrays (excluding Parameters which was handled above)
+                    { $_ -is [System.Collections.IList] -and $prop.Name -ne 'Parameters' } {
+                        if ($_.Count -gt 0) {
+                            if ($_[0] -is [PSObject]) {
+                                # Handle array of objects
+                                for ($i = 0; $i -lt $_.Count; $i++) {
+                                    $nestedObject = ConvertTo-FlatObject -InputObject $_[$i] -Prefix "${key}_${i}" -PreserveTypes:$PreserveTypes
+                                    $flatProperties += $nestedObject
+                                }
+                            }
+                            else {
+                                # Handle array of simple values
+                                $flatProperties[$key] = $_ -join "|"
+                            }
+                        }
+                        else {
+                            # Handle empty arrays
+                            $flatProperties[$key] = [string]::Empty
+                        }
+                    }
+                    # Recursively process nested objects
+                    { $_ -is [PSObject] } {
+                        $nestedObject = ConvertTo-FlatObject -InputObject $_ -Prefix $key -PreserveTypes:$PreserveTypes
+                        $flatProperties += $nestedObject
+                    }
+                    # Handle simple values
+                    default {
+                        if ($PreserveTypes) {
+                            # Keep original type if PreserveTypes is specified
+                            $flatProperties[$key] = $_
+                        }
+                        else {
+                            # Convert values to appropriate types
+                            $flatProperties[$key] = switch ($_) {
+                                { $_ -is [datetime] } { $_ }
+                                { $_ -is [bool] } { $_ }
+                                { $_ -is [int] } { $_ }
+                                { $_ -is [long] } { $_ }
+                                { $_ -is [decimal] } { $_ }
+                                { $_ -is [double] } { $_ }
+                                default { [string]$_ }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return $flatProperties
+        }
     }
 
-    Process {
+    process {
         try {
-            # Convert the AuditData JSON string to an object
-            $AuditData = $Record.AuditData | ConvertFrom-Json
+            # Extract base properties excluding AuditData
+            $baseProperties = $Record | Select-Object * -ExcludeProperty AuditData
 
-            if ($AuditData) {
-                # Create hashtable for all properties
-                $properties = @{
-                    # Common Schema properties
-                    RecordType = $Record.RecordType
-                    CreationDate = $Record.CreationDate
-                    UserIds = $Record.UserIds
-                    Operations = $Record.Operations
-                    ResultIndex = $Record.ResultIndex
-                    ResultCount = $Record.ResultCount
-                    Identity = $Record.Identity
-                    IsValid = $Record.IsValid
-                    ObjectState = $Record.ObjectState
+            # Process AuditData if present
+            $auditData = $Record.AuditData | ConvertFrom-Json
+            if ($auditData) {
+                # Flatten the audit data
+                $flatAuditData = ConvertTo-FlatObject -InputObject $auditData -PreserveTypes:$PreserveTypes
 
-                    # AppAccessContext properties
-                    AADSessionId = $AuditData.AppAccessContext.AADSessionId
-                    AppAccessContextIssuedAtTime = $AuditData.AppAccessContext.IssuedAtTime
-                    AppAccessContextUniqueTokenId = $AuditData.AppAccessContext.UniqueTokenId
+                # Combine base properties with flattened audit data
+                $combinedProperties = @{}
+                $baseProperties.PSObject.Properties | ForEach-Object { $combinedProperties[$_.Name] = $_.Value }
+                $flatAuditData.GetEnumerator() | ForEach-Object { $combinedProperties[$_.Key] = $_.Value }
 
-                    # Common AuditData properties
-                    AuditCreationTime = $AuditData.CreationTime
-                    AuditId = $AuditData.Id
-                    Operation = $AuditData.Operation
-                    OrganizationId = $AuditData.OrganizationId
-                    AuditRecordType = $AuditData.RecordType
-                    ResultStatus = $AuditData.ResultStatus
-                    UserKey = $AuditData.UserKey
-                    UserType = $AuditData.UserType
-                    Version = $AuditData.Version
-                    Workload = $AuditData.Workload
-                    ClientIP = $AuditData.ClientIP
-                    ObjectId = $AuditData.ObjectId
-                    UserId = $AuditData.UserId
-                    AppId = $AuditData.AppId
-                    AppPoolName = $AuditData.AppPoolName
-                    ClientAppId = $AuditData.ClientAppId
-                    CorrelationID = $AuditData.CorrelationID
-                    ExternalAccess = $AuditData.ExternalAccess
-                    OrganizationName = $AuditData.OrganizationName
-                    OriginatingServer = $AuditData.OriginatingServer
-                    RequestId = $AuditData.RequestId
-                    SessionId = $AuditData.SessionId
-                    DeviceId = $AuditData.DeviceId
-                }
-
-                # Add each parameter as its own column
-                if ($AuditData.Parameters) {
-                    foreach ($param in $AuditData.Parameters) {
-                        $properties["Param_$($param.Name)"] = $param.Value
-                    }
-
-                    # Also add consolidated parameters view
-                    $properties["Parameters"] = ($AuditData.Parameters | ForEach-Object {
-                        "$($_.Name)=$($_.Value)"
-                    }) -join ' | '
-                }
-
-                # Create full command string
-                if ($AuditData.Parameters) {
-                    $paramStrings = foreach ($param in $AuditData.Parameters) {
-                        $value = switch -Regex ($param.Value) {
-                            '\s' { "'$($param.Value)'" }
-                            '^True$|^False$' { "`$$($param.Value.ToLower())" }
-                            ';' { "'$($param.Value)'" }
-                            default { $param.Value }
-                        }
-                        "-$($param.Name) $value"
-                    }
-                    $properties["FullCommand"] = "$($AuditData.Operation) $($paramStrings -join ' ')"
-                }
-                else {
-                    $properties["FullCommand"] = $AuditData.Operation
-                }
-
-                # Check for any other properties in AuditData and add them
-                foreach ($prop in $AuditData.PSObject.Properties) {
-                    if (-not $properties.ContainsKey($prop.Name) -and $prop.Name -ne 'Parameters' -and $prop.Name -ne 'AppAccessContext') {
-                        $properties[$prop.Name] = $prop.Value
-                    }
-                }
-
-                $Results += [PSCustomObject]$properties
+                # Create and store the result
+                $Results += [PSCustomObject]$combinedProperties
             }
         }
         catch {
-            Write-Verbose "Error processing record: $_"
-            $Results += [PSCustomObject]@{
-                RecordType = "Error"
+            # Handle and log any processing errors
+            Write-Warning "Error processing record: $_"
+            $errorProperties = @{
+                RecordType = $Record.RecordType
                 CreationDate = Get-Date
-                UserIds = "Error"
-                Operations = "Error processing audit record: $_"
-                ResultIndex = 0
-                ResultCount = 0
-                Identity = "Error"
-                IsValid = $false
-                ObjectState = "Error"
-                ErrorDetails = $_.Exception.Message
+                Error = $_.Exception.Message
+                Record = $Record
             }
+            $Results += [PSCustomObject]$errorProperties
         }
     }
 
-    End {
+    end {
+        # Return all processed results
         $Results
     }
 }
