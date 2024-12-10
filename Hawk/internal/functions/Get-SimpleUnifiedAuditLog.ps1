@@ -66,7 +66,7 @@
             if ($AuditData) {
                 # Create hashtable for all properties
                 $properties = @{
-                    # Base record properties
+                    # Common Schema properties
                     RecordType = $Record.RecordType
                     CreationDate = $Record.CreationDate
                     UserIds = $Record.UserIds
