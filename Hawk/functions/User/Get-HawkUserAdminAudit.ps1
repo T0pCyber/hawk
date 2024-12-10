@@ -4,9 +4,13 @@
         Searches the Unified Audit logs for any commands that were run against the provided user object.
     .DESCRIPTION
         Searches the Unified Audit logs for any commands that were run against the provided user object.
-        Limited by the provided search period.
+        Uses Get-AllUnifiedAuditLogEntry to ensure complete retrieval of all audit records within the
+        specified search period, handling pagination and large result sets automatically.
+
     .PARAMETER UserPrincipalName
-        UserPrincipalName of the user you're investigating
+        UserPrincipalName of the user you're investigating. Can be a single UPN, comma-separated list,
+        or array of objects containing UPNs.
+
     .OUTPUTS
         File: Simple_User_Changes.csv
         Path: \<user>
@@ -23,10 +27,16 @@
         File: User_Changes_Raw.txt
         Path: \<user>
         Description: Human readable format of raw audit data.
+
     .EXAMPLE
         Get-HawkUserAdminAudit -UserPrincipalName user@company.com
 
         Gets all changes made to user@company.com and outputs them to the csv and json files.
+
+    .EXAMPLE
+        Get-HawkUserAdminAudit -UserPrincipalName (Get-Mailbox -Filter {CustomAttribute1 -eq "VIP"})
+
+        Gets admin audit data for all mailboxes with CustomAttribute1 set to "VIP".
     #>
     [CmdletBinding()]
     param (
@@ -48,33 +58,47 @@
 
         Out-LogFile ("Searching for changes made to: " + $MailboxName) -action
 
-        # Get all changes for this user
-        [array]$UserChanges = Search-UnifiedAuditLog -UserIds $User -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate -RecordType ExchangeAdmin -Operations "*" -ResultSize 5000
+        try {
+            # Build search command for Get-AllUnifiedAuditLogEntry
+            $searchCommand = "Search-UnifiedAuditLog -UserIds $User -RecordType ExchangeAdmin -Operations '*'"
 
-        # If there are any results push them to an output file
-        if ($UserChanges.Count -gt 0) {
-            Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
+            # Get all changes for this user using Get-AllUnifiedAuditLogEntry
+            [array]$UserChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
-            # Get the user's output folder path
-            $UserFolder = Get-HawkUserPath -User $User
+            # If there are any results process and output them
+            if ($UserChanges.Count -gt 0) {
+                Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
 
-            # Write raw AuditData to files for verification/debugging
-            $RawJsonPath = Join-Path -Path $UserFolder -ChildPath "User_Changes_Raw.json"
-            $UserChanges | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
+                # Get the user's output folder path
+                $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
 
-            # Parse and format the changes using Get-SimpleUnifiedAuditLog
-            $ParsedChanges = $UserChanges | Get-SimpleUnifiedAuditLog
+                # Ensure user folder exists
+                if (-not (Test-Path -Path $UserFolder)) {
+                    New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
+                }
 
-            # Output the processed results
-            if ($ParsedChanges) {
-                $ParsedChanges | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -json -User $User
+                # Write raw AuditData to files for verification/debugging
+                $RawJsonPath = Join-Path -Path $UserFolder -ChildPath "User_Changes_Raw.json"
+                $UserChanges | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
+
+                # Parse and format the changes using Get-SimpleUnifiedAuditLog
+                $ParsedChanges = $UserChanges | Get-SimpleUnifiedAuditLog
+
+                # Output the processed results
+                if ($ParsedChanges) {
+                    $ParsedChanges | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -json -User $User
+                }
+
+                # Output the raw changes
+                $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -User $User
             }
-
-            # Output the raw changes
-            $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -User $User
+            else {
+                Out-LogFile "No User Changes found."
+            }
         }
-        else {
-            Out-LogFile "No User Changes found."
+        catch {
+            Out-LogFile "Error processing audit logs for $User : $_" -Notice
+            Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 }
