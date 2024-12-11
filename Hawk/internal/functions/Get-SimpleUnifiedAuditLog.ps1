@@ -214,17 +214,74 @@
             # Handle and log any processing errors
             Write-Warning "Error processing record: $_"
             $errorProperties = @{
-                RecordType = $Record.RecordType
+                RecordType   = $Record.RecordType
                 CreationDate = Get-Date
-                Error = $_.Exception.Message
-                Record = $Record
+                Error        = $_.Exception.Message
+                Record       = $Record
             }
             $Results += [PSCustomObject]$errorProperties
         }
     }
 
     end {
-        # Return all processed results
-        $Results
+        # Define the ordered common schema properties
+        $orderedProperties = @(
+            'CreationTime',
+            'Workload',
+            'RecordType',
+            'Operation',
+            'ResultStatus',
+            'ClientIP',
+            'UserId',
+            'Id',
+            'OrganizationId',
+            'UserType',
+            'UserKey',
+            'ObjectId',
+            'Scope',
+            'AppAccessContext'
+        )
+
+        # Process each result to ensure proper property ordering
+        $orderedResults = $Results | ForEach-Object {
+            $orderedObject = [ordered]@{}
+
+            # Add ordered common schema properties first
+            foreach ($prop in $orderedProperties) {
+                if ($_.PSObject.Properties.Name -contains $prop) {
+                    $orderedObject[$prop] = $_.$prop
+                }
+            }
+
+            # Add ParameterString if it exists
+            if ($_.PSObject.Properties.Name -contains 'ParameterString') {
+                $orderedObject['ParameterString'] = $_.ParameterString
+
+                # Add all Param_* properties immediately after ParameterString
+                $_.PSObject.Properties |
+                    Where-Object { $_.Name -like 'Param_*' } |
+                    Sort-Object Name |
+                    ForEach-Object {
+                        $orderedObject[$_.Name] = $_.Value
+                    }
+            }
+
+            # Add all remaining properties that aren't already added
+            $_.PSObject.Properties |
+                Where-Object {
+                    $_.Name -notin $orderedProperties -and
+                    $_.Name -ne 'ParameterString' -and
+                    $_.Name -notlike 'Param_*'
+                } |
+                ForEach-Object {
+                    $orderedObject[$_.Name] = $_.Value
+                }
+
+            # Return the ordered object
+            [PSCustomObject]$orderedObject
+        }
+
+        # Return all processed results with ordered properties
+        $orderedResults
     }
 }
