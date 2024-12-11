@@ -3,7 +3,7 @@
 	RootModule         = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion      = '3.1.2'
+	ModuleVersion      = '3.2.3'
 
 	# ID used to uniquely identify this module
 	GUID               = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
@@ -31,8 +31,10 @@
 		@{ModuleName = 'PSFramework'; ModuleVersion = '1.12.346' },
 		@{ModuleName = 'PSAppInsights'; ModuleVersion = '0.9.6' },
 		@{ModuleName = 'ExchangeOnlineManagement'; ModuleVersion = '3.0.0' },
-		@{ModuleName = 'Microsoft.Graph.Authentication'; ModuleVersion = '2.25.0' },
-		@{ModuleName = 'Microsoft.Graph.Identity.DirectoryManagement'; ModuleVersion = '2.25.0' }
+		@{ModuleName = 'AzureAD'; ModuleVersion = '2.0.2.182' },
+		@{ModuleName = 'Microsoft.Graph.Authentication'; ModuleVersion = '1.23.0' },
+		@{ModuleName = 'Microsoft.Graph.Identity.DirectoryManagement'; ModuleVersion = '1.23.0' },
+		@{ModuleName = 'Microsoft.Graph.Identity.DirectoryManagement'; ModuleVersion = '1.23.0' }
 	)
 
 	# Assemblies that must be loaded prior to importing this module
@@ -49,8 +51,8 @@
 	'Get-HawkTenantConfiguration',
 	'Get-HawkTenantEDiscoveryConfiguration',
 	'Get-HawkTenantInboxRules',
-	'Get-HawkTenantConsentGrant',
-	'Get-HawkTenantRBACChanges',
+	'Get-HawkTenantConsentGrants',
+	'Get-HawkTenantRBACChange',
 	'Get-HawkTenantAzureAppAuditLog',
 	'Get-HawkUserAuthHistory',
 	'Get-HawkUserConfiguration',

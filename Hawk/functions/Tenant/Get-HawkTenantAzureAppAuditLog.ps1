@@ -10,7 +10,7 @@
 	Get-HawkTenantConfigurationn			Basic Tenant information
 	Get-HawkTenantEDiscoveryConfiguration	Looks for changes to ediscovery configuration
 	Search-HawkTenantEXOAuditLog			Searches the EXO audit log for activity
-	Get-HawkTenantRBACChanges				Looks for changes to Roles Based Access Control
+	Get-HawkTenantRBACChange				Looks for changes to Roles Based Access Control
 .OUTPUTS
 	See help from individual cmdlets for output list.
 	All outputs are placed in the $Hawk.FilePath directory
