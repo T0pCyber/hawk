@@ -51,53 +51,59 @@
 		Get-HawkTenantEDiscoveryConfiguration
 	}
 
-	if ($PSCmdlet.ShouldProcess("Exchange Audit Log", "Search audit logs")) {
-		Out-LogFile "Running Search-HawkTenantEXOAuditLog" -action
-		Search-HawkTenantEXOAuditLog
+	# if ($PSCmdlet.ShouldProcess("Exchange Audit Log", "Search audit logs")) {
+	# 	Out-LogFile "Running Search-HawkTenantEXOAuditLog" -action
+	# 	Search-HawkTenantEXOAuditLog
+	# }
+
+	if ($PSCmdlet.ShouldProcess("Inbox Rule History Audit Log", "Search Inbox Rule History Audit Log")) {
+		Out-LogFile "Running Get-HawkTenantInboxRuleHistory" -action
+		Get-HawkTenantInboxRuleHistory
 	}
 
 	if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
 		Out-LogFile "Running Get-HawkTenantEDiscoveryLogs" -action
 		Get-HawkTenantEDiscoveryLogs
 	}
-
-	if ($PSCmdlet.ShouldProcess("Domain Activity", "Get domain activity")) {
-		Out-LogFile "Running Get-HawkTenantDomainActivity" -action
-		Get-HawkTenantDomainActivity
-	}
-
-	if ($PSCmdlet.ShouldProcess("RBAC Changes", "Get RBAC changes")) {
-		Out-LogFile "Running Get-HawkTenantRBACChange" -action
-		Get-HawkTenantRBACChange
-	}
-
-	if ($PSCmdlet.ShouldProcess("Azure App Audit Log", "Get app audit logs")) {
-		Out-LogFile "Running Get-HawkTenantAzureAppAuditLog" -action
-		Get-HawkTenantAzureAppAuditLog
-	}
-
-	if ($PSCmdlet.ShouldProcess("Exchange Admins", "Get Exchange admin list")) {
-		Out-LogFile "Running Get-HawkTenantEXOAdmins" -action
-		Get-HawkTenantEXOAdmins
-	}
-
-	if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {
-		Out-LogFile "Running Get-HawkTenantConsentGrant" -action
-		Get-HawkTenantConsentGrant
-	}
-
-	if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Azure admin list")) {
-		Out-LogFile "Running Get-HawkTenantAZAdmin" -action
-		Get-HawkTenantAZAdmin
-	}
-
-	if ($PSCmdlet.ShouldProcess("App and SPN Credentials", "Get credential details")) {
-		Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetail" -action
-		Get-HawkTenantAppAndSPNCredentialDetail
-	}
-
-	if ($PSCmdlet.ShouldProcess("Entra ID Users", "Get Entra ID user list")) {
-		Out-LogFile "Running Get-HawkTenantEntraIDUser" -action
-		Get-HawkTenantEntraIDUser
-	}
 }
+
+	# if ($PSCmdlet.ShouldProcess("Domain Activity", "Get domain activity")) {
+	# 	Out-LogFile "Running Get-HawkTenantDomainActivity" -action
+	# 	Get-HawkTenantDomainActivity
+	# }
+
+	# if ($PSCmdlet.ShouldProcess("RBAC Changes", "Get RBAC changes")) {
+	# 	Out-LogFile "Running Get-HawkTenantRBACChange" -action
+	# 	Get-HawkTenantRBACChange
+	# }
+
+	# if ($PSCmdlet.ShouldProcess("Azure App Audit Log", "Get app audit logs")) {
+	# 	Out-LogFile "Running Get-HawkTenantAzureAppAuditLog" -action
+	# 	Get-HawkTenantAzureAppAuditLog
+	# }
+
+	# if ($PSCmdlet.ShouldProcess("Exchange Admins", "Get Exchange admin list")) {
+	# 	Out-LogFile "Running Get-HawkTenantEXOAdmins" -action
+	# 	Get-HawkTenantEXOAdmins
+	# }
+
+	# if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {
+	# 	Out-LogFile "Running Get-HawkTenantConsentGrants" -action
+	# 	Get-HawkTenantConsentGrants
+	# }
+
+	# if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Azure admin list")) {
+	# 	Out-LogFile "Running Get-HawkTenantAZAdmins" -action
+	# 	Get-HawkTenantAZAdmins
+	# }
+
+	# if ($PSCmdlet.ShouldProcess("App and SPN Credentials", "Get credential details")) {
+	# 	Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetails" -action
+	# 	Get-HawkTenantAppAndSPNCredentialDetails
+	# }
+
+	# if ($PSCmdlet.ShouldProcess("Azure AD Users", "Get Azure AD user list")) {
+	# 	Out-LogFile "Running Get-HawkTenantAzureADUsers" -action
+	# 	Get-HawkTenantAzureADUsers
+	# }
+# }
