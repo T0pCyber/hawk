@@ -1,5 +1,5 @@
 ﻿
-Function Import-AzureAuthenticationLogs {
+Function Import-AzureAuthenticationLog {
 <#
 .SYNOPSIS
     Takes in a set of azure Authentication logs and combines them into a unified output
@@ -117,7 +117,7 @@ Function Import-AzureAuthenticationLogs {
                     }
                 }
                 Creationtime {
-                    $processedentry | Add-Member -MemberType NoteProperty -Name CreationTime -value (get-date $entry.Creationtime -format g)
+                    $processedentry | Add-Member -MemberType NoteProperty -Name CreationTime -Value (([datetime]$entry.Creationtime).ToUniversalTime())
                 }
                 Default {
                     # For some entries a property can appear in ExtendedProperties and as a normal property
@@ -146,17 +146,18 @@ Function Import-AzureAuthenticationLogs {
     $baseobject = $null
     $baseobject = New-Object -TypeName PSobject
     foreach ($propertyname in $baseproperties) {
-        switch ($propertyname) {
-            CreationTime { $baseobject | Add-Member -MemberType NoteProperty -Name $propertyname -Value (get-date 01/01/1900 -format g) }
-            Default { $baseobject | Add-Member -MemberType NoteProperty -Name $propertyname -Value "Base" }
-        }
+    switch ($propertyname) {
+        CreationTime { $baseobject | Add-Member -MemberType NoteProperty -Name $propertyname -Value ((Get-Date "01/01/1900").ToUniversalTime()) }
+        Default { $baseobject | Add-Member -MemberType NoteProperty -Name $propertyname -Value "Base" }
     }
+}
+
 
     # Add that object to the output
     $Listoutput.add($baseobject) | Out-Null
 
     # Base object HAS to be the first entry in the output so that when it is written to CSV it includes all properties
-    [array]$sortedoutput = $Listoutput | Sort-Object -Property creationtime
+    [array]$sortedoutput = $Listoutput | Sort-Object -Property CreationTime
     $sortedoutput = $sortedoutput | Where-Object { $_.ClientIP -ne 'Base' }
 
     # Build an ordered arry to use to order the output coloums

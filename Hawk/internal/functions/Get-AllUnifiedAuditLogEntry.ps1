@@ -35,7 +35,7 @@
     [string]$cmd = $null
 
     # build our search command to execute
-    $cmd = $UnifiedSearch + " -StartDate `'" + (get-date ($StartDate) -UFormat %m/%d/%Y) + "`' -EndDate `'" + (get-date ($endDate) -UFormat %m/%d/%Y) + "`' -SessionCommand ReturnLargeSet -resultsize 5000 -sessionid " + (Get-Date -UFormat %H%M%S)
+    $cmd = $UnifiedSearch + " -StartDate `'" + (Get-Date ($StartDate.ToUniversalTime()) -AsUTC -UFormat %m/%d/%Y) + "`' -EndDate `'" + (Get-Date ($EndDate.ToUniversalTime()) -AsUTC -UFormat %m/%d/%Y) + "`' -SessionCommand ReturnLargeSet -resultsize 5000 -sessionid " + (Get-Date -AsUTC -UFormat %H%M%S)
     Out-LogFile ("Running Unified Audit Log Search")
     Out-Logfile $cmd
 
@@ -48,7 +48,7 @@
 
     # Since we have more than 1k results we need to keep returning results until we have them all
     while ($Run) {
-        $Output += (Invoke-Expression $cmd)
+        $Output += & $cmd
 
         # Check for null results if so warn and stop
         if ($null -eq $Output) {

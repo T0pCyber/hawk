@@ -1,4 +1,4 @@
-﻿<#
+﻿﻿<#
 .SYNOPSIS
     Writes output to a log file with a time date stamp
 .DESCRIPTION
@@ -39,7 +39,7 @@ Function Out-LogFile {
     $LogOutput = $true
 
     # Get the current date
-    [string]$date = Get-Date -Format G
+    [string]$date = Get-Date -AsUTC -Format G
 
     # Deal with each switch and what log string it should put out and if any special output
 

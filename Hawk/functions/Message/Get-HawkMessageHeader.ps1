@@ -278,7 +278,7 @@ Function Convert-ReceiveHeader {
             ReceivedFrom = $headerMatches.Matches.groups[1].value.trim()
             ReceivedBy   = $headerMatches.Matches.groups[2].value.trim()
             ReceivedWith = $with
-            ReceivedTime = [datetime]($headerMatches.Matches.groups[4].value.trim())
+            ReceivedTime = ([datetime]($headerMatches.Matches.groups[4].value.trim())).ToUniversalTime()
         }
 
         # Put the data into an object and return it
