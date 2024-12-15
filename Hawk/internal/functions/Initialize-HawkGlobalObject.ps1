@@ -350,6 +350,7 @@
                     Write-Information "EndDate too Far in the furture."
 
                     Write-Information "Setting EndDate to Today."
+                    # Variable retained for future logic
                     [DateTime]$EndDate = (Get-Date).ToUniversalTime().AddDays(1).Date
 
                 }
