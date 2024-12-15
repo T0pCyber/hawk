@@ -1,5 +1,5 @@
 ﻿Function Initialize-HawkGlobalObject {
-<#
+    <#
 .SYNOPSIS
     Create global variable $Hawk for use by all Hawk cmdlets.
 .DESCRIPTION
@@ -39,13 +39,12 @@
 
     This Command will force the creation of a new $Hawk variable even if one already exists.
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param
     (
         [switch]$Force,
         [switch]$IAgreeToTheEula,
         [switch]$SkipUpdate,
-        [int]$DaysToLookBack,
         [DateTime]$StartDate,
         [DateTime]$EndDate,
         [string]$FilePath
@@ -75,11 +74,14 @@
     }
 
     Function New-LoggingFolder {
+        [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
 
         # Create a folder ID based on date
+ bugfix/151-ensure-all-scripts-use-utc-time-instead-of-local-time
         [string]$TenantName = (Get-MGDomain | Where-Object {$_.isDefault}).ID
         [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmm")
+
 
 
         # Add that ID to the given path
@@ -99,6 +101,7 @@
     }
 
     Function Set-LoggingPath {
+        [CmdletBinding(SupportsShouldProcess)]
         param ([string]$Path)
 
         # If no value of Path is provided prompt and gather from the user
@@ -193,6 +196,8 @@
     }
 
     Function New-ApplicationInsight {
+        [CmdletBinding(SupportsShouldProcess)]
+        param()
         # Initialize Application Insights client
         $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
         if ($Null -eq $Client) {
@@ -220,8 +225,6 @@
         }
 
         # Test if we have a connection to Microsoft Graph
-        $notification = New-Object -ComObject Wscript.Shell
-        $Output =$notification.Popup("Hawk has been updated to support MGGraph due to MSONLINE deprecation. Please click OK to continue", 0, "Hawk Update", 0x00000040)
         Write-Information "Testing Graph Connection"
         Test-GraphConnection
 
@@ -342,8 +345,10 @@
                     [DateTime]$EndDate = (Get-Date).ToUniversalTime().AddDays(1).Date
 
                 }
+ bugfix/151-ensure-all-scripts-use-utc-time-instead-of-local-time
                 elseif ($EndDate -gt (Get-Date).ToUniversalTime().AddDays(2)){
                     Write-Information "EndDate too Far in the furture."
+
                     Write-Information "Setting EndDate to Today."
                     [DateTime]$EndDate = (Get-Date).ToUniversalTime().AddDays(1).Date
 
@@ -370,15 +375,16 @@
             [bool]$AdvancedAzureLicense = $false
         }
 
-		# Configuration Example, currently not used
-		#TODO: Implement Configuration system across entire project
-		Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value $Days -PassThru | Register-PSFConfig
-		if ($OutputPath) {
-			Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
-		}
+        # Configuration Example, currently not used
+        #TODO: Implement Configuration system across entire project
+        Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value $Days -PassThru | Register-PSFConfig
+        if ($OutputPath) {
+            Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
+        }
 
-		#TODO: Discard below once migration to configuration is completed
+        #TODO: Discard below once migration to configuration is completed
         $Output = [PSCustomObject]@{
+ bugfix/151-ensure-all-scripts-use-utc-time-instead-of-local-time
 			FilePath = $OutputPath
 			DaysToLookBack = $Days
 			StartDate = $StartDate
@@ -389,13 +395,13 @@
 			EULA = $Eula
 		}
 
+
         # Create the script hawk variable
         Write-Information "Setting up Script Hawk environment variable`n"
         New-Variable -Name Hawk -Scope Script -value $Output -Force
         Out-LogFile "Script Variable Configured"
         Out-LogFile ("*** Version " + (Get-Module Hawk).version + " ***")
         Out-LogFile $Hawk
-
         #### End of IF
     }
 

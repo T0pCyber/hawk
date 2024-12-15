@@ -7,7 +7,7 @@ on:
     branches:
       - master
       - Development
-      - bugfix/157-bug-multiple-failed-tests-after-fixing-workflow
+      - bugfix/162-modernize-authentication-to-replace-azuread-with-microsoft-graph
 
 jobs:
   validate:
