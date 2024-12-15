@@ -346,22 +346,13 @@
 
                 }
                 bugfix/151-ensure-all-scripts-use-utc-time-instead-of-local-time
-                elseif ($EndDate -gt (Get-Date).ToUniversalTime().AddDays(2)){
-                    Write-Information "EndDate too Far in the future."
-
-                    # Correct the EndDate if it's too far in the future
-                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().AddDays(1).Date
-                    Write-Information "Setting EndDate to Today."
-                }
-
-                # Confirm EndDate value is set and used
-                Write-Information ("Final EndDate is " + $EndDate + "`n")
             }
 
             else {
                 Write-Error "Invalid date information provided. Could not determine if this was a date or an integer." -ErrorAction Stop
             }
         }
+
 
 
         # Determine if we have access to a P1 or P2 Azure Ad License
