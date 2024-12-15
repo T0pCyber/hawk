@@ -50,7 +50,7 @@
 	'Get-HawkTenantEDiscoveryConfiguration',
 	'Get-HawkTenantInboxRules',
 	'Get-HawkTenantConsentGrant',
-	'Get-HawkTenantRBACChanges',
+	'Get-HawkTenantRBACChange',
 
 	'Get-HawkTenantAzureAppAuditLog',
 	'Get-HawkUserAuthHistory',
