@@ -82,22 +82,22 @@
 	}
 
 	if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {
-		Out-LogFile "Running Get-HawkTenantConsentGrants" -action
-		Get-HawkTenantConsentGrants
+		Out-LogFile "Running Get-HawkTenantConsentGrant" -action
+		Get-HawkTenantConsentGrant
 	}
 
-	if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Azure admin list")) {
-		Out-LogFile "Running Get-HawkTenantAZAdmins" -action
-		Get-HawkTenantAZAdmins
+	if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Entra ID admin list")) {
+		Out-LogFile "Running Get-HawkTenantEntraIDAdmin" -action
+		Get-HawkTenantEntraIDAdmin
 	}
 
 	if ($PSCmdlet.ShouldProcess("App and SPN Credentials", "Get credential details")) {
-		Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetails" -action
-		Get-HawkTenantAppAndSPNCredentialDetails
+		Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetail" -action
+		Get-HawkTenantAppAndSPNCredentialDetail
 	}
 
-	if ($PSCmdlet.ShouldProcess("Azure AD Users", "Get Azure AD user list")) {
-		Out-LogFile "Running Get-HawkTenantAzureADUsers" -action
-		Get-HawkTenantAzureADUsers
+	if ($PSCmdlet.ShouldProcess("Entra ID Users", "Get Entra ID user list")) {
+		Out-LogFile "Running Get-HawkTenantEntraIDUser" -action
+		Get-HawkTenantEntraIDUser
 	}
 }
