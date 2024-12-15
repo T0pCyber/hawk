@@ -378,16 +378,16 @@
 		}
 
 		#TODO: Discard below once migration to configuration is completed
-        $Output = [PSCustomObject]@{
-			FilePath = $OutputPath
-			DaysToLookBack = $Days
-			StartDate = $StartDate
-			EndDate = $EndDate
-			AdvancedAzureLicense = $AdvancedAzureLicense
-			WhenCreated = (Get-Date).ToUniversalTime().ToString("g")
+$Output = [PSCustomObject]@{
+    FilePath               = $OutputPath
+    DaysToLookBack         = $Days
+    StartDate              = $StartDate
+    EndDate                = $EndDate
+    AdvancedAzureLicense   = $AdvancedAzureLicense
+    WhenCreated            = (Get-Date).ToUniversalTime().ToString("g")
+    EULA                   = $Eula
+}
 
-			EULA = $Eula
-		}
 
         # Create the script hawk variable
         Write-Information "Setting up Script Hawk environment variable`n"
