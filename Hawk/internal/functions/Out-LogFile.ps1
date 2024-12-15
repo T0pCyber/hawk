@@ -39,7 +39,8 @@ Function Out-LogFile {
     $LogOutput = $true
 
     # Get the current date
-    [string]$date = Get-Date -AsUTC -Format G
+    [string]$date = (Get-Date).ToUniversalTime().ToString("G")
+
 
     # Deal with each switch and what log string it should put out and if any special output
 
