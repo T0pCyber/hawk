@@ -8,94 +8,75 @@ if ($Hawk_dotsourcemodule) { $script:doDotSource = $true }
 <#
 Note on Resolve-Path:
 All paths are sent through Resolve-Path/Resolve-PSFPath in order to convert them to the correct path separator.
-Resolve-Path can only be used for paths that already exist, Resolve-PSFPath can accept that the last leaf may not exist.
+This allows ignoring path separators throughout the import sequence, which could otherwise cause trouble depending on OS.
+Resolve-Path can only be used for paths that already exist, Resolve-PSFPath can accept that the last leaf my not exist.
+This is important when testing for paths.
 #>
 
-# Detect whether loading individual module files was enforced
+# Detect whether at some level loading individual module files, rather than the compiled module was enforced
 $importIndividualFiles = Get-PSFConfigValue -FullName Hawk.Import.IndividualFiles -Fallback $false
 if ($Hawk_importIndividualFiles) { $importIndividualFiles = $true }
 if (Test-Path (Resolve-PSFPath -Path "$($script:ModuleRoot)\..\.git" -SingleItem -NewChild)) { $importIndividualFiles = $true }
 if ("<was not compiled>" -eq '<was not compiled>') { $importIndividualFiles = $true }
 
-function Import-ModuleFile {
-    <#
-        .SYNOPSIS
-            Loads files into the module on module import.
+function Import-ModuleFile
+{
+	<#
+		.SYNOPSIS
+			Loads files into the module on module import.
 
-        .DESCRIPTION
-            This helper function is used during module initialization.
-            It ensures PowerShell script files are imported safely.
+		.DESCRIPTION
+			This helper function is used during module initialization.
+			It should always be dotsourced itself, in order to proper function.
 
-        .PARAMETER Path
-            The path to the file to load.
+			This provides a central location to react to files being imported, if later desired
 
-        .EXAMPLE
-            PS C:\> . Import-ModuleFile -Path $function.FullName
-    #>
-    [CmdletBinding()]
-    Param (
-        [string]
-        $Path
-    )
+		.PARAMETER Path
+			The path to the file to load
 
-    if (-not (Test-Path $Path)) {
-        Write-Warning "Skipping file: $Path does not exist."
-        return
-    }
+		.EXAMPLE
+			PS C:\> . Import-ModuleFile -File $function.FullName
 
-    $resolvedPath = $ExecutionContext.SessionState.Path.GetResolvedPSPathFromPSPath($Path).ProviderPath
-    Write-Host "Importing file: $resolvedPath"
-    if ($doDotSource) {
-        . $resolvedPath
-    }
-    else {
-        $scriptContent = [io.file]::ReadAllText($resolvedPath)
-        $ExecutionContext.InvokeCommand.InvokeScript($false, ([scriptblock]::Create($scriptContent)), $null, $null)
-    }
+			Imports the file stored in $function according to import policy
+	#>
+	[CmdletBinding()]
+	Param (
+		[string]
+		$Path
+	)
+
+	$resolvedPath = $ExecutionContext.SessionState.Path.GetResolvedPSPathFromPSPath($Path).ProviderPath
+	if ($doDotSource) { . $resolvedPath }
+	else { $ExecutionContext.InvokeCommand.InvokeScript($false, ([scriptblock]::Create([io.file]::ReadAllText($resolvedPath))), $null, $null) }
 }
 
 #region Load individual files
-if ($importIndividualFiles) {
-    Write-Host "Starting individual file import process..."
+if ($importIndividualFiles)
+{
+	# Execute Preimport actions
+	foreach ($path in (& "$ModuleRoot\internal\scripts\preimport.ps1")) {
+		. Import-ModuleFile -Path $path
+	}
 
-    # Execute Preimport actions
-    foreach ($path in (& "$ModuleRoot\internal\scripts\preimport.ps1")) {
-        if (-not (Test-Path $path)) {
-            Write-Warning "Preimport script not found: $path"
-            continue
-        }
-        . Import-ModuleFile -Path $path
-    }
+	# Import all internal functions
+	foreach ($function in (Get-ChildItem "$ModuleRoot\internal\functions" -Filter "*.ps1" -Recurse -ErrorAction Ignore))
+	{
+		. Import-ModuleFile -Path $function.FullName
+	}
 
-    # Import all internal functions
-    foreach ($function in (Get-ChildItem "$ModuleRoot\internal\functions" -Filter "*.ps1" -Recurse -ErrorAction Ignore)) {
-        if (-not (Test-Path $function.FullName)) {
-            Write-Warning "Skipping invalid file: $($function.FullName)"
-            continue
-        }
-        . Import-ModuleFile -Path $function.FullName
-    }
+	# Import all public functions
+	foreach ($function in (Get-ChildItem "$ModuleRoot\functions" -Filter "*.ps1" -Recurse -ErrorAction Ignore))
+	{
+		. Import-ModuleFile -Path $function.FullName
+	}
 
-    # Import all public functions
-    foreach ($function in (Get-ChildItem "$ModuleRoot\functions" -Filter "*.ps1" -Recurse -ErrorAction Ignore)) {
-        if (-not (Test-Path $function.FullName)) {
-            Write-Warning "Skipping invalid file: $($function.FullName)"
-            continue
-        }
-        . Import-ModuleFile -Path $function.FullName
-    }
+	# Execute Postimport actions
+	foreach ($path in (& "$ModuleRoot\internal\scripts\postimport.ps1")) {
+		. Import-ModuleFile -Path $path
+	}
 
-    # Execute Postimport actions
-    foreach ($path in (& "$ModuleRoot\internal\scripts\postimport.ps1")) {
-        if (-not (Test-Path $path)) {
-            Write-Warning "Postimport script not found: $path"
-            continue
-        }
-        . Import-ModuleFile -Path $path
-    }
-
-    Write-Host "Individual file import process completed."
-    return
+	# End it here, do not load compiled code below
+	return
 }
 #endregion Load individual files
 
