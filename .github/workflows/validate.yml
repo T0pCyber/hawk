@@ -1,4 +1,13 @@
-on: [pull_request]
+on:
+  pull_request:
+    branches:
+      - master
+      - Development
+  push:
+    branches:
+      - master
+      - Development
+      - bugfix/162-modernize-authentication-to-replace-azuread-with-microsoft-graph
 
 jobs:
   validate:

@@ -1,0 +1,96 @@
+name: PSScriptAnalyzer
+on:
+  pull_request:
+    paths:
+      - "**.ps1"
+      - "**.psm1"
+      - "**.psd1"
+  push:
+    paths:
+      - "**.ps1"
+      - "**.psm1"
+      - "**.psd1"
+
+jobs:
+  analyze:
+    name: PSScriptAnalyzer
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for getting changed files
+
+      - name: Get changed files
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
+              $baseCommit = git rev-parse $env:GITHUB_EVENT.pull_request.base.sha
+              $headCommit = git rev-parse HEAD
+              $changedFiles = git diff --name-only $baseCommit..$headCommit
+          } else {
+              $changedFiles = git diff --name-only HEAD^1 HEAD
+          }
+
+          $powershellFiles = $changedFiles | Where-Object { 
+              $_ -match '\.(ps1|psm1|psd1)$' 
+          }
+
+          $powershellFiles | Out-File -FilePath $env:GITHUB_WORKSPACE/changed_files.txt
+          Write-Host "Changed PowerShell files:"
+          $powershellFiles | ForEach-Object { Write-Host "  $_" }
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -Force
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $settingsPath = Join-Path $env:GITHUB_WORKSPACE 'Hawk' 'internal' 'configurations' 'PSScriptAnalyzerSettings.psd1'
+
+          Write-Output "Using settings file: $settingsPath"
+          if (-not (Test-Path $settingsPath)) {
+              Write-Error "PSScriptAnalyzer settings file not found at: $settingsPath"
+              exit 1
+          }
+
+          $changedFiles = Get-Content -Path "$env:GITHUB_WORKSPACE/changed_files.txt"
+          if (-not $changedFiles) {
+              Write-Output "No PowerShell files were changed"
+              $null > (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
+              exit 0
+          }
+
+          $results = @()
+          foreach ($file in $changedFiles) {
+              $fullPath = Join-Path $env:GITHUB_WORKSPACE $file
+              if (Test-Path $fullPath) {
+                  Write-Output "Analyzing $fullPath"
+                  $fileResults = Invoke-ScriptAnalyzer -Path $fullPath -Settings $settingsPath
+                  if ($fileResults) {
+                      $results += $fileResults
+                  }
+              }
+          }
+
+          if ($results) {
+              Write-Output "Found $($results.Count) issues in changed files:"
+              $results | Format-Table -AutoSize | Out-String | Write-Output
+              $results | Format-Table -AutoSize | Out-File (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
+              exit 1
+          } else {
+              Write-Output "No PSScriptAnalyzer issues found in changed files"
+              $null > (Join-Path $env:GITHUB_WORKSPACE 'psscriptanalyzer-results.txt')
+              exit 0
+          }
+
+      - name: Upload Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: psscriptanalyzer-results
+          path: psscriptanalyzer-results.txt
+          if-no-files-found: warn

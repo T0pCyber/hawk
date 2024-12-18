@@ -10,7 +10,7 @@
 	Get-HawkTenantConfigurationn			Basic Tenant information
 	Get-HawkTenantEDiscoveryConfiguration	Looks for changes to ediscovery configuration
 	Search-HawkTenantEXOAuditLog			Searches the EXO audit log for activity
-	Get-HawkTenantRBACChanges				Looks for changes to Roles Based Access Control
+	Get-HawkTenantRBACChange				Looks for changes to Roles Based Access Control
 .OUTPUTS
 	See help from individual cmdlets for output list.
 	All outputs are placed in the $Hawk.FilePath directory
@@ -19,10 +19,16 @@
 
 	Runs all of the tenant investigation cmdlets.
 #>
+Begin {
+	#Initializing Hawk Object if not present
+	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+		Initialize-HawkGlobalObject
+	}
+	Out-LogFile "Gathering Tenant information" -Action
+	Test-EXOConnection
+}#End BEGIN
 
-Test-EXOConnection
-Send-AIEvent -Event "CmdRun"
-
+PROCESS{
 # Make sure our variables are null
 $AzureApplicationActivityEvents = $null
 
@@ -59,4 +65,8 @@ else {
 			| Out-MultipleFileType -fileprefix "Azure_Application_Audit" -csv -json -append
 	}
 }
+}#End PROCESS
+END{
+Out-LogFile "Completed gathering Tenant App Audit Logs" -Action
+}#End END
 }

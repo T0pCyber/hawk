@@ -3,6 +3,7 @@
     Determine if an IP listed in on the O365 XML list
 .DESCRIPTION
     Determine if an IP listed in on the O365 XML list
+    This function uses the System.Net.IPNetwork.dll to parse the IP Addresses. This is the only use for this DLL
 .PARAMETER IPtoTest
     IP that is being tested against the Microsoft IP List
 .PARAMETER Type
@@ -43,9 +44,6 @@ Function Test-MicrosoftIP {
         }
 
         $Error.clear()
-        # Read in the XML file from the internet
-        # Out-LogFile ("Reading XML for MSFT IP Addresses https://support.content.office.net/en-us/static/O365IPAddresses.xml")
-        # [xml]$msftxml = (Invoke-webRequest -Uri https://support.content.office.net/en-us/static/O365IPAddresses.xml).content
 
         $MSFTJSON = (Invoke-WebRequest -uri ("https://endpoints.office.com/endpoints/Worldwide?ClientRequestId=" + (new-guid).ToString())).content | ConvertFrom-Json
 

@@ -1,14 +1,14 @@
 ﻿param (
 	$TestGeneral = $true,
-	
+
 	$TestFunctions = $true,
-	
+
 	[ValidateSet('None', 'Normal', 'Detailed', 'Diagnostic')]
 	[Alias('Show')]
 	$Output = "None",
-	
+
 	$Include = "*",
-	
+
 	$Exclude = ""
 )
 
@@ -78,7 +78,7 @@ if ($TestFunctions)
 	{
 		if ($file.Name -notlike $Include) { continue }
 		if ($file.Name -like $Exclude) { continue }
-		
+
 		Write-PSFMessage -Level Significant -Message "  Executing $($file.Name)"
 		$config.TestResult.OutputPath = Join-Path "$PSScriptRoot\..\..\TestResults" "TEST-$($file.BaseName).xml"
 		$config.Run.Path = $file.FullName
