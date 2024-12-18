@@ -67,8 +67,8 @@
 	}
 
 	if ($PSCmdlet.ShouldProcess("RBAC Changes", "Get RBAC changes")) {
-		Out-LogFile "Running Get-HawkTenantRBACChanges" -action
-		Get-HawkTenantRBACChanges
+		Out-LogFile "Running Get-HawkTenantRBACChange" -action
+		Get-HawkTenantRBACChange
 	}
 
 	if ($PSCmdlet.ShouldProcess("Azure App Audit Log", "Get app audit logs")) {
@@ -86,9 +86,9 @@
 		Get-HawkTenantConsentGrant
 	}
 
-	if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Azure admin list")) {
-		Out-LogFile "Running Get-HawkTenantAZAdmin" -action
-		Get-HawkTenantAZAdmin
+	if ($PSCmdlet.ShouldProcess("Azure Admins", "Get Entra ID admin list")) {
+		Out-LogFile "Running Get-HawkTenantEntraIDAdmin" -action
+		Get-HawkTenantEntraIDAdmin
 	}
 
 	if ($PSCmdlet.ShouldProcess("App and SPN Credentials", "Get credential details")) {

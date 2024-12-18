@@ -40,10 +40,10 @@
         $spnResults = @()
         $appResults = @()
 
-        Out-LogFile "Collecting Azure AD Service Principals"
+        Out-LogFile "Collecting Entra ID Service Principals"
         try {
             $spns = Get-MgServicePrincipal -All | Sort-Object -Property DisplayName
-            Out-LogFile "Collecting Azure AD Registered Applications"
+            Out-LogFile "Collecting Entra ID Registered Applications"
             $apps = Get-MgApplication -All | Sort-Object -Property DisplayName
         }
         catch {

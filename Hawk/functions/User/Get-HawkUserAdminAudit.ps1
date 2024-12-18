@@ -1,25 +1,45 @@
 ﻿Function Get-HawkUserAdminAudit {
-<#
-.SYNOPSIS
-    Searches the EXO Audit logs for any commands that were run against the provided user object.
-.DESCRIPTION
-    Searches the EXO Audit logs for any commands that were run against the provided user object.
-    Limited by the provided search period.
-.PARAMETER UserPrincipalName
-    UserPrincipalName of the user you're investigating
-.OUTPUTS
+    <#
+    .SYNOPSIS
+        Searches the Unified Audit logs for any commands that were run against the provided user object.
+    .DESCRIPTION
+        Searches the Unified Audit logs for any commands that were run against the provided user object.
+        Uses Get-AllUnifiedAuditLogEntry to ensure complete retrieval of all audit records within the
+        specified search period, handling pagination and large result sets automatically.
 
-    File: Simple_User_Changes.csv
-    Path: \<user>
-    Description: All cmdlets that were run against the user in a simple format.
-.EXAMPLE
-    Get-HawkUserAdminAudit -UserPrincipalName user@company.com
+    .PARAMETER UserPrincipalName
+        UserPrincipalName of the user you're investigating. Can be a single UPN, comma-separated list,
+        or array of objects containing UPNs.
 
-    Gets all changes made to user@company.com and ouputs them to the csv and xml files.
-#>
+    .OUTPUTS
+        File: Simple_User_Changes.csv
+        Path: \<user>
+        Description: All cmdlets that were run against the user in a simple format.
 
-    param
-    (
+        File: User_Changes.csv
+        Path: \<user>
+        Description: Raw data of all changes made to the user.
+
+        File: User_Changes_Raw.json
+        Path: \<user>
+        Description: Raw JSON data from audit logs.
+
+        File: User_Changes_Raw.txt
+        Path: \<user>
+        Description: Human readable format of raw audit data.
+
+    .EXAMPLE
+        Get-HawkUserAdminAudit -UserPrincipalName user@company.com
+
+        Gets all changes made to user@company.com and outputs them to the csv and json files.
+
+    .EXAMPLE
+        Get-HawkUserAdminAudit -UserPrincipalName (Get-Mailbox -Filter {CustomAttribute1 -eq "VIP"})
+
+        Gets admin audit data for all mailboxes with CustomAttribute1 set to "VIP".
+    #>
+    [CmdletBinding()]
+    param (
         [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName
     )
@@ -30,28 +50,55 @@
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    Foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray) {
         [string]$User = $Object.UserPrincipalName
 
         # Get the mailbox name since that is what we store in the admin audit log
-        $MailboxName = (Get-Mailbox -identity $User).name
+        $MailboxName = (Get-Mailbox -Identity $User).Name
 
         Out-LogFile ("Searching for changes made to: " + $MailboxName) -action
 
-        # Get all changes to this user from the admin audit logs
-        [array]$UserChanges = Search-AdminAuditLog -ObjectIDs $MailboxName -StartDate $Hawk.StartDate -EndDate $Hawk.EndDate
+        try {
+            # Build search command for Get-AllUnifiedAuditLogEntry
+            $searchCommand = "Search-UnifiedAuditLog -UserIds $User -RecordType ExchangeAdmin -Operations '*'"
 
+            # Get all changes for this user using Get-AllUnifiedAuditLogEntry
+            [array]$UserChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
-        # If there are any results push them to an output file
-        if ($UserChanges.Count -gt 0) {
-            Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
-            $UserChanges | Get-SimpleAdminAuditLog | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -json -user $User
-            $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -user $User
+            # If there are any results process and output them
+            if ($UserChanges.Count -gt 0) {
+                Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
+
+                # Get the user's output folder path
+                $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
+
+                # Ensure user folder exists
+                if (-not (Test-Path -Path $UserFolder)) {
+                    New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
+                }
+
+                # Write raw AuditData to files for verification/debugging
+                $RawJsonPath = Join-Path -Path $UserFolder -ChildPath "User_Changes_Raw.json"
+                $UserChanges | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
+
+                # Parse and format the changes using Get-SimpleUnifiedAuditLog
+                $ParsedChanges = $UserChanges | Get-SimpleUnifiedAuditLog
+
+                # Output the processed results
+                if ($ParsedChanges) {
+                    $ParsedChanges | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -json -User $User
+                }
+
+                # Output the raw changes
+                $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -User $User
+            }
+            else {
+                Out-LogFile "No User Changes found."
+            }
         }
-        # Otherwise report no results found
-        else {
-            Out-LogFile "No User Changes found."
+        catch {
+            Out-LogFile "Error processing audit logs for $User : $_" -Notice
+            Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
-
     }
 }
