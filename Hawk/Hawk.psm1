@@ -1,6 +1,5 @@
-﻿$script:ModuleRoot = $PSScriptRoot
+$script:ModuleRoot = $PSScriptRoot
 $script:ModuleVersion = (Import-PowerShellDataFile -Path "$($script:ModuleRoot)\Hawk.psd1").ModuleVersion
-
 # Detect whether at some level dotsourcing was enforced
 $script:doDotSource = Get-PSFConfigValue -FullName Hawk.Import.DoDotSource -Fallback $false
 if ($Hawk_dotsourcemodule) { $script:doDotSource = $true }
@@ -47,7 +46,13 @@ function Import-ModuleFile
 
 	$resolvedPath = $ExecutionContext.SessionState.Path.GetResolvedPSPathFromPSPath($Path).ProviderPath
 	if ($doDotSource) { . $resolvedPath }
-	else { $ExecutionContext.InvokeCommand.InvokeScript($false, ([scriptblock]::Create([io.file]::ReadAllText($resolvedPath))), $null, $null) }
+	else {try {
+        $content = [io.file]::ReadAllText($resolvedPath)
+        $scriptBlock = [scriptblock]::Create($content)
+        $ExecutionContext.InvokeCommand.InvokeScript($false, $scriptBlock, $null, $null)
+    } catch {
+        Write-Error "Failed to import: $resolvedPath. Error: $_"
+    }}
 }
 
 #region Load individual files

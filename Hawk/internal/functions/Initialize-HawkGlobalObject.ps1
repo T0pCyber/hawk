@@ -78,8 +78,11 @@
         param([string]$RootPath)
 
         # Create a folder ID based on date
-        [string]$TenantName = (Get-MGDomain | Where-Object { $_.isDefault }).ID
-        [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date -UFormat %Y%m%d_%H%M).tostring()
+ bugfix/151-ensure-all-scripts-use-utc-time-instead-of-local-time
+        [string]$TenantName = (Get-MGDomain | Where-Object {$_.isDefault}).ID
+        [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmm")
+
+
 
         # Add that ID to the given path
         $FullOutputPath = Join-Path $RootPath $FolderID
@@ -178,7 +181,8 @@
             switch ($result) {
                 0 {
                     Write-Information "`n"
-                    Return ("Agreed " + (Get-Date)).ToString()
+                    Return ("Agreed " + (Get-Date).ToUniversalTime().ToString())
+
                 }
                 1 {
                     Write-Information "Aborting Cmdlet"
@@ -230,7 +234,8 @@
         ### Validating EULA ###
         if ($IAgreeToTheEula) {
             # Customer has accepted the EULA on the command line
-            [string]$Eula = ("Agreed " + (Get-Date))
+            [string]$Eula = "Agreed " + (Get-Date).ToUniversalTime().ToString()
+
         }
         else {
             [string]$Eula = Get-Eula
@@ -266,23 +271,26 @@
 
                 # Calculate our startdate setting it to midnight
                 Write-Information ("Calculating Start Date from current date minus " + $StartRead + " days.")
-                [DateTime]$StartDate = ((Get-Date).AddDays(-$StartRead)).Date
+                [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
+
                 Write-Information ("Setting StartDate by Calculation to " + $StartDate + "`n")
             }
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
                 #### DATE TIME Provided ####
 
                 # Convert the input to a date time object
-                [DateTime]$StartDate = (Get-Date $StartRead).Date
+                [DateTime]$StartDate = (Get-Date $StartRead).ToUniversalTime().Date
+
 
                 # Test to make sure the date time is > 90 and < today
-                if ($StartDate -ge ((Get-date).AddDays(-90).Date) -and ($StartDate -le (Get-Date).Date)) {
+                if ($StartDate -ge ((Get-Date).ToUniversalTime().AddDays(-90)).Date -and $StartDate -le (Get-Date).ToUniversalTime().Date){
                     #Valid Date do nothing
                 }
                 else {
                     Write-Information ("Date provided beyond acceptable range of 90 days.")
                     Write-Information ("Setting date to default of Today - 90 days.")
-                    [DateTime]$StartDate = ((Get-Date).AddDays(-90)).Date
+                    [DateTime]$StartDate = (Get-Date).ToUniversalTime().AddDays(-90).Date
+
                 }
 
                 Write-Information ("Setting StartDate by Date to " + $StartDate + "`n")
@@ -304,13 +312,15 @@
                 # if we have a null entry (just hit enter) then set startread to the default of 90
                 if ([string]::IsNullOrEmpty($EndRead)) {
                     Write-Information ("Setting End Date to Today")
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(1)).Date
+
                 }
                 else {
                     # Calculate our startdate setting it to midnight
                     Write-Information ("Calculating End Date from current date minus " + $EndRead + " days.")
                     # Subtract 1 from the EndRead entry so that we get one day less for the purpose of how searching works with times
-                    [DateTime]$EndDate = ((Get-Date).AddDays( - ($EndRead - 1))).Date
+                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().AddDays(-($EndRead - 1)).Date
+
                 }
 
                 # Validate that the start date is further back in time than the end date
@@ -325,27 +335,25 @@
                 #### DATE TIME Provided ####
 
                 # Convert the input to a date time object
-                [DateTime]$EndDate = ((Get-Date $EndRead).AddDays(1)).Date
+                [DateTime]$EndDate = (Get-Date $EndRead).ToUniversalTime().AddDays(1).Date
+
 
                 # Test to make sure the end date is newer than the start date
                 if ($StartDate -gt $EndDate) {
                     Write-Information "EndDate Selected was older than start date."
                     Write-Information "Setting EndDate to today."
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
-                }
-                elseif ($EndDate -gt (get-Date).AddDays(2)) {
-                    Write-Information "EndDate to Far in the furture."
-                    Write-Information "Setting EndDate to Today."
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
-                }
+                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().AddDays(1).Date
 
-                Write-Information ("Setting EndDate by Date to " + $EndDate + "`n")
+                }
+                bugfix/151-ensure-all-scripts-use-utc-time-instead-of-local-time
             }
 
             else {
-                Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
+                Write-Error "Invalid date information provided. Could not determine if this was a date or an integer." -ErrorAction Stop
             }
         }
+
+
 
         # Determine if we have access to a P1 or P2 Azure Ad License
         # EMS SKU contains Azure P1 as part of the sku
@@ -367,16 +375,19 @@
             Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
         }
 
-        #TODO: Discard below once migration to configuration is completed
-        $Output = [PSCustomObject]@{
-            FilePath             = $OutputPath
-            DaysToLookBack       = $Days
-            StartDate            = $StartDate
-            EndDate              = $EndDate
-            AdvancedAzureLicense = $AdvancedAzureLicense
-            WhenCreated          = (Get-Date -Format g)
-            EULA                 = $Eula
-        }
+
+		#TODO: Discard below once migration to configuration is completed
+$Output = [PSCustomObject]@{
+    FilePath               = $OutputPath
+    DaysToLookBack         = $Days
+    StartDate              = $StartDate
+    EndDate                = $EndDate
+    AdvancedAzureLicense   = $AdvancedAzureLicense
+    WhenCreated            = (Get-Date).ToUniversalTime().ToString("g")
+    EULA                   = $Eula
+}
+
+
 
         # Create the script hawk variable
         Write-Information "Setting up Script Hawk environment variable`n"

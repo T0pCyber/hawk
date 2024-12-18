@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.1//EN" "report.dtd"[]>
+<report name="Pester (12/12/2024 00:57:03)">
+  <sessioninfo id="this" start="1733964927641" dump="1733965023306" />
+  <package name="scripts">
+    <class name="scripts/license" sourcefilename="license.ps1">
+      <method name="&lt;script&gt;" desc="()" line="1">
+        <counter type="INSTRUCTION" missed="2" covered="0" />
+        <counter type="LINE" missed="2" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <counter type="INSTRUCTION" missed="2" covered="0" />
+      <counter type="LINE" missed="2" covered="0" />
+      <counter type="METHOD" missed="1" covered="0" />
+      <counter type="CLASS" missed="1" covered="0" />
+    </class>
+    <sourcefile name="license.ps1">
+      <line nr="1" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="3" mi="1" ci="0" mb="0" cb="0" />
+      <counter type="INSTRUCTION" missed="2" covered="0" />
+      <counter type="LINE" missed="2" covered="0" />
+      <counter type="METHOD" missed="1" covered="0" />
+      <counter type="CLASS" missed="1" covered="0" />
+    </sourcefile>
+    <counter type="INSTRUCTION" missed="2" covered="0" />
+    <counter type="LINE" missed="2" covered="0" />
+    <counter type="METHOD" missed="1" covered="0" />
+    <counter type="CLASS" missed="1" covered="0" />
+  </package>
+  <counter type="INSTRUCTION" missed="2" covered="0" />
+  <counter type="LINE" missed="2" covered="0" />
+  <counter type="METHOD" missed="1" covered="0" />
+  <counter type="CLASS" missed="1" covered="0" />
+</report>

@@ -38,7 +38,7 @@
     [array]$RoleAssignements = $null
 
     # Look for E-Discovery Roles and who they might be assigned to
-    $EDiscoveryCmdlets = "New-MailboxSearch", "Search-Mailbox"
+    $EDiscoveryCmdlets = "New-ComplianceSearch", "New-ComplianceSearchAction"
 
     # Find any roles that have these critical ediscovery cmdlets in them
     # Bad actors with sufficient rights could have created new roles so we search for them

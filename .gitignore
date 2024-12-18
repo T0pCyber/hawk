@@ -20,3 +20,9 @@ TestResults/*
 
 # ignore the publishing Directory
 publish/*
+
+# Ignore specific file types
+*.csv
+*.json
+*.docx
+*.xlsx
