@@ -1,4 +1,4 @@
-﻿﻿<#
+﻿<#
 .SYNOPSIS
     Writes output to a log file with a time date stamp
 .DESCRIPTION
