@@ -1,4 +1,4 @@
-Function Get-HawkTenantAdminInboxRuleHistory {
+Function Get-HawkTenantAdminInboxRuleCreation {
     <#
     .SYNOPSIS
         Retrieves audit log entries for inbox rules that were historically created within the tenant.
@@ -18,23 +18,23 @@ Function Get-HawkTenantAdminInboxRuleHistory {
         For current, active rules, use Get-HawkTenantInboxRules.
 
     .OUTPUTS
-        File: Simple_Admin_Inbox_Rules_Creation_History.csv/.json  
+        File: Simple_Admin_Inbox_Rules_Creation.csv/.json  
         Path: \Tenant  
         Description: Simplified view of created inbox rule events.
 
-        File: Admin_Inbox_Rules_Creation_History.csv/.json  
+        File: Admin_Inbox_Rules_Creation.csv/.json  
         Path: \Tenant  
         Description: Detailed audit log data for created inbox rules.
 
-        File: _Investigate_Admin_Inbox_Rules_Creation_History.csv/.json  
+        File: _Investigate_Admin_Inbox_Rules_Creation.csv/.json  
         Path: \Tenant  
         Description: A subset of historically created rules flagged as suspicious.
 
-        File: Investigate_Admin_Inbox_Rules_Creation_History_Raw.json  
+        File: Investigate_Admin_Inbox_Rules_Creation_Raw.json  
         Path: \Tenant  
         Description: Raw audit data for suspicious created rules.
     .EXAMPLE
-        Get-HawkTenantAdminInboxRuleHistory
+        Get-HawkTenantAdminInboxRuleCreation
 
         Retrieves events for all admin inbox rules created and available within the audit logs within the configured search window.
         
@@ -66,7 +66,7 @@ Function Get-HawkTenantAdminInboxRuleHistory {
             Out-LogFile ("Found " + $NewInboxRules.Count + " admin inbox rule changes in audit logs") -Information
 
             # Write raw audit data with action flag
-            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Creation_History_Raw.json"
+            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Creation_Raw.json"
             Out-LogFile "Writing raw audit data to: $RawJsonPath" -Action
             $NewInboxRules | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
 
@@ -74,8 +74,8 @@ Function Get-HawkTenantAdminInboxRuleHistory {
             $ParsedRules = $NewInboxRules | Get-SimpleUnifiedAuditLog
             if ($ParsedRules) {
                 Out-LogFile "Writing parsed admin inbox rule creation data" -Action
-                $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Creation_History" -csv -json
-                $NewInboxRules | Out-MultipleFileType -FilePrefix "Admin_Inbox_Rules_Creation_History" -csv -json
+                $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Creation" -csv -json
+                $NewInboxRules | Out-MultipleFileType -FilePrefix "Admin_Inbox_Rules_Creation" -csv -json
 
                 # Check for suspicious rules using the helper function
                 $SuspiciousRules = $ParsedRules | Where-Object {
@@ -87,10 +87,10 @@ Function Get-HawkTenantAdminInboxRuleHistory {
                     Out-LogFile "Found suspicious admin inbox rule creation requiring investigation" -Notice
 
                     Out-LogFile "Writing suspicious rule creation data" -Action
-                    $SuspiciousRules | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Creation_History" -csv -json -Notice
+                    $SuspiciousRules | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Creation" -csv -json -Notice
 
                     # Write raw data for suspicious rules with action flag
-                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_Admin_Inbox_Rules_Creation_History_Raw.json"
+                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_Admin_Inbox_Rules_Creation_Raw.json"
                     Out-LogFile "Writing raw suspicious rule data to: $RawSuspiciousPath" -Action
                     $SuspiciousRules | ConvertTo-Json -Depth 10 | Out-File -FilePath $RawSuspiciousPath
 

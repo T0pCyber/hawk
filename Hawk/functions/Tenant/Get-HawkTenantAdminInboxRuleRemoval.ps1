@@ -17,19 +17,19 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
         For current, active rules, use Get-HawkTenantInboxRules.
 
     .OUTPUTS
-        File: Simple_Admin_Inbox_Rules_Removal_History.csv/.json  
+        File: Simple_Admin_Inbox_Rules_Removal.csv/.json  
         Path: \Tenant  
         Description: Simplified view of removed inbox rule events.
 
-        File: Admin_Inbox_Rules_Removal_History.csv/.json  
+        File: Admin_Inbox_Rules_Removal.csv/.json  
         Path: \Tenant  
         Description: Detailed audit log data for removed inbox rules.
 
-        File: _Investigate_Admin_Inbox_Rules_Removal_History.csv/.json  
+        File: _Investigate_Admin_Inbox_Rules_Removal.csv/.json  
         Path: \Tenant  
         Description: A subset of historically removed rules flagged as suspicious.
 
-        File: Investigate_Admin_Inbox_Rules_Removal_History_Raw.json  
+        File: Investigate_Admin_Inbox_Rules_Removal_Raw.json  
         Path: \Tenant  
         Description: Raw audit data for suspicious removed rules.
 
@@ -63,17 +63,17 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
             Out-LogFile ("Found " + $RemovedInboxRules.Count + " admin inbox rule removals in audit logs") -Information
 
             # Write raw audit data for reference
-            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Removal_History_Raw.json"
+            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Removal_Raw.json"
             $RemovedInboxRules | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
 
             # Process and output the results
             $ParsedRules = $RemovedInboxRules | Get-SimpleUnifiedAuditLog
             if ($ParsedRules) {
                 # Output simple format for easy analysis
-                $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Removal_History" -csv -json
+                $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Removal" -csv -json
 
                 # Output full audit logs for complete record
-                $RemovedInboxRules | Out-MultipleFileType -FilePrefix "Admin_Inbox_Rules_Removal_History" -csv -json
+                $RemovedInboxRules | Out-MultipleFileType -FilePrefix "Admin_Inbox_Rules_Removal" -csv -json
 
                 # Check for suspicious removals
                 $SuspiciousRemovals = $ParsedRules | Where-Object {
@@ -85,15 +85,15 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
                     Out-LogFile "Found suspicious admin inbox rule removals requiring investigation" -Notice
 
                     # Output files with timestamps
-                    $csvPath = Join-Path -Path $TenantPath -ChildPath "_Investigate_Admin_Inbox_Rules_Removal_History.csv"
-                    $jsonPath = Join-Path -Path $TenantPath -ChildPath "_Investigate_Admin_Inbox_Rules_Removal_History.json"
+                    $csvPath = Join-Path -Path $TenantPath -ChildPath "_Investigate_Admin_Inbox_Rules_Removal.csv"
+                    $jsonPath = Join-Path -Path $TenantPath -ChildPath "_Investigate_Admin_Inbox_Rules_Removal.json"
                     Out-LogFile "Additional Information: $csvPath" -Notice
                     Out-LogFile "Additional Information: $jsonPath" -Notice
 
-                    $SuspiciousRemovals | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Removal_History" -csv -json -Notice
+                    $SuspiciousRemovals | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Removal" -csv -json -Notice
 
                     # Write raw data for suspicious rules
-                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_Admin_Inbox_Rules_Removal_History_Raw.json"
+                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_Admin_Inbox_Rules_Removal_Raw.json"
                     $SuspiciousRemovals | ConvertTo-Json -Depth 10 | Out-File -FilePath $RawSuspiciousPath
 
                     # Log details about why each removal was flagged

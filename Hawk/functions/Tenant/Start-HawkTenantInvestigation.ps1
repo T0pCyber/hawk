@@ -56,17 +56,17 @@
 	# 	Search-HawkTenantEXOAuditLog
 	# }
 
-	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule History Audit Log", "Search Admin Inbox Rule History")) {
-		Out-LogFile "Running Get-HawkTenantAdminInboxRuleHistory" -action
+	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Creation Audit Log", "Search Admin Inbox Rule Creation")) {
+		Out-LogFile "Running Get-HawkTenantAdminInboxRuleCreation" -action
 		Get-HawkTenantAdminInboxRuleHistory
 	}
 
-	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule History Modification Audit Log", "Search Admin Inbox Rule Modification History")) {
+	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Modification Audit Log", "Search Admin Inbox Rule Modification")) {
 		Out-LogFile "Running Get-HawkTenantInboxRuleModification" -action
 		Get-HawkTenantAdminInboxRuleModification
 	}
 
-	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Removal Audit Log", "Search Admin Inbox Rule Removal History")) {
+	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Removal Audit Log", "Search Admin Inbox Rule Removal")) {
 		Out-LogFile "Running Get-HawkTenantAdminInboxRuleRemoval" -action
 		Get-HawkTenantAdminInboxRuleRemoval
 	}

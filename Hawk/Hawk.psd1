@@ -58,7 +58,7 @@
 	'Get-HawkUserInboxRule',
 	'Get-HawkUserMailboxAuditing',
 	'Search-HawkTenantActivityByIP',
-	'Get-HawkTenantAdminInboxRuleHistory',
+	'Get-HawkTenantAdminInboxRuleCreation',
 	'Get-HawkTenantAdminInboxRuleModification',
 	'Get-HawkTenantAdminInboxRuleRemoval',
 	'Search-HawkTenantEXOAuditLog',
