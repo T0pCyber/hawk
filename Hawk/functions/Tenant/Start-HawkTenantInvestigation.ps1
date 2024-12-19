@@ -41,10 +41,10 @@
 	Send-AIEvent -Event "CmdRun"
 
 	# Wrap operations in ShouldProcess checks
-	if ($PSCmdlet.ShouldProcess("Tenant Configuration", "Get configuration data")) {
-		Out-LogFile "Running Get-HawkTenantConfiguration" -action
-		Get-HawkTenantConfiguration
-	}
+	# if ($PSCmdlet.ShouldProcess("Tenant Configuration", "Get configuration data")) {
+	# 	Out-LogFile "Running Get-HawkTenantConfiguration" -action
+	# 	Get-HawkTenantConfiguration
+	# }
 
 	# if ($PSCmdlet.ShouldProcess("EDiscovery Configuration", "Get eDiscovery configuration")) {
 	# 	Out-LogFile "Running Get-HawkTenantEDiscoveryConfiguration" -action
@@ -56,9 +56,14 @@
 	# 	Search-HawkTenantEXOAuditLog
 	# }
 
-	if ($PSCmdlet.ShouldProcess("Inbox Rule History Audit Log", "Search Inbox Rule History Audit Log")) {
-		Out-LogFile "Running Get-HawkTenantInboxRuleHistory" -action
-		Get-HawkTenantInboxRuleHistory
+	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule History Audit Log", "Search Admin Inbox Rule History")) {
+		Out-LogFile "Running Get-HawkTenantAdminInboxRuleHistory" -action
+		Get-HawkTenantAdminInboxRuleHistory
+	}
+
+	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule History Modification Audit Log", "Search Admin Inbox Rule Modification History")) {
+		Out-LogFile "Running Get-HawkTenantInboxRuleModification" -action
+		Get-HawkTenantAdminInboxRuleModification
 	}
 
 	# if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {

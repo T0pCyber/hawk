@@ -5,7 +5,7 @@ Function Get-HawkTenantAdminInboxRuleModification {
 
     .DESCRIPTION
         This function queries the Microsoft 365 Unified Audit Logs for events classified as 
-        inbox rule modifications (Set-InboxRule). It focuses on past changes to existing rules, 
+        inbox rule modification (Set-InboxRule). It focuses on past changes to existing rules, 
         helping identify suspicious modifications (e.g., forwarding to external addresses, 
         enabling deletion, or targeting sensitive keywords).
 
