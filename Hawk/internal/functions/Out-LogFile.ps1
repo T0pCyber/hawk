@@ -4,8 +4,15 @@
         Writes output to a log file with a time date stamp.
     .DESCRIPTION
         Writes output to a log file with a time date stamp and appropriate prefixes
-        based on the type of message (action, notice, etc.). By default, messages are
-        also displayed on the screen unless the -NoDisplay switch is used.
+        based on the type of message. By default, messages are also displayed on the screen 
+        unless the -NoDisplay switch is used.
+
+        Message types:
+        - Action: Represent ongoing operations or procedures.
+        - Investigate (notice, silentnotice): Represent events that require attention or hold 
+          investigative value.
+        - Information: Represent successful completion or informational status updates 
+          that do not require action or investigation.
 
     .PARAMETER string
         The log message to be written.
@@ -23,6 +30,10 @@
     .PARAMETER NoDisplay
         Switch indicating the message should only be written to the log file,
         not displayed in the console.
+
+    .PARAMETER Information
+        Switch indicating the log entry provides informational status or completion messages,
+        for example: "Retrieved all results" or "Completed data export successfully."
 
     .EXAMPLE
         Out-LogFile "Routine scan completed."
@@ -48,6 +59,12 @@
         This is useful for adding detail to a previously logged [INVESTIGATE] event without cluttering the console.
 
     .EXAMPLE
+        Out-LogFile "Retrieved all results successfully" -Information
+
+        Writes a log message indicating a successful or informational event. 
+        The output is prefixed with [INFO], suitable for status updates or completion notices.
+        
+    .EXAMPLE
         Out-LogFile "Executing periodic health check" -NoDisplay
 
         Writes a log message to the file without displaying it on the console, 
@@ -61,7 +78,8 @@
         [switch]$action,
         [switch]$notice,
         [switch]$silentnotice,
-        [switch]$NoDisplay
+        [switch]$NoDisplay,
+        [switch]$Information
     )
 
     Write-PSFMessage -Message $string -ModuleName Hawk -FunctionName (Get-PSCallstack)[1].FunctionName
@@ -101,6 +119,9 @@
         # Suppress regular output for silentnotice
         $ScreenOutput = $false
         $LogOutput = $false
+    }
+    elseif ($Information) {
+        $logstring = "[$timestamp] - [INFO] - $string"
     }
     else {
         $logstring = "[$timestamp] - $string"

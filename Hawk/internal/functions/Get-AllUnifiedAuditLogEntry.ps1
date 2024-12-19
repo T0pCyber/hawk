@@ -52,7 +52,7 @@
     # Since we have more than 1k results we need to keep returning results until we have them all
     while ($Run) {
         $Output += & $searchScript
-        
+
         # Check for null results if so warn and stop
         if ($null -eq $Output) {
             Out-LogFile ("[WARNING] - Unified Audit log returned no results.")
@@ -70,12 +70,12 @@
             }
             # if our resultindex = our resultcount then we have everything and should stop
             elseif ($Output[-1].Resultindex -ge $Output[-1].ResultCount) {
-                Out-LogFile ("Retrieved all results.")
+                Out-LogFile ("Retrieved all results.") -Information
                 $Run = $false
             }
 
             # Output the current progress
-            Out-LogFile ("Retrieved:" + $Output[-1].ResultIndex.tostring().PadRight(5, " ") + " Total: " + $Output[-1].ResultCount)
+            Out-LogFile ("Retrieved:" + $Output[-1].ResultIndex.tostring().PadRight(5, " ") + " Total: " + $Output[-1].ResultCount) -Information
         }
     }
 

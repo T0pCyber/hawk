@@ -60,7 +60,7 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
         [array]$RemovedInboxRules = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
         if ($RemovedInboxRules.Count -gt 0) {
-            Out-LogFile ("Found " + $RemovedInboxRules.Count + " admin inbox rule removals in audit logs")
+            Out-LogFile ("Found " + $RemovedInboxRules.Count + " admin inbox rule removals in audit logs") -Information
 
             # Write raw audit data for reference
             $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Removal_History_Raw.json"
