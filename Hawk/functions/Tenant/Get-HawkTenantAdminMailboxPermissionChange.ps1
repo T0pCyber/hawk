@@ -5,7 +5,7 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
 
     .DESCRIPTION
         Searches the Unified Audit Log for mailbox permission changes and flags any grants
-        of FullAccess, SendAs, or Send on Behalf permissions for investigation.
+        of FullAccess, SendAs, or Send on Behalf permissions for investigations.
         Excludes normal system operations on Discovery Search Mailboxes.
 
     .OUTPUTS
