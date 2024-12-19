@@ -1,11 +1,11 @@
 Function Get-HawkTenantInboxRuleHistory {
     <#
     .SYNOPSIS
-        Retrieves audit log entries for all inbox rules created within the tenant, whether they are active or not.
+        Retrieves audit log entries for all inbox rules created within the tenant via PowerShell or the ExchangeAdmin Portal, whether they are active or not.
 
     .DESCRIPTION
         This function queries the Microsoft 365 Unified Audit Logs for events where inbox rules
-        were created (New-InboxRule events). It is focused on historical record-keeping and detection 
+        were created (New-InboxRule events) via PowerShell or the Exchange Admin Portal. It is focused on historical record-keeping and detection 
         of potentially suspicious rules that were created. 
         
         Key points:
