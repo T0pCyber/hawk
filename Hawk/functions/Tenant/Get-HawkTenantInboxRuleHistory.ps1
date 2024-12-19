@@ -1,55 +1,48 @@
 Function Get-HawkTenantInboxRuleHistory {
     <#
     .SYNOPSIS
-        Retrieves historical changes made to inbox rules across the tenant using audit logs.
+        Retrieves audit log entries for newly created inbox rules within the tenant.
 
     .DESCRIPTION
-        Analyzes the Microsoft 365 Unified Audit Log to identify historical changes made to inbox rules
-        across the tenant. This function focuses on detecting potentially suspicious rule changes by:
-
-        - Finding newly created inbox rules
-        - Identifying rules with suspicious configurations (forwarding, deletion, etc.)
-        - Showing who made changes to rules and when
-        - Providing detailed audit trail of rule modifications
-
-        This function complements Get-HawkTenantInboxRules:
-        - Get-HawkTenantInboxRules: Shows current rules that exist in mailboxes
-        - Get-HawkTenantInboxRuleHistory: Shows historical changes to rules over time
-
-        Suspicious configurations that are flagged include:
-        - Rules that forward or redirect messages
-        - Rules that delete messages or move to Deleted Items
-        - Rules with suspicious keyword filters
-        - Rules targeting security-related senders
+        This function queries the Microsoft 365 Unified Audit Logs for events where new inbox rules
+        were created (New-InboxRule events). It is focused on historical record-keeping and detection 
+        of potentially suspicious rules that were added in the past. 
+        
+        Key points:
+        - Shows historical creation events for inbox rules, including who created them and when.
+        - Flags any historically created rules that appear suspicious (e.g., rules that forward 
+          externally, delete messages, or target certain keywords).
+        - Does not show whether the rules are still active or currently exist in the mailboxes.
+        
+        For current, active rules, use Get-HawkTenantInboxRules.
 
     .OUTPUTS
-        File: Simple_New_InboxRule.csv/.json
-        Path: \Tenant
-        Description: Simplified view of rule changes
+        File: Simple_New_InboxRule.csv/.json  
+        Path: \Tenant  
+        Description: Simplified view of newly created inbox rule events.
 
-        File: New_InboxRules.csv/.json
-        Path: \Tenant
-        Description: Detailed log data for rule changes
+        File: New_InboxRules.csv/.json  
+        Path: \Tenant  
+        Description: Detailed audit log data for newly created inbox rules.
 
-        File: _Investigate_InboxRules.csv/.json
-        Path: \Tenant
-        Description: Rules flagged as potentially suspicious
+        File: _Investigate_InboxRules.csv/.json  
+        Path: \Tenant  
+        Description: A subset of historically created rules flagged as suspicious.
 
-        File: Investigate_InboxRules_Raw.json
-        Path: \Tenant
-        Description: Raw audit data for suspicious rules
+        File: Investigate_InboxRules_Raw.json  
+        Path: \Tenant  
+        Description: Raw audit data for suspicious newly created rules.
 
     .EXAMPLE
         Get-HawkTenantInboxRuleHistory
 
-        Retrieves all inbox rule changes from the audit logs within the configured search window,
-        analyzing them for suspicious configurations.
+        Retrieves events for all newly created inbox rules from the audit logs within the specified 
+        search window, highlighting any that appear suspicious.
 
     .NOTES
-        This function focuses on historical changes through audit logs, while Get-HawkTenantInboxRules
-        shows current mailbox rules. Use both for comprehensive investigation:
-        - Get-HawkTenantInboxRuleHistory: Find when suspicious changes were made
-        - Get-HawkTenantInboxRules: Verify what rules currently exist
+        - Focuses solely on the historical aspect of rule creation.
+        - Does not show if the rules currently exist or are active; it only surfaces past creation events.
+        - To view active rules in mailboxes, use Get-HawkTenantInboxRules.
     #>
     [CmdletBinding()]
     param()
