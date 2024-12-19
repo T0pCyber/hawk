@@ -63,7 +63,7 @@ Function Get-HawkTenantAdminInboxRuleHistory {
         [array]$NewInboxRules = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
         if ($NewInboxRules.Count -gt 0) {
-            Out-LogFile ("Found " + $NewInboxRules.Count + " admin inbox rule changes in audit logs") -Action
+            Out-LogFile ("Found " + $NewInboxRules.Count + " admin inbox rule changes in audit logs") -Information
 
             # Write raw audit data with action flag
             $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Creation_History_Raw.json"
