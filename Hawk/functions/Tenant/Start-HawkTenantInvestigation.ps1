@@ -58,7 +58,7 @@
 
 	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Creation Audit Log", "Search Admin Inbox Rule Creation")) {
 		Out-LogFile "Running Get-HawkTenantAdminInboxRuleCreation" -action
-		Get-HawkTenantAdminInboxRuleHistory
+		Get-HawkTenantAdminInboxRuleCreation
 	}
 
 	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Modification Audit Log", "Search Admin Inbox Rule Modification")) {
