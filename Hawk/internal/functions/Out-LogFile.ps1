@@ -1,32 +1,33 @@
-﻿<#
-.SYNOPSIS
-    Writes output to a log file with a time date stamp
-.DESCRIPTION
-    Writes output to a log file with a time date stamp
-.PARAMETER string
-    Log Message
-.PARAMETER action
-    What is happening
-.PARAMETER notice
-    Verbose notification
-.PARAMETER silentnotice
-    Silent notification
-.EXAMPLE
-    Out-LogFile
-    Sends messages to the log file
-.NOTES
-    This is will depracted soon.
-#>
-Function Out-LogFile {
+﻿Function Out-LogFile {
+    <#
+    .SYNOPSIS
+        Writes output to a log file with a time date stamp
+    .DESCRIPTION
+        Writes output to a log file with a time date stamp and appropriate prefixes
+        based on the type of message (action, notice, etc.)
+    .PARAMETER string
+        Log Message
+    .PARAMETER action
+        Switch indicating an action is being performed
+    .PARAMETER notice
+        Switch indicating this is a notice that requires investigation
+    .PARAMETER silentnotice
+        Switch indicating this is additional information for an investigation notice
+    .PARAMETER NoDisplay
+        Switch indicating the message should only be written to the log file, not displayed
+    #>
+    [CmdletBinding()]
     Param
     (
+        [Parameter(Mandatory = $true)]
         [string]$string,
         [switch]$action,
         [switch]$notice,
-        [switch]$silentnotice
-	)
+        [switch]$silentnotice,
+        [switch]$NoDisplay
+    )
 
-	Write-PSFMessage -Message $string -ModuleName Hawk -FunctionName (Get-PSCallstack)[1].FunctionName
+    Write-PSFMessage -Message $string -ModuleName Hawk -FunctionName (Get-PSCallstack)[1].FunctionName
 
     # Make sure we have the Hawk Global Object
     if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
@@ -35,52 +36,46 @@ Function Out-LogFile {
 
     # Get our log file path
     $LogFile = Join-path $Hawk.FilePath "Hawk.log"
-    $ScreenOutput = $true
+    $ScreenOutput = -not $NoDisplay
     $LogOutput = $true
 
     # Get the current date
-    [string]$date = Get-Date -Format G
+    [string]$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    [string]$logstring = ""
 
-    # Deal with each switch and what log string it should put out and if any special output
-
-    # Action indicates that we are starting to do something
+    # Build the log string based on the type of message
     if ($action) {
-        [string]$logstring = ( "[" + $date + "] - [ACTION] - " + $string)
-
+        $logstring = "[$timestamp] - [ACTION] - $string"
     }
-    # If notice is true the we should write this to interesting.txt as well
     elseif ($notice) {
-        [string]$logstring = ( "[" + $date + "] - ## INVESTIGATE ## - " + $string)
+        $logstring = "[$timestamp] - [INVESTIGATE] - $string"
 
-        # Build the file name for Investigate stuff log
+        # Write to the investigation file
         [string]$InvestigateFile = Join-Path (Split-Path $LogFile -Parent) "_Investigate.txt"
         $logstring | Out-File -FilePath $InvestigateFile -Append
     }
-    # For silent we need to supress the screen output
     elseif ($silentnotice) {
-        [string]$logstring = ( "Addtional Information: " + $string)
-        # Build the file name for Investigate stuff log
+        $logstring = "[$timestamp] - [INVESTIGATE] - Additional Information: $string"
+
+        # Write to the investigation file
         [string]$InvestigateFile = Join-Path (Split-Path $LogFile -Parent) "_Investigate.txt"
         $logstring | Out-File -FilePath $InvestigateFile -Append
 
-        # Supress screen and normal log output
+        # Suppress regular output for silentnotice
         $ScreenOutput = $false
         $LogOutput = $false
-
     }
-    # Normal output
     else {
-        [string]$logstring = ( "[" + $date + "] - " + $string)
+        $logstring = "[$timestamp] - $string"
     }
 
-    # Write everything to our log file
+    # Write to log file if enabled
     if ($LogOutput) {
         $logstring | Out-File -FilePath $LogFile -Append
     }
 
-    # Output to the screen
+    # Write to screen if enabled
     if ($ScreenOutput) {
         Write-Information -MessageData $logstring -InformationAction Continue
     }
-
 }

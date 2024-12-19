@@ -66,6 +66,11 @@
 		Get-HawkTenantAdminInboxRuleModification
 	}
 
+	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Removal Audit Log", "Search Admin Inbox Rule Removal History")) {
+		Out-LogFile "Running Get-HawkTenantAdminInboxRuleRemoval" -action
+		Get-HawkTenantAdminInboxRuleRemoval
+	}
+
 	# if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
 	# 	Out-LogFile "Running Get-HawkTenantEDiscoveryLogs" -action
 	# 	Get-HawkTenantEDiscoveryLogs

@@ -60,6 +60,7 @@
 	'Search-HawkTenantActivityByIP',
 	'Get-HawkTenantAdminInboxRuleHistory',
 	'Get-HawkTenantAdminInboxRuleModification',
+	'Get-HawkTenantAdminInboxRuleRemoval',
 	'Search-HawkTenantEXOAuditLog',
 	'Show-HawkHelp',
 	'Start-HawkTenantInvestigation',
