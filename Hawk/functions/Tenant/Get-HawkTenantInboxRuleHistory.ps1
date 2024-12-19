@@ -1,46 +1,46 @@
 Function Get-HawkTenantInboxRuleHistory {
     <#
     .SYNOPSIS
-        Retrieves audit log entries for newly created inbox rules within the tenant.
+        Retrieves audit log entries for all inbox rules created within the tenant, whether they are active or not.
 
     .DESCRIPTION
-        This function queries the Microsoft 365 Unified Audit Logs for events where new inbox rules
+        This function queries the Microsoft 365 Unified Audit Logs for events where inbox rules
         were created (New-InboxRule events). It is focused on historical record-keeping and detection 
-        of potentially suspicious rules that were added in the past. 
+        of potentially suspicious rules that were created. 
         
         Key points:
-        - Shows historical creation events for inbox rules, including who created them and when.
-        - Flags any historically created rules that appear suspicious (e.g., rules that forward 
+        - Shows  creation events for inbox rules, including who created them and when.
+        - Flags any created rules that appear suspicious (e.g., rules that forward 
           externally, delete messages, or target certain keywords).
         - Does not show whether the rules are still active or currently exist in the mailboxes.
         
         For current, active rules, use Get-HawkTenantInboxRules.
 
     .OUTPUTS
-        File: Simple_New_InboxRule.csv/.json  
+        File: Simple_InboxRules_Creation_History.csv/.json  
         Path: \Tenant  
-        Description: Simplified view of newly created inbox rule events.
+        Description: Simplified view of created inbox rule events.
 
-        File: New_InboxRules.csv/.json  
+        File: InboxRules_Creation_History.csv/.json  
         Path: \Tenant  
-        Description: Detailed audit log data for newly created inbox rules.
+        Description: Detailed audit log data for created inbox rules.
 
-        File: _Investigate_InboxRules.csv/.json  
+        File: _Investigate_InboxRules_Creation_History.csv/.json  
         Path: \Tenant  
         Description: A subset of historically created rules flagged as suspicious.
 
-        File: Investigate_InboxRules_Raw.json  
+        File: Investigate_InboxRules_Creation_History_Raw.json  
         Path: \Tenant  
-        Description: Raw audit data for suspicious newly created rules.
+        Description: Raw audit data for suspicious created rules.
 
     .EXAMPLE
         Get-HawkTenantInboxRuleHistory
 
-        Retrieves events for all newly created inbox rules from the audit logs within the specified 
+        Retrieves events for all created inbox rules from the audit logs within the specified 
         search window, highlighting any that appear suspicious.
 
     .NOTES
-        - Focuses solely on the historical aspect of rule creation.
+        - Focuses solely on the aspect of rule creation.
         - Does not show if the rules currently exist or are active; it only surfaces past creation events.
         - To view active rules in mailboxes, use Get-HawkTenantInboxRules.
     #>
@@ -50,7 +50,7 @@ Function Get-HawkTenantInboxRuleHistory {
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Analyzing historical inbox rule changes from audit logs" -Action
+    Out-LogFile "Analyzing inbox rule creation from audit logs" -Action
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -68,17 +68,17 @@ Function Get-HawkTenantInboxRuleHistory {
             Out-LogFile ("Found " + $NewInboxRules.Count + " inbox rule changes in audit logs")
 
             # Write raw audit data for reference
-            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "New_InboxRules_Raw.json"
+            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "InboxRules_Creation_History_Raw.json"
             $NewInboxRules | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
 
             # Process and output the results
             $ParsedRules = $NewInboxRules | Get-SimpleUnifiedAuditLog
             if ($ParsedRules) {
                 # Output simple format for easy analysis
-                $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_New_InboxRule" -csv -json
+                $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_InboxRules_Creation_History" -csv -json
 
                 # Output full audit logs for complete record
-                $NewInboxRules | Out-MultipleFileType -FilePrefix "New_InboxRules" -csv -json
+                $NewInboxRules | Out-MultipleFileType -FilePrefix "InboxRules_Creation_History" -csv -json
 
                 # Check for suspicious rules
                 $SuspiciousRules = $ParsedRules | Where-Object {
@@ -101,11 +101,11 @@ Function Get-HawkTenantInboxRuleHistory {
                 }
 
                 if ($SuspiciousRules) {
-                    Out-LogFile "Found suspicious historical rule changes requiring investigation" -Notice
-                    $SuspiciousRules | Out-MultipleFileType -FilePrefix "_Investigate_InboxRules" -csv -json -Notice
+                    Out-LogFile "Found suspicious inbox rule creation requiring investigation" -Notice
+                    $SuspiciousRules | Out-MultipleFileType -FilePrefix "_Investigate_InboxRules_Creation_History" -csv -json -Notice
 
                     # Write raw data for suspicious rules
-                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_InboxRules_Raw.json"
+                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_InboxRules_Creation_History_Raw.json"
                     $SuspiciousRules | ConvertTo-Json -Depth 10 | Out-File -FilePath $RawSuspiciousPath
 
                     # Log details about why each rule was flagged
@@ -123,7 +123,7 @@ Function Get-HawkTenantInboxRuleHistory {
                             $reasons += "targets security sender: $($rule.Param_From)"
                         }
 
-                        Out-LogFile "Found historically suspicious rule: '$($rule.Param_Name)' created by $($rule.UserId) at $($rule.CreationTime)" -Notice
+                        Out-LogFile "Found suspicious rule creation: '$($rule.Param_Name)' created by $($rule.UserId) at $($rule.CreationTime)" -Notice
                         Out-LogFile "Reasons for investigation: $($reasons -join '; ')" -Notice
                     }
                 }
@@ -137,7 +137,7 @@ Function Get-HawkTenantInboxRuleHistory {
         }
     }
     catch {
-        Out-LogFile "Error analyzing inbox rule history: $($_.Exception.Message)" -Notice
+        Out-LogFile "Error analyzing inbox rule creation: $($_.Exception.Message)" -Notice
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
 }
