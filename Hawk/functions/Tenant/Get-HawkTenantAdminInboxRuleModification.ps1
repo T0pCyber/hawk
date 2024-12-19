@@ -20,19 +20,19 @@ Function Get-HawkTenantAdminInboxRuleModification {
         For current, active rules, use Get-HawkTenantInboxRules.
 
     .OUTPUTS
-        File: Simple_Admin_Inbox_Rules_Modification_History.csv/.json  
+        File: Simple_Admin_Inbox_Rules_Modification.csv/.json  
         Path: \Tenant  
         Description: Simplified view of inbox rule modification events.
 
-        File: Admin_Inbox_Rules_Modification_History.csv/.json  
+        File: Admin_Inbox_Rules_Modification.csv/.json  
         Path: \Tenant  
         Description: Detailed audit log data for modified inbox rules.
 
-        File: _Investigate_Admin_Inbox_Rules_Modification_History.csv/.json  
+        File: _Investigate_Admin_Inbox_Rules_Modification.csv/.json  
         Path: \Tenant  
         Description: A subset of historically modified rules flagged as suspicious.
 
-        File: Investigate_Admin_Inbox_Rules_Modification_History_Raw.json  
+        File: Investigate_Admin_Inbox_Rules_Modification_Raw.json  
         Path: \Tenant  
         Description: Raw audit data for suspicious rule modifications.
     .EXAMPLE
@@ -69,7 +69,7 @@ Function Get-HawkTenantAdminInboxRuleModification {
             Out-LogFile ("Found " + $ModifiedInboxRules.Count + " admin inbox rule modifications in audit logs") -Action
 
             # Write raw audit data with action flag
-            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Modification_History_Raw.json"
+            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Modification_Raw.json"
             Out-LogFile "Writing raw audit data to: $RawJsonPath" -Action
             $ModifiedInboxRules | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
 
@@ -77,8 +77,8 @@ Function Get-HawkTenantAdminInboxRuleModification {
             $ParsedRules = $ModifiedInboxRules | Get-SimpleUnifiedAuditLog
             if ($ParsedRules) {
                 Out-LogFile "Writing parsed admin inbox rule modification data" -Action
-                $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Modification_History" -csv -json
-                $ModifiedInboxRules | Out-MultipleFileType -FilePrefix "Admin_Inbox_Rules_Modification_History" -csv -json
+                $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Modification" -csv -json
+                $ModifiedInboxRules | Out-MultipleFileType -FilePrefix "Admin_Inbox_Rules_Modification" -csv -json
 
                 # Check for suspicious modifications using the helper function
                 $SuspiciousModifications = $ParsedRules | Where-Object {
@@ -90,10 +90,10 @@ Function Get-HawkTenantAdminInboxRuleModification {
                     Out-LogFile "Found suspicious rule modifications requiring investigation" -Notice
 
                     Out-LogFile "Writing suspicious rule modification data" -Action
-                    $SuspiciousModifications | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Modification_History" -csv -json -Notice
+                    $SuspiciousModifications | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Modification" -csv -json -Notice
 
                     # Write raw data for suspicious modifications with action flag
-                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_Admin_Inbox_Rules_Modification_History_Raw.json"
+                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_Admin_Inbox_Rules_Modification_Raw.json"
                     Out-LogFile "Writing raw suspicious modification data to: $RawSuspiciousPath" -Action
                     $SuspiciousModifications | ConvertTo-Json -Depth 10 | Out-File -FilePath $RawSuspiciousPath
 
