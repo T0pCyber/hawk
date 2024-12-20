@@ -71,9 +71,15 @@
 	# 	Get-HawkTenantAdminInboxRuleRemoval
 	# }
 
-	if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Permission Change Audit Log", "Search Admin Inbox Permission Changes")) {
-		Out-LogFile "Running Get-HawkTenantAdminMailboxPermissionChange" -action
-		Get-HawkTenantAdminMailboxPermissionChange
+	# if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Permission Change Audit Log", "Search Admin Inbox Permission Changes")) {
+	# 	Out-LogFile "Running Get-HawkTenantAdminMailboxPermissionChange" -action
+	# 	Get-HawkTenantAdminMailboxPermissionChange
+	# }
+
+	
+	if ($PSCmdlet.ShouldProcess("Admin Email Forwarding Change Change Audit Log", "Search Admin Email Forwarding Changes")) {
+		Out-LogFile "Running Get-HawkTenantAdminEmailForwardingChange" -action
+		Get-HawkTenantAdminEmailForwardingChange
 	}
 
 
