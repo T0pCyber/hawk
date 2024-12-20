@@ -60,18 +60,19 @@
 - Removed Robust Cloud Command from build as it was not being used in the code base anymore
 - Updated PowerShell API key in GitHub to fix build.yml issue where the Hawk would not publish to gallery on merge to main
 
-## 3.2.3 (2024-12-09)
+## 3.2.3 (2024-12-20)
 
-- **Migration to Microsoft Graph**: Replaced all AzureAD functionality with Microsoft Graph commands, including updates to functions like `Get-HawkTenantAppAndSPNCredentialDetails` (now using `Get-MgServicePrincipal` and `Get-MgApplication`).
-
-- **Directory Role Management**: Updated `Get-HawkTenantAZAdmins` to use Microsoft Graph (`Get-MgRoleDefinition` and `Get-MgRoleAssignment`), renamed to `Get-HawkTenantEntraIDAdmin`, and enhanced output for better role tracking.
-
-- **Consent Grant Updates**: Migrated `Get-HawkTenantConsentGrant` to Graph commands (`Get-MgOauth2PermissionGrant` and `Get-MgServicePrincipalAppRoleAssignment`), ensuring consistent output and backward compatibility.
-
-- **Removed AzureAD Dependencies**: Eliminated AzureAD references in the Hawk.psd1 manifest and removed the deprecated `Test-AzureADConnection.ps1`. Updated manifest to rely solely on Microsoft Graph modules (v2.25.0).
-
-- **Simplified Authentication**: Streamlined Graph API connections by removing unnecessary commands like `Select-MgProfile` and improving `Test-GraphConnection` for default behaviors.
-
-- **Improved Logging and Naming**: Standardized log outputs (e.g., `AzureADUsers` to `EntraIDUsers`) and aligned function outputs with updated naming conventions.
-
-- This release completes the migration to Microsoft Graph, fully deprecating AzureAD and aligning Hawk with modern Microsoft standards.
+- Replaced all AzureAD functionality with Microsoft Graph commands.
+- Updated Get-HawkTenantAZAdmins to use Microsoft Graph.
+- Migrated Get-HawkTenantConsentGrant to Graph commands.
+- Removed AzureAD Dependencies: Eliminated AzureAD references in the Hawk.psd1 manifest and removed the deprecated Test-AzureADConnection.ps1.
+- Simplified Authentication: Streamlined Graph API connections by removing unnecessary commands like Select-MgProfile and improving Test-GraphConnection.
+- Improved Logging and Naming: Standardized log outputs (e.g., AzureADUsers to EntraIDUsers) and aligned function outputs with updated naming conventions.
+- Removed Search-HawkTenantEXOAuditLog as it was deprecated and replaced with modern, modular functions, as listed below:
+- Added Get-HawkTenantAdminInboxRuleModification, which retrieves audit log entries for inbox rules that were historically modified within the tenant.
+- Added Get-HawkTenantAdminEmailForwardingChange, which retrieves audit log entries for email forwarding changes made within the tenant.
+- Added Get-HawkTenantAdminInboxRuleCreation, which retrieves audit log entries for inbox rules that were historically created within the tenant.
+- Added Get-HawkTenantAdminInboxRuleRemoval, which retrieves audit log entries for inbox rules that were removed within the tenant.
+- Added Get-HawkTenantAdminMailboxPermissionChange, which retrieves audit log entries for mailbox permission changes within the tenant.
+- Added internal helper function Test-SuspiciousInboxRule, which detects suspicious inbox rule patterns.
+- Removed ability to detect RBAC Application Impersonation as this is being deprecated / removed in FEB 2025.
