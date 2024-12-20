@@ -63,7 +63,6 @@
 	'Get-HawkTenantAdminInboxRuleRemoval',
 	'Get-HawkTenantAdminMailboxPermissionChange',
 	'Get-HawkTenantAdminEmailForwardingChange',
-	'Search-HawkTenantEXOAuditLog',
 	'Show-HawkHelp',
 	'Start-HawkTenantInvestigation',
 	'Start-HawkUserInvestigation',
