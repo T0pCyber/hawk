@@ -76,13 +76,6 @@
 		Get-HawkTenantAdminMailboxPermissionChange
 	}
 
-	if ($PSCmdlet.ShouldProcess("Checks for Exchange Impersonation Role Assignments", "Search For Exchange Impersonation Role Assignments")) {
-		Out-LogFile "Running Get-HawkTenantImpersonationAccess" -action
-		Get-HawkTenantImpersonationAccess
-	}
-
-	
-
 
 	# if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
 	# 	Out-LogFile "Running Get-HawkTenantEDiscoveryLogs" -action
