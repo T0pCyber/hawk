@@ -76,3 +76,5 @@
 - Added Get-HawkTenantAdminMailboxPermissionChange, which retrieves audit log entries for mailbox permission changes within the tenant.
 - Added internal helper function Test-SuspiciousInboxRule, which detects suspicious inbox rule patterns.
 - Removed ability to detect RBAC Application Impersonation as this is being deprecated / removed in FEB 2025.
+- Updated Out-Log file, adding -Information parameter for tagging prompts with INFO for status updates.
+- Updated Out-Log file, modifying -Notice parameter for tagging prompts with INVESTIGATE in brackets instead of asterisks, for uniformity purposes.
