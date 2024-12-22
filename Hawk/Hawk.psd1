@@ -34,7 +34,9 @@
 		@{ModuleName = 'Microsoft.Graph.Authentication'; ModuleVersion = '2.25.0' },
 		@{ModuleName = 'Microsoft.Graph.Identity.DirectoryManagement'; ModuleVersion = '2.25.0' },
 		@{ModuleName = 'Microsoft.Graph.Users'; ModuleVersion = '2.25.0' },
-		@{ModuleName = 'Microsoft.Graph.Applications'; ModuleVersion = '2.25.0' }
+		@{ModuleName = 'Microsoft.Graph.Applications'; ModuleVersion = '2.25.0' },
+		@{ModuleName = 'Microsoft.Graph.Identity.Signins'; ModuleVersion = '2.25.0' },
+		@{ModuleName = 'Microsoft.Graph.Reports'; ModuleVersion = '2.25.0' }
 	)
 
 	# Assemblies that must be loaded prior to importing this module
