@@ -35,7 +35,7 @@
             try {
                 # Retrieve all directory roles from Microsoft Graph
                 $directoryRoles = Get-MgDirectoryRole -ErrorAction Stop
-                Out-LogFile "Retrieved $(($directoryRoles | Measure-Object).Count) directory roles"
+                Out-LogFile "Retrieved $(($directoryRoles | Measure-Object).Count) directory roles" -Information
 
                 # Process each role and its members
                 $roles = foreach ($role in $directoryRoles) {
