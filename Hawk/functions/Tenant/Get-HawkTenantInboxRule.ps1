@@ -1,4 +1,4 @@
-﻿Function Get-HawkTenantInboxRules {
+﻿Function Get-HawkTenantInboxRule {
     <#
     .SYNOPSIS
         Retrieves the currently active inbox rules and forwarding settings from all (or specified) mailboxes.
