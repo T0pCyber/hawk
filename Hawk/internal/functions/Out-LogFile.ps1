@@ -1,32 +1,88 @@
-﻿<#
-.SYNOPSIS
-    Writes output to a log file with a time date stamp
-.DESCRIPTION
-    Writes output to a log file with a time date stamp
-.PARAMETER string
-    Log Message
-.PARAMETER action
-    What is happening
-.PARAMETER notice
-    Verbose notification
-.PARAMETER silentnotice
-    Silent notification
-.EXAMPLE
-    Out-LogFile
-    Sends messages to the log file
-.NOTES
-    This is will depracted soon.
-#>
-Function Out-LogFile {
+﻿Function Out-LogFile {
+    <#
+    .SYNOPSIS
+        Writes output to a log file with a time date stamp.
+    .DESCRIPTION
+        Writes output to a log file with a time date stamp and appropriate prefixes
+        based on the type of message. By default, messages are also displayed on the screen 
+        unless the -NoDisplay switch is used.
+
+        Message types:
+        - Action: Represent ongoing operations or procedures.
+        - Investigate (notice, silentnotice): Represent events that require attention or hold 
+          investigative value.
+        - Information: Represent successful completion or informational status updates 
+          that do not require action or investigation.
+
+    .PARAMETER string
+        The log message to be written.
+
+    .PARAMETER action
+        Switch indicating the log entry is describing an action being performed.
+
+    .PARAMETER notice
+        Switch indicating the log entry requires investigation or special attention.
+
+    .PARAMETER silentnotice
+        Switch indicating additional investigative information that should not be
+        displayed on the screen. This is logged to the file but suppressed in console output.
+
+    .PARAMETER NoDisplay
+        Switch indicating the message should only be written to the log file,
+        not displayed in the console.
+
+    .PARAMETER Information
+        Switch indicating the log entry provides informational status or completion messages,
+        for example: "Retrieved all results" or "Completed data export successfully."
+
+    .EXAMPLE
+        Out-LogFile "Routine scan completed."
+
+        Writes a simple log message with a timestamp to the log file and displays it on the screen.
+
+    .EXAMPLE
+        Out-LogFile "Starting mailbox export operation" -action
+
+        Writes a log message indicating an action is being performed. 
+        The output is prefixed with [ACTION] in the log file.
+
+    .EXAMPLE
+        Out-LogFile "Detected suspicious login attempt from external IP" -notice
+
+        Writes a log message indicating a situation requiring investigation. 
+        The output is prefixed with [INVESTIGATE] and also recorded in a separate _Investigate.txt file.
+
+    .EXAMPLE
+        Out-LogFile "User mailbox configuration details" -silentnotice
+
+        Writes investigative detail to the log and _Investigate.txt file without printing to the console. 
+        This is useful for adding detail to a previously logged [INVESTIGATE] event without cluttering the console.
+
+    .EXAMPLE
+        Out-LogFile "Retrieved all results successfully" -Information
+
+        Writes a log message indicating a successful or informational event. 
+        The output is prefixed with [INFO], suitable for status updates or completion notices.
+        
+    .EXAMPLE
+        Out-LogFile "Executing periodic health check" -NoDisplay
+
+        Writes a log message to the file without displaying it on the console, 
+        useful for routine logging that doesn't need immediate user visibility.
+    #>
+    [CmdletBinding()]
     Param
     (
+        [Parameter(Mandatory = $true)]
         [string]$string,
         [switch]$action,
         [switch]$notice,
-        [switch]$silentnotice
-	)
+        [switch]$silentnotice,
+        [switch]$NoDisplay,
+        [switch]$Information
+    )
 
-	Write-PSFMessage -Message $string -ModuleName Hawk -FunctionName (Get-PSCallstack)[1].FunctionName
+    Write-PSFMessage -Message $string -ModuleName Hawk -FunctionName (Get-PSCallstack)[1].FunctionName
 
     # Make sure we have the Hawk Global Object
     if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
@@ -35,52 +91,49 @@ Function Out-LogFile {
 
     # Get our log file path
     $LogFile = Join-path $Hawk.FilePath "Hawk.log"
-    $ScreenOutput = $true
+    $ScreenOutput = -not $NoDisplay
     $LogOutput = $true
 
     # Get the current date
-    [string]$date = Get-Date -Format G
+    [string]$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    [string]$logstring = ""
 
-    # Deal with each switch and what log string it should put out and if any special output
-
-    # Action indicates that we are starting to do something
+    # Build the log string based on the type of message
     if ($action) {
-        [string]$logstring = ( "[" + $date + "] - [ACTION] - " + $string)
-
+        $logstring = "[$timestamp] - [ACTION] - $string"
     }
-    # If notice is true the we should write this to interesting.txt as well
     elseif ($notice) {
-        [string]$logstring = ( "[" + $date + "] - ## INVESTIGATE ## - " + $string)
+        $logstring = "[$timestamp] - [INVESTIGATE] - $string"
 
-        # Build the file name for Investigate stuff log
+        # Write to the investigation file
         [string]$InvestigateFile = Join-Path (Split-Path $LogFile -Parent) "_Investigate.txt"
         $logstring | Out-File -FilePath $InvestigateFile -Append
     }
-    # For silent we need to supress the screen output
     elseif ($silentnotice) {
-        [string]$logstring = ( "Addtional Information: " + $string)
-        # Build the file name for Investigate stuff log
+        $logstring = "[$timestamp] - [INVESTIGATE] - Additional Information: $string"
+
+        # Write to the investigation file
         [string]$InvestigateFile = Join-Path (Split-Path $LogFile -Parent) "_Investigate.txt"
         $logstring | Out-File -FilePath $InvestigateFile -Append
 
-        # Supress screen and normal log output
+        # Suppress regular output for silentnotice
         $ScreenOutput = $false
         $LogOutput = $false
-
     }
-    # Normal output
+    elseif ($Information) {
+        $logstring = "[$timestamp] - [INFO] - $string"
+    }
     else {
-        [string]$logstring = ( "[" + $date + "] - " + $string)
+        $logstring = "[$timestamp] - $string"
     }
 
-    # Write everything to our log file
+    # Write to log file if enabled
     if ($LogOutput) {
         $logstring | Out-File -FilePath $LogFile -Append
     }
 
-    # Output to the screen
+    # Write to screen if enabled
     if ($ScreenOutput) {
         Write-Information -MessageData $logstring -InformationAction Continue
     }
-
 }
