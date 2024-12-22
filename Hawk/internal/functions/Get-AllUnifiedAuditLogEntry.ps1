@@ -36,8 +36,8 @@
 
     # build our search command to execute
     $cmd = $UnifiedSearch + " -StartDate `'" + (get-date ($StartDate) -UFormat %m/%d/%Y) + "`' -EndDate `'" + (get-date ($endDate) -UFormat %m/%d/%Y) + "`' -SessionCommand ReturnLargeSet -resultsize 5000 -sessionid " + (Get-Date -UFormat %H%M%S)
-    Out-LogFile ("Running Unified Audit Log Search")
-    Out-Logfile $cmd
+    Out-LogFile ("Running Unified Audit Log Search") -Action
+    Out-Logfile $cmd -NoDisplay
 
     # Run the initial command
     $Output = $null
@@ -46,9 +46,12 @@
     # Setup our run variable
     $Run = $true
 
+    # Convert the command string into a scriptblock to avoid Invoke-Expression
+    $searchScript = [ScriptBlock]::Create($cmd)
+
     # Since we have more than 1k results we need to keep returning results until we have them all
     while ($Run) {
-        $Output += (Invoke-Expression $cmd)
+        $Output += & $searchScript
 
         # Check for null results if so warn and stop
         if ($null -eq $Output) {
@@ -67,12 +70,12 @@
             }
             # if our resultindex = our resultcount then we have everything and should stop
             elseif ($Output[-1].Resultindex -ge $Output[-1].ResultCount) {
-                Out-LogFile ("Retrieved all results.")
+                Out-LogFile ("Retrieved all results.") -Information
                 $Run = $false
             }
 
             # Output the current progress
-            Out-LogFile ("Retrieved:" + $Output[-1].ResultIndex.tostring().PadRight(5, " ") + " Total: " + $Output[-1].ResultCount)
+            Out-LogFile ("Retrieved:" + $Output[-1].ResultIndex.tostring().PadRight(5, " ") + " Total: " + $Output[-1].ResultCount) -Information
         }
     }
 

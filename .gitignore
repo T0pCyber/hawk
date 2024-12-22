@@ -1,5 +1,4 @@
-﻿
-# ignore the settings folder and files for VSCode and PSS
+﻿# ignore the settings folder and files for VSCode and PSS
 .vscode/*
 *.psproj
 *TempPoint*
@@ -20,3 +19,10 @@ TestResults/*
 
 # ignore the publishing Directory
 publish/*
+
+# Ignore all .csv, .json, .docx, and .xlsx files
+*.csv
+*.json
+*.docx
+*.doc
+*.xlsx

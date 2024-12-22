@@ -113,7 +113,7 @@ Function Out-MultipleFileType {
                 else {
                     $filename = Join-Path $xmlPath ($FilePrefix + ".xml")
                 }
-                Out-LogFile ("Writing Data to " + $filename)
+                Out-LogFile ("Writing Data to " + $filename) -Action
 
                 # Output our objects to clixml
                 $AllObject | Export-Clixml $filename
@@ -143,7 +143,7 @@ Function Out-MultipleFileType {
 
                 # Otherwise overwrite
                 else {
-                    Out-LogFile ("Writing Data to " + $filename)
+                    Out-LogFile ("Writing Data to " + $filename) -Action
                     $AllObject | Export-Csv $filename -NoTypeInformation -Encoding UTF8
                 }
 
@@ -169,7 +169,7 @@ Function Out-MultipleFileType {
 
                 # Otherwise overwrite
                 else {
-                    Out-LogFile ("Writing Data to " + $filename)
+                    Out-LogFile ("Writing Data to " + $filename) -Action
                     $AllObject | Format-List * | Out-File $filename
                 }
 
@@ -198,7 +198,7 @@ Function Out-MultipleFileType {
 
                 # Otherwise overwrite
                 else {
-                    Out-LogFile ("Writing Data to " + $filename)
+                    Out-LogFile ("Writing Data to " + $filename) -Action
                     $AllObject | ConvertTo-Json -Depth 100 | Out-File -FilePath $filename
                 }
 
