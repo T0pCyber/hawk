@@ -52,7 +52,7 @@
 	FunctionsToExport  =
 	'Get-HawkTenantConfiguration',
 	'Get-HawkTenantEDiscoveryConfiguration',
-	'Get-HawkTenantInboxRules',
+	'Get-HawkTenantInboxRule',
 	'Get-HawkTenantConsentGrant',
 	'Get-HawkTenantRBACChange',
 	'Get-HawkTenantAzureAppAuditLog',
