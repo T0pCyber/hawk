@@ -29,17 +29,17 @@ Function Test-MicrosoftIP {
 
     # Check if we have imported all of our IP Addresses
     if ($null -eq $MSFTIPList) {
-        Out-Logfile "Building MSFTIPList"
+        Out-Logfile "Building MSFTIPList" -Action
 
         # Load our networking dll pulled from https://github.com/lduchosal/ipnetwork
         [string]$dll = join-path (Split-path (((get-module Hawk)[0]).path) -Parent) "\bin\System.Net.IPNetwork.dll"
 
         $Error.Clear()
-        Out-LogFile ("Loading Networking functions from " + $dll)
+        Out-LogFile ("Loading Networking functions from " + $dll) -Action
         [Reflection.Assembly]::LoadFile($dll)
 
         if ($Error.Count -gt 0) {
-            Out-Logfile "[WARNING] - DLL Failed to load can't process IPs"
+            Out-Logfile "DLL Failed to load can't process IPs" -isError
             Return "Unknown"
         }
 
@@ -48,7 +48,7 @@ Function Test-MicrosoftIP {
         $MSFTJSON = (Invoke-WebRequest -uri ("https://endpoints.office.com/endpoints/Worldwide?ClientRequestId=" + (new-guid).ToString())).content | ConvertFrom-Json
 
         if ($Error.Count -gt 0) {
-            Out-Logfile "[WARNING] - Unable to retrieve JSON file"
+            Out-Logfile "Unable to retrieve JSON file" -isError
             Return "Unknown"
         }
 
@@ -74,8 +74,8 @@ Function Test-MicrosoftIP {
             }
         }
 
-        Out-LogFile ("Found " + $ipv6.Count + " unique MSFT IPv6 address ranges")
-        Out-LogFile ("Found " + $ipv4.count + " unique MSFT IPv4 address ranges")
+        Out-LogFile ("Found " + $ipv6.Count + " unique MSFT IPv6 address ranges") -Information
+        Out-LogFile ("Found " + $ipv4.count + " unique MSFT IPv4 address ranges") -Information
 
         # New up using our networking dll we need to pull these all in as network objects
         foreach ($ip in $ipv6) {
@@ -92,7 +92,7 @@ Function Test-MicrosoftIP {
         $output | Add-Member -MemberType NoteProperty -Value $ipv4objects -Name IPv4Objects
 
         # Create a global variable to hold our IP list so we can keep using it
-        Out-LogFile "Creating global variable `$MSFTIPList"
+        Out-LogFile "Creating global variable `$MSFTIPList" -Action
         New-Variable -Name MSFTIPList -Value $output -Scope global
     }
 

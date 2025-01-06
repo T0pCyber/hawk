@@ -26,8 +26,8 @@
 
     # Validate the incoming search command
     if (($UnifiedSearch -match "-StartDate") -or ($UnifiedSearch -match "-EndDate") -or ($UnifiedSearch -match "-SessionCommand") -or ($UnifiedSearch -match "-ResultSize") -or ($UnifiedSearch -match "-SessionId")) {
-        Out-LogFile "Do not include any of the following in the Search Command"
-        Out-LogFile "-StartDate, -EndDate, -SessionCommand, -ResultSize, -SessionID"
+        Out-LogFile "Do not include any of the following in the Search Command" -isError
+        Out-LogFile "-StartDate, -EndDate, -SessionCommand, -ResultSize, -SessionID" -isError
         Write-Error -Message "Unable to process search command, switch in UnifiedSearch that is handled by this cmdlet specified" -ErrorAction Stop
     }
 
@@ -55,7 +55,7 @@
 
         # Check for null results if so warn and stop
         if ($null -eq $Output) {
-            Out-LogFile ("[WARNING] - Unified Audit log returned no results.")
+            Out-LogFile ("Unified Audit log returned no results.") -isError
             $Run = $false
         }
         # Else continue
@@ -65,7 +65,7 @@
 
             # if total result count returned is 0 then we should warn and stop
             if ($Output[-1].ResultCount -eq 0) {
-                Out-LogFile ("[WARNING] - Returned Result count was 0")
+                Out-LogFile ("Returned Result count was 0") -Information
                 $Run = $false
             }
             # if our resultindex = our resultcount then we have everything and should stop

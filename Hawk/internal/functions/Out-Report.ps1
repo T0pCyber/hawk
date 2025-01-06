@@ -76,7 +76,7 @@
     }
     # Since we have NOTHING we will create a new XML and just add / save / and exit
     else {
-        Out-LogFile ("Creating new Report file" + $reportpath)
+        Out-LogFile ("Creating new Report file" + $reportpath) -Action
         # Create the report xml object
         $reportxml = New-Object xml
 

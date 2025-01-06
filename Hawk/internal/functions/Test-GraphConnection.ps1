@@ -20,11 +20,11 @@ Function Test-GraphConnection {
     catch {
         # Write to the screen if we don't have a log file path yet
         if ([string]::IsNullOrEmpty($Hawk.Logfile)) {
-            Write-Output "Connecting to MGGraph using MGGraph Module"
+            Out-File "Connecting to MGGraph using MGGraph Module" -Action
         }
         # Otherwise output to the log file
         else {
-            Out-LogFile "Connecting to MGGraph using MGGraph Module"
+            Out-LogFile "Connecting to MGGraph using MGGraph Module" -Action
         }
         Connect-MGGraph
     }

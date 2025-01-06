@@ -33,7 +33,7 @@ Function Get-HawkUserPath {
 
     # Create directory if it doesn't exist
     if (-not (Test-Path -Path $userPath)) {
-        Out-LogFile "Making output directory for user $userPath"
+        Out-LogFile "Making output directory for user $userPath" -Action
         New-Item -Path $userPath -ItemType Directory -Force | Out-Null
     }
 
