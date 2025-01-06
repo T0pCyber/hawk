@@ -81,7 +81,7 @@
 	'Get-HawkUserMessageTrace',
 	'Get-HawkUserMobileDevice',
 	'Get-HawkTenantEntraIDAdmin',
-	'Get-HawkTenantEXOAdmins',
+	'Get-HawkTenantEXOAdmin',
 	'Get-HawkTenantMailItemsAccessed',
 	'Get-HawkTenantAppAndSPNCredentialDetail',
 	'Get-HawkTenantEntraIDUser',

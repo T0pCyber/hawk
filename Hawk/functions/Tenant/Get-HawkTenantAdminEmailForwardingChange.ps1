@@ -167,7 +167,7 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
                             }
                             catch {
                                 # Log a warning if the recipient cannot be resolved.
-                                Out-LogFile "Unable to resolve forwarding recipient: $forwardingAddress" -Notice
+                                Out-LogFile "Unable to resolve forwarding recipient: $forwardingAddress" -isError
                                 # Add an unresolved entry for transparency in the output.
                                 $ForwardingDestinations += [PSCustomObject]@{
                                     UserModified = $targetUser
@@ -198,7 +198,7 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
             }
             else {
                 # Log a warning if the parsing of audit data fails.
-                Out-LogFile "Error: Failed to parse forwarding change audit data" -Notice
+                Out-LogFile "Error: Failed to parse forwarding change audit data" -isError
             }
         }
         else {
@@ -209,7 +209,7 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
     }
     catch {
         # Log an error if the analysis encounters an exception.
-        Out-LogFile "Error analyzing email forwarding changes: $($_.Exception.Message)" -Notice
+        Out-LogFile "Error analyzing email forwarding changes: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
 }

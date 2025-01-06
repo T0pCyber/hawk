@@ -98,8 +98,8 @@
 	# }
 
 	# if ($PSCmdlet.ShouldProcess("Exchange Admins", "Get Exchange admin list")) {
-	# 	Out-LogFile "Running Get-HawkTenantEXOAdmins" -action
-	# 	Get-HawkTenantEXOAdmins
+	# 	Out-LogFile "Running Get-HawkTenantEXOAdmin" -action
+	# 	Get-HawkTenantEXOAdmin
 	# }
 
 	# if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {

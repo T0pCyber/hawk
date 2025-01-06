@@ -50,7 +50,7 @@
     $eDiscoveryLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'Discovery'")
     # If null we found no changes to nothing to do here
     if ($null -eq $eDiscoveryLogs) {
-        Out-LogFile "No eDiscovery Logs found"
+        Out-LogFile "No eDiscovery Logs found" -Information
     }
 
     # If not null then we must have found some events so flag them

@@ -107,15 +107,15 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
                 }
             }
             else {
-                Out-LogFile "Error: Failed to parse inbox rule removal audit data" -Notice
+                Out-LogFile "Error: Failed to parse inbox rule removal audit data" -isError
             }
         }
         else {
-            Out-LogFile "No inbox rule removals found in audit logs"
+            Out-LogFile "No inbox rule removals found in audit logs" -Information
         }
     }
     catch {
-        Out-LogFile "Error analyzing admin inbox rule removals: $($_.Exception.Message)" -Notice
+        Out-LogFile "Error analyzing admin inbox rule removals: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
 }
