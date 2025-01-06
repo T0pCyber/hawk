@@ -1,4 +1,5 @@
 ﻿Function Start-HawkUserInvestigation {
+	[CmdletBinding(SupportsShouldProcess = $true)]
     <#
     .SYNOPSIS
         Gathers common data about a provided user.
@@ -42,7 +43,6 @@
     .NOTES
         Ensure the Hawk global object is initialized with a valid logging file path before running this function.
     #>
-	[CmdletBinding(SupportsShouldProcess = $true)]
 	param (
 		[Parameter(Mandatory = $true)]
 		[array]$UserPrincipalName
