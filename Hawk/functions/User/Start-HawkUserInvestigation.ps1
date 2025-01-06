@@ -1,85 +1,105 @@
 ﻿# String together the hawk user functions to pull data for a single user
 Function Start-HawkUserInvestigation {
-<#
-.SYNOPSIS
-	Gathers common data about a provided user.
-.DESCRIPTION
-	Runs all Hawk users related cmdlets against the specified user and gathers the data.
+	<#
+	.SYNOPSIS
+		Gathers common data about a provided user.
+	.DESCRIPTION
+		Runs all Hawk users related cmdlets against the specified user and gathers the data.
 
-	Cmdlet								Information Gathered
-	-------------------------			-------------------------
-	Get-HawkTenantConfigurationn        Basic Tenant information
-	Get-HawkUserConfiguration           Basic User information
-	Get-HawkUserInboxRule               Searches the user for Inbox Rules
-	Get-HawkUserEmailForwarding         Looks for email forwarding configured on the user
-	Get-HawkUserAutoReply				Looks for enabled AutoReplyConfiguration
-	Get-HawkuserAuthHistory             Searches the unified audit log for users logons
-	Get-HawkUserMailboxAuditing         Searches the unified audit log for mailbox auditing information
-	Get-HawkUserAdminAudit				Searches the EXO Audit logs for any commands that were run against the provided user object.
-	Get-HawkUserMessageTrace			Pulls the email sent by the user in the last 7 days.
-.PARAMETER UserPrincipalName
-	Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
-.OUTPUTS
-	See help from individual cmdlets for output list.
-	All outputs are placed in the $Hawk.FilePath directory
-.EXAMPLE
-	Start-HawkUserInvestigation -UserPrincipalName bsmith@contoso.com
+		Cmdlet								Information Gathered
+		-------------------------			-------------------------
+		Get-HawkTenantConfigurationn        Basic Tenant information
+		Get-HawkUserConfiguration           Basic User information
+		Get-HawkUserInboxRule               Searches the user for Inbox Rules
+		Get-HawkUserEmailForwarding         Looks for email forwarding configured on the user
+		Get-HawkUserAutoReply				Looks for enabled AutoReplyConfiguration
+		Get-HawkuserAuthHistory             Searches the unified audit log for users logons
+		Get-HawkUserMailboxAuditing         Searches the unified audit log for mailbox auditing information
+		Get-HawkUserAdminAudit				Searches the EXO Audit logs for any commands that were run against the provided user object.
+		Get-HawkUserMessageTrace			Pulls the email sent by the user in the last 7 days.
+	.PARAMETER UserPrincipalName
+		Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
+	.OUTPUTS
+		See help from individual cmdlets for output list.
+		All outputs are placed in the $Hawk.FilePath directory
+	.EXAMPLE
+		Start-HawkUserInvestigation -UserPrincipalName bsmith@contoso.com
 
-	Runs all Get-HawkUser* cmdlets against the user with UPN bsmith@contoso.com
-.EXAMPLE
+		Runs all Get-HawkUser* cmdlets against the user with UPN bsmith@contoso.com
+	.EXAMPLE
 
-	Start-HawkUserInvestigation -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
+		Start-HawkUserInvestigation -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
 
-	Runs all Get-HawkUser* cmdlets against all users who have "C-Level" set in CustomAttribute1
-#>
+		Runs all Get-HawkUser* cmdlets against all users who have "C-Level" set in CustomAttribute1
+	#>
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param (
+		[Parameter(Mandatory = $true)]
+		[array]$UserPrincipalName
+	)
 
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [array]$UserPrincipalName
-    )
-	#Checking to see if Logging filepath is set
+	# Checking to see if Logging filepath is set
 	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
 		Initialize-HawkGlobalObject
 	}
 
-    Out-LogFile "Investigating Users"
-    Send-AIEvent -Event "CmdRun"
+	if ($PSCmdlet.ShouldProcess("Investigating Users")) {
+		Out-LogFile "Investigating Users" -Action
+		Send-AIEvent -Event "CmdRun"
 
-    # Pull the tenent configuration
-    Get-HawkTenantConfiguration
+		# Pull the tenant configuration
+		Get-HawkTenantConfiguration
 
-    # Verify our UPN input
-    [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
+		# Verify our UPN input
+		[array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    foreach ($Object in $UserArray) {
-        [string]$User = $Object.UserPrincipalName
+		foreach ($Object in $UserArray) {
+			[string]$User = $Object.UserPrincipalName
 
-        Out-LogFile "Running Get-HawkUserConfiguration" -action
-        Get-HawkUserConfiguration -User $User
+			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserConfiguration for $User")) {
+				Out-LogFile "Running Get-HawkUserConfiguration" -Action
+				Get-HawkUserConfiguration -User $User
+			}
 
-        Out-LogFile "Running Get-HawkUserInboxRule" -action
-        Get-HawkUserInboxRule -User $User
+			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserInboxRule for $User")) {
+				Out-LogFile "Running Get-HawkUserInboxRule" -Action
+				Get-HawkUserInboxRule -User $User
+			}
 
-        Out-LogFile "Running Get-HawkUserEmailForwarding" -action
-		Get-HawkUserEmailForwarding -User $User
+			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEmailForwarding for $User")) {
+				Out-LogFile "Running Get-HawkUserEmailForwarding" -Action
+				Get-HawkUserEmailForwarding -User $User
+			}
 
-		Out-LogFile "Running Get-HawkUserAutoReply" -action
-		Get-HawkUserAutoReply -User $User
+			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAutoReply for $User")) {
+				Out-LogFile "Running Get-HawkUserAutoReply" -Action
+				Get-HawkUserAutoReply -User $User
+			}
 
-        Out-LogFile "Running Get-HawkUserAuthHistory" -action
-        Get-HawkUserAuthHistory -User $user -ResolveIPLocations
+			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAuthHistory for $User")) {
+				Out-LogFile "Running Get-HawkUserAuthHistory" -Action
+				Get-HawkUserAuthHistory -User $User -ResolveIPLocations
+			}
 
-        Out-LogFile "Running Get-HawkUserMailboxAuditing" -action
-        Get-HawkUserMailboxAuditing -User $User
+			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
+				Out-LogFile "Running Get-HawkUserMailboxAuditing" -Action
+				Get-HawkUserMailboxAuditing -User $User
+			}
 
-        Out-LogFile "Running Get-HawkUserAdminAudit" -action
-		Get-HawkUserAdminAudit -User $User
+			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAdminAudit for $User")) {
+				Out-LogFile "Running Get-HawkUserAdminAudit" -Action
+				Get-HawkUserAdminAudit -User $User
+			}
 
-		Out-LogFile "Running Get-HawkUserMessageTrace" -action
-		Get-HawkUserMessageTrace -user $User
+			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMessageTrace for $User")) {
+				Out-LogFile "Running Get-HawkUserMessageTrace" -Action
+				Get-HawkUserMessageTrace -User $User
+			}
 
-		Out-LogFile "Running Get-HawkUserMobileDevice" -action
-		Get-HawkUserMobileDevice -user $User
-    }
-}
+			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMobileDevice for $User")) {
+				Out-LogFile "Running Get-HawkUserMobileDevice" -Action
+				Get-HawkUserMobileDevice -User $User
+			}
+		}
+	}
+	}
