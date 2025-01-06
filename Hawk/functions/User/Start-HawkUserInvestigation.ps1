@@ -1,4 +1,6 @@
-﻿Function Start-HawkUserInvestigation {
+﻿# String together the hawk user functions to pull data for a single user
+Function Start-HawkUserInvestigation {
+    [CmdletBinding(SupportsShouldProcess = $true)]
     <#
     .SYNOPSIS
         Gathers common data about a provided user.
@@ -42,74 +44,74 @@
     .NOTES
         Ensure the Hawk global object is initialized with a valid logging file path before running this function.
     #>
-	[CmdletBinding(SupportsShouldProcess = $true)]
-	param (
-		[Parameter(Mandatory = $true)]
-		[array]$UserPrincipalName
-	)
 
-	# Checking to see if Logging filepath is set
-	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
-		Initialize-HawkGlobalObject
-	}
+    param (
+        [Parameter(Mandatory = $true)]
+        [array]$UserPrincipalName
+    )
 
-	if ($PSCmdlet.ShouldProcess("Investigating Users")) {
-		Out-LogFile "Investigating Users" -Action
-		Send-AIEvent -Event "CmdRun"
+    # Check if the logging filepath is set
+    if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+        Initialize-HawkGlobalObject
+    }
 
-		# Pull the tenant configuration
-		Get-HawkTenantConfiguration
+    if ($PSCmdlet.ShouldProcess("Investigating Users")) {
+        Out-LogFile "Investigating Users" -Action
+        Send-AIEvent -Event "CmdRun"
 
-		# Verify our UPN input
-		[array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
+        # Pull the tenant configuration
+        Get-HawkTenantConfiguration
 
-		foreach ($Object in $UserArray) {
-			[string]$User = $Object.UserPrincipalName
+        # Verify the UPN input
+        [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserConfiguration for $User")) {
-				Out-LogFile "Running Get-HawkUserConfiguration" -Action
-				Get-HawkUserConfiguration -User $User
-			}
+        foreach ($Object in $UserArray) {
+            [string]$User = $Object.UserPrincipalName
 
-			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserInboxRule for $User")) {
-				Out-LogFile "Running Get-HawkUserInboxRule" -Action
-				Get-HawkUserInboxRule -User $User
-			}
+            if ($PSCmdlet.ShouldProcess("Running Get-HawkUserConfiguration for $User")) {
+                Out-LogFile "Running Get-HawkUserConfiguration" -Action
+                Get-HawkUserConfiguration -User $User
+            }
 
-			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEmailForwarding for $User")) {
-				Out-LogFile "Running Get-HawkUserEmailForwarding" -Action
-				Get-HawkUserEmailForwarding -User $User
-			}
+            if ($PSCmdlet.ShouldProcess("Running Get-HawkUserInboxRule for $User")) {
+                Out-LogFile "Running Get-HawkUserInboxRule" -Action
+                Get-HawkUserInboxRule -User $User
+            }
 
-			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAutoReply for $User")) {
-				Out-LogFile "Running Get-HawkUserAutoReply" -Action
-				Get-HawkUserAutoReply -User $User
-			}
+            if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEmailForwarding for $User")) {
+                Out-LogFile "Running Get-HawkUserEmailForwarding" -Action
+                Get-HawkUserEmailForwarding -User $User
+            }
 
-			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAuthHistory for $User")) {
-				Out-LogFile "Running Get-HawkUserAuthHistory" -Action
-				Get-HawkUserAuthHistory -User $User -ResolveIPLocations
-			}
+            if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAutoReply for $User")) {
+                Out-LogFile "Running Get-HawkUserAutoReply" -Action
+                Get-HawkUserAutoReply -User $User
+            }
 
-			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
-				Out-LogFile "Running Get-HawkUserMailboxAuditing" -Action
-				Get-HawkUserMailboxAuditing -User $User
-			}
+            if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAuthHistory for $User")) {
+                Out-LogFile "Running Get-HawkUserAuthHistory" -Action
+                Get-HawkUserAuthHistory -User $User -ResolveIPLocations
+            }
 
-			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAdminAudit for $User")) {
-				Out-LogFile "Running Get-HawkUserAdminAudit" -Action
-				Get-HawkUserAdminAudit -User $User
-			}
+            if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
+                Out-LogFile "Running Get-HawkUserMailboxAuditing" -Action
+                Get-HawkUserMailboxAuditing -User $User
+            }
 
-			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMessageTrace for $User")) {
-				Out-LogFile "Running Get-HawkUserMessageTrace" -Action
-				Get-HawkUserMessageTrace -User $User
-			}
+            if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAdminAudit for $User")) {
+                Out-LogFile "Running Get-HawkUserAdminAudit" -Action
+                Get-HawkUserAdminAudit -User $User
+            }
 
-			if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMobileDevice for $User")) {
-				Out-LogFile "Running Get-HawkUserMobileDevice" -Action
-				Get-HawkUserMobileDevice -User $User
-			}
-		}
-	}
-	}
+            if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMessageTrace for $User")) {
+                Out-LogFile "Running Get-HawkUserMessageTrace" -Action
+                Get-HawkUserMessageTrace -User $User
+            }
+
+            if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMobileDevice for $User")) {
+                Out-LogFile "Running Get-HawkUserMobileDevice" -Action
+                Get-HawkUserMobileDevice -User $User
+            }
+        }
+    }
+}
