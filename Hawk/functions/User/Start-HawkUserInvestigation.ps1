@@ -1,6 +1,4 @@
-﻿# String together the hawk user functions to pull data for a single user
-Function Start-HawkUserInvestigation {
-    [CmdletBinding(SupportsShouldProcess = $true)]
+﻿Function Start-HawkUserInvestigation {
     <#
     .SYNOPSIS
         Gathers common data about a provided user.
@@ -44,7 +42,7 @@ Function Start-HawkUserInvestigation {
     .NOTES
         Ensure the Hawk global object is initialized with a valid logging file path before running this function.
     #>
-
+    [CmdletBinding(SupportsShouldProcess = $true)]
     param (
         [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName
