@@ -1,46 +1,59 @@
 ﻿Function Get-HawkTenantEDiscoveryConfiguration {
     <#
     .SYNOPSIS
-        Gets eDiscovery permissions across both Exchange Online and Microsoft 365 Compliance.
+        Gets eDiscovery permissions across Exchange Online and Microsoft 365 platforms using multiple detection methods.
     
     .DESCRIPTION
-        Retrieves eDiscovery permissions using three complementary methods:
-        1. Exchange Online Role Groups: Checks membership in the Discovery Management role group
-        2. Microsoft Graph API: Checks modern eDiscovery Manager/Administrator roles
-        3. Management Role Entries: Discovers custom roles with eDiscovery permissions
+        Retrieves eDiscovery permissions using three complementary methods to ensure complete coverage:
 
-        This comprehensive approach covers both legacy Exchange eDiscovery and modern 
-        Microsoft 365 eDiscovery permissions.
+        1. Exchange Online Role Groups:
+           - Finds built-in Exchange Online eDiscovery roles like "Discovery Management"
+           - Detects roles with direct mailbox search and hold capabilities
+           - Limited to Exchange Online mailbox operations
+           - Managed through Exchange admin center/PowerShell
+
+        2. Graph API eDiscovery Roles:
+           - Detects Microsoft 365 eDiscovery Manager/Administrator roles
+           - These roles have broader access across all Microsoft 365 services
+           - Can manage full eDiscovery cases and content
+           - Can search Exchange, SharePoint, and OneDrive content
+           - Managed through Microsoft 365 admin center
+
+        3. Custom Roles with eDiscovery Permissions:
+           - Finds custom-created roles with eDiscovery cmdlet access
+           - Includes roles with New-MailboxSearch and Search-Mailbox capabilities
+           - Limited to Exchange Online operations
+           - Often created for specific organizational needs
+
+        The function maintains original data structures in JSON format while providing
+        a unified view in CSV format for analysis.
 
     .OUTPUTS
-        File: ModernEDiscoveryRoles.csv/.json
-        Path: \Tenant
-        Description: Modern eDiscovery Manager/Administrator role assignments via Graph API
+        Original Data (JSON):
+        File: ExchangeRoleGroups.json
+        Description: Raw Exchange Online role group data
 
-        File: ExchangeEDiscoveryRoleGroups.csv/.json
-        Path: \Tenant
-        Description: Members of Exchange Online Discovery Management role group
+        File: GraphAPIEDiscoveryRoles.json
+        Description: Raw Microsoft 365 eDiscovery role data
 
-        File: CustomEDiscoveryRoles.csv/.json
-        Path: \Tenant
-        Description: Custom roles with eDiscovery cmdlet permissions
+        File: CustomEDiscoveryRoles.json
+        Description: Raw custom role data with eDiscovery permissions
 
-        File: CustomEDiscoveryAssignments.csv/.json
-        Path: \Tenant
-        Description: All assignments for custom roles with eDiscovery permissions
+        Combined Data:
+        File: AllEDiscoveryRoles.csv
+        Description: Unified, flattened view of all eDiscovery roles and assignments
 
     .EXAMPLE
         Get-HawkTenantEDiscoveryConfiguration
 
-        Lists all users and groups with eDiscovery permissions across both Exchange Online
-        and Microsoft 365 Compliance platforms.
+        Retrieves and analyzes all eDiscovery permissions across platforms, maintaining
+        original data structures while providing a unified analysis view.
 
     .NOTES
-        This function helps identify potential security risks by:
-        - Tracking who has access to both legacy and modern eDiscovery features
-        - Monitoring role group and role memberships across platforms
-        - Identifying custom roles that may grant unexpected access
-        - Flagging potentially risky configurations
+        Each detection method finds different types of permissions:
+        - Exchange roles focus on mailbox-level operations
+        - Graph API roles provide broader Microsoft 365 access
+        - Custom roles may have varying levels of access based on assigned cmdlets
     #>
     [CmdletBinding()]
     param()
@@ -50,228 +63,212 @@
             Initialize-HawkGlobalObject
         }
 
-        # Verify both Graph and EXO connections
         Test-GraphConnection
         Test-EXOConnection
         Send-AIEvent -Event "CmdRun"
 
-        Out-LogFile "Gathering eDiscovery permissions across Exchange Online and Microsoft 365" -action
+        Out-LogFile "Starting eDiscovery permission analysis" -action
 
-        # Create tenant folder if it doesn't exist
+        # Create tenant folder if needed
         $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
         if (-not (Test-Path -Path $TenantPath)) {
             New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
         }
+
+        # Initialize array for combined output
+        $allRoles = @()
     }
 
     PROCESS {
         try {
-            #region Check Modern eDiscovery Roles via Graph API
-            Out-LogFile "Checking Microsoft 365 eDiscovery roles via Graph API" -action
+            #region Exchange Online Role Groups
+            Out-LogFile "Checking Exchange Online role groups" -action
 
             try {
-                # Get all directory roles to find eDiscovery roles
-                $modernEDiscoveryRoles = @(
-                    @{
+                $exchangeGroups = Get-RoleGroup | Where-Object { 
+                    $_.Name -like "*Discovery*" -or 
+                    $_.Roles -like "*Discovery*" 
+                }
+
+                if ($exchangeGroups) {
+                    # Save original JSON structure
+                    $exchangeGroups | ConvertTo-Json -Depth 10 | 
+                        Out-File (Join-Path -Path $TenantPath -ChildPath "ExchangeRoleGroups.json")
+
+                    # Flatten for combined output
+                    foreach ($group in $exchangeGroups) {
+                        $allRoles += [PSCustomObject]@{
+                            SourceType = "Exchange"
+                            RoleName = $group.Name
+                            DisplayName = $group.DisplayName
+                            Description = $group.Description
+                            Members = $group.Members -join ";"
+                            Roles = $group.Roles -join ";"
+                            RoleAssignments = $group.RoleAssignments -join ";"
+                            ManagedBy = $group.ManagedBy -join ";"
+                            WhenCreatedUTC = $group.WhenCreatedUTC
+                            WhenChangedUTC = $group.WhenChangedUTC
+                            Type = $group.RoleGroupType
+                        }
+                    }
+
+                    Out-LogFile "Found $($exchangeGroups.Count) Exchange role groups" -Information
+                }
+                else {
+                    Out-LogFile "No Exchange eDiscovery role groups found" -Information
+                }
+            }
+            catch {
+                Out-LogFile "Error checking Exchange role groups: $($_.Exception.Message)" -isError
+            }
+            #endregion
+
+            #region Graph API Roles
+            Out-LogFile "Checking Graph API eDiscovery roles" -action
+
+            try {
+                $graphRoles = @(
+                    @{ 
                         Id = "c430b396-e693-46cc-96f3-db01bf8bb62a"
                         Name = "eDiscovery Manager"
-                        Description = "Can perform searches and place holds on mailboxes, SharePoint Online sites, and OneDrive for Business locations"
+                        Description = "Can perform searches and manage eDiscovery cases across Microsoft 365"
                     },
-                    @{
+                    @{ 
                         Id = "8101c9e6-6e5c-4d98-a460-f1c27ee29a99"
                         Name = "eDiscovery Administrator"
-                        Description = "Can perform all eDiscovery actions including managing cases and accessing all case content"
+                        Description = "Can manage all eDiscovery cases and delegate case access"
                     }
                 )
 
-                $modernRoleMembers = @()
-                foreach ($role in $modernEDiscoveryRoles) {
-                    try {
-                        # Get role by ID first to confirm it exists in tenant
-                        $directoryRole = Get-MgDirectoryRole -DirectoryRoleId $role.Id -ErrorAction Stop
-                        if ($directoryRole) {
-                            $members = Get-MgDirectoryRoleMember -DirectoryRoleId $role.Id -ErrorAction Stop
-                            foreach ($member in $members) {
-                                $memberType = if ($member.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.user') { 
-                                    "User" 
-                                } else { 
-                                    "Group" 
-                                }
+                $graphResults = @()
 
-                                $modernRoleMembers += [PSCustomObject]@{
-                                    RoleId = $role.Id
-                                    RoleName = $role.Name
-                                    RoleDescription = $role.Description
-                                    UserId = $member.Id
-                                    UserPrincipalName = $member.AdditionalProperties.userPrincipalName
-                                    DisplayName = $member.AdditionalProperties.displayName
-                                    AssignmentType = $memberType
-                                    Platform = "Microsoft 365"
-                                }
+                foreach ($role in $graphRoles) {
+                    try {
+                        $roleInfo = Get-MgDirectoryRole -DirectoryRoleId $role.Id -ErrorAction Stop
+                        if ($roleInfo) {
+                            $members = Get-MgDirectoryRoleMember -DirectoryRoleId $role.Id
+                            
+                            $graphResults += [PSCustomObject]@{
+                                Role = $roleInfo
+                                Members = $members
+                                Description = $role.Description
+                            }
+
+                            # Add to combined output
+                            $allRoles += [PSCustomObject]@{
+                                SourceType = "GraphAPI"
+                                RoleName = $role.Name
+                                DisplayName = $roleInfo.DisplayName
+                                Description = $role.Description
+                                Members = ($members | ForEach-Object { 
+                                    $_.AdditionalProperties.userPrincipalName 
+                                }) -join ";"
+                                Roles = $role.Name
+                                RoleAssignments = $null
+                                ManagedBy = $null
+                                WhenCreatedUTC = $null  # Graph API doesn't provide this
+                                WhenChangedUTC = $null
+                                Type = "Microsoft 365"
                             }
                         }
                     }
                     catch {
-                        if ($_.Exception.Message -like "*Resource*not found*") {
-                            Out-LogFile "Role $($role.Name) not found in tenant - this is normal if the role isn't used" -Information
-                        }
-                        else {
-                            Out-LogFile "Error checking role $($role.Name): $($_.Exception.Message)" -Notice
+                        if ($_.Exception.Message -notlike "*Resource*not found*") {
+                            Out-LogFile "Error checking Graph role $($role.Name): $($_.Exception.Message)" -isError
                         }
                     }
                 }
 
-                if ($modernRoleMembers.Count -gt 0) {
-                    Out-LogFile "Found $($modernRoleMembers.Count) users/groups with Microsoft 365 eDiscovery roles"
-                    $modernRoleMembers | Out-MultipleFileType -FilePrefix "ModernEDiscoveryRoles" -csv -json
+                if ($graphResults) {
+                    # Save original JSON structure
+                    $graphResults | ConvertTo-Json -Depth 10 | 
+                        Out-File (Join-Path -Path $TenantPath -ChildPath "GraphAPIEDiscoveryRoles.json")
+
+                    Out-LogFile "Found $($graphResults.Count) Graph API roles" -Information
                 }
                 else {
-                    Out-LogFile "No Microsoft 365 eDiscovery role assignments found"
+                    Out-LogFile "No Graph API eDiscovery roles found" -Information
                 }
             }
             catch {
-                Out-LogFile "Error querying Microsoft 365 eDiscovery roles: $($_.Exception.Message)" -Notice
+                Out-LogFile "Error checking Graph API roles: $($_.Exception.Message)" -isError
             }
             #endregion
 
-            #region Check Exchange Online Discovery Management Role Group
-            Out-LogFile "Checking Exchange Online Discovery Management role group members" -action
+            #region Custom Roles
+            Out-LogFile "Checking custom roles with eDiscovery permissions" -action
 
             try {
-                $members = Get-RoleGroupMember -Identity "Discovery Management" -ErrorAction Stop
-                
-                if ($members) {
-                    $exchangeRoleMembers = foreach ($member in $members) {
-                        [PSCustomObject]@{
-                            RoleGroup = "Discovery Management"
-                            Name = $member.Name 
-                            DisplayName = $member.DisplayName
-                            RecipientType = $member.RecipientType
-                            WindowsLiveID = $member.WindowsLiveID
-                            Platform = "Exchange Online"
-                            AssignmentType = 'RoleGroup'
-                        }
-                    }
-                    Out-LogFile "Found $($members.Count) members in Exchange Discovery Management role group"
-                    
-                    if ($exchangeRoleMembers.Count -gt 0) {
-                        $exchangeRoleMembers | Out-MultipleFileType -FilePrefix "ExchangeEDiscoveryRoleGroups" -csv -json
+                $eDiscoveryCmdlets = @("New-MailboxSearch", "Search-Mailbox")
+                $customRoles = @()
+                $customResults = @()
+
+                foreach ($cmdlet in $eDiscoveryCmdlets) {
+                    $roleEntries = Get-ManagementRoleEntry ("*\" + $cmdlet) -ErrorAction Stop
+                    if ($roleEntries) {
+                        $customRoles += $roleEntries | 
+                            Where-Object { $_.Role -notlike "*Discovery*" } | 
+                            Select-Object -Property Role -Unique
                     }
                 }
+
+                if ($customRoles) {
+                    foreach ($role in $customRoles) {
+                        $assignments = Get-ManagementRoleAssignment -Role $role.Role -Delegating $false
+                        
+                        $roleInfo = [PSCustomObject]@{
+                            Role = $role.Role
+                            Assignments = $assignments
+                        }
+                        $customResults += $roleInfo
+
+                        # Add to combined output
+                        $allRoles += [PSCustomObject]@{
+                            SourceType = "Custom"
+                            RoleName = $role.Role
+                            DisplayName = $null
+                            Description = $null
+                            Members = ($assignments | ForEach-Object { $_.RoleAssignee }) -join ";"
+                            Roles = $role.Role
+                            RoleAssignments = ($assignments | ForEach-Object { $_.Name }) -join ";"
+                            ManagedBy = $null
+                            WhenCreatedUTC = ($assignments | Select-Object -First 1).WhenCreatedUTC
+                            WhenChangedUTC = ($assignments | Select-Object -First 1).WhenChangedUTC
+                            Type = "Custom"
+                        }
+                    }
+
+                    # Save original JSON structure
+                    $customResults | ConvertTo-Json -Depth 10 | 
+                        Out-File (Join-Path -Path $TenantPath -ChildPath "CustomEDiscoveryRoles.json")
+
+                    Out-LogFile "Found $($customRoles.Count) custom roles" -Information
+                }
                 else {
-                    Out-LogFile "No members found in Exchange Discovery Management role group"
+                    Out-LogFile "No custom roles with eDiscovery permissions found" -Information
                 }
             }
             catch {
-                Out-LogFile "Error checking Exchange Discovery Management role group: $($_.Exception.Message)" -Notice
+                Out-LogFile "Error checking custom roles: $($_.Exception.Message)" -isError
             }
             #endregion
 
-            #region Check Custom Roles with eDiscovery Cmdlets
-            Out-LogFile "Checking custom roles with eDiscovery permissions" -action
-            
-            # Define key eDiscovery cmdlets to check
-            $eDiscoveryCmdlets = @(
-                "New-MailboxSearch", 
-                "Search-Mailbox"
-            )
-            $customRoles = @()
-
-            foreach ($cmdlet in $eDiscoveryCmdlets) {
-                try {
-                    Out-LogFile "Checking role entries for cmdlet $cmdlet"
-                    $roleEntries = Get-ManagementRoleEntry ("*\" + $cmdlet) -ErrorAction Stop
-                    if ($roleEntries) {
-                        $customRoles += $roleEntries | Select-Object -Property Role -Unique
-                    }
-                }
-                catch {
-                    Out-LogFile "Error checking role entries for cmdlet $cmdlet : $($_.Exception.Message)" -Notice
-                }
-            }
-
-            if ($customRoles.Count -gt 0) {
-                # Filter out standard Discovery Management role
-                $customRoles = $customRoles | Where-Object { 
-                    $_.Role -notlike "*Discovery*"
-                } | Sort-Object Role -Unique
-
-                Out-LogFile "Found $($customRoles.Count) custom roles with eDiscovery permissions" -Notice
-                $customRoles | Out-MultipleFileType -FilePrefix "CustomEDiscoveryRoles" -csv -json
-
-                $customRoleAssignments = @()
-                foreach ($role in $customRoles) {
-                    try {
-                        Out-LogFile "Getting assignments for role $($role.Role)"
-                        $assignments = Get-ManagementRoleAssignment -Role $role.Role -Delegating $false -ErrorAction Stop
-                        foreach ($assignment in $assignments) {
-                            $customRoleAssignments += [PSCustomObject]@{
-                                RoleName = $role.Role
-                                RoleType = "Custom"
-                                AssignmentName = $assignment.Name
-                                RoleAssigneeType = $assignment.RoleAssigneeType
-                                AssigneeDisplayName = $assignment.DisplayName
-                                AssignmentEnabled = $assignment.Enabled
-                                AssignmentCustom = $assignment.CustomRecipientWriteScope
-                                AssigningTimeUTC = $assignment.WhenCreatedUTC
-                                Platform = "Exchange Online"
-                            }
-                        }
-                    }
-                    catch {
-                        Out-LogFile "Error getting assignments for role $($role.Role): $($_.Exception.Message)" -Notice
-                    }
-                }
-
-                if ($customRoleAssignments.Count -gt 0) {
-                    Out-LogFile "Found $($customRoleAssignments.Count) assignments for custom eDiscovery roles" -Notice
-                    $customRoleAssignments | Out-MultipleFileType -FilePrefix "CustomEDiscoveryAssignments" -csv -json
-
-                    foreach ($assignment in $customRoleAssignments) {
-                        Out-LogFile "Custom Role Assignment found:" -Notice
-                        Out-LogFile "  Role: $($assignment.RoleName)" -Notice
-                        Out-LogFile "  Assignee: $($assignment.AssigneeDisplayName) ($($assignment.RoleAssigneeType))" -Notice
-                        Out-LogFile "  Assigned: $($assignment.AssigningTimeUTC)" -Notice
-                        
-                        if (-not $assignment.AssignmentEnabled) {
-                            Out-LogFile "  Warning: Assignment is disabled" -Notice
-                        }
-                        if ($assignment.AssignmentCustom) {
-                            Out-LogFile "  Warning: Custom recipient scope configured" -Notice
-                        }
-                    }
-                }
+            # Export combined CSV
+            if ($allRoles.Count -gt 0) {
+                $allRoles | Export-Csv -Path (Join-Path -Path $TenantPath -ChildPath "AllEDiscoveryRoles.csv") -NoTypeInformation
+                Out-LogFile "Found total of $($allRoles.Count) eDiscovery roles across all platforms" -notice
             }
             else {
-                Out-LogFile "No custom roles with eDiscovery permissions found"
+                Out-LogFile "No eDiscovery roles found on any platform" -notice
             }
-            #endregion
-
-            #region Cross-Platform Summary
-            if ($modernRoleMembers.Count -gt 0 -or $exchangeRoleMembers.Count -gt 0 -or $customRoleAssignments.Count -gt 0) {
-                Out-LogFile "eDiscovery Permission Summary:" -Notice
-                if ($modernRoleMembers.Count -gt 0) {
-                    Out-LogFile "  Microsoft 365: $($modernRoleMembers.Count) role assignments" -Notice
-                }
-                if ($exchangeRoleMembers.Count -gt 0) {
-                    Out-LogFile "  Exchange Online: $($exchangeRoleMembers.Count) role group members" -Notice
-                }
-                if ($customRoleAssignments.Count -gt 0) {
-                    Out-LogFile "  Custom Roles: $($customRoleAssignments.Count) role assignments" -Notice
-                }
-            }
-            else {
-                Out-LogFile "No eDiscovery permissions found in either platform" -Notice
-            }
-            #endregion
         }
         catch {
-            Out-LogFile "Error gathering eDiscovery permission information: $($_.Exception.Message)" -Notice
+            Out-LogFile "Error in eDiscovery configuration analysis: $($_.Exception.Message)" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 
     END {
-        Out-LogFile "Completed gathering eDiscovery permissions across platforms"
+        Out-LogFile "Completed eDiscovery permission analysis" -action
     }
 }
