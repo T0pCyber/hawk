@@ -56,7 +56,7 @@
 		Out-LogFile ("Gathering information about " + $User) -action
 
 		#Gather mailbox information
-		Out-LogFile "Gathering Mailbox Information"
+		Out-LogFile "Gathering Mailbox Information" -action
 		$mbx = Get-EXOMailbox -Identity $user
 
 		# Test to see if we have an archive and include that info as well
@@ -69,7 +69,7 @@
 		Get-EXOMailboxFolderStatistics -identity $user | Out-MultipleFileType -FilePrefix "Mailbox_Folder_Statistics" -User $User -txt
 
 		# Gather cas mailbox sessions
-		Out-LogFile "Gathering CAS Mailbox Information"
+		Out-LogFile "Gathering CAS Mailbox Information" -action
 		Get-EXOCasMailbox -identity $user | Out-MultipleFileType -FilePrefix "CAS_Mailbox_Info" -User $User -txt
 	}
 }
