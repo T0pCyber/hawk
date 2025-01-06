@@ -1,37 +1,47 @@
-﻿# String together the hawk user functions to pull data for a single user
-Function Start-HawkUserInvestigation {
-	<#
-	.SYNOPSIS
-		Gathers common data about a provided user.
-	.DESCRIPTION
-		Runs all Hawk users related cmdlets against the specified user and gathers the data.
+﻿Function Start-HawkUserInvestigation {
+    <#
+    .SYNOPSIS
+        Gathers common data about a provided user.
 
-		Cmdlet								Information Gathered
-		-------------------------			-------------------------
-		Get-HawkTenantConfigurationn        Basic Tenant information
-		Get-HawkUserConfiguration           Basic User information
-		Get-HawkUserInboxRule               Searches the user for Inbox Rules
-		Get-HawkUserEmailForwarding         Looks for email forwarding configured on the user
-		Get-HawkUserAutoReply				Looks for enabled AutoReplyConfiguration
-		Get-HawkuserAuthHistory             Searches the unified audit log for users logons
-		Get-HawkUserMailboxAuditing         Searches the unified audit log for mailbox auditing information
-		Get-HawkUserAdminAudit				Searches the EXO Audit logs for any commands that were run against the provided user object.
-		Get-HawkUserMessageTrace			Pulls the email sent by the user in the last 7 days.
-	.PARAMETER UserPrincipalName
-		Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
-	.OUTPUTS
-		See help from individual cmdlets for output list.
-		All outputs are placed in the $Hawk.FilePath directory
-	.EXAMPLE
-		Start-HawkUserInvestigation -UserPrincipalName bsmith@contoso.com
+    .DESCRIPTION
+        Runs all Hawk users related cmdlets against the specified user and gathers the data.
 
-		Runs all Get-HawkUser* cmdlets against the user with UPN bsmith@contoso.com
-	.EXAMPLE
+        Cmdlet                              Information Gathered
+        -------------------------           -------------------------
+        Get-HawkTenantConfiguration          Basic Tenant information
+        Get-HawkUserConfiguration            Basic User information
+        Get-HawkUserInboxRule                Searches the user for Inbox Rules
+        Get-HawkUserEmailForwarding          Looks for email forwarding configured on the user
+        Get-HawkUserAutoReply                Looks for enabled AutoReplyConfiguration
+        Get-HawkUserAuthHistory              Searches the unified audit log for user logons
+        Get-HawkUserMailboxAuditing          Searches the unified audit log for mailbox auditing information
+        Get-HawkUserAdminAudit               Searches the EXO Audit logs for any commands that were run against the provided user object.
+        Get-HawkUserMessageTrace             Pulls the email sent by the user in the last 7 days.
 
-		Start-HawkUserInvestigation -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
+    .PARAMETER UserPrincipalName
+        Single UPN of a user, comma-separated list of UPNs, or an array of objects that contain UPNs.
 
-		Runs all Get-HawkUser* cmdlets against all users who have "C-Level" set in CustomAttribute1
-	#>
+    .PARAMETER <CommonParameters>
+        This function supports the common parameters: `-Verbose`, `-Debug`, `-ErrorAction`, `-ErrorVariable`, `-WarningAction`,
+        `-WarningVariable`, `-OutBuffer`, `-OutVariable`, `-WhatIf`, and `-Confirm`.
+
+    .OUTPUTS
+        See help from individual cmdlets for output list.
+        All outputs are placed in the $Hawk.FilePath directory.
+
+    .EXAMPLE
+        Start-HawkUserInvestigation -UserPrincipalName bsmith@contoso.com
+
+        Runs all Get-HawkUser* cmdlets against the user with UPN bsmith@contoso.com.
+
+    .EXAMPLE
+        Start-HawkUserInvestigation -UserPrincipalName (Get-Mailbox -Filter {CustomAttribute1 -eq "C-level"})
+
+        Runs all Get-HawkUser* cmdlets against all users who have "C-Level" set in CustomAttribute1.
+
+    .NOTES
+        Ensure the Hawk global object is initialized with a valid logging file path before running this function.
+    #>
 	[CmdletBinding(SupportsShouldProcess = $true)]
 	param (
 		[Parameter(Mandatory = $true)]
