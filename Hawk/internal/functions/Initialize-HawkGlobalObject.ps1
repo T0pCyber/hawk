@@ -10,8 +10,6 @@
     * Records target start and end dates for searches
 .PARAMETER Force
     Switch to force the function to run and allow the variable to be recreated
-.PARAMETER IAgreeToTheEula
-    Agrees to the EULA on the command line to skip the prompt.
 .PARAMETER SkipUpdate
     Skips checking for the latest version of the Hawk Module
 .PARAMETER DaysToLookBack
@@ -33,7 +31,6 @@
     StartDate		Calculated start date for searches based on DaysToLookBack
     EndDate			One day in the future
     WhenCreated		Date and time that the variable was created
-    EULA			If you have agreed to the EULA or not
 .EXAMPLE
     Initialize-HawkGlobalObject -Force
 
@@ -43,7 +40,6 @@
     param
     (
         [switch]$Force,
-        [switch]$IAgreeToTheEula,
         [switch]$SkipUpdate,
         [DateTime]$StartDate,
         [DateTime]$EndDate,
@@ -140,64 +136,17 @@
         Return $Folder
     }
 
-    Function Get-Eula {
-
-        if ([string]::IsNullOrEmpty($Hawk.EULA)) {
-            Write-Information ('
-
-	DISCLAIMER:
-
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-			')
-
-            # Prompt the user to agree with EULA
-            $title = "Disclaimer"
-            $message = "Do you agree with the above disclaimer?"
-            $yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes", "Logs agreement and continues use of the Hawk Functions."
-            $no = New-Object System.Management.Automation.Host.ChoiceDescription "&No", "Stops execution of Hawk Functions"
-            $options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
-            $result = $host.ui.PromptForChoice($title, $message, $options, 0)
-            # If yes log and continue
-            # If no log error and exit
-            switch ($result) {
-                0 {
-                    Write-Information "`n"
-                    Return ("Agreed " + (Get-Date)).ToString()
-                }
-                1 {
-                    Write-Information "Aborting Cmdlet"
-                    Write-Error -Message "Failure to agree with EULA" -ErrorAction Stop
-                    break
-                }
-            }
-        }
-        else { Return $Hawk.EULA }
-
-    }
-
     Function New-ApplicationInsight {
         [CmdletBinding(SupportsShouldProcess)]
         param()
         # Initialize Application Insights client
         $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
         if ($Null -eq $Client) {
-            Write-Information "Initializing Application Insights"
+            # So we replicate Out-LogFile’s date/time format and [ACTION] tag to produce a
+            # consistent log-style message on the console when $Hawk is not yet available.
+            # When using Out-LogFile at this point in the program, it causes a circular dependency
+            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            Write-Output "[$timestamp] - [ACTION] - Initializing Application Insights"
             $Client = New-AIClient -key $insightkey
         }
     }
@@ -226,15 +175,6 @@
 
         # If the global variable Hawk doesn't exist or we have -force then set the variable up
         Write-Information "Setting Up initial Hawk environment variable"
-
-        ### Validating EULA ###
-        if ($IAgreeToTheEula) {
-            # Customer has accepted the EULA on the command line
-            [string]$Eula = ("Agreed " + (Get-Date))
-        }
-        else {
-            [string]$Eula = Get-Eula
-        }
 
         #### Checking log path and setting up subdirectory ###
         # If we have a path passed in then we need to check that otherwise ask
@@ -375,7 +315,6 @@
             EndDate              = $EndDate
             AdvancedAzureLicense = $AdvancedAzureLicense
             WhenCreated          = (Get-Date -Format g)
-            EULA                 = $Eula
         }
 
         # Create the script hawk variable
