@@ -24,6 +24,6 @@ Function Out-HawkAppData {
         $null = New-Item -ItemType Directory -Path $HawkAppdataFolder
     }
 
-    Out-LogFile ("Recording HawkAppData to file " + $HawkAppdataPath) -Action
+    Out-LogFile ("Recording HawkAppData to file " + $HawkAppdataPath)
     $global:HawkAppData | ConvertTo-Json | Out-File -FilePath $HawkAppdataPath -Force
 }

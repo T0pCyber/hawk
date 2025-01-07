@@ -16,7 +16,7 @@
     General notes
 #>
 Function Compress-HawkData {
-    Out-LogFile ("Compressing all data in " + $Hawk.FilePath + " for Upload") -action
+    Out-LogFile ("Compressing all data in " + $Hawk.FilePath + " for Upload")
     # Make sure we don't already have a zip file
     if ($null -eq (Get-ChildItem *.zip -Path $Hawk.filepath)) { }
     else {

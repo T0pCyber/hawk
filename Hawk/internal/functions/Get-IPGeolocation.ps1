@@ -25,21 +25,17 @@ Function Get-IPGeolocation {
         Read-HawkAppData
     }
 
-    # If there is no value for access_key, prompt the user
+    # if there is no value of access_key then we need to get it from the user
     if ($null -eq $HawkAppData.access_key) {
 
-        Write-Information "
-        IpStack.com now requires an API access key to gather GeoIP information from their API.
-        Please get a Free access key from https://ipstack.com/ and provide it below.
-        " -InformationAction Continue
+        Out-LogFile "IpStack.com now requires an API access key to gather GeoIP information from their API.`nPlease get a Free access key from https://ipstack.com/ and provide it below." -Information
 
-        # Get the access key from the user
+        # get the access key from the user
         $Accesskey = Read-Host "ipstack.com accesskey"
 
-        # Add the access key to the appdata file
-        Add-HawkAppData -Name access_key -Value $Accesskey
+        # add the access key to the appdata file
+        Add-HawkAppData -name access_key -Value $Accesskey
     }
-
     else {
         $Accesskey = $HawkAppData.access_key
     }
@@ -71,7 +67,7 @@ Function Get-IPGeolocation {
         $geoip = Invoke-RestMethod -Method Get -URI $resource -ErrorAction SilentlyContinue
 
         if (($Error.Count -gt 0) -or ($null -eq $geoip.type)) {
-            Out-LogFile ("Failed to retreive location for IP " + $IPAddress) -isError
+            Out-LogFile ("Failed to retreive location for IP " + $IPAddress)
             $hash = @{
                 IP               = $IPAddress
                 CountryName      = "Failed to Resolve"

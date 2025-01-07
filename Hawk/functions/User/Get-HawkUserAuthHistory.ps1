@@ -85,11 +85,14 @@
                 }
             }
 
-            if ($FailedConversions -le 0){}
-            else {
-                Out-LogFile ($FailedConversions.Count + " Entries failed JSON Conversion") -isError
-                $FailedConversions | Out-MultipleFileType -fileprefix "Failed_Conversion_Authentication_Logs" -user $User -csv -json
+            if ($FailedConversions.Count -le 0) {
+                # Do nothing or handle the zero-case
             }
+            else {
+                Out-LogFile ("$($FailedConversions.Count) Entries failed JSON Conversion") -isError
+                $FailedConversions | Out-MultipleFileType -FilePrefix "Failed_Conversion_Authentication_Logs" -User $User -Csv -Json
+            }
+            
 
             # Add IP Geo Location information to the data
             if ($ResolveIPLocations) {
@@ -128,7 +131,7 @@
 
             # Convert to human readable and export
             Out-LogFile "Converting to Human Readable" -action
-            (Import-AzureAuthenticationLogs -JsonConvertedLogs $ExpandedUserLogonLogs) | Out-MultipleFileType -fileprefix "Converted_Authentication_Logs" -User $User -csv -json
+            (Import-AzureAuthenticationLog -JsonConvertedLogs $ExpandedUserLogonLogs) | Out-MultipleFileType -fileprefix "Converted_Authentication_Logs" -User $User -csv -json
 
             # Export RAW data
             $UserLogonLogs | Out-MultipleFileType -fileprefix "Raw_Authentication_Logs" -user $User -csv -json

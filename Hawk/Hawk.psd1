@@ -113,7 +113,7 @@
 			Tags         = @("O365", "Security", "Audit", "Breach", "Investigation", "Exchange", "EXO", "Compliance", "Logon", "M365", "Incident-Response", "Solarigate")
 
 			# A URL to the license for this module.
-			LicenseUri   = 'https://github.com/T0pCyber/Hawk/LICENSE'
+			LicenseUri   = 'https://github.com/T0pCyber/hawk/blob/master/LICENSE'
 
 			# A URL to the main website for this project.
 			ProjectUri   = 'https://github.com/T0pCyber/Hawk'

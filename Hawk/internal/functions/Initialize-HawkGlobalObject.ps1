@@ -379,11 +379,11 @@
         }
 
         # Create the script hawk variable
-        Out-LogFile "Setting up Script Hawk environment variable`n" -Action
+        Write-Information "Setting up Script Hawk environment variable`n"
         New-Variable -Name Hawk -Scope Script -value $Output -Force
-        Out-LogFile "Script Variable Configured" -Information
-        Out-LogFile ("Hawk Version " + (Get-Module Hawk).version) -Information
-        # Out-LogFile $Hawk
+        Out-LogFile "Script Variable Configured"
+        Out-LogFile ("*** Version " + (Get-Module Hawk).version + " ***")
+        Out-LogFile $Hawk
         #### End of IF
     }
 

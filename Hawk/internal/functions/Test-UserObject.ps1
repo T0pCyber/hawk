@@ -32,8 +32,8 @@ Function Test-UserObject {
             Return $Output
         }
         else {
-            Out-LogFile "Unable to determine if input is a UserPrincipalName" -isError
-            Out-LogFile "Please provide a UPN or array of objects with propertly UserPrincipalName populated" -Information
+            Out-LogFile "[ERROR] - Unable to determine if input is a UserPrincipalName"
+            Out-LogFile "Please provide a UPN or array of objects with propertly UserPrincipalName populated"
             Write-Error "Unable to determine if input is a User Principal Name" -ErrorAction Stop
         }
     }
@@ -43,8 +43,8 @@ Function Test-UserObject {
         Return $ToTest
     }
     else {
-        Out-LogFile "Unable to determine if input is a UserPrincipalName" -isError
-        Out-LogFile "Please provide a UPN or array of objects with propertly UserPrincipalName populated" -Information
+        Out-LogFile "[ERROR] - Unable to determine if input is a UserPrincipalName"
+        Out-LogFile "Please provide a UPN or array of objects with propertly UserPrincipalName populated"
         Write-Error "Unable to determine if input is a User Principal Name" -ErrorAction Stop
     }
 }
