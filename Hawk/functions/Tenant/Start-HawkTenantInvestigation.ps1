@@ -80,8 +80,8 @@
 
 
 	if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
-		Out-LogFile "Running Get-HawkTenantEDiscoveryLogs" -action
-		Get-HawkTenantEDiscoveryLogs
+		Out-LogFile "Running Get-HawkTenantEDiscoveryLog" -action
+		Get-HawkTenantEDiscoveryLog
 	}
 
 	if ($PSCmdlet.ShouldProcess("Domain Activity", "Get domain activity")) {

@@ -142,11 +142,7 @@
         # Initialize Application Insights client
         $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
         if ($Null -eq $Client) {
-            # So we replicate Out-LogFile’s date/time format and [ACTION] tag to produce a
-            # consistent log-style message on the console when $Hawk is not yet available.
-            # When using Out-LogFile at this point in the program, it causes a circular dependency
-            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-            Write-Output "[$timestamp] - [ACTION] - Initializing Application Insights"
+            Write-Output "Initializing Application Insights"
             $Client = New-AIClient -key $insightkey
         }
     }
@@ -189,7 +185,7 @@
         if ($null -eq $StartDate) {
 
             # Read in our # of days back or the actual start date
-            $StartRead = Read-Host "`nFirst Day of Search Window (1-90, Date, Default 90)"
+            $StartRead = Read-Host "`nPlease Enter First Day of Search Window (1-90, Date, Default 90)"
 
             # Determine if the input was a date time
             # True means it was NOT a datetime
@@ -205,9 +201,8 @@
                 }
 
                 # Calculate our startdate setting it to midnight
-                Write-Information ("Calculating Start Date from current date minus " + $StartRead + " days.")
                 [DateTime]$StartDate = ((Get-Date).AddDays(-$StartRead)).Date
-                Write-Information ("Setting StartDate by Calculation to " + $StartDate + "`n")
+                Write-Information ("Start Date: " + $StartDate + "")
             }
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
                 #### DATE TIME Provided ####
@@ -224,8 +219,6 @@
                     Write-Information ("Setting date to default of Today - 90 days.")
                     [DateTime]$StartDate = ((Get-Date).AddDays(-90)).Date
                 }
-
-                Write-Information ("Setting StartDate by Date to " + $StartDate + "`n")
             }
             else {
                 Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
@@ -234,7 +227,7 @@
 
         if ($null -eq $EndDate) {
             # Read in the end date
-            $EndRead = Read-Host "`nLast Day of search Window (1-90, date, Default Today)"
+            $EndRead = Read-Host "`nPlease Enter Last Day of Search Window (1-90, date, Default Today)"
 
             # Determine if the input was a date time
             # True means it was NOT a datetime
@@ -243,12 +236,11 @@
 
                 # if we have a null entry (just hit enter) then set startread to the default of 90
                 if ([string]::IsNullOrEmpty($EndRead)) {
-                    Write-Information ("Setting End Date to Today")
                     [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
                 }
                 else {
                     # Calculate our startdate setting it to midnight
-                    Write-Information ("Calculating End Date from current date minus " + $EndRead + " days.")
+                    Write-Information ("End Date: " + $EndRead + " days.")
                     # Subtract 1 from the EndRead entry so that we get one day less for the purpose of how searching works with times
                     [DateTime]$EndDate = ((Get-Date).AddDays( - ($EndRead - 1))).Date
                 }
@@ -258,7 +250,7 @@
                     Write-Error "StartDate Cannot be More Recent than EndDate" -ErrorAction Stop
                 }
                 else {
-                    Write-Information ("Setting EndDate by Calculation to " + $EndDate + "`n")
+                    Write-Information ("End Date: " + $EndDate + "`n")
                 }
             }
             elseif (!($null -eq ($EndRead -as [DateTime]))) {
@@ -320,9 +312,19 @@
         # Create the script hawk variable
         Write-Information "Setting up Script Hawk environment variable`n"
         New-Variable -Name Hawk -Scope Script -value $Output -Force
-        Out-LogFile "Script Variable Configured"
-        Out-LogFile ("*** Version " + (Get-Module Hawk).version + " ***")
-        Out-LogFile $Hawk
+        Out-LogFile "Script Variable Configured" -Information
+        Out-LogFile ("Hawk Version: " + (Get-Module Hawk).version) -Information
+        # Print each property of $Hawk on its own line
+        foreach ($prop in $Hawk.PSObject.Properties) {
+            # If the property value is $null or an empty string, display "N/A"
+            $value = if ($null -eq $prop.Value -or [string]::IsNullOrEmpty($prop.Value.ToString())) {
+                "N/A"
+            } else {
+                $prop.Value
+            }
+        
+            Out-LogFile ("{0} = {1}" -f $prop.Name, $value) -Information
+        }
         #### End of IF
     }
 
