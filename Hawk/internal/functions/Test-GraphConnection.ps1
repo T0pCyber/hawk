@@ -15,17 +15,21 @@
 
 #>
 Function Test-GraphConnection {
-    # Get tenant details to test that Connect-MgGraph has been called
-    try { $null = Get-MgOrganization -ErrorAction stop }
+    try {
+        $null = Get-MgOrganization -ErrorAction Stop
+    }
     catch {
-        # Write to the screen if we don't have a log file path yet
-        if ([string]::IsNullOrEmpty($Hawk.Logfile)) {
-            Write-Output "Connecting to MGGraph using MGGraph Module"
+        # Fallback if $Hawk is not initialized
+        if ($null -eq $Hawk) {
+            # Replicate Out-LogFile's date/time format and ACTION style
+            $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            Write-Output "[$timestamp] - [ACTION] - Connecting to MGGraph using MGGraph Module"
         }
-        # Otherwise output to the log file
         else {
-            Out-LogFile "Connecting to MGGraph using MGGraph Module" -Action
+            # $Hawk exists, so we can safely use Out-LogFile 
+            Out-LogFile -String "Connecting to MGGraph using MGGraph Module" -Action
         }
+
         Connect-MGGraph
     }
 }
