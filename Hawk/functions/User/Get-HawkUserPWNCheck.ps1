@@ -5,7 +5,7 @@
 .DESCRIPTION
     Checks a single email address against HaveIBeenPwned. An API key is required and can be obtained from https://haveibeenpwned.com/API/Key for $3.50 a month.
     This script will prompt for the key if $hibpkey is not set as a variable.
-.PARAMETER Email
+.PARAMETER EmailAddress
     Accepts since EMail address or array of Email address strings.
     DOES NOT Accept an array of objects (it will end up checked the UPN and not the email address)
 .OUTPUTS
