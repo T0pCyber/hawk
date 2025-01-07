@@ -80,4 +80,5 @@
 - Updated Out-Log file, modifying -Notice parameter for tagging prompts with INVESTIGATE in brackets instead of asterisks, for uniformity purposes.
 - Fixed critical lack of avian artwork in startup sequence by adding ASCII welcome banner.
 - Updated all post Global Hawk Variable Initialized code to use prompt tagging.
+- Modified Out-MultipleFileType to not output "appending to file" to STDOUT repetitively.
 - Updated Get-HawkTenantEDiscoveryConfiguration to use non-deprecated means of collecting / analyzing eDiscovery role assignments.
