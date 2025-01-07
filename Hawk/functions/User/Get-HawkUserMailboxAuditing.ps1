@@ -99,7 +99,7 @@
         # Test if mailbox auditing is enabled
         $mbx = Get-Mailbox -Identity $User
         if ($mbx.AuditEnabled -eq $true) {
-            Out-LogFile "Mailbox Auditing is enabled."
+            Out-LogFile "Mailbox Auditing is enabled." -Information
 
             try {
                 # Get the user's folder path
@@ -109,12 +109,12 @@
                 }
 
                 # Process ExchangeItem records
-                Out-LogFile "Searching Unified Audit Log for ExchangeItem events..."
+                Out-LogFile "Searching Unified Audit Log for ExchangeItem events." -action
                 $searchCommand = "Search-UnifiedAuditLog -UserIds $User -RecordType ExchangeItem"
                 $itemLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
                 if ($itemLogs.Count -gt 0) {
-                    Out-LogFile ("Found " + $itemLogs.Count + " ExchangeItem events.")
+                    Out-LogFile ("Found " + $itemLogs.Count + " ExchangeItem events.") -Information
 
                     # Write raw JSON dump
                     $RawJsonPath = Join-Path -Path $UserFolder -ChildPath "ExchangeItem_Raw.json"
@@ -130,16 +130,16 @@
                     $itemLogs | Out-MultipleFileType -FilePrefix "ExchangeItem_Logs" -csv -json -User $User
                 }
                 else {
-                    Out-LogFile "No ExchangeItem events found."
+                    Out-LogFile "No ExchangeItem events found." -Information
                 }
 
                 # Process ExchangeItemGroup records
-                Out-LogFile "Searching Unified Audit Log for ExchangeItemGroup events..."
+                Out-LogFile "Searching Unified Audit Log for ExchangeItemGroup events." -action
                 $searchCommand = "Search-UnifiedAuditLog -UserIds $User -RecordType ExchangeItemGroup"
                 $groupLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
                 if ($groupLogs.Count -gt 0) {
-                    Out-LogFile ("Found " + $groupLogs.Count + " ExchangeItemGroup events.")
+                    Out-LogFile ("Found " + $groupLogs.Count + " ExchangeItemGroup events.") -Information
 
                     # Write raw JSON dump
                     $RawJsonPath = Join-Path -Path $UserFolder -ChildPath "ExchangeItemGroup_Raw.json"
@@ -155,21 +155,21 @@
                     $groupLogs | Out-MultipleFileType -FilePrefix "ExchangeItemGroup_Logs" -csv -json -User $User
                 }
                 else {
-                    Out-LogFile "No ExchangeItemGroup events found."
+                    Out-LogFile "No ExchangeItemGroup events found." -Information
                 }
 
                 # Summary logging
                 $totalEvents = ($itemLogs.Count + $groupLogs.Count)
-                Out-LogFile "Completed processing $totalEvents total events."
+                Out-LogFile "Completed processing $totalEvents total events." -Information
             }
             catch {
-                Out-LogFile "Error retrieving audit logs: $($_.Exception.Message)" -Notice
+                Out-LogFile "Error retrieving audit logs: $($_.Exception.Message)" -isError
                 Write-Error -ErrorRecord $_ -ErrorAction Continue
             }
         }
         else {
-            Out-LogFile ("Auditing not enabled for " + $User) -Notice
-            Out-LogFile "Enable auditing to track mailbox access patterns." -Notice
+            Out-LogFile ("Auditing not enabled for " + $User) -Information
+            Out-LogFile "Enable auditing to track mailbox access patterns." -Information
         }
     }
 }

@@ -25,7 +25,7 @@
     [CmdletBinding()]
     param()
 
-    Out-LogFile "Gathering OAuth / Application Grants"
+    Out-LogFile "Gathering OAuth / Application Grants" -Action
 
     Test-GraphConnection
 
@@ -44,12 +44,12 @@
     }
 
     if ($flag) {
-        Out-LogFile 'Review the information at the following link to understand these results' -notice
-        Out-LogFile 'https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants' -notice
+        Out-LogFile 'Review the information at the following link to understand these results' -Information
+        Out-LogFile 'https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants' -Information
     }
     else {
-        Out-LogFile "To review this data follow:"
-        Out-LogFile "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants"
+        Out-LogFile "To review this data follow:" -Information
+        Out-LogFile "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants" -Information
     }
 
     $Grants | Out-MultipleFileType -FilePrefix "Consent_Grants" -csv -json

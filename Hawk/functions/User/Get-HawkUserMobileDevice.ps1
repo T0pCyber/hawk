@@ -44,14 +44,14 @@
         [string]$User = $Object.UserPrincipalName
 
         # Get all mobile devices
-        Out-Logfile ("Gathering Mobile Devices for: " + $User)
+        Out-Logfile ("Gathering Mobile Devices for: " + $User) -Action
         [array]$MobileDevices = Get-MobileDevice -mailbox $User
 
         if ($Null -eq $MobileDevices) {
-            Out-Logfile ("No devices found for user: " + $User)
+            Out-Logfile ("No devices found for user: " + $User) -Information
         }
         else {
-            Out-Logfile ("Found " + $MobileDevices.count + " Devices")
+            Out-Logfile ("Found " + $MobileDevices.count + " Devices") -Information
 
             # Check each device to see if it was NEW
             # If so flag it for investigation

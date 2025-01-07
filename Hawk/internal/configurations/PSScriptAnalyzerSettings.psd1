@@ -7,5 +7,6 @@
         'PSShouldProcess'
         # Exclude this as old test rules use Global Vars, will need to fix old tests and re-include this rule
         'PSAvoidGlobalVars'
+        'PSUseDeclaredVarsMoreThanAssignments' 
     )
 }

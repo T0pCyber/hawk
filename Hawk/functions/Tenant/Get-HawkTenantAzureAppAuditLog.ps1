@@ -33,7 +33,7 @@ PROCESS{
 $AzureApplicationActivityEvents = $null
 
 Out-LogFile "Searching Unified Audit Logs Azure Activities" -Action
-Out-LogFile "Searching for Application Activities"
+Out-LogFile "Searching for Application Activities" -Action
 
 # Search the unified audit log for events related to application activity
 # https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants
@@ -41,7 +41,7 @@ $AzureApplicationActivityEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("S
 
 # If null we found no changes to nothing to do here
 if ($null -eq $AzureApplicationActivityEvents){
-	Out-LogFile "No Application related events found in the search time frame."
+	Out-LogFile "No Application related events found in the search time frame." -Information
 }
 
 # If not null then we must have found some events so flag them

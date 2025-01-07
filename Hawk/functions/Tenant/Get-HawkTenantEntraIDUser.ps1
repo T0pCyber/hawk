@@ -24,7 +24,7 @@
         if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
             Initialize-HawkGlobalObject
         }
-        Out-LogFile "Gathering Entra ID Users"
+        Out-LogFile "Gathering Entra ID Users" -Action
 
         # Ensure we have a valid Graph connection
         Test-GraphConnection
@@ -56,10 +56,10 @@
                 Out-MultipleFileType -FilePrefix "EntraIDUsers" -csv -json
         }
         else {
-            Out-LogFile "No users found"
+            Out-LogFile "No users found" -Information
         }
     }
     END {
-        Out-Logfile "Completed exporting Entra ID users"
+        Out-Logfile "Completed exporting Entra ID users" -Information
     }
  }

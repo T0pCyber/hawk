@@ -60,7 +60,7 @@
 - Removed Robust Cloud Command from build as it was not being used in the code base anymore
 - Updated PowerShell API key in GitHub to fix build.yml issue where the Hawk would not publish to gallery on merge to main
 
-## 3.2.3 (2024-12-20)
+## 3.2.3 (2025-1-07)
 
 - Replaced all AzureAD functionality with Microsoft Graph commands.
 - Updated Get-HawkTenantAZAdmins to use Microsoft Graph.
@@ -78,3 +78,7 @@
 - Removed ability to detect RBAC Application Impersonation as this is being deprecated / removed in FEB 2025.
 - Updated Out-Log file, adding -Information parameter for tagging prompts with INFO for status updates.
 - Updated Out-Log file, modifying -Notice parameter for tagging prompts with INVESTIGATE in brackets instead of asterisks, for uniformity purposes.
+- Fixed critical lack of avian artwork in startup sequence by adding ASCII welcome banner.
+- Updated all post Global Hawk Variable Initialized code to use prompt tagging.
+- Modified Out-MultipleFileType to not output "appending to file" to STDOUT repetitively.
+- Updated Get-HawkTenantEDiscoveryConfiguration to use non-deprecated means of collecting / analyzing eDiscovery role assignments.

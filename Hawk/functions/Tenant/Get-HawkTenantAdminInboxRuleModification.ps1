@@ -66,7 +66,7 @@ Function Get-HawkTenantAdminInboxRuleModification {
         [array]$ModifiedInboxRules = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
         if ($ModifiedInboxRules.Count -gt 0) {
-            Out-LogFile ("Found " + $ModifiedInboxRules.Count + " admin inbox rule modifications in audit logs") -Action
+            Out-LogFile ("Found " + $ModifiedInboxRules.Count + " admin inbox rule modifications in audit logs") -Information
 
             # Write raw audit data with action flag
             $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Modification_Raw.json"
@@ -108,15 +108,15 @@ Function Get-HawkTenantAdminInboxRuleModification {
                 }
             }
             else {
-                Out-LogFile "Error: Failed to parse inbox rule audit data" -Notice
+                Out-LogFile "Error: Failed to parse inbox rule audit data" -isError
             }
         }
         else {
-            Out-LogFile "No inbox rule modifications found in audit logs"
+            Out-LogFile "No inbox rule modifications found in audit logs" -Information
         }
     }
     catch {
-        Out-LogFile "Error analyzing admin inbox rule modifications: $($_.Exception.Message)" -Notice
+        Out-LogFile "Error analyzing admin inbox rule modifications: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
 }

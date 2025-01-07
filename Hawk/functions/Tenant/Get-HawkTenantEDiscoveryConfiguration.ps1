@@ -1,64 +1,137 @@
 ﻿Function Get-HawkTenantEDiscoveryConfiguration {
-<#
-.SYNOPSIS
-    Looks for users that have e-discovery rights.
-    Find any roles that have access to key edisocovery cmdlets and output the users who have those rights
-.DESCRIPTION
-    Searches for all roles that have e-discovery cmdlets.
-    Searches for all users / groups that have access to those roles.
-.OUTPUTS
-    File: EDiscoveryRoles.csv
-    Path: \
-    Description: All roles that have access to the New-MailboxSearch and Search-Mailbox cmdlets
+    <#
+    .SYNOPSIS
+        Gets complete eDiscovery configuration data across built-in and custom role assignments.
 
-    File: EDiscoveryRoles.xml
-    Path: \XML
-    Description: All roles that have access to the New-MailboxSearch and Search-Mailbox cmdlets as CLI XML
+    .DESCRIPTION
+        Retrieves comprehensive eDiscovery permissions data from two distinct sources in Exchange Online:
 
-    File: EDiscoveryRoleAssignments.csv
-    Path: \
-    Description: All users that are assigned one of the discovered roles
+        1. Built-in Exchange Online Role Groups:
+        - Standard eDiscovery roles like "Discovery Management"
+        - Pre-configured with specific eDiscovery capabilities
+        - Managed through Exchange admin center
+        - Typically used for organization-wide eDiscovery access
+        - Includes mailbox search and hold capabilities
+        - Part of Microsoft's default security model
 
-    File: EDiscoveryRoleAssignments.xml
-    Path: \XML
-    Description: All users that are assigned one of the discovered roles as CLI XML
-.EXAMPLE
-    Get-HawkTenantEDiscoveryConfiguration
+        2. Custom Management Role Entries:
+        - User-created roles with eDiscovery permissions
+        - Can be tailored for specific business needs
+        - May include subset of eDiscovery capabilities
+        - Often created for specialized teams or scenarios
+        - Requires careful monitoring for security
+        - May grant permissions through role assignments
+        - Can include cmdlets like:
+            * New-MailboxSearch
+            * Search-Mailbox
 
-    Runs the cmdlet against the current logged in tenant and outputs ediscovery information
-#>
+        The function captures all properties and relationships to provide a complete
+        view of who has eDiscovery access and how those permissions were granted.
+        This helps security teams audit and manage eDiscovery permissions effectively.
 
-    Test-EXOConnection
-    Send-AIEvent -Event "CmdRun"
+    .OUTPUTS
+        File: EDiscoveryRoles.csv/.json
+        Path: \Tenant
+        Description: Complete data about standard Exchange Online eDiscovery role groups
+        Contains: Role names, members, assigned permissions, creation dates, and all
+                associated properties for built-in eDiscovery roles
 
-    Out-LogFile "Gathering Tenant information about E-Discovery Configuration" -action
+        File: CustomEDiscoveryRoles.csv/.json
+        Path: \Tenant
+        Description: Complete data about custom roles with eDiscovery permissions
+        Contains: Custom role definitions, assignments, scope, creation dates, and all
+                configurable properties for user-created roles with eDiscovery access
 
-    # Nulling our our role arrays
-    [array]$Roles = $null
-    [array]$RoleAssignements = $null
+    .EXAMPLE
+        Get-HawkTenantEDiscoveryConfiguration
 
-    # Look for E-Discovery Roles and who they might be assigned to
-    $EDiscoveryCmdlets = "New-MailboxSearch", "Search-Mailbox"
+        Returns complete, unfiltered eDiscovery permission data showing both built-in
+        role groups and custom role assignments that grant eDiscovery access.
 
-    # Find any roles that have these critical ediscovery cmdlets in them
-    # Bad actors with sufficient rights could have created new roles so we search for them
-    Foreach ($cmdlet in $EDiscoveryCmdlets) {
-        [array]$Roles = $Roles + (Get-ManagementRoleEntry ("*\" + $cmdlet))
+    .NOTES
+        Built-in roles provide consistent, pre-configured access while custom roles
+        offer flexibility but require more oversight. Regular review of both types
+        is recommended for security compliance.
+    #>
+    [CmdletBinding()]
+    param()
+
+    #TO DO: UPDATE THIS FUNCTION TO FIND E-Discovery roles created via the graph API
+
+    BEGIN {
+        if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+            Initialize-HawkGlobalObject
+        }
+
+        Test-EXOConnection
+        Send-AIEvent -Event "CmdRun"
+
+        Out-LogFile "Gathering complete E-Discovery Configuration" -action
+
+        # Create tenant folder if needed
+        $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
+        if (-not (Test-Path -Path $TenantPath)) {
+            New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
+        }
+
+        # Null out role arrays
+        [array]$Roles = $null
+        [array]$RoleAssignements = $null
     }
 
-    # Select just the unique entries based on role name
-    $UniqueRoles = Select-UniqueObject -ObjectArray $Roles -Property Role
+    PROCESS {
+        try {
+            #region Exchange Online Role Groups - Full Data
+            Out-LogFile "Gathering all Exchange Online role entries with eDiscovery cmdlets" -Action
+            
+            # Find any roles that have eDiscovery cmdlets
+            $EDiscoveryCmdlets = "New-MailboxSearch", "Search-Mailbox"
+            
+            foreach ($cmdlet in $EDiscoveryCmdlets) {
+                [array]$Roles = $Roles + (Get-ManagementRoleEntry ("*\" + $cmdlet))
+            }
 
-    Out-LogFile ("Found " + $UniqueRoles.count + " Roles with E-Discovery Rights")
-    $UniqueRoles | Out-MultipleFileType -FilePrefix "EDiscoveryRoles" -csv -xml -json
+            # Select just the unique entries based on role name
+            if ($Roles) {
+                $UniqueRoles = $Roles | Sort-Object -Property Role -Unique
 
-    # Get everyone who is assigned one of these roles
-    Foreach ($Role in $UniqueRoles) {
-        [array]$RoleAssignements = $RoleAssignements + (Get-ManagementRoleAssignment -Role $Role.role -Delegating $false)
+                Out-LogFile ("Found " + $UniqueRoles.Count + " Roles with E-Discovery Rights") -Information
+                
+                # Save complete role data
+                $UniqueRoles | ConvertTo-Json -Depth 100 | 
+                    Out-File (Join-Path -Path $TenantPath -ChildPath "EDiscoveryRoles.json")
+                $UniqueRoles | Export-Csv -Path (Join-Path -Path $TenantPath -ChildPath "EDiscoveryRoles.csv") -NoTypeInformation
+
+                # Get everyone who is assigned one of these roles
+                foreach ($Role in $UniqueRoles) {
+                    [array]$RoleAssignements = $RoleAssignements + (Get-ManagementRoleAssignment -Role $Role.Role -Delegating $false)
+                }
+
+                if ($RoleAssignements) {
+                    Out-LogFile ("Found " + $RoleAssignements.Count + " Role Assignments for these Roles") -Information
+                    
+                    # Save complete assignment data
+                    $RoleAssignements | ConvertTo-Json -Depth 100 | 
+                        Out-File (Join-Path -Path $TenantPath -ChildPath "CustomEDiscoveryRoles.json")
+                    $RoleAssignements | Export-Csv -Path (Join-Path -Path $TenantPath -ChildPath "CustomEDiscoveryRoles.csv") -NoTypeInformation
+                }
+                else {
+                    Out-LogFile "No role assignments found" -Information
+                }
+            }
+            else {
+                Out-LogFile "No roles with eDiscovery cmdlets found" -Information
+            }
+
+            #endregion
+        }
+        catch {
+            Out-LogFile "Error gathering eDiscovery configuration: $($_.Exception.Message)" -isError
+            Write-Error -ErrorRecord $_ -ErrorAction Continue
+        }
     }
 
-    Out-LogFile ("Found " + $RoleAssignements.count + " Role Assignements for these Roles")
-    $RoleAssignements | Out-MultipleFileType -FilePreFix "EDiscoveryRoleAssignments" -csv -xml -json
-
-
+    END {
+        Out-LogFile "Completed gathering eDiscovery configuration" -Information
+    }
 }

@@ -67,7 +67,7 @@
 
             # If there are any results process and output them
             if ($UserChanges.Count -gt 0) {
-                Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user")
+                Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user") -Information
 
                 # Get the user's output folder path
                 $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
@@ -93,11 +93,11 @@
                 $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -User $User
             }
             else {
-                Out-LogFile "No User Changes found."
+                Out-LogFile "No User Changes found." -Information
             }
         }
         catch {
-            Out-LogFile "Error processing audit logs for $User : $_" -Notice
+            Out-LogFile "Error processing audit logs for $User : $_" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }

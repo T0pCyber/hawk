@@ -55,7 +55,7 @@
 
         # Check if forwarding is configured by user or admin
         if ([string]::IsNullOrEmpty($mbx.ForwardingSMTPAddress) -and [string]::IsNullOrEmpty($mbx.ForwardingAddress)) {
-            Out-LogFile "No forwarding configuration found"
+            Out-LogFile "No forwarding configuration found" -Information
         }
         # If populated report it and add to a CSV file of positive finds
         else {

@@ -69,7 +69,7 @@
     # If yes log and continue
     # If no log error and exit
     switch ($result) {
-        0 { Out-LogFile "Starting full Tenant Search" }
+        0 { Out-LogFile "Starting full Tenant Search" -Action}
         1 { Write-Error -Message "User Stopped Cmdlet" -ErrorAction Stop }
     }
 
@@ -77,7 +77,7 @@
     $exopssession = get-pssession | Where-Object { ($_.ConfigurationName -eq 'Microsoft.Exchange') -and ($_.State -eq 'Opened') }
 
     # Gather all of the mailboxes
-    Out-LogFile "Getting all Mailboxes"
+    Out-LogFile "Getting all Mailboxes" -Action
 
     # If we don't have a value for csvpath then gather all users in the tenant
     if ([string]::IsNullOrEmpty($CSVPath)) {
@@ -95,18 +95,32 @@
     }
 
     # Report how many mailboxes we are going to operate on
-    Out-LogFile ("Found " + $AllMailboxes.count + " Mailboxes")
+    Out-LogFile ("Found " + $AllMailboxes.count + " Mailboxes") -Information
 
     # Path for robust log file
-    $RobustLog = Join-path $Hawk.FilePath "Robust.log"
+    # $RobustLog = Join-path $Hawk.FilePath "Robust.log"
 
     # Build the command we are going to need to run with Start-RobustCloudCommand
-    $cmd = "Start-RobustCloudCommand -UserPrincipalName " + $UserPrincipalName + " -logfile `$RobustLog -recipients `$AllMailboxes -scriptblock {Get-HawkUserInboxRule -UserPrincipalName `$input.PrimarySmtpAddress.tostring()}"
+    # $cmd = "Start-RobustCloudCommand -UserPrincipalName " + $UserPrincipalName + " -logfile `$RobustLog -recipients `$AllMailboxes -scriptblock {Get-HawkUserInboxRule -UserPrincipalName `$input.PrimarySmtpAddress.tostring()}"
+    $AllMailboxes | ForEach-Object {
+        Start-RobustCloudCommand -UserPrincipalName $UserPrincipalName -LogFile $RobustLog -Recipients $_ -ScriptBlock {
+            Get-HawkUserInboxRule -UserPrincipalName $_.PrimarySmtpAddress
+        }
+    }
+    
+
 
     # Invoke our Start-Robust command to get all of the inbox rules
-    Out-LogFile "===== Starting Robust Cloud Command to gather user inbox rules for all tenant users ====="
-    Out-LogFile $cmd
-    Invoke-Expression $cmd
+    Out-LogFile "===== Starting Robust Cloud Command to gather user inbox rules for all tenant users =====" -Action
+    # Out-LogFile $cmd
+    # Invoke-Expression $cmd
 
-    Out-LogFile "Process Complete"
+    # Build the command directly without using Invoke-Expression
+    $AllMailboxes | ForEach-Object {
+        Start-RobustCloudCommand -UserPrincipalName $UserPrincipalName -LogFile $RobustLog -Recipients $_ -ScriptBlock {
+            Get-HawkUserInboxRule -UserPrincipalName $_.PrimarySmtpAddress
+        }
+    }
+
+    Out-LogFile "Process Complete" -Information
 }

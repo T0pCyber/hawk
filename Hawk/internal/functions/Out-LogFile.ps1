@@ -9,16 +9,21 @@
 
         Message types:
         - Action: Represent ongoing operations or procedures.
+        - Error: Represent failures, exceptions, or error conditions that prevented successful execution.
         - Investigate (notice, silentnotice): Represent events that require attention or hold 
-          investigative value.
+        investigative value.
         - Information: Represent successful completion or informational status updates 
-          that do not require action or investigation.
+        that do not require action or investigation.
 
     .PARAMETER string
         The log message to be written.
 
     .PARAMETER action
         Switch indicating the log entry is describing an action being performed.
+
+    .PARAMETER isError
+        Switch indicating the log entry represents an error condition or failure.
+        The output is prefixed with [ERROR] in the log file.
 
     .PARAMETER notice
         Switch indicating the log entry requires investigation or special attention.
@@ -45,6 +50,12 @@
 
         Writes a log message indicating an action is being performed. 
         The output is prefixed with [ACTION] in the log file.
+
+    .EXAMPLE
+        Out-LogFile "Failed to connect to Exchange Online" -isError
+
+        Writes a log message indicating an error condition.
+        The output is prefixed with [ERROR] in the log file.
 
     .EXAMPLE
         Out-LogFile "Detected suspicious login attempt from external IP" -notice
@@ -78,6 +89,7 @@
         [switch]$action,
         [switch]$notice,
         [switch]$silentnotice,
+        [switch]$isError,
         [switch]$NoDisplay,
         [switch]$Information
     )
@@ -102,6 +114,9 @@
     if ($action) {
         $logstring = "[$timestamp] - [ACTION] - $string"
     }
+    elseif ($isError) {
+        $logstring = "[$timestamp] - [ERROR]  - $string"
+    }
     elseif ($notice) {
         $logstring = "[$timestamp] - [INVESTIGATE] - $string"
 
@@ -121,7 +136,7 @@
         $LogOutput = $false
     }
     elseif ($Information) {
-        $logstring = "[$timestamp] - [INFO] - $string"
+        $logstring = "[$timestamp] - [INFO]   - $string"
     }
     else {
         $logstring = "[$timestamp] - $string"

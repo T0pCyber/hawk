@@ -64,18 +64,18 @@
     #Check Audit Log Config Setting and make sure it is enabled
     Out-LogFile "Gathering Tenant Configuration Information" -action
 
-    Out-LogFile "Admin Audit Log"
+    Out-LogFile "Gathering Admin Audit Log" -action
     Get-AdminAuditLogConfig | Out-MultipleFileType -FilePrefix "AdminAuditLogConfig" -txt -xml
 
-    Out-LogFile "Organization Configuration"
+    Out-LogFile "Gathering Organization Configuration" -action
     Get-OrganizationConfig| Out-MultipleFileType -FilePrefix "OrgConfig" -xml -txt
 
-    Out-LogFile "Remote Domains"
+    Out-LogFile "Gathering Remote Domains" -action
     Get-RemoteDomain | Out-MultipleFileType -FilePrefix "RemoteDomain" -xml -csv -json
 
-    Out-LogFile "Transport Rules"
+    Out-LogFile "Gathering Transport Rules" -action
     Get-TransportRule | Out-MultipleFileType -FilePrefix "TransportRules" -xml -csv -json
 
-    Out-LogFile "Transport Configuration"
+    Out-LogFile "Gathering Transport Configuration" -action
     Get-TransportConfig | Out-MultipleFileType -FilePrefix "TransportConfig" -xml -csv -json
 }
