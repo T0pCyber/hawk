@@ -76,7 +76,7 @@
             }
         }
 
-        # Convert the result into a PS object
+        # Convert the result into a PS custgom object
         $Pwned = $Result.content | ConvertFrom-Json
 
         # Output the value
