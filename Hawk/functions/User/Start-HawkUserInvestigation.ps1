@@ -49,6 +49,8 @@
 			[Parameter(Mandatory = $true)]
 			[array]$UserPrincipalName
 		)
+
+		Write-HawkBanner
 	
 		# Check if the logging filepath is set
 		if ([string]::IsNullOrEmpty($Hawk.FilePath)) {

@@ -33,6 +33,8 @@
 	[CmdletBinding(SupportsShouldProcess)]
 	param()
 
+	Write-HawkBanner
+
 	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
 		Initialize-HawkGlobalObject
 	}
