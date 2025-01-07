@@ -13,35 +13,38 @@
     Path: \<user>
     Description: Information returned from the pwned database
 .EXAMPLE
-    Start-HawkUserPWNCheck -Email user@company.com
+    Get-HawkUserPWNCheck -EmailAddress user@company.com
 
     Returns the pwn state of the email address provided
 #>
 
-    param([array]$Email)
+    param(
+        [string[]]$EmailAddress
+        )
 
     # if there is no value of hibpkey then we need to get it from the user
-    if ($null -eq $hibpkey) {
+    BEGIN {if ($null -eq $hibpkey) {
 
         Write-Host -ForegroundColor Green "
 
         HaveIBeenPwned.com now requires an API access key to gather Stats with from their API.
 
-        Please purchase an API key for $3.50 a month from get a Free access key from https://haveibeenpwned.com/API/Key and provide it below.
+        Please purchase an API key for `$3.95 a month from get a Free access key from https://haveibeenpwned.com/API/Key and provide it below.
 
         "
 
         # get the access key from the user
         $hibpkey = Read-Host "haveibeenpwned.com apikey"
-    }
+        }
+    }#End of BEGIN block
 
     # Verify our UPN input
-    [array]$UserArray = Test-UserObject -ToTest $Email
+    PROCESS {[array]$UserArray = Test-UserObject -ToTest $EmailAddress
     $headers=@{'hibp-api-key' = $hibpkey}
 
     foreach ($Object in $UserArray) {
 
-        $[string]$User = $Object.UserPrincipalName
+        [string]$User = $Object.UserPrincipalName
 
         # Convert the email to URL encoding
         $uriEncodeEmail = [uri]::EscapeDataString($($user))
@@ -49,19 +52,25 @@
         # Build and invoke the URL
         $InvokeURL = 'https://haveibeenpwned.com/api/v3/breachedaccount/' + $uriEncodeEmail + '?truncateResponse=false'
         $Error.clear()
-
+        #Will catch the error if the email is not found. 404 error means that the email is not found in the database.
+        #https://haveibeenpwned.com/API/v3#ResponseCodes contains the response codes for the API
         try {
-            $Result = Invoke-WebRequest $InvokeURL -Headers $headers -userAgent 'Hawk' -ErrorAction Stop
+            $Result = Invoke-WebRequest -Uri $InvokeURL -Headers $headers -userAgent 'Hawk' -ErrorAction Stop
         }
         catch {
-            switch ($Error[0].exception.response.statuscode) {
-                NotFound {
-                    write-host "Email Not Found to be Pwned"
+            $StatusCode = $_.Exception.Response.StatusCode
+            $ErrorMessage = $_.Exception.Message
+            switch ($StatusCode) {
+                NotFound{
+                    write-host "Email Provided Not Found in Pwned Database"
+                    return
+                }
+                Unauthorized{
+                    write-host "Unauthorised Access - API key provided is not valid or has expired"
                     return
                 }
                 Default {
-                    write-host "[ERROR] - Failure to retrieve pwned status"
-                    write-host $Error
+                    write-host $ErrorMessage
                     return
                 }
             }
@@ -74,6 +83,10 @@
         Out-LogFile ("Email Address found in " + $pwned.count)
         $Pwned | Out-MultipleFileType -FilePreFix "Have_I_Been_Pwned" -user $user -txt
 
+
+        }
+    }#End of PROCESS block
+    END {
         Start-Sleep -Milliseconds 1500
-    }
+    }#End of END block
 }
