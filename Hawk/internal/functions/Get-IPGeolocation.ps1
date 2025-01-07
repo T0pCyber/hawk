@@ -67,7 +67,7 @@ Function Get-IPGeolocation {
         $geoip = Invoke-RestMethod -Method Get -URI $resource -ErrorAction SilentlyContinue
 
         if (($Error.Count -gt 0) -or ($null -eq $geoip.type)) {
-            Out-LogFile ("Failed to retreive location for IP " + $IPAddress)
+            Out-LogFile ("Failed to retreive location for IP " + $IPAddress) -isError
             $hash = @{
                 IP               = $IPAddress
                 CountryName      = "Failed to Resolve"
