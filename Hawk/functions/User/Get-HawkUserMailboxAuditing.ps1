@@ -37,10 +37,6 @@
         Path: \<User>
         Description: Raw item-level operations data in CSV and JSON formats
 
-        File: ExchangeItem_Raw.json
-        Path: \<User>
-        Description: Raw JSON dump of item operations audit data
-
         ExchangeItemGroup Records:
         File: ExchangeItemGroup_Simple_{User}.csv/.json
         Path: \<User>
@@ -49,10 +45,6 @@
         File: ExchangeItemGroup_Logs_{User}.csv/.json
         Path: \<User>
         Description: Raw access pattern data in CSV and JSON formats
-
-        File: ExchangeItemGroup_Raw.json
-        Path: \<User>
-        Description: Raw JSON dump of access pattern audit data
 
     .EXAMPLE
         Get-HawkUserMailboxAuditing -UserPrincipalName user@contoso.com
@@ -116,10 +108,6 @@
                 if ($itemLogs.Count -gt 0) {
                     Out-LogFile ("Found " + $itemLogs.Count + " ExchangeItem events.") -Information
 
-                    # Write raw JSON dump
-                    $RawJsonPath = Join-Path -Path $UserFolder -ChildPath "ExchangeItem_Raw.json"
-                    $itemLogs | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
-
                     # Process and output flattened data
                     $ParsedItemLogs = $itemLogs | Get-SimpleUnifiedAuditLog
                     if ($ParsedItemLogs) {
@@ -140,10 +128,6 @@
 
                 if ($groupLogs.Count -gt 0) {
                     Out-LogFile ("Found " + $groupLogs.Count + " ExchangeItemGroup events.") -Information
-
-                    # Write raw JSON dump
-                    $RawJsonPath = Join-Path -Path $UserFolder -ChildPath "ExchangeItemGroup_Raw.json"
-                    $groupLogs | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
 
                     # Process and output flattened data
                     $ParsedGroupLogs = $groupLogs | Get-SimpleUnifiedAuditLog

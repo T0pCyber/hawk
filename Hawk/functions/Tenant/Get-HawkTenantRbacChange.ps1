@@ -30,10 +30,6 @@
         Path: \Tenant
         Description: Raw audit data in JSON format for detailed analysis
 
-        File: RBAC_Changes_Raw.json
-        Path: \Tenant
-        Description: Complete raw audit logs in JSON format
-
     .EXAMPLE
         Get-HawkTenantRBACChange
 
@@ -87,10 +83,6 @@
         # Process results if any found
         if ($RBACChanges.Count -gt 0) {
             Out-LogFile ("Found " + $RBACChanges.Count + " changes made to Roles-Based Access Control") -Information
-
-            # Write raw audit data JSON for reference
-            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "RBAC_Changes_Raw.json"
-            $RBACChanges | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
 
             # Parse changes using Get-SimpleUnifiedAuditLog
             $ParsedChanges = $RBACChanges | Get-SimpleUnifiedAuditLog

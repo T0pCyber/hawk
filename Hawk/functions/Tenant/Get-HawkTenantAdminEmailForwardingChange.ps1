@@ -100,10 +100,6 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
             # Log the number of forwarding configuration changes found.
             Out-LogFile ("Found " + $ForwardingChanges.Count + " change(s) to user email forwarding") -Information
 
-            # Write raw JSON data for detailed reference and potential troubleshooting.
-            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Forwarding_Changes_Raw.json"
-            $ForwardingChanges | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
-
             # Parse the audit data into a simpler format for further processing and output.
             $ParsedChanges = $ForwardingChanges | Get-SimpleUnifiedAuditLog
             if ($ParsedChanges) {
