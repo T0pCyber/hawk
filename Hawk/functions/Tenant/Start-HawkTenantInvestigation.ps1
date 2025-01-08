@@ -26,12 +26,14 @@
     Prompts for confirmation before running each data gathering operation.
 
 .OUTPUTS
-    Various CSV, JSON, and XML files containing investigation results.
+    Various CSV and files containing investigation results.
     See help from individual cmdlets for specific output details.
     All outputs are placed in the $Hawk.FilePath directory.
 #>
 	[CmdletBinding(SupportsShouldProcess)]
 	param()
+
+	Write-HawkBanner
 
 	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
 		Initialize-HawkGlobalObject
@@ -78,8 +80,8 @@
 
 
 	if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
-		Out-LogFile "Running Get-HawkTenantEDiscoveryLogs" -action
-		Get-HawkTenantEDiscoveryLogs
+		Out-LogFile "Running Get-HawkTenantEDiscoveryLog" -action
+		Get-HawkTenantEDiscoveryLog
 	}
 
 	if ($PSCmdlet.ShouldProcess("Domain Activity", "Get domain activity")) {
@@ -98,8 +100,8 @@
 	}
 
 	if ($PSCmdlet.ShouldProcess("Exchange Admins", "Get Exchange admin list")) {
-		Out-LogFile "Running Get-HawkTenantEXOAdmins" -action
-		Get-HawkTenantEXOAdmins
+		Out-LogFile "Running Get-HawkTenantEXOAdmin" -action
+		Get-HawkTenantEXOAdmin
 	}
 
 	if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {

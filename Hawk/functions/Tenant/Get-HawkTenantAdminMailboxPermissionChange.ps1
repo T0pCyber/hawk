@@ -47,7 +47,7 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
         [array]$PermissionChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
         if ($PermissionChanges.Count -gt 0) {
-            Out-LogFile ("Found " + $PermissionChanges.Count + " mailbox permission changes in audit logs")
+            Out-LogFile ("Found " + $PermissionChanges.Count + " mailbox permission changes in audit logs") -Information
 
             # Process and output the results
             $ParsedChanges = $PermissionChanges | Get-SimpleUnifiedAuditLog
@@ -94,15 +94,15 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
                 }
             }
             else {
-                Out-LogFile "Error: Failed to parse mailbox permission audit data" -Notice
+                Out-LogFile "Error: Failed to parse mailbox permission audit data" -isError
             }
         }
         else {
-            Out-LogFile "No mailbox permission changes found in audit logs"
+            Out-LogFile "No mailbox permission changes found in audit logs" -Information
         }
     }
     catch {
-        Out-LogFile "Error analyzing mailbox permission changes: $($_.Exception.Message)" -Notice
+        Out-LogFile "Error analyzing mailbox permission changes: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
 }

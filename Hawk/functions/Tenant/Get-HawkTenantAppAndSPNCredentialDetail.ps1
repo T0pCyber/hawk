@@ -40,21 +40,21 @@
         $spnResults = @()
         $appResults = @()
 
-        Out-LogFile "Collecting Entra ID Service Principals"
+        Out-LogFile "Collecting Entra ID Service Principals" -Action
         try {
             $spns = Get-MgServicePrincipal -All | Sort-Object -Property DisplayName
-            Out-LogFile "Collecting Entra ID Registered Applications"
+            Out-LogFile "Collecting Entra ID Registered Applications" -Action
             $apps = Get-MgApplication -All | Sort-Object -Property DisplayName
         }
         catch {
-            Out-LogFile "Error retrieving Service Principals or Applications: $($_.Exception.Message)" -Notice
+            Out-LogFile "Error retrieving Service Principals or Applications: $($_.Exception.Message)" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 
     PROCESS {
         try {
-            Out-LogFile "Exporting Service Principal Certificate and Password details"
+            Out-LogFile "Exporting Service Principal Certificate and Password details" -Action
             foreach ($spn in $spns) {
                 # Process key credentials
                 foreach ($key in $spn.KeyCredentials) {
@@ -96,7 +96,7 @@
                 $spnResults | ConvertTo-Json | Out-File -FilePath (Join-Path -Path $tenantPath -ChildPath "SPNCertsAndSecrets.json")
             }
 
-            Out-LogFile "Exporting Registered Applications Certificate and Password details"
+            Out-LogFile "Exporting Registered Applications Certificate and Password details" -Action
             foreach ($app in $apps) {
                 # Process key credentials
                 foreach ($key in $app.KeyCredentials) {
@@ -139,12 +139,12 @@
             }
         }
         catch {
-            Out-LogFile "Error processing credentials: $($_.Exception.Message)" -Notice
+            Out-LogFile "Error processing credentials: $($_.Exception.Message)" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 
     END {
-        Out-Logfile "Completed exporting Azure AD Service Principal and App Registration Certificate and Password Details"
+        Out-Logfile "Completed exporting Azure AD Service Principal and App Registration Certificate and Password Details" -Information
     }
 }

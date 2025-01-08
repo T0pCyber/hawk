@@ -24,7 +24,7 @@
             if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
                 Initialize-HawkGlobalObject
             }
-            Out-LogFile "Gathering Microsoft Entra ID Administrators"
+            Out-LogFile "Gathering Microsoft Entra ID Administrators" -Action
 
             # Verify Graph API connection
             Test-GraphConnection
@@ -79,20 +79,20 @@
                 # Export results if any roles were found
                 if ($roles) {
                     $roles | Out-MultipleFileType -FilePrefix "EntraIDAdministrators" -csv -json
-                    Out-LogFile "Successfully exported Microsoft Entra ID Administrators data"
+                    Out-LogFile "Successfully exported Microsoft Entra ID Administrators data" -Information
                 }
                 else {
-                    Out-LogFile "No administrator roles found or accessible" -notice
+                    Out-LogFile "No administrator roles found or accessible" -Information
                 }
             }
             catch {
                 # Handle and log any errors during execution
-                Out-LogFile "Error retrieving Microsoft Entra ID Administrators: $($_.Exception.Message)" -notice
+                Out-LogFile "Error retrieving Microsoft Entra ID Administrators: $($_.Exception.Message)" -isError
                 Write-Error -ErrorRecord $_ -ErrorAction Continue
             }
         }
 
         END {
-            Out-LogFile "Completed exporting Microsoft Entra ID Admins"
+            Out-LogFile "Completed exporting Microsoft Entra ID Admins" -Information
         }
     }

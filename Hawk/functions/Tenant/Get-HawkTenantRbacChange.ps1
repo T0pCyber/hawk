@@ -79,14 +79,14 @@
         $searchCommand = "Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations " +
             "'$($RBACOperations -join "','")'"
 
-        Out-LogFile "Searching for RBAC changes using Unified Audit Log..."
+        Out-LogFile "Searching for RBAC changes using Unified Audit Log." -Action
 
         # Get all RBAC changes using Get-AllUnifiedAuditLogEntry
         [array]$RBACChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
         # Process results if any found
         if ($RBACChanges.Count -gt 0) {
-            Out-LogFile ("Found " + $RBACChanges.Count + " changes made to Roles-Based Access Control")
+            Out-LogFile ("Found " + $RBACChanges.Count + " changes made to Roles-Based Access Control") -Information
 
             # Write raw audit data JSON for reference
             $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "RBAC_Changes_Raw.json"
@@ -104,15 +104,15 @@
                 $RBACChanges | Out-MultipleFileType -FilePrefix "RBAC_Changes" -csv -json
             }
             else {
-                Out-LogFile "Error: Failed to parse RBAC changes" -Notice
+                Out-LogFile "Error: Failed to parse RBAC changes" -isError
             }
         }
         else {
-            Out-LogFile "No RBAC changes found."
+            Out-LogFile "No RBAC changes found." -Information
         }
     }
     catch {
-        Out-LogFile "Error searching for RBAC changes: $($_.Exception.Message)" -Notice
+        Out-LogFile "Error searching for RBAC changes: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
 }

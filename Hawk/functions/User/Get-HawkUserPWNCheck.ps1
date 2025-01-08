@@ -30,20 +30,16 @@
         HaveIBeenPwned.com now requires an API access key to gather Stats with from their API.
 
         Please purchase an API key for `$3.95 a month from get a Free access key from https://haveibeenpwned.com/API/Key and provide it below.
-
-        "
-
-        # get the access key from the user
         $hibpkey = Read-Host "haveibeenpwned.com apikey"
         }
     }#End of BEGIN block
-
     # Verify our UPN input
     PROCESS {[array]$UserArray = Test-UserObject -ToTest $EmailAddress
     $headers=@{'hibp-api-key' = $hibpkey}
 
     foreach ($Object in $UserArray) {
-
+        $User = [string]$Object.UserPrincipalName
+        $uriEncodeEmail = [uri]::EscapeDataString($User)
         [string]$User = $Object.UserPrincipalName
 
         # Convert the email to URL encoding
@@ -82,7 +78,6 @@
         # Output the value
         Out-LogFile ("Email Address found in " + $pwned.count)
         $Pwned | Out-MultipleFileType -FilePreFix "Have_I_Been_Pwned" -user $user -txt
-
 
         }
     }#End of PROCESS block

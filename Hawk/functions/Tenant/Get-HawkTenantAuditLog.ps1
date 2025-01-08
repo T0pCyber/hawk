@@ -26,7 +26,7 @@ BEGIN{
     if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
         Initialize-HawkGlobalObject
     }
-    Out-LogFile "Gathering Azure AD Audit Logs events"
+    Out-LogFile "Gathering Azure AD Audit Logs events" -Action
 }
 PROCESS{
         $auditLogsResponse = Get-MgAuditLogDirectoryAudit -All
@@ -47,6 +47,6 @@ PROCESS{
     }
     END{
         $auditLogs | Sort-Object -Property ActivityDateTime | Out-MultipleFileType -FilePrefix "AzureADAuditLog" -csv -json
-        Out-Logfile "Completed exporting Azure AD audit logs"
+        Out-Logfile "Completed exporting Azure AD audit logs" -Information
     }
 }

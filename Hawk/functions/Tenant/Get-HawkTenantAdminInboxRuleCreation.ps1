@@ -105,15 +105,15 @@ Function Get-HawkTenantAdminInboxRuleCreation {
                 }
             }
             else {
-                Out-LogFile "Error: Failed to parse inbox rule audit data" -Notice
+                Out-LogFile "Error: Failed to parse inbox rule audit data" -isError
             }
         }
         else {
-            Out-LogFile "No admin inbox rule creation events found in audit logs"
+            Out-LogFile "No admin inbox rule creation events found in audit logs" -Information
         }
     }
     catch {
-        Out-LogFile "Error analyzing admin inbox rule creation: $($_.Exception.Message)" -Notice
+        Out-LogFile "Error analyzing admin inbox rule creation: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
 }
