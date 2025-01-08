@@ -20,14 +20,6 @@
         Path: \<user>
         Description: Raw data of all changes made to the user.
 
-        File: User_Changes_Raw.json
-        Path: \<user>
-        Description: Raw JSON data from audit logs.
-
-        File: User_Changes_Raw.txt
-        Path: \<user>
-        Description: Human readable format of raw audit data.
-
     .EXAMPLE
         Get-HawkUserAdminAudit -UserPrincipalName user@company.com
 
@@ -76,10 +68,6 @@
                 if (-not (Test-Path -Path $UserFolder)) {
                     New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
                 }
-
-                # Write raw AuditData to files for verification/debugging
-                $RawJsonPath = Join-Path -Path $UserFolder -ChildPath "User_Changes_Raw.json"
-                $UserChanges | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
 
                 # Parse and format the changes using Get-SimpleUnifiedAuditLog
                 $ParsedChanges = $UserChanges | Get-SimpleUnifiedAuditLog

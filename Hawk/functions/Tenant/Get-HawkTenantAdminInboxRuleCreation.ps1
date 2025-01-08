@@ -30,9 +30,6 @@ Function Get-HawkTenantAdminInboxRuleCreation {
         Path: \Tenant  
         Description: A subset of historically created rules flagged as suspicious.
 
-        File: Investigate_Admin_Inbox_Rules_Creation_Raw.json  
-        Path: \Tenant  
-        Description: Raw audit data for suspicious created rules.
     .EXAMPLE
         Get-HawkTenantAdminInboxRuleCreation
 
@@ -65,11 +62,6 @@ Function Get-HawkTenantAdminInboxRuleCreation {
         if ($NewInboxRules.Count -gt 0) {
             Out-LogFile ("Found " + $NewInboxRules.Count + " admin inbox rule changes in audit logs") -Information
 
-            # Write raw audit data with action flag
-            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Creation_Raw.json"
-            Out-LogFile "Writing raw audit data to: $RawJsonPath" -Action
-            $NewInboxRules | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
-
             # Process and output the results
             $ParsedRules = $NewInboxRules | Get-SimpleUnifiedAuditLog
             if ($ParsedRules) {
@@ -88,11 +80,6 @@ Function Get-HawkTenantAdminInboxRuleCreation {
 
                     Out-LogFile "Writing suspicious rule creation data" -Action
                     $SuspiciousRules | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Creation" -csv -json -Notice
-
-                    # Write raw data for suspicious rules with action flag
-                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_Admin_Inbox_Rules_Creation_Raw.json"
-                    Out-LogFile "Writing raw suspicious rule data to: $RawSuspiciousPath" -Action
-                    $SuspiciousRules | ConvertTo-Json -Depth 10 | Out-File -FilePath $RawSuspiciousPath
 
                     # Log details about why each rule was flagged
                     foreach ($rule in $SuspiciousRules) {

@@ -32,9 +32,6 @@ Function Get-HawkTenantAdminInboxRuleModification {
         Path: \Tenant  
         Description: A subset of historically modified rules flagged as suspicious.
 
-        File: Investigate_Admin_Inbox_Rules_Modification_Raw.json  
-        Path: \Tenant  
-        Description: Raw audit data for suspicious rule modifications.
     .EXAMPLE
         Get-HawkTenantAdminInboxRuleModification
 
@@ -68,11 +65,6 @@ Function Get-HawkTenantAdminInboxRuleModification {
         if ($ModifiedInboxRules.Count -gt 0) {
             Out-LogFile ("Found " + $ModifiedInboxRules.Count + " admin inbox rule modifications in audit logs") -Information
 
-            # Write raw audit data with action flag
-            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Modification_Raw.json"
-            Out-LogFile "Writing raw audit data to: $RawJsonPath" -Action
-            $ModifiedInboxRules | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
-
             # Process and output the results
             $ParsedRules = $ModifiedInboxRules | Get-SimpleUnifiedAuditLog
             if ($ParsedRules) {
@@ -91,11 +83,6 @@ Function Get-HawkTenantAdminInboxRuleModification {
 
                     Out-LogFile "Writing suspicious rule modification data" -Action
                     $SuspiciousModifications | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Modification" -csv -json -Notice
-
-                    # Write raw data for suspicious modifications with action flag
-                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_Admin_Inbox_Rules_Modification_Raw.json"
-                    Out-LogFile "Writing raw suspicious modification data to: $RawSuspiciousPath" -Action
-                    $SuspiciousModifications | ConvertTo-Json -Depth 10 | Out-File -FilePath $RawSuspiciousPath
 
                     # Log details about why each modification was flagged
                     foreach ($rule in $SuspiciousModifications) {

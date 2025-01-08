@@ -29,10 +29,6 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
         Path: \Tenant  
         Description: A subset of historically removed rules flagged as suspicious.
 
-        File: Investigate_Admin_Inbox_Rules_Removal_Raw.json  
-        Path: \Tenant  
-        Description: Raw audit data for suspicious removed rules.
-
     .EXAMPLE
         Get-HawkTenantAdminInboxRuleRemoval
 
@@ -62,10 +58,6 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
         if ($RemovedInboxRules.Count -gt 0) {
             Out-LogFile ("Found " + $RemovedInboxRules.Count + " admin inbox rule removals in audit logs") -Information
 
-            # Write raw audit data for reference
-            $RawJsonPath = Join-Path -Path $TenantPath -ChildPath "Admin_Inbox_Rules_Removal_Raw.json"
-            $RemovedInboxRules | Select-Object -ExpandProperty AuditData | Out-File -FilePath $RawJsonPath
-
             # Process and output the results
             $ParsedRules = $RemovedInboxRules | Get-SimpleUnifiedAuditLog
             if ($ParsedRules) {
@@ -91,10 +83,6 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
                     Out-LogFile "Additional Information: $jsonPath" -Notice
 
                     $SuspiciousRemovals | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Removal" -csv -json -Notice
-
-                    # Write raw data for suspicious rules
-                    $RawSuspiciousPath = Join-Path -Path $TenantPath -ChildPath "Investigate_Admin_Inbox_Rules_Removal_Raw.json"
-                    $SuspiciousRemovals | ConvertTo-Json -Depth 10 | Out-File -FilePath $RawSuspiciousPath
 
                     # Log details about why each removal was flagged
                     foreach ($rule in $SuspiciousRemovals) {
