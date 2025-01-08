@@ -3,19 +3,19 @@
 	RootModule         = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion      = '3.2.3'
+	ModuleVersion      = '3.2.4'
 
 	# ID used to uniquely identify this module
 	GUID               = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
 
 	# Author of this module
-	Author             = 'Paul Navarro'
+	Author             = 'Paul Navarro, Jonathan Butler'
 
 	# Company or vendor of this module
 	CompanyName        = 'Cloud Forensicator'
 
 	# Copyright statement for this module
-	Copyright          = 'Copyright (c) 2023 Paul Navarro'
+	Copyright          = 'Copyright (c) 2025 Paul Navarro'
 
 	# Description of the functionality provided by this module
 	Description        = 'Microsoft 365 Incident Response and Threat Hunting PowerShell tool.
@@ -122,7 +122,7 @@
 			IconUri      = 'https://i.ibb.co/XXH4500/Hawk.png'
 
 			# ReleaseNotes of this module
-			ReleaseNotes = 'https://github.com/T0pCyber/Hawk/Hawk/changelog.md'
+			ReleaseNotes = 'https://github.com/T0pCyber/hawk/blob/master/Hawk/changelog.md'
 
 		} # End of PSData hashtable
 

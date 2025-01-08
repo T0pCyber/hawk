@@ -78,8 +78,12 @@
 - Removed ability to detect RBAC Application Impersonation as this is being deprecated / removed in FEB 2025.
 - Updated Out-Log file, adding -Information parameter for tagging prompts with INFO for status updates.
 - Updated Out-Log file, modifying -Notice parameter for tagging prompts with INVESTIGATE in brackets instead of asterisks, for uniformity purposes.
-- Corrected HawkUserPWNCheck to accept proper input and provide user with accurate errors. 
+- Corrected HawkUserPWNCheck to accept proper input and provide user with accurate errors.
+
+## 3.2.4 (2025-1-08)
+
 - Fixed critical lack of avian artwork in startup sequence by adding ASCII welcome banner.
 - Updated all post Global Hawk Variable Initialized code to use prompt tagging.
 - Modified Out-MultipleFileType to not output "appending to file" to STDOUT repetitively.
 - Updated Get-HawkTenantEDiscoveryConfiguration to use non-deprecated means of collecting / analyzing eDiscovery role assignments.
+- Updated Change Log URI.
