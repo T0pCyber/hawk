@@ -1,11 +1,15 @@
-﻿param (
+﻿#vsts-prequisites.ps1
+
+param (
     [string]
     $Repository = 'PSGallery'
 )
 
-$modules = @("Pester", "PSFramework", "PSModuleDevelopment", "PSScriptAnalyzer")
+$modules = @("Pester", "PSFramework", "PSModuleDevelopment")
 
 # Automatically add missing dependencies
+# TODO: uncomment this block of code below and fix RobustCloudCommand error.
+
 $data = Import-PowerShellDataFile -Path "$PSScriptRoot\..\Hawk\Hawk.psd1"
 foreach ($dependency in $data.RequiredModules) {
     if ($dependency -is [string]) {
@@ -19,7 +23,8 @@ foreach ($dependency in $data.RequiredModules) {
 }
 
 foreach ($module in $modules) {
-    Write-Host "Installing $module" -ForegroundColor Cyan
+    # Write-Output "Installing module: $module"
+    Write-Output "Installing $module"
     Install-Module $module -Force -SkipPublisherCheck -Repository $Repository
     Import-Module $module -Force -PassThru
 }

@@ -1,0 +1,14 @@
+repos:
+  - repo: local
+    hooks:
+      - id: powershell-script-analyzer
+        name: PowerShell Script Analyzer
+        entry: pwsh
+        args:
+          - -NoProfile
+          - -ExecutionPolicy
+          - Bypass
+          - -File
+          - Hawk/internal/scripts/pre_commit_hook_scripts/Invoke-PowerShellScriptAnalyzer.ps1
+        language: system
+        types: [powershell]

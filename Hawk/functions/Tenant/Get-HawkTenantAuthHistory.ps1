@@ -38,12 +38,11 @@
 
     # Make sure the start date isn't more than 90 days in the past
     if ((Get-Date).adddays(-91) -gt $StartDate) {
-        Out-Logfile "[ERROR] - Start date is over 90 days in the past"
+        Out-Logfile "Start date is over 90 days in the past" -isError
         break
     }
 
     Test-EXOConnection
-    Send-AIEvent -Event "CmdRun"
 
     # Setup inial start and end time for the search
     [datetime]$CurrentStart = $StartDate
@@ -65,7 +64,7 @@
 
         # See if we have results if so push to csv file
         if ($null -eq $output) {
-            Out-LogFile ("No results found for time period " + $CurrentStart + " - " + $CurrentEnd)
+            Out-LogFile ("No results found for time period " + $CurrentStart + " - " + $CurrentEnd) -Information
         }
         else {
             $output | Out-MultipleFileType -FilePrefix "Audit_Log_Full_$prefix" -Append -csv -json

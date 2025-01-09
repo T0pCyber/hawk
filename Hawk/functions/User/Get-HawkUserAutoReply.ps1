@@ -41,13 +41,13 @@
         [string]$User = $Object.UserPrincipalName
 
         # Get Autoreply Configuration
-        Out-LogFile ("Retrieving Autoreply Configuration: " + $User) -action
+        Out-LogFile ("Retrieving AutoReply Configuration: " + $User) -action
         $AutoReply = Get-MailboxAutoReplyConfiguration -Identity  $User
 
         # Check if the Autoreply is Disabled
         if ($AutoReply.AutoReplyState -eq 'Disabled') {
 
-            Out-LogFile "AutoReply is not enabled or not configured."
+            Out-LogFile "AutoReply is not enabled or not configured." -Information
         }
         # Output Enabled AutoReplyConfiguration to a generic txt
         else {

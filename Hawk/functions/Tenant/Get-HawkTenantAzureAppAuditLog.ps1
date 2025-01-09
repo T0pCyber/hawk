@@ -10,7 +10,7 @@
 	Get-HawkTenantConfigurationn			Basic Tenant information
 	Get-HawkTenantEDiscoveryConfiguration	Looks for changes to ediscovery configuration
 	Search-HawkTenantEXOAuditLog			Searches the EXO audit log for activity
-	Get-HawkTenantRBACChanges				Looks for changes to Roles Based Access Control
+	Get-HawkTenantRBACChange				Looks for changes to Roles Based Access Control
 .OUTPUTS
 	See help from individual cmdlets for output list.
 	All outputs are placed in the $Hawk.FilePath directory
@@ -19,15 +19,21 @@
 
 	Runs all of the tenant investigation cmdlets.
 #>
+Begin {
+	#Initializing Hawk Object if not present
+	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+		Initialize-HawkGlobalObject
+	}
+	Out-LogFile "Gathering Tenant information" -Action
+	Test-EXOConnection
+}#End BEGIN
 
-Test-EXOConnection
-Send-AIEvent -Event "CmdRun"
-
+PROCESS{
 # Make sure our variables are null
 $AzureApplicationActivityEvents = $null
 
 Out-LogFile "Searching Unified Audit Logs Azure Activities" -Action
-Out-LogFile "Searching for Application Activities"
+Out-LogFile "Searching for Application Activities" -Action
 
 # Search the unified audit log for events related to application activity
 # https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants
@@ -35,7 +41,7 @@ $AzureApplicationActivityEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("S
 
 # If null we found no changes to nothing to do here
 if ($null -eq $AzureApplicationActivityEvents){
-	Out-LogFile "No Application related events found in the search time frame."
+	Out-LogFile "No Application related events found in the search time frame." -Information
 }
 
 # If not null then we must have found some events so flag them
@@ -59,4 +65,8 @@ else {
 			| Out-MultipleFileType -fileprefix "Azure_Application_Audit" -csv -json -append
 	}
 }
+}#End PROCESS
+END{
+Out-LogFile "Completed gathering Tenant App Audit Logs" -Action
+}#End END
 }

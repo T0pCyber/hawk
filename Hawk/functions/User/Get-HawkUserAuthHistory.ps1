@@ -56,18 +56,18 @@
 
         # Get back the account logon logs for the user
         foreach ($Type in $RecordTypes) {
-            Out-LogFile ("Searching Unified Audit log for Records of type: " + $Type)
+            Out-LogFile ("Searching Unified Audit log for Records of type: " + $Type) -action
             $UserLogonLogs += Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -UserIds " + $User + " -RecordType " + $Type)
         }
 
         # Make sure we have results
         if ($null -eq $UserLogonLogs) {
-            Out-LogFile "[ERROR] - No results found when searching UAL for AzureActiveDirectoryAccountLogon events"
+            Out-LogFile "No results found when searching UAL for AzureActiveDirectoryAccountLogon events" -isError
         }
         else {
 
             # Expand out the AuditData and convert from JSON
-            Out-LogFile "Converting AuditData"
+            Out-LogFile "Converting AuditData" -action
             $ExpandedUserLogonLogs = $null
             $ExpandedUserLogonLogs = New-Object System.Collections.ArrayList
             $FailedConversions = $null
@@ -85,14 +85,18 @@
                 }
             }
 
-            if ($FailedConversions -le 0){}
-            else {
-                Out-LogFile ("[ERROR] - " + $FailedConversions.Count + " Entries failed JSON Conversion")
-                $FailedConversions | Out-MultipleFileType -fileprefix "Failed_Conversion_Authentication_Logs" -user $User -csv -json
+            if ($FailedConversions.Count -le 0) {
+                # Do nothing or handle the zero-case
             }
+            else {
+                Out-LogFile ("$($FailedConversions.Count) Entries failed JSON Conversion") -isError
+                $FailedConversions | Out-MultipleFileType -FilePrefix "Failed_Conversion_Authentication_Logs" -User $User -Csv -Json
+            }
+            
 
             # Add IP Geo Location information to the data
             if ($ResolveIPLocations) {
+                Out-File "Resolving IP Locations"
                 # Setup our counter
                 $i = 0
 
@@ -113,7 +117,7 @@
                     }
 
                     # Combine the connection object and the location object so that we have a single output ready
-                    $ExpandedUserLogonLogs.item($i) = ($ExpandedUserLogonLogs.item($i) | Select-Object -Property *, @{Name = "CountryName"; Expression = { $Location.CountryName } }, @{Name = "RegionCode"; Expression = { $Location.RegionCode } }, @{Name = "RegionName"; Expression = { $Location.RegionName } }, @{Name = "City"; Expression = { $Location.City } }, @{Name = "ZipCode"; Expression = { $Location.ZipCode } }, @{Name = "KnownMicrosoftIP"; Expression = { $Location.KnownMicrosoftIP } })
+                    $ExpandedUserLogonLogs.item($i) = ($ExpandedUserLogonLogs.item($i) | Select-Object -Property *, @{Name = "CountryName"; Expression = { $Location.CountryName } }, @{Name = "RegionCode"; Expression = { $Location.RegionCode } }, @{Name = "RegionName"; Expression = { $Location.RegionName } }, @{Name = "City"; Expression = { $Location.City } }, @{Name = "KnownMicrosoftIP"; Expression = { $Location.KnownMicrosoftIP } })
 
                     # increment our counter for the progress bar
                     $i++
@@ -122,12 +126,12 @@
                 Write-Progress -Completed -Activity "Looking Up Ip Address Locations" -Status " "
             }
             else {
-                Out-LogFile "ResolveIPLocations not specified"
+                Out-LogFile "ResolveIPLocations not specified" -Information
             }
 
             # Convert to human readable and export
-            Out-LogFile "Converting to Human Readable"
-            (Import-AzureAuthenticationLogs -JsonConvertedLogs $ExpandedUserLogonLogs) | Out-MultipleFileType -fileprefix "Converted_Authentication_Logs" -User $User -csv -json
+            Out-LogFile "Converting to Human Readable" -action
+            (Import-AzureAuthenticationLog -JsonConvertedLogs $ExpandedUserLogonLogs) | Out-MultipleFileType -fileprefix "Converted_Authentication_Logs" -User $User -csv -json
 
             # Export RAW data
             $UserLogonLogs | Out-MultipleFileType -fileprefix "Raw_Authentication_Logs" -user $User -csv -json

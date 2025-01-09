@@ -3,7 +3,8 @@
 .SYNOPSIS
     Check to see if a recipient object was created since our start date
 .DESCRIPTION
-    Check to see if a recipient object was created since our start date
+    Check to see if a recipient object was created since our start date.
+    This will be used to determine if a new user has been created within the time frame specified.
 .PARAMETER RecipientID
     Recipient object ID that is being retrieved
 .EXAMPLE

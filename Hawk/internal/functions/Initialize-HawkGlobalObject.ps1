@@ -1,5 +1,5 @@
 ﻿Function Initialize-HawkGlobalObject {
-<#
+    <#
 .SYNOPSIS
     Create global variable $Hawk for use by all Hawk cmdlets.
 .DESCRIPTION
@@ -10,8 +10,6 @@
     * Records target start and end dates for searches
 .PARAMETER Force
     Switch to force the function to run and allow the variable to be recreated
-.PARAMETER IAgreeToTheEula
-    Agrees to the EULA on the command line to skip the prompt.
 .PARAMETER SkipUpdate
     Skips checking for the latest version of the Hawk Module
 .PARAMETER DaysToLookBack
@@ -33,19 +31,16 @@
     StartDate		Calculated start date for searches based on DaysToLookBack
     EndDate			One day in the future
     WhenCreated		Date and time that the variable was created
-    EULA			If you have agreed to the EULA or not
 .EXAMPLE
     Initialize-HawkGlobalObject -Force
 
     This Command will force the creation of a new $Hawk variable even if one already exists.
 #>
-	[CmdletBinding()]
+    [CmdletBinding()]
     param
     (
         [switch]$Force,
-        [switch]$IAgreeToTheEula,
         [switch]$SkipUpdate,
-        [int]$DaysToLookBack,
         [DateTime]$StartDate,
         [DateTime]$EndDate,
         [string]$FilePath
@@ -75,10 +70,11 @@
     }
 
     Function New-LoggingFolder {
+        [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
 
         # Create a folder ID based on date
-        [string]$TenantName = (Get-MGDomain | Where-Object {$_.isDefault}).ID
+        [string]$TenantName = (Get-MGDomain | Where-Object { $_.isDefault }).ID
         [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date -UFormat %Y%m%d_%H%M).tostring()
 
         # Add that ID to the given path
@@ -98,6 +94,7 @@
     }
 
     Function Set-LoggingPath {
+        [CmdletBinding(SupportsShouldProcess)]
         param ([string]$Path)
 
         # If no value of Path is provided prompt and gather from the user
@@ -139,62 +136,13 @@
         Return $Folder
     }
 
-    Function Get-Eula {
-
-        if ([string]::IsNullOrEmpty($Hawk.EULA)) {
-            Write-Information ('
-
-	DISCLAIMER:
-
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-			')
-
-            # Prompt the user to agree with EULA
-            $title = "Disclaimer"
-            $message = "Do you agree with the above disclaimer?"
-            $yes = New-Object System.Management.Automation.Host.ChoiceDescription "&Yes", "Logs agreement and continues use of the Hawk Functions."
-            $no = New-Object System.Management.Automation.Host.ChoiceDescription "&No", "Stops execution of Hawk Functions"
-            $options = [System.Management.Automation.Host.ChoiceDescription[]]($yes, $no)
-            $result = $host.ui.PromptForChoice($title, $message, $options, 0)
-            # If yes log and continue
-            # If no log error and exit
-            switch ($result) {
-                0 {
-                    Write-Information "`n"
-                    Return ("Agreed " + (Get-Date)).ToString()
-                }
-                1 {
-                    Write-Information "Aborting Cmdlet"
-                    Write-Error -Message "Failure to agree with EULA" -ErrorAction Stop
-                    break
-                }
-            }
-        }
-        else { Return $Hawk.EULA }
-
-    }
-
     Function New-ApplicationInsight {
+        [CmdletBinding(SupportsShouldProcess)]
+        param()
         # Initialize Application Insights client
         $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
         if ($Null -eq $Client) {
-            Write-Information "Initializing Application Insights"
+            Write-Output "Initializing Application Insights"
             $Client = New-AIClient -key $insightkey
         }
     }
@@ -218,22 +166,11 @@
         }
 
         # Test if we have a connection to Microsoft Graph
-        $notification = New-Object -ComObject Wscript.Shell
-        $Output =$notification.Popup("Hawk has been updated to support MGGraph due to MSONLINE deprecation. Please click OK to continue", 0, "Hawk Update", 0x00000040)
         Write-Information "Testing Graph Connection"
         Test-GraphConnection
-        
+
         # If the global variable Hawk doesn't exist or we have -force then set the variable up
         Write-Information "Setting Up initial Hawk environment variable"
-
-        ### Validating EULA ###
-        if ($IAgreeToTheEula) {
-            # Customer has accepted the EULA on the command line
-            [string]$Eula = ("Agreed " + (Get-Date))
-        }
-        else {
-            [string]$Eula = Get-Eula
-        }
 
         #### Checking log path and setting up subdirectory ###
         # If we have a path passed in then we need to check that otherwise ask
@@ -248,7 +185,7 @@
         if ($null -eq $StartDate) {
 
             # Read in our # of days back or the actual start date
-            $StartRead = Read-Host "`nFirst Day of Search Window (1-90, Date, Default 90)"
+            $StartRead = Read-Host "`nPlease Enter First Day of Search Window (1-90, Date, Default 90)"
 
             # Determine if the input was a date time
             # True means it was NOT a datetime
@@ -264,9 +201,8 @@
                 }
 
                 # Calculate our startdate setting it to midnight
-                Write-Information ("Calculating Start Date from current date minus " + $StartRead + " days.")
                 [DateTime]$StartDate = ((Get-Date).AddDays(-$StartRead)).Date
-                Write-Information ("Setting StartDate by Calculation to " + $StartDate + "`n")
+                Write-Information ("Start Date: " + $StartDate + "")
             }
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
                 #### DATE TIME Provided ####
@@ -283,8 +219,6 @@
                     Write-Information ("Setting date to default of Today - 90 days.")
                     [DateTime]$StartDate = ((Get-Date).AddDays(-90)).Date
                 }
-
-                Write-Information ("Setting StartDate by Date to " + $StartDate + "`n")
             }
             else {
                 Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
@@ -293,7 +227,7 @@
 
         if ($null -eq $EndDate) {
             # Read in the end date
-            $EndRead = Read-Host "`nLast Day of search Window (1-90, date, Default Today)"
+            $EndRead = Read-Host "`nPlease Enter Last Day of Search Window (1-90, date, Default Today)"
 
             # Determine if the input was a date time
             # True means it was NOT a datetime
@@ -302,12 +236,11 @@
 
                 # if we have a null entry (just hit enter) then set startread to the default of 90
                 if ([string]::IsNullOrEmpty($EndRead)) {
-                    Write-Information ("Setting End Date to Today")
                     [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
                 }
                 else {
                     # Calculate our startdate setting it to midnight
-                    Write-Information ("Calculating End Date from current date minus " + $EndRead + " days.")
+                    Write-Information ("End Date: " + $EndRead + " days.")
                     # Subtract 1 from the EndRead entry so that we get one day less for the purpose of how searching works with times
                     [DateTime]$EndDate = ((Get-Date).AddDays( - ($EndRead - 1))).Date
                 }
@@ -317,7 +250,7 @@
                     Write-Error "StartDate Cannot be More Recent than EndDate" -ErrorAction Stop
                 }
                 else {
-                    Write-Information ("Setting EndDate by Calculation to " + $EndDate + "`n")
+                    Write-Information ("End Date: " + $EndDate + "`n")
                 }
             }
             elseif (!($null -eq ($EndRead -as [DateTime]))) {
@@ -332,7 +265,7 @@
                     Write-Information "Setting EndDate to today."
                     [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
                 }
-                elseif ($EndDate -gt (get-Date).AddDays(2)){
+                elseif ($EndDate -gt (get-Date).AddDays(2)) {
                     Write-Information "EndDate to Far in the furture."
                     Write-Information "Setting EndDate to Today."
                     [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
@@ -359,31 +292,39 @@
             [bool]$AdvancedAzureLicense = $false
         }
 
-		# Configuration Example, currently not used
-		#TODO: Implement Configuration system across entire project
-		Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value $Days -PassThru | Register-PSFConfig
-		if ($OutputPath) {
-			Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
-		}
+        # Configuration Example, currently not used
+        #TODO: Implement Configuration system across entire project
+        Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value $Days -PassThru | Register-PSFConfig
+        if ($OutputPath) {
+            Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
+        }
 
-		#TODO: Discard below once migration to configuration is completed
+        #TODO: Discard below once migration to configuration is completed
         $Output = [PSCustomObject]@{
-			FilePath = $OutputPath
-			DaysToLookBack = $Days
-			StartDate = $StartDate
-			EndDate = $EndDate
-			AdvancedAzureLicense = $AdvancedAzureLicense
-			WhenCreated = (Get-Date -Format g)
-			EULA = $Eula
-		}
+            FilePath             = $OutputPath
+            DaysToLookBack       = $Days
+            StartDate            = $StartDate
+            EndDate              = $EndDate
+            AdvancedAzureLicense = $AdvancedAzureLicense
+            WhenCreated          = (Get-Date -Format g)
+        }
 
         # Create the script hawk variable
         Write-Information "Setting up Script Hawk environment variable`n"
         New-Variable -Name Hawk -Scope Script -value $Output -Force
-        Out-LogFile "Script Variable Configured"
-        Out-LogFile ("*** Version " + (Get-Module Hawk).version + " ***")
-        Out-LogFile $Hawk
-
+        Out-LogFile "Script Variable Configured" -Information
+        Out-LogFile ("Hawk Version: " + (Get-Module Hawk).version) -Information
+        # Print each property of $Hawk on its own line
+        foreach ($prop in $Hawk.PSObject.Properties) {
+            # If the property value is $null or an empty string, display "N/A"
+            $value = if ($null -eq $prop.Value -or [string]::IsNullOrEmpty($prop.Value.ToString())) {
+                "N/A"
+            } else {
+                $prop.Value
+            }
+        
+            Out-LogFile ("{0} = {1}" -f $prop.Name, $value) -Information
+        }
         #### End of IF
     }
 

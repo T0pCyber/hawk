@@ -18,11 +18,11 @@ Function Read-HawkAppData {
 
     # check to see if our xml file is there
     if (test-path $HawkAppdataPath) {
-        Out-LogFile ("Reading file " + $HawkAppdataPath)
+        Out-LogFile ("Reading file " + $HawkAppdataPath) -Action
         $global:HawkAppData = ConvertFrom-Json -InputObject ([string](Get-Content $HawkAppdataPath))
     }
     # if we don't have an xml file then do nothing
     else {
-        Out-LogFile ("No HawkAppData File found " + $HawkAppdataPath)
+        Out-LogFile ("No HawkAppData File found " + $HawkAppdataPath) -Information
     }
 }

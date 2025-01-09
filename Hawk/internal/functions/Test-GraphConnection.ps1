@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Test if we are connected to Graph and connect if not
 .DESCRIPTION
@@ -15,19 +15,19 @@
 
 #>
 Function Test-GraphConnection {
-    # Get tenant details to test that Connect-MgGraph has been called
-    try { $null = Get-MgOrganization -ErrorAction stop }
+    try {
+        $null = Get-MgOrganization -ErrorAction Stop
+    }
     catch {
-        # Write to the screen if we don't have a log file path yet
-        if ([string]::IsNullOrEmpty($Hawk.Logfile)) {
+        # Fallback if $Hawk is not initialized
+        if ($null -eq $Hawk) {
             Write-Output "Connecting to MGGraph using MGGraph Module"
         }
-        # Otherwise output to the log file
         else {
-            Out-LogFile "Connecting to MGGraph using MGGraph Module"
+            # $Hawk exists, so we can safely use Out-LogFile 
+            Out-LogFile -String "Connecting to MGGraph using MGGraph Module" -Action
         }
-        # Connect to the MG Graph. The following scopes allow to retrieve Domain, Organization, and Sku data from the Graph.
-        Connect-MGGraph -Scopes "User.Read.All","Directory.Read.All"
-        Select-MgProfile -Name "v1.0"
+
+        Connect-MGGraph
     }
-}#End Function Test-GraphConnection
+}

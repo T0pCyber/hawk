@@ -1,21 +1,21 @@
-﻿<#
-.SYNOPSIS
-    Convert output from search-adminauditlog to be more human readable
-.DESCRIPTION
-    Convert output from search-adminauditlog to be more human readable
-.PARAMETER SearchResults
-    Results from query
-.EXAMPLE
-    PS C:\> <example usage>
-    Explanation of what the example does
-.INPUTS
-    Inputs (if any)
-.OUTPUTS
-    Output (if any)
-.NOTES
-    General notes
-#>
-Function Get-SimpleAdminAuditLog {
+﻿Function Get-SimpleAdminAuditLog {
+    <#
+    .SYNOPSIS
+        Convert output from search-adminauditlog to be more human readable
+    .DESCRIPTION
+        Convert output from search-adminauditlog to be more human readable
+    .PARAMETER SearchResults
+        Results from query
+    .EXAMPLE
+        PS C:\> <example usage>
+        Explanation of what the example does
+    .INPUTS
+        Inputs (if any)
+    .OUTPUTS
+        Output (if any)
+    .NOTES
+        General notes
+    #>
     Param (
         [Parameter(
             Position = 0,

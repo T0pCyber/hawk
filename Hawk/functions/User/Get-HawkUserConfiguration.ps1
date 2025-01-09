@@ -1,5 +1,5 @@
-Function Get-HawkUserConfiguration {
-<#
+﻿Function Get-HawkUserConfiguration {
+	<#
 .SYNOPSIS
 	Gathers baseline information about the provided user.
 .DESCRIPTION
@@ -38,29 +38,29 @@ Function Get-HawkUserConfiguration {
 	Gathers the user configuration for all users who have "C-Level" set in CustomAttribute1
 #>
 
-    param
-    (
-        [Parameter(Mandatory = $true)]
-        [array]$UserPrincipalName
-    )
+	param
+	(
+		[Parameter(Mandatory = $true)]
+		[array]$UserPrincipalName
+	)
 
-    Test-EXOConnection
-    Send-AIEvent -Event "CmdRun"
+	Test-EXOConnection
+	Send-AIEvent -Event "CmdRun"
 
-    # Verify our UPN input
-    [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
+	# Verify our UPN input
+	[array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    foreach ($Object in $UserArray) {
-        [string]$User = $Object.UserPrincipalName
+	foreach ($Object in $UserArray) {
+		[string]$User = $Object.UserPrincipalName
 
-        Out-LogFile ("Gathering information about " + $User) -action
+		Out-LogFile ("Gathering information about " + $User) -action
 
-        #Gather mailbox information
-        Out-LogFile "Gathering Mailbox Information"
-		$mbx = Get-EXOMailbox -Identity $user 
+		#Gather mailbox information
+		Out-LogFile "Gathering Mailbox Information" -action
+		$mbx = Get-EXOMailbox -Identity $user
 
 		# Test to see if we have an archive and include that info as well
-		if (!($null -eq $mbx.archivedatabase)){
+		if (!($null -eq $mbx.archivedatabase)) {
 			Get-EXOMailboxStatistics -identity $user -Archive | Out-MultipleFileType -FilePrefix "Mailbox_Archive_Statistics" -user $user -txt
 		}
 
@@ -68,8 +68,8 @@ Function Get-HawkUserConfiguration {
 		Get-EXOMailboxStatistics -Identity $user | Out-MultipleFileType -FilePrefix "Mailbox_Statistics" -User $User -txt
 		Get-EXOMailboxFolderStatistics -identity $user | Out-MultipleFileType -FilePrefix "Mailbox_Folder_Statistics" -User $User -txt
 
-        # Gather cas mailbox sessions
-        Out-LogFile "Gathering CAS Mailbox Information"
+		# Gather cas mailbox sessions
+		Out-LogFile "Gathering CAS Mailbox Information" -action
 		Get-EXOCasMailbox -identity $user | Out-MultipleFileType -FilePrefix "CAS_Mailbox_Info" -User $User -txt
 	}
 }

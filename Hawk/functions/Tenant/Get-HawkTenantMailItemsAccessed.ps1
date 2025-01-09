@@ -33,7 +33,7 @@
 
     )
 BEGIN {
-    Out-LogFile "Starting Unified Audit Log (UAL) search for 'MailItemsAccessed'"
+    Out-LogFile "Starting Unified Audit Log (UAL) search for 'MailItemsAccessed'" -Action
 
 }#End Begin
 
@@ -45,7 +45,7 @@ PROCESS{
 
 END{
 
-    Out-Logfile "Completed exporting MailItemsAccessed logs"
+    Out-Logfile "Completed exporting MailItemsAccessed logs" -Information
 }#End End
 
 

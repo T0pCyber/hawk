@@ -28,10 +28,7 @@ Function Get-IPGeolocation {
     # if there is no value of access_key then we need to get it from the user
     if ($null -eq $HawkAppData.access_key) {
 
-        Write-Host -ForegroundColor Green "
-        IpStack.com now requires an API access key to gather GeoIP information from their API.
-        Please get a Free access key from https://ipstack.com/ and provide it below.
-        "
+        Out-LogFile "IpStack.com now requires an API access key to gather GeoIP information from their API.`nPlease get a Free access key from https://ipstack.com/ and provide it below." -Information
 
         # get the access key from the user
         $Accesskey = Read-Host "ipstack.com accesskey"
@@ -53,7 +50,8 @@ Function Get-IPGeolocation {
                 $hash = @{
                 IP               = $IPAddress
                 CountryName      = "NULL IP"
-                Continent        = "Unknown"
+                RegionName       = "Unknown"
+                RegionCode       = "Unknown"
                 ContinentName    = "Unknown"
                 City             = "Unknown"
                 KnownMicrosoftIP = "Unknown"
@@ -69,11 +67,12 @@ Function Get-IPGeolocation {
         $geoip = Invoke-RestMethod -Method Get -URI $resource -ErrorAction SilentlyContinue
 
         if (($Error.Count -gt 0) -or ($null -eq $geoip.type)) {
-            Out-LogFile ("Failed to retreive location for IP " + $IPAddress)
+            Out-LogFile ("Failed to retreive location for IP " + $IPAddress) -isError
             $hash = @{
                 IP               = $IPAddress
                 CountryName      = "Failed to Resolve"
-                Continent        = "Unknown"
+                RegionName       = "Unknown"
+                RegionCode       = "Unknown"
                 ContinentName    = "Unknown"
                 City             = "Unknown"
                 KnownMicrosoftIP = "Unknown"
@@ -81,16 +80,19 @@ Function Get-IPGeolocation {
         }
         else {
             # Determine if this IP is known to be owned by Microsoft
-            [string]$isMSFTIP = Test-MicrosoftIP -IP $IPAddress -type $geoip.type
-
+            [string]$isMSFTIP = Test-MicrosoftIP -IPToTest $IPAddress -type $geoip.type
+            if ($isMSFTIP){
+                $MSFTIP =  $isMSFTIP
+            }
             # Push return into a response object
             $hash = @{
                 IP               = $geoip.ip
                 CountryName      = $geoip.country_name
-                Continent        = $geoip.continent_code
                 ContinentName    = $geoip.continent_name
+                RegionName       = $geoip.region_name
+                RegionCode       = $geoip.region_code
                 City             = $geoip.City
-                KnownMicrosoftIP = $isMSFTIP
+                KnownMicrosoftIP = $MSFTIP
             }
             $result = New-Object PSObject -Property $hash
         }

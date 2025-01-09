@@ -29,7 +29,7 @@ Function Compress-HawkData {
             # Make sure we didn't throw an error when we tried to remove them
             if ($Error.Count -gt 0) {
                 Out-LogFile "Unable to remove existing zip files from " + $Hawk.filepath + " please remove them manually"
-                Write-Error -Message "Unable to remove existing zip files from " + $Hawk.filepath + " please remove them manually" -ErrorAction Stop
+                Write-Error -Message ("Unable to remove existing zip files from " + $Hawk.filepath + " please remove them manually") -ErrorAction Stop
             }
             else { }
         }

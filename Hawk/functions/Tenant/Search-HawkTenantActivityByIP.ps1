@@ -52,7 +52,7 @@
 
     # Make sure we got only a single IP address
     if ($IpAddress -like "*,*") {
-        Out-LogFile "Please provide a single IP address to search."
+        Out-LogFile "Please provide a single IP address to search." -Information
         Write-Error -Message "Please provide a single IP address to search." -ErrorAction Stop
     }
 
@@ -63,7 +63,7 @@
 
     # If we didn't get anything back log it
     if ($null -eq $ipevents) {
-        Out-LogFile ("No IP logon events found for IP "	+ $IpAddress)
+        Out-LogFile ("No IP logon events found for IP "	+ $IpAddress) -Information
     }
 
     # If we did then process it
@@ -71,12 +71,12 @@
 
         # Expand out the Data and convert from JSON
         [array]$ipeventsexpanded = $ipevents | Select-object -ExpandProperty AuditData | ConvertFrom-Json
-        Out-LogFile ("Found " + $ipeventsexpanded.count + " related to provided IP" )
+        Out-LogFile ("Found " + $ipeventsexpanded.count + " related to provided IP" ) -Information
         $ipeventsexpanded | Out-MultipleFileType -FilePrefix "All_Events" -csv -json -User $DirectoryName
 
         # Get the logon events that were a success
         [array]$successipevents = $ipeventsexpanded | Where-Object { $_.ResultStatus -eq "success" }
-        Out-LogFile ("Found " + $successipevents.Count + " Successful logons related to provided IP")
+        Out-LogFile ("Found " + $successipevents.Count + " Successful logons related to provided IP") -Information
         $successipevents | Out-MultipleFileType -FilePrefix "Success_Events" -csv -json -User $DirectoryName
 
         # Select all unique users accessed by this IP

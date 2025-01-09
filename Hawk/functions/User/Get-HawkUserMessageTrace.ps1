@@ -42,7 +42,7 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
         [string]$PrimarySMTP = (Get-Mailbox -identity $User).primarysmtpaddress
 
         if ([string]::IsNullOrEmpty($PrimarySMTP)) {
-            Out-LogFile ("[ERROR] - Failed to find Primary SMTP Address for user: " + $User)
+            Out-LogFile ("Failed to find Primary SMTP Address for user: " + $User) -isError
             Write-Error ("Failed to find Primary SMTP Address for user: " + $User)
         }
         else {
