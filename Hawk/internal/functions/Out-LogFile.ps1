@@ -169,7 +169,7 @@
         $logstring = "[$timestamp] [+] - $string"
     }
     elseif ($isWarning) {
-        $logstring = "[$timestamp] [~] - WARNING: $string"
+        $logstring = "[$timestamp] [-] - WARNING: $string"
     }
     elseif ($isPrompt) {
         $logstring = "[$timestamp] [>] - $string"
