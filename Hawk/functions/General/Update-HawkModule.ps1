@@ -41,17 +41,17 @@
     
            # If we can then look for an updated version of the module
            else {
-               Write-Output "Checking for latest version online"
+               Out-LogFile "Checking for latest version online" -Action
                $onlineversion = Find-Module -name Hawk -erroraction silentlycontinue
                $Localversion = (Get-Module Hawk | Sort-Object -Property Version -Descending)[0]
-               Write-Output ("Found Version " + $onlineversion.version + " Online")
-    
+               Out-LogFile ("Found Version " + $onlineversion.version + " Online") -Information
+
                if ($null -eq $onlineversion){
-                   Write-Output "[ERROR] - Unable to check Hawk version in Gallery"
+                   Out-LogFile "[ERROR] - Unable to check Hawk version in Gallery" -isError 
                }
                elseif (([version]$onlineversion.version) -gt ([version]$localversion.version)) {
-                   Write-Output "New version of Hawk module found online"
-                   Write-Output ("Local Version: " + $localversion.version + " Online Version: " + $onlineversion.version)
+                   Out-LogFile "New version of Hawk module found online" -Information
+                   Out-LogFile ("Local Version: " + $localversion.version + " Online Version: " + $onlineversion.version) -Information
     
                    # Prompt the user to upgrade or not
                    $title = "Upgrade version"
@@ -71,7 +71,7 @@
                }
                # If the versions match then we don't need to upgrade
                else {
-                   Write-Output "Latest Version Installed"
+                   Out-LogFile "Latest Version Installed" -Information
                }
            }
        }
@@ -82,9 +82,9 @@
            If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
                # Update the module
                if ($PSCmdlet.ShouldProcess("Hawk Module", "Update module")) {
-                   Write-Output "Downloading Updated Hawk Module"
+                   Out-LogFile "Downloading Updated Hawk Module" -Action
                    Update-Module Hawk -Force
-                   Write-Output "Update Finished"
+                   Out-LogFile "Update Finished" -Action
                    Start-Sleep 3
     
                    # If Elevated update then this prompt was created by the Update-HawkModule function and we can close it out otherwise leave it up
@@ -92,11 +92,11 @@
     
                    # If we didn't elevate then we are running in the admin prompt and we need to import the new hawk module
                    else {
-                       Write-Output "Starting new PowerShell Window with the updated Hawk Module loaded"
+                       Out-LogFile "Starting new PowerShell Window with the updated Hawk Module loaded" -Action
     
                        # We can't load a new copy of the same module from inside the module so we have to start a new window
                        Start-Process powershell.exe -ArgumentList "-noexit -Command Import-Module Hawk -force" -Verb RunAs
-                       Write-Warning "Updated Hawk Module loaded in New PowerShell Window. `nPlease Close this Window."
+                       Out-LogFile "Updated Hawk Module loaded in New PowerShell Window. Please Close this Window." -Notice
                        break
                    }
                }
@@ -104,19 +104,19 @@
            # If we are not running as admin we need to start an admin prompt
            else {
                # Relaunch as an elevated process:
-               Write-Output "Starting Elevated Prompt"
+               Out-LogFile "Starting Elevated Prompt" -Action
                Start-Process powershell.exe -ArgumentList "-noexit -Command Import-Module Hawk;Update-HawkModule -ElevatedUpdate" -Verb RunAs -Wait
     
-               Write-Output "Starting new PowerShell Window with the updated Hawk Module loaded"
+               Out-LogFile "Starting new PowerShell Window with the updated Hawk Module loaded" -Action
     
                # We can't load a new copy of the same module from inside the module so we have to start a new window
                Start-Process powershell.exe -ArgumentList "-noexit -Command Import-Module Hawk -force"
-               Write-Warning "Updated Hawk Module loaded in New PowerShell Window. `nPlease Close this Window."
+               Out-LogFile "Updated Hawk Module loaded in New PowerShell Window. Please Close this Window." -Notice
                break
            }
        }
        # Since upgrade is false we log and continue
        else {
-           Write-Output "Skipping Upgrade"
+           Out-LogFile "Skipping Upgrade" -Action
        }
     }
