@@ -279,19 +279,6 @@
             }
         }
 
-        # Determine if we have access to a P1 or P2 Azure Ad License
-        # EMS SKU contains Azure P1 as part of the sku
-        # This uses Graph instead of MSOL
-        Test-GraphConnection
-        if ([bool] (Get-MgSubscribedSku | Where-Object { ($_.SkuPartNumber -like "*aad_premium*") -or ($_.SkuPartNumber -like "*EMS*") -or ($_.SkuPartNumber -like "*E5*") -or ($_.SkuPartNumber -like "*G5*") } )) {
-            Write-Information "Advanced Azure AD License Found"
-            [bool]$AdvancedAzureLicense = $true
-        }
-        else {
-            Write-Information "Advanced Azure AD License NOT Found"
-            [bool]$AdvancedAzureLicense = $false
-        }
-
         # Configuration Example, currently not used
         #TODO: Implement Configuration system across entire project
         Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value $Days -PassThru | Register-PSFConfig
@@ -305,7 +292,6 @@
             DaysToLookBack = $Days
             StartDate = $StartDate
             EndDate = $EndDate
-            AdvancedAzureLicense = $AdvancedAzureLicense
             WhenCreated = (Get-Date -Format g)
             MaxAuditDays = (Test-HawkLicenseType) 
         }
