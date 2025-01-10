@@ -54,7 +54,10 @@ Function Get-HawkUserInboxRule {
         Out-LogFile ("Gathering Inbox Rules: " + $User) -action
         $InboxRules = Get-InboxRule -mailbox  $User
 
-        if ($null -eq $InboxRules) { Out-LogFile "No Inbox Rules found" -Information } 
+        if ($null -eq $InboxRules) { 
+            Out-LogFile "Get-HawkUserInboxRule completed successfully" -Information
+            Out-LogFile "No Inbox Rules found" -action
+        } 
         else {
             # If the rules contains one of a number of known suspecious properties flag them
             foreach ($Rule in $InboxRules) {

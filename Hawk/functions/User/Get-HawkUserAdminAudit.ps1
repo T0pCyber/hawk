@@ -81,7 +81,8 @@
                 $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -User $User
             }
             else {
-                Out-LogFile "No User Changes found." -Information
+                Out-LogFile "Get-HawkUserAdminAudit completed successfully" -Information
+                Out-LogFile "No User Changes found." -action
             }
         }
         catch {

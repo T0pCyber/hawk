@@ -64,7 +64,8 @@
 
         # See if we have results if so push to csv file
         if ($null -eq $output) {
-            Out-LogFile ("No results found for time period " + $CurrentStart + " - " + $CurrentEnd) -Information
+            Out-LogFile "Get-HawkTenantAuthHistory completed successfully" -Information
+            Out-LogFile ("No results found for time period " + $CurrentStart + " - " + $CurrentEnd) -action
         }
         else {
             $output | Out-MultipleFileType -FilePrefix "Audit_Log_Full_$prefix" -Append -csv -json

@@ -48,7 +48,8 @@
         [array]$MobileDevices = Get-MobileDevice -mailbox $User
 
         if ($Null -eq $MobileDevices) {
-            Out-Logfile ("No devices found for user: " + $User) -Information
+            Out-LogFile "Get-HawkUserMobileDevice completed successfully" -Information
+            Out-Logfile ("No devices found for user: " + $User) -action
         }
         else {
             Out-Logfile ("Found " + $MobileDevices.count + " Devices") -Information

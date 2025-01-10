@@ -8,5 +8,7 @@
         # Exclude this as old test rules use Global Vars, will need to fix old tests and re-include this rule
         'PSAvoidGlobalVars'
         'PSUseDeclaredVarsMoreThanAssignments' 
+        # Exclude this to allow the use of Write-Host
+        'PSAvoidUsingWriteHost'
     )
 }

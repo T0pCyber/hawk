@@ -118,7 +118,8 @@
                     $itemLogs | Out-MultipleFileType -FilePrefix "ExchangeItem_Logs" -csv -json -User $User
                 }
                 else {
-                    Out-LogFile "No ExchangeItem events found." -Information
+                    Out-LogFile "ExchangeItem event search completed successfully" -Information
+                    Out-LogFile "No ExchangeItem events found." -Action
                 }
 
                 # Process ExchangeItemGroup records
@@ -139,7 +140,8 @@
                     $groupLogs | Out-MultipleFileType -FilePrefix "ExchangeItemGroup_Logs" -csv -json -User $User
                 }
                 else {
-                    Out-LogFile "No ExchangeItemGroup events found." -Information
+                    Out-LogFile "ExchangeItemGroup search completed successfully" -Information
+                    Out-LogFile "No ExchangeItemGroup events found." -action
                 }
 
                 # Summary logging

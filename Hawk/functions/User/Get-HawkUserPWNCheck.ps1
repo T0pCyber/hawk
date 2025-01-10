@@ -34,7 +34,8 @@
             "
 
             # get the access key from the user
-            $hibpkey = Read-Host "haveibeenpwned.com apikey"
+            Out-LogFile "haveibeenpwned.com apikey" -isPrompt -NoNewLine
+            $hibpkey = Read-Host 
             }
         }#End of BEGIN block
 

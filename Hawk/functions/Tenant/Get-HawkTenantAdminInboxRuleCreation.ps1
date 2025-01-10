@@ -85,8 +85,8 @@ Function Get-HawkTenantAdminInboxRuleCreation {
                     foreach ($rule in $SuspiciousRules) {
                         $reasons = @()
                         if (Test-SuspiciousInboxRule -Rule $rule -Reasons ([ref]$reasons)) {
-                            Out-LogFile "Found suspicious rule creation: '$($rule.Param_Name)' created by $($rule.UserId) at $($rule.CreationTime)" -Notice
-                            Out-LogFile "Reasons for investigation: $($reasons -join '; ')" -Notice
+                            Out-LogFile "Found suspicious rule creation: '$($rule.Param_Name)'" -Notice
+                      
                         }
                     }
                 }
@@ -96,7 +96,8 @@ Function Get-HawkTenantAdminInboxRuleCreation {
             }
         }
         else {
-            Out-LogFile "No admin inbox rule creation events found in audit logs" -Information
+            Out-LogFile "Get-HawkTenantAdminInboxRuleCreation completed successfully" -Information
+            Out-LogFile "No admin inbox rule creation events found in audit logs" -Action
         }
     }
     catch {

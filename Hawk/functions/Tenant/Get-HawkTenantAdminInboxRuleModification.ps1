@@ -88,8 +88,8 @@ Function Get-HawkTenantAdminInboxRuleModification {
                     foreach ($rule in $SuspiciousModifications) {
                         $reasons = @()
                         if (Test-SuspiciousInboxRule -Rule $rule -Reasons ([ref]$reasons)) {
-                            Out-LogFile "Found suspicious rule modification: '$($rule.Param_Name)' modified by $($rule.UserId) at $($rule.CreationTime)" -Notice
-                            Out-LogFile "Reasons for investigation: $($reasons -join '; ')" -Notice
+                            Out-LogFile "Found suspicious rule modification: '$($rule.Param_Name)'" -Notice
+                
                         }
                     }
                 }
@@ -99,7 +99,8 @@ Function Get-HawkTenantAdminInboxRuleModification {
             }
         }
         else {
-            Out-LogFile "No inbox rule modifications found in audit logs" -Information
+            Out-LogFile "Get-HawkTenantAdminInboxRuleModification completed successfully" -Information 
+            Out-LogFile "No inbox rule modifications found in audit logs" -action
         }
     }
     catch {

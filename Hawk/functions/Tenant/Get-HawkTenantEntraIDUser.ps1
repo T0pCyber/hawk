@@ -56,7 +56,8 @@
                 Out-MultipleFileType -FilePrefix "EntraIDUsers" -csv -json
         }
         else {
-            Out-LogFile "No users found" -Information
+            Out-LogFile "Get-HawkTenantEntraIDUser completed successfully" -Information
+            Out-LogFile "No users found" -Action
         }
     }
     END {

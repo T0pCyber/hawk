@@ -25,7 +25,7 @@ Function Test-GraphConnection {
         }
         else {
             # $Hawk exists, so we can safely use Out-LogFile 
-            Out-LogFile -String "Connecting to MGGraph using MGGraph Module" -Action
+            Write-Output "Connecting to MGGraph using MGGraph Module"
         }
 
         Connect-MGGraph

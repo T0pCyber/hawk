@@ -91,7 +91,7 @@ Function Out-MultipleFileType {
 
     end {
         if ($null -eq $AllObject) {
-            Out-LogFile "No Data Found" -Information
+            Out-LogFile "No Data Found" -Action
         }
         else {
 

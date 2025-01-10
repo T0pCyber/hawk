@@ -116,11 +116,13 @@
                     $RoleAssignements | Export-Csv -Path (Join-Path -Path $TenantPath -ChildPath "CustomEDiscoveryRoles.csv") -NoTypeInformation
                 }
                 else {
-                    Out-LogFile "No role assignments found" -Information
+                    Out-LogFile "Get-HawkTenantEDiscoveryConfiguration completed successfully" -Information
+                    Out-LogFile "No role assignments found" -action
                 }
             }
             else {
-                Out-LogFile "No roles with eDiscovery cmdlets found" -Information
+                Out-LogFile "Get-HawkTenantEDiscoveryConfiguration completed successfully" -Information
+                Out-LogFile "No roles with eDiscovery cmdlets found" -action
             }
 
             #endregion

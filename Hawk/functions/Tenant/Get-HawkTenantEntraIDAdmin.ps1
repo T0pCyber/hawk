@@ -82,7 +82,8 @@
                     Out-LogFile "Successfully exported Microsoft Entra ID Administrators data" -Information
                 }
                 else {
-                    Out-LogFile "No administrator roles found or accessible" -Information
+                    Out-LogFile "Get-HawkTenantEntraID completed" -Information
+                    Out-LogFile "No administrator roles found or accessible" -Action
                 }
             }
             catch {

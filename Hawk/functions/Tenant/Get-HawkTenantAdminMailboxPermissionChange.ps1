@@ -98,7 +98,8 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
             }
         }
         else {
-            Out-LogFile "No mailbox permission changes found in audit logs" -Information
+            Out-LogFile "Get-HawkTenantAdminMailBoxPermissionChange completed successfully" -Information
+            Out-LogFile "No mailbox permission changes found in audit logs" -action
         }
     }
     catch {

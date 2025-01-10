@@ -100,7 +100,8 @@
             }
         }
         else {
-            Out-LogFile "No RBAC changes found." -Information
+            Out-LogFile "Get-HawkTenantRbacChange completed successfully" -Information
+            Out-LogFile "No RBAC changes found." -action
         }
     }
     catch {
