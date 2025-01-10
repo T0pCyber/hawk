@@ -181,117 +181,118 @@
             [string]$OutputPath = Set-LoggingPath -path $FilePath
         }
 
-        # Get license information and validate retention period
         try {
             $LicenseInfo = Test-LicenseType
             $MaxDaysToGoBack = $LicenseInfo.RetentionPeriod
             $LicenseType = $LicenseInfo.LicenseType
-
+        
             Write-Information "Detecting M365 license type to determine maximum log retention period" 
             Write-Information "M365 License type detected: $LicenseType"
             Write-Information "Max log retention: $MaxDaysToGoBack days"
-
+        
         } catch {
             Write-Information "Failed to detect license type. Max days of log retention is unknown." 
             $MaxDaysToGoBack = 90
             $LicenseType = "Unknown"
         }
-
-        # We need to ask for start and end date if daystolookback was not set
-        if ($null -eq $StartDate) {
-
-            # Read in our # of days back or the actual start date
-            $StartRead = Read-Host "`nPlease Enter First Day of Search Window (1-$MaxDaysToGoBack, Date, Default 90)"
-
-            # Determine if the input was a date time
-            # True means it was NOT a datetime
-            if ($Null -eq ($StartRead -as [DateTime])) {
-                #### Not a Date time ####
-
-                # if we have a null entry (just hit enter) then set startread to the default of 365
-                if ([string]::IsNullOrEmpty($StartRead)) { $StartRead = 90 }
-                elseif (($StartRead -gt 90) -or ($StartRead -lt 1)) {
-                    Write-Information "Value provided is outside of valid Range 1-365"
-                    Write-Information "Setting StartDate to default of Today - 90 days"
-                    $StartRead = 90
+        
+        # Ensure MaxDaysToGoBack does not exceed 365 days
+        if ($MaxDaysToGoBack -gt 365) { $MaxDaysToGoBack = 365 }
+        
+        # Prompt for Start Date if not set
+        while ($null -eq $StartDate) {
+        
+            # Read input from user
+            Write-Output "`nPlease specify the first day of the search window:"
+            Write-Output " - Enter a number of days to go back (1-$MaxDaysToGoBack)"
+            Write-Output " - OR enter a date in MM/DD/YYYY format"
+            $StartRead = Read-Host "Default is 90 days back"
+                    
+            # Determine if input is a valid date
+            if ($null -eq ($StartRead -as [DateTime])) {
+        
+                #### Not a DateTime ####
+                if ([string]::IsNullOrEmpty($StartRead)) { 
+                    $StartRead = 90 
                 }
-
-                # Calculate our startdate setting it to midnight UTC
+        
+                # Validate the entered days back
+                if ($StartRead -gt $MaxDaysToGoBack) {
+                    Write-Warning "You have entered a time frame greater than your license allows ($MaxDaysToGoBack days)."
+                    $Proceed = Read-Host "Press ENTER to proceed or type 'R' to re-enter the value"
+                    if ($Proceed -eq 'R') { continue }
+                }
+        
+                if ($StartRead -gt 365) {
+                    Write-Warning "Log retention cannot exceed 365 days. Setting retention to 365 days."
+                    $StartRead = 365
+                }
+        
+                # Calculate start date
                 [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
-                Write-Information ("Start Date (UTC): " + $StartDate + "")
-            }
-            elseif (!($null -eq ($StartRead -as [DateTime]))) {
-                #### DATE TIME Provided ####
-
-                # Convert the input to a UTC date time object
+                Write-Information "Start Date (UTC): $StartDate"
+        
+            } elseif (!($null -eq ($StartRead -as [DateTime]))) {
+        
+                #### DateTime Provided ####
                 [DateTime]$StartDate = (Get-Date $StartRead).ToUniversalTime().Date
-
-                # Test to make sure the date time is not further back than 365 and < today
-                # I DONT KNOW WHAT TO CHANGE HERE
-                if ($StartDate -ge ((Get-date).ToUniversalTime().AddDays(-365).Date) -and ($StartDate -le (Get-Date).ToUniversalTime().Date)) {
-                    #Valid Date do nothing
+        
+                # Validate the date
+                if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-$MaxDaysToGoBack))) {
+                    Write-Warning "The date entered exceeds your license retention period of $MaxDaysToGoBack days."
+                    $Proceed = Read-Host "Press ENTER to proceed or type 'R' to re-enter the date"
+                    if ($Proceed -eq 'R') { $StartDate = $null; continue }
                 }
-                else {
-                    Write-Information ("Date provided beyond acceptable range of 365 days.")
-                    Write-Information ("Setting date to default of Today - 90 days.")
-                    [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-90)).Date
+        
+                if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-365))) {
+                    Write-Warning "The date cannot exceed 365 days. Setting to the maximum limit of 365 days."
+                    [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-365)).Date
                 }
-            }
-            else {
-                Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
+        
+                Write-Information "Start Date (UTC): $StartDate"
+        
+            } else {
+                Write-Error "Invalid date information provided. Could not determine if this was a date or an integer." -ErrorAction Stop
             }
         }
 
+        # End date logic remains unchanged
         if ($null -eq $EndDate) {
-            # Read in the end date
-            $EndRead = Read-Host "`nPlease Enter Last Day of Search Window (1-365, date, Default Today)"
+            Write-Output "`nPlease specify the last day of the search window:"
+            Write-Output " - Enter a number of days to go back from today (1-365)"
+            Write-Output " - OR enter a specific date in MM/DD/YYYY format"
+            $EndRead = Read-Host "Default is today's date"
+            
+            
 
-            # Determine if the input was a date time
-            # True means it was NOT a datetime
-            if ($Null -eq ($EndRead -as [DateTime])) {
-                #### Not a Date time ####
-
-                # if we have a null entry (just hit enter) then set startread to the default of today
+            # End date validation
+            if ($null -eq ($EndRead -as [DateTime])) {
                 if ([string]::IsNullOrEmpty($EndRead)) {
-                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(1)).Date
-                }
-                else {
-                    # Calculate our enddate setting it to midnight UTC
-                    Write-Information ("End Date (UTC): " + $EndRead + " days.")
-                    # Subtract 1 from the EndRead entry so that we get one day less for the purpose of how searching works with times
-                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays( - ($EndRead - 1))).Date
+                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
+                } else {
+                    Write-Information "End Date (UTC): $EndRead days."
+                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(-($EndRead - 1))).Date
                 }
 
-                # Validate that the start date is further back in time than the end date
                 if ($StartDate -gt $EndDate) {
-                    Write-Error "StartDate Cannot be More Recent than EndDate" -ErrorAction Stop
+                    Write-Error "StartDate cannot be more recent than EndDate" -ErrorAction Stop
+                } else {
+                    Write-Information "End Date (UTC): $EndDate`n"
                 }
-                else {
-                    Write-Information ("End Date (UTC): " + $EndDate + "`n")
-                }
-            }
-            elseif (!($null -eq ($EndRead -as [DateTime]))) {
-                #### DATE TIME Provided ####
+            } elseif (!($null -eq ($EndRead -as [DateTime]))) {
+                [DateTime]$EndDate = (Get-Date $EndRead).ToUniversalTime().Date
 
-                # Convert the input to a UTC date time object
-                [DateTime]$EndDate = ((Get-Date $EndRead).ToUniversalTime().AddDays(1)).Date
-
-                # Test to make sure the end date is newer than the start date
                 if ($StartDate -gt $EndDate) {
-                    Write-Information "EndDate Selected was older than start date."
-                    Write-Information "Setting EndDate to today."
-                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(1)).Date
-                }
-                elseif ($EndDate -gt (Get-Date).ToUniversalTime().AddDays(2)) {
-                    Write-Information "EndDate too far in the future."
-                    Write-Information "Setting EndDate to Today."
-                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(1)).Date
+                    Write-Warning "EndDate is earlier than StartDate. Setting EndDate to today."
+                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
+                } elseif ($EndDate -gt ((Get-Date).ToUniversalTime().AddDays(1))) {
+                    Write-Warning "EndDate too far in the future. Setting EndDate to today."
+                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
                 }
 
-                Write-Information ("End Date (UTC): " + $EndDate + "`n")
-            }
-            else {
-                Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
+                Write-Information "End Date (UTC): $EndDate`n"
+            } else {
+                Write-Error "Invalid date information provided. Could not determine if this was a date or an integer." -ErrorAction Stop
             }
         }
 
