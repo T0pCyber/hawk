@@ -4,43 +4,35 @@ function Test-HawkLicenseType {
         Identifies the Microsoft 365 license type (E5, E3, or other) for the current tenant and returns the corresponding retention period.
 
     .DESCRIPTION
-        This function retrieves the list of subscribed SKUs for the tenant using the Microsoft Graph API.
-        It checks the license type based on the `SkuPartNumber` and returns the appropriate retention period in days:
-        - 365 days for E5 licenses (including equivalents like Developer Pack E5).
-        - 180 days for E3 licenses (including equivalents like Developer Pack E3).
-        - 90 days as a default retention period if no matching license is found.
+        This function retrieves the list of subscribed SKUs for the tenant using the Microsoft Graph API. It determines the license type based on the `SkuPartNumber` to return the appropriate audit log retention period:
+        - 365 days for E5 licenses (including equivalents like Developer Pack E5)
+        - 180 days for E3 licenses (including equivalents like Developer Pack E3)  
+        - 90 days as a default retention period if no matching license is found
 
     .EXAMPLE
-        PS C:\> Test-HawkLicenseType
-        This command returns the retention period based on the tenant's Microsoft 365 license type.
+        PS> Test-HawkLicenseType
+        365
+        
+        Returns 365 days retention period because the tenant has an E5 license.
+
+    .EXAMPLE
+        PS> Test-HawkLicenseType 
+        180
+        
+        Returns 180 days retention period because the tenant has an E3 license.
+    
+    .EXAMPLE 
+        PS> Test-HawkLicenseType
+        90
+        
+        Returns default 90 days retention period because tenant license type could not be determined.
 
     .NOTES
         Author: Jonathan Butler
         Last Updated: January 9, 2025
-        This function uses Microsoft Graph cmdlets to retrieve the tenant's license information.
-        
-    .REQUIREMENTS
-        - Microsoft.Graph module must be installed and authenticated.
-        - The user must have permission to query the tenant's subscription details.
-
-    .PARAMETER None
-        This function does not take any parameters.
-
-    .INPUTS
-        None. This function does not accept input from the pipeline.
-
-    .OUTPUTS
-        [int] - Returns the retention period in days based on the identified license type:
-                - 365 for E5 or equivalent licenses.
-                - 180 for E3 or equivalent licenses.
-                - 90 as the default retention period.
-
-    .COMPONENT
-        Microsoft Graph PowerShell Module
 
     .LINK
         https://learn.microsoft.com/en-us/powershell/microsoftgraph
-
     #>
     [CmdletBinding()]
     [OutputType([int])]
