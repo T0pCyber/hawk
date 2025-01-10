@@ -1,41 +1,41 @@
 ﻿Function Initialize-HawkGlobalObject {
     <#
-.SYNOPSIS
-    Create global variable $Hawk for use by all Hawk cmdlets.
-.DESCRIPTION
-    Creates the global variable $Hawk and populates it with information needed by the other Hawk cmdlets.
+    .SYNOPSIS
+        Create global variable $Hawk for use by all Hawk cmdlets.
+    .DESCRIPTION
+        Creates the global variable $Hawk and populates it with information needed by the other Hawk cmdlets.
 
-    * Checks for latest version of the Hawk module
-    * Creates path for output files
-    * Records target start and end dates for searches
-.PARAMETER Force
-    Switch to force the function to run and allow the variable to be recreated
-.PARAMETER SkipUpdate
-    Skips checking for the latest version of the Hawk Module
-.PARAMETER DaysToLookBack
-    Defines the # of days to look back in the availible logs.
-    Valid values are 1-90
-.PARAMETER StartDate
-    First day that data will be retrieved
-.PARAMETER EndDate
-    Last day that data will be retrieved
-.PARAMETER FilePath
-    Provide an output file path.
-.OUTPUTS
-    Creates the $Hawk global variable and populates it with a custom PS object with the following properties
+        * Checks for latest version of the Hawk module
+        * Creates path for output files
+        * Records target start and end dates for searches (in UTC)
+    .PARAMETER Force
+        Switch to force the function to run and allow the variable to be recreated
+    .PARAMETER SkipUpdate
+        Skips checking for the latest version of the Hawk Module
+    .PARAMETER DaysToLookBack
+        Defines the # of days to look back in the availible logs.
+        Valid values are 1-90
+    .PARAMETER StartDate
+        First day that data will be retrieved (in UTC)
+    .PARAMETER EndDate
+        Last day that data will be retrieved (in UTC)
+    .PARAMETER FilePath
+        Provide an output file path.
+    .OUTPUTS
+        Creates the $Hawk global variable and populates it with a custom PS object with the following properties
 
-    Property Name	Contents
-    ==========		==========
-    FilePath		Path to output files
-    DaysToLookBack	Number of day back in time we are searching
-    StartDate		Calculated start date for searches based on DaysToLookBack
-    EndDate			One day in the future
-    WhenCreated		Date and time that the variable was created
-.EXAMPLE
-    Initialize-HawkGlobalObject -Force
+        Property Name	Contents
+        ==========		==========
+        FilePath		Path to output files
+        DaysToLookBack	Number of day back in time we are searching
+        StartDate		Calculated start date for searches based on DaysToLookBack (UTC)
+        EndDate			One day in the future (UTC)
+        WhenCreated		Date and time that the variable was created (UTC)
+    .EXAMPLE
+        Initialize-HawkGlobalObject -Force
 
-    This Command will force the creation of a new $Hawk variable even if one already exists.
-#>
+        This Command will force the creation of a new $Hawk variable even if one already exists.
+    #>
     [CmdletBinding()]
     param
     (
@@ -73,9 +73,9 @@
         [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
 
-        # Create a folder ID based on date
+        # Create a folder ID based on UTC date
         [string]$TenantName = (Get-MGDomain | Where-Object { $_.isDefault }).ID
-        [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date -UFormat %Y%m%d_%H%M).tostring()
+        [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmm")
 
         # Add that ID to the given path
         $FullOutputPath = Join-Path $RootPath $FolderID
@@ -181,43 +181,60 @@
             [string]$OutputPath = Set-LoggingPath -path $FilePath
         }
 
+        # Get license information and validate retention period
+        try {
+            $LicenseInfo = Test-LicenseType
+            $MaxDaysToGoBack = $LicenseInfo.RetentionPeriod
+            $LicenseType = $LicenseInfo.LicenseType
+
+            Write-Information "Detecting M365 license type to determine maximum log retention period" 
+            Write-Information "M365 License type detected: $LicenseType"
+            Write-Information "Max log retention: $MaxDaysToGoBack days"
+
+        } catch {
+            Write-Information "Failed to detect license type. Max days of log retention is unknown." 
+            $MaxDaysToGoBack = 90
+            $LicenseType = "Unknown"
+        }
+
         # We need to ask for start and end date if daystolookback was not set
         if ($null -eq $StartDate) {
 
             # Read in our # of days back or the actual start date
-            $StartRead = Read-Host "`nPlease Enter First Day of Search Window (1-90, Date, Default 90)"
+            $StartRead = Read-Host "`nPlease Enter First Day of Search Window (1-$MaxDaysToGoBack, Date, Default 90)"
 
             # Determine if the input was a date time
             # True means it was NOT a datetime
             if ($Null -eq ($StartRead -as [DateTime])) {
                 #### Not a Date time ####
 
-                # if we have a null entry (just hit enter) then set startread to the default of 90
+                # if we have a null entry (just hit enter) then set startread to the default of 365
                 if ([string]::IsNullOrEmpty($StartRead)) { $StartRead = 90 }
                 elseif (($StartRead -gt 90) -or ($StartRead -lt 1)) {
-                    Write-Information "Value provided is outside of valid Range 1-90"
+                    Write-Information "Value provided is outside of valid Range 1-365"
                     Write-Information "Setting StartDate to default of Today - 90 days"
                     $StartRead = 90
                 }
 
-                # Calculate our startdate setting it to midnight
-                [DateTime]$StartDate = ((Get-Date).AddDays(-$StartRead)).Date
-                Write-Information ("Start Date: " + $StartDate + "")
+                # Calculate our startdate setting it to midnight UTC
+                [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
+                Write-Information ("Start Date (UTC): " + $StartDate + "")
             }
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
                 #### DATE TIME Provided ####
 
-                # Convert the input to a date time object
-                [DateTime]$StartDate = (Get-Date $StartRead).Date
+                # Convert the input to a UTC date time object
+                [DateTime]$StartDate = (Get-Date $StartRead).ToUniversalTime().Date
 
-                # Test to make sure the date time is > 90 and < today
-                if ($StartDate -ge ((Get-date).AddDays(-90).Date) -and ($StartDate -le (Get-Date).Date)) {
+                # Test to make sure the date time is not further back than 365 and < today
+                # I DONT KNOW WHAT TO CHANGE HERE
+                if ($StartDate -ge ((Get-date).ToUniversalTime().AddDays(-365).Date) -and ($StartDate -le (Get-Date).ToUniversalTime().Date)) {
                     #Valid Date do nothing
                 }
                 else {
-                    Write-Information ("Date provided beyond acceptable range of 90 days.")
+                    Write-Information ("Date provided beyond acceptable range of 365 days.")
                     Write-Information ("Setting date to default of Today - 90 days.")
-                    [DateTime]$StartDate = ((Get-Date).AddDays(-90)).Date
+                    [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-90)).Date
                 }
             }
             else {
@@ -227,22 +244,22 @@
 
         if ($null -eq $EndDate) {
             # Read in the end date
-            $EndRead = Read-Host "`nPlease Enter Last Day of Search Window (1-90, date, Default Today)"
+            $EndRead = Read-Host "`nPlease Enter Last Day of Search Window (1-365, date, Default Today)"
 
             # Determine if the input was a date time
             # True means it was NOT a datetime
             if ($Null -eq ($EndRead -as [DateTime])) {
                 #### Not a Date time ####
 
-                # if we have a null entry (just hit enter) then set startread to the default of 90
+                # if we have a null entry (just hit enter) then set startread to the default of today
                 if ([string]::IsNullOrEmpty($EndRead)) {
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(1)).Date
                 }
                 else {
-                    # Calculate our startdate setting it to midnight
-                    Write-Information ("End Date: " + $EndRead + " days.")
+                    # Calculate our enddate setting it to midnight UTC
+                    Write-Information ("End Date (UTC): " + $EndRead + " days.")
                     # Subtract 1 from the EndRead entry so that we get one day less for the purpose of how searching works with times
-                    [DateTime]$EndDate = ((Get-Date).AddDays( - ($EndRead - 1))).Date
+                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays( - ($EndRead - 1))).Date
                 }
 
                 # Validate that the start date is further back in time than the end date
@@ -250,30 +267,29 @@
                     Write-Error "StartDate Cannot be More Recent than EndDate" -ErrorAction Stop
                 }
                 else {
-                    Write-Information ("End Date: " + $EndDate + "`n")
+                    Write-Information ("End Date (UTC): " + $EndDate + "`n")
                 }
             }
             elseif (!($null -eq ($EndRead -as [DateTime]))) {
                 #### DATE TIME Provided ####
 
-                # Convert the input to a date time object
-                [DateTime]$EndDate = ((Get-Date $EndRead).AddDays(1)).Date
+                # Convert the input to a UTC date time object
+                [DateTime]$EndDate = ((Get-Date $EndRead).ToUniversalTime().AddDays(1)).Date
 
                 # Test to make sure the end date is newer than the start date
                 if ($StartDate -gt $EndDate) {
                     Write-Information "EndDate Selected was older than start date."
                     Write-Information "Setting EndDate to today."
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(1)).Date
                 }
-                elseif ($EndDate -gt (get-Date).AddDays(2)) {
-                    Write-Information "EndDate to Far in the furture."
+                elseif ($EndDate -gt (Get-Date).ToUniversalTime().AddDays(2)) {
+                    Write-Information "EndDate too far in the future."
                     Write-Information "Setting EndDate to Today."
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(1)).Date
                 }
 
-                Write-Information ("Setting EndDate by Date to " + $EndDate + "`n")
+                Write-Information ("End Date (UTC): " + $EndDate + "`n")
             }
-
             else {
                 Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
             }
@@ -288,12 +304,12 @@
 
         #TODO: Discard below once migration to configuration is completed
         $Output = [PSCustomObject]@{
-            FilePath = $OutputPath
-            DaysToLookBack = $Days
-            StartDate = $StartDate
-            EndDate = $EndDate
-            WhenCreated = (Get-Date -Format g)
-            MaxAuditDays = (Test-HawkLicenseType) 
+            FilePath             = $OutputPath
+            DaysToLookBack       = $Days
+            StartDate           = $StartDate
+            EndDate             = $EndDate
+            MaxDays             = $MaxDaysToGoBack
+            WhenCreated         = (Get-Date).ToUniversalTime().ToString("g")
         }
 
         # Create the script hawk variable
@@ -301,21 +317,19 @@
         New-Variable -Name Hawk -Scope Script -value $Output -Force
         Out-LogFile "Script Variable Configured" -Information
         Out-LogFile ("Hawk Version: " + (Get-Module Hawk).version) -Information
+        
         # Print each property of $Hawk on its own line
         foreach ($prop in $Hawk.PSObject.Properties) {
             # If the property value is $null or an empty string, display "N/A"
             $value = if ($null -eq $prop.Value -or [string]::IsNullOrEmpty($prop.Value.ToString())) {
                 "N/A"
-            }
-            else {
+            } else {
                 $prop.Value
             }
         
             Out-LogFile ("{0} = {1}" -f $prop.Name, $value) -Information
         }
-        #### End of IF
     }
-
     else {
         Write-Information "Valid Hawk Object already exists no actions will be taken."
     }
