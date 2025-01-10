@@ -301,12 +301,13 @@
 
         #TODO: Discard below once migration to configuration is completed
         $Output = [PSCustomObject]@{
-            FilePath             = $OutputPath
-            DaysToLookBack       = $Days
-            StartDate            = $StartDate
-            EndDate              = $EndDate
+            FilePath = $OutputPath
+            DaysToLookBack = $Days
+            StartDate = $StartDate
+            EndDate = $EndDate
             AdvancedAzureLicense = $AdvancedAzureLicense
-            WhenCreated          = (Get-Date -Format g)
+            WhenCreated = (Get-Date -Format g)
+            MaxAuditDays = (Test-HawkLicenseType) 
         }
 
         # Create the script hawk variable
@@ -319,7 +320,8 @@
             # If the property value is $null or an empty string, display "N/A"
             $value = if ($null -eq $prop.Value -or [string]::IsNullOrEmpty($prop.Value.ToString())) {
                 "N/A"
-            } else {
+            }
+            else {
                 $prop.Value
             }
         

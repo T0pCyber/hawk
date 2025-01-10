@@ -56,7 +56,7 @@ function Test-HawkLicenseType {
         return 90
     }
     catch {
-        Out-LogFile "Unable to determine license type. Defaulting to 90 days retention." -isError
+        Out-LogFile "Unable to determine license type. Defaulting to 90 days retention." -information
         return 90
     }
 }
