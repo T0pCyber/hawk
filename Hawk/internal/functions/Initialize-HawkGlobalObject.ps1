@@ -197,9 +197,9 @@
         # Create the global $Hawk variable immediately with minimal properties
         $Global:Hawk = [PSCustomObject]@{
             FilePath       = $null  # Will be set shortly
-            DaysToLookBack = $null
-            StartDate      = $null
-            EndDate        = $null
+            DaysToLookBack = 90
+            StartDate      = ((Get-Date).ToUniversalTime().AddDays(-90)).Date  # 90 days back in UTC
+            EndDate        = (Get-Date).ToUniversalTime().Date                 # Today's date in UTC
             WhenCreated    = $null
         }
 
@@ -233,9 +233,6 @@
         Out-LogFile "Testing Graph Connection" -Action
 
         Test-GraphConnection
-
-        # If the global variable Hawk doesn't exist or we have -force then set the variable up
-        Out-LogFile -string "Setting Up initial Hawk environment variable" -NoDisplay
 
         try {
             $LicenseInfo = Test-LicenseType
