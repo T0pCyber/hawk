@@ -37,6 +37,11 @@ Function Get-HawkTenantAdminEmailForwardingChange {
     [CmdletBinding()]
     param()
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
     # Test the Exchange Online connection to ensure the environment is ready for operations.
     Test-EXOConnection
     # Log the execution of the function for audit and telemetry purposes.

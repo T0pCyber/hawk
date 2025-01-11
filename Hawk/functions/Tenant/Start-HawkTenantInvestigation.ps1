@@ -33,9 +33,10 @@
 	[CmdletBinding(SupportsShouldProcess)]
 	param()
 
-	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
-		Initialize-HawkGlobalObject
-	}
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
 
 	Out-LogFile "Starting Tenant Sweep" -action
 	Send-AIEvent -Event "CmdRun"

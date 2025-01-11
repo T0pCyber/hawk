@@ -59,9 +59,11 @@
     #TO DO: UPDATE THIS FUNCTION TO FIND E-Discovery roles created via the graph API
 
     BEGIN {
-        if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+        # Check if Hawk object exists and is fully initialized
+        if (Test-HawkGlobalObject) {
             Initialize-HawkGlobalObject
         }
+
 
         Test-EXOConnection
         Send-AIEvent -Event "CmdRun"

@@ -37,6 +37,11 @@
     #>
     [CmdletBinding()]
     param()
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
 
     # Verify EXO connection and send telemetry
     Test-EXOConnection

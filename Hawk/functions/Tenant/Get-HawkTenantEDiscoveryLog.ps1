@@ -41,6 +41,13 @@
         - Cmdlet: Command that was executed (if applicable)
     #>
     # Search UAL audit logs for any Domain configuration changes
+
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
+
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 

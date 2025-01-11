@@ -27,6 +27,13 @@ Function Get-HawkTenantDomainActivity {
 	Searches for all Domain configuration actions
 #>
 	BEGIN{
+		# Check if Hawk object exists and is fully initialized
+		if (Test-HawkGlobalObject) {
+			Initialize-HawkGlobalObject
+		}
+
+
+
 		Test-EXOConnection
 		Send-AIEvent -Event "CmdRun"
 		Out-LogFile "Gathering any changes to Domain configuration settings" -action

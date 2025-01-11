@@ -21,9 +21,13 @@
 #>
 Begin {
 	#Initializing Hawk Object if not present
-	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
-		Initialize-HawkGlobalObject
-	}
+    # Check if Hawk object exists and is fully initialized
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
+
 	Out-LogFile "Gathering Tenant information" -Action
 	Test-EXOConnection
 }#End BEGIN

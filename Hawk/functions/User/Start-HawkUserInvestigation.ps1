@@ -49,6 +49,10 @@
 			[Parameter(Mandatory = $true)]
 			[array]$UserPrincipalName
 		)
+		# Check if Hawk object exists and is fully initialized
+		if (Test-HawkGlobalObject) {
+			Initialize-HawkGlobalObject
+		}
 
 	
 		# Check if the logging filepath is set

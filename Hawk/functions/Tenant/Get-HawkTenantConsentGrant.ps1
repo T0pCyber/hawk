@@ -25,6 +25,11 @@
     [CmdletBinding()]
     param()
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
     Out-LogFile "Gathering OAuth / Application Grants" -Action
 
     Test-GraphConnection

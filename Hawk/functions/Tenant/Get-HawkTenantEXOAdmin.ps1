@@ -14,6 +14,11 @@
 .NOTES
 #>
 BEGIN{
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+    
     Out-LogFile "Gathering Exchange Online Administrators" -Action
 
     Test-EXOConnection

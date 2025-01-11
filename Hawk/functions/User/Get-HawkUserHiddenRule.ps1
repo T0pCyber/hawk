@@ -46,6 +46,12 @@
         [System.Management.Automation.PSCredential]$EWSCredential
     )
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
+
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
