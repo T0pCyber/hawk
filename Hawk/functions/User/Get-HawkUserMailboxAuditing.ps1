@@ -124,11 +124,13 @@
 
                 # Process ExchangeItemGroup records
                 Out-LogFile "Searching Unified Audit Log for ExchangeItemGroup events." -action
+                Out-LogFile "Please be patient, this can take a while..." -action
                 $searchCommand = "Search-UnifiedAuditLog -UserIds $User -RecordType ExchangeItemGroup"
                 $groupLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
                 if ($groupLogs.Count -gt 0) {
                     Out-LogFile ("Found " + $groupLogs.Count + " ExchangeItemGroup events.") -Information
+                    Out-LogFile "Processing all events, this can take a while..." -action
 
                     # Process and output flattened data
                     $ParsedGroupLogs = $groupLogs | Get-SimpleUnifiedAuditLog
