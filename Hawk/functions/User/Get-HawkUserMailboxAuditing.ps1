@@ -130,7 +130,7 @@
 
                 if ($groupLogs.Count -gt 0) {
                     Out-LogFile ("Found " + $groupLogs.Count + " ExchangeItemGroup events.") -Information
-                    Out-LogFile "Processing all events, this can take a while..." -action
+                    Out-LogFile "Processing all ExchangeItemGroup events, this can take a while..." -action
 
                     # Process and output flattened data
                     $ParsedGroupLogs = $groupLogs | Get-SimpleUnifiedAuditLog
