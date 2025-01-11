@@ -91,36 +91,40 @@
         param([string]$RootPath)
     
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-
-        Write-Information "[$timestamp UTC] - [ACTION] - Connecting to Microsoft Graph"
     
         try {
-            # Test Graph connection
-            $null = Test-GraphConnection
+            # Test Graph connection first to see if we're already connected
+            try {
+                $null = Get-MgOrganization -ErrorAction Stop
+                Write-Information "[$timestamp UTC] - [INFO]   - Already connected to Microsoft Graph"
+            }
+            catch {
+                # Only show connecting message if we actually need to connect
+                Write-Information "[$timestamp UTC] - [ACTION] - Connecting to Microsoft Graph"
+                $null = Test-GraphConnection
+                Write-Information "[$timestamp UTC] - [INFO]   - Connected to Microsoft Graph Successfully"
+            }
     
-            # If successful, display a success message
-            Write-Information "[$timestamp UTC] - [INFO]   - Connected to Microsoft Graph Successfully"
+            # Get tenant name 
+            $TenantName = (Get-MGDomain -ErrorAction Stop | Where-Object { $_.isDefault }).ID
+            [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmmss")
+    
+            $FullOutputPath = Join-Path $RootPath $FolderID
+    
+            if (Test-Path $FullOutputPath) {
+                Write-Information "[$timestamp UTC] - [ERROR] - Path $FullOutputPath already exists"
+            }
+            else {
+                Write-Information "[$timestamp UTC] - [ACTION] - Creating subfolder $FullOutputPath"
+                $null = New-Item $FullOutputPath -ItemType Directory -ErrorAction Stop
+            }
+    
+            Return $FullOutputPath
         }
         catch {
-            # If it fails, display an error message
-            Write-Error "[$timestamp UTC] - [ERROR] - Failed to connect to Microsoft Graph"
+            # If it fails at any point, display an error message
+            Write-Error "[$timestamp UTC] - [ERROR] - Failed to create logging folder: $_"
         }
-    
-        # Get tenant name
-        $TenantName = (Get-MGDomain -ErrorAction Stop | Where-Object { $_.isDefault }).ID
-        [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmm")
-    
-        $FullOutputPath = Join-Path $RootPath $FolderID
-    
-        if (Test-Path $FullOutputPath) {
-            Write-Information "[$timestamp UTC] - [ERROR] - Path $FullOutputPath already exists"
-        }
-        else {
-            Write-Information "[$timestamp UTC] - [ACTION] - Creating subfolder $FullOutputPath"
-            $null = New-Item $FullOutputPath -ItemType Directory -ErrorAction Stop
-        }
-    
-        Return $FullOutputPath
     }
     
     Function Set-LoggingPath {
