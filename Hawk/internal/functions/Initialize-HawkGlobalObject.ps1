@@ -141,7 +141,7 @@
             # Setup a while loop to get a valid path
             Do {
                 # Ask the user for the output path
-                [string]$UserPath = Read-Host "[$timestamp] - [PROMPT] - Please provide an output directory"
+                [string]$UserPath = (Read-Host "[$timestamp] - [PROMPT] - Please provide an output directory").Trim()
     
                 # If the input is null or empty, prompt again
                 if ([string]::IsNullOrEmpty($UserPath)) {
@@ -260,7 +260,7 @@
             Out-LogFile " Enter a number of days to go back (1-$MaxDaysToGoBack)" -isPrompt
             Out-LogFile " OR enter a date in MM/DD/YYYY format" -isPrompt
             Out-LogFile " Default is 90 days back: " -isPrompt -NoNewLine
-            $StartRead = Read-Host
+            $StartRead = (Read-Host).Trim()
             
 
             # Determine if input is a valid date
@@ -274,7 +274,8 @@
                 # Validate the entered days back
                 if ($StartRead -gt $MaxDaysToGoBack) {
                     Out-LogFile -string "You have entered a time frame greater than your license allows ($MaxDaysToGoBack days)." -isWarning
-                    $Proceed = Read-Host "Press ENTER to proceed or type 'R' to re-enter the value"
+                    Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the value: " -isPrompt -NoNewLine
+                    $Proceed = (Read-Host).Trim()
                     if ($Proceed -eq 'R') { continue }
                 }
 
@@ -296,7 +297,8 @@
                 # Validate the date
                 if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-$MaxDaysToGoBack))) {
                     Out-LogFile -string "The date entered exceeds your license retention period of $MaxDaysToGoBack days." -isWarning
-                    $Proceed = Read-Host "Press ENTER to proceed or type 'R' to re-enter the date"
+                    Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the date:" -isPrompt -NoNewLine
+                    $Proceed = (Read-Host).Trim()
                     if ($Proceed -eq 'R') { $StartDate = $null; continue }
                 }
 
@@ -320,7 +322,7 @@
             Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
             Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
             Out-LogFile " Default is today's date:" -isPrompt -NoNewLine
-            $EndRead = Read-Host            
+            $EndRead = (Read-Host).Trim()            
 
             # End date validation
             if ($null -eq ($EndRead -as [DateTime])) {

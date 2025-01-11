@@ -39,7 +39,7 @@
 
                # get the access key from the user
                Out-LogFile "haveibeenpwned.com apikey" -isPrompt -NoNewLine
-               $hibpkey = Read-Host 
+               $hibpkey = (Read-Host).Trim() 
            }
        }#End of BEGIN block
 

@@ -33,7 +33,7 @@ Function Get-IPGeolocation {
         # get the access key from the user
         # get the access key from the user
         Out-LogFile "ipstack.com accesskey" -isPrompt -NoNewLine
-        $Accesskey = Read-Host 
+        $Accesskey = (Read-Host).Trim() 
 
         # add the access key to the appdata file
         Add-HawkAppData -name access_key -Value $Accesskey
