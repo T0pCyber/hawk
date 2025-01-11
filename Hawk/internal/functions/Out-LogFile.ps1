@@ -106,8 +106,8 @@
     $ScreenOutput = -not $NoDisplay
     $LogOutput = $true
 
-    # Get the current date
-    [string]$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    # Get the current date in UTC
+    [string]$timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss UTC")
     [string]$logstring = ""
 
     # Build the log string based on the type of message
