@@ -60,13 +60,32 @@
     # call depth overflow errors from recursion.
     # Attempted to put in its own function, but resulted in issues due to order of the call stack
 
+# Validation to handle interrupted initialization states
+# If Hawk initialization was interrupted (e.g., by CTRL+C during path input),
+# it can leave behind a partially initialized Hawk object. This causes
+# recursion errors on subsequent runs due to the partial state.
+# 
+# Two cleanup scenarios:
+# 1. Force parameter: Always remove any existing Hawk object
+# 2. Incomplete object: Remove if missing essential properties
+#    (FilePath, StartDate, EndDate)
+#
+# This validation runs before any function definitions or calls to prevent
+# call depth overflow errors from recursion.
+# Attempted to put in its own function, but resulted in issues due to order of the call stack
+
     if ($Force) {
         Remove-Variable -Name Hawk -Scope Global -ErrorAction SilentlyContinue 
     }
 
     # Then check if the Hawk object exists but is incomplete
     if ($null -ne (Get-Variable -Name Hawk -ErrorAction SilentlyContinue) -and 
-        ($null -eq $Hawk.FilePath -or $null -eq $Hawk.StartDate -or $null -eq $Hawk.EndDate)) {
+        ($null -eq $Hawk.FilePath -or 
+        $null -eq $Hawk.StartDate -or 
+        $null -eq $Hawk.EndDate -or
+        # Add additional checks for partially initialized date properties
+        ($Hawk.PSObject.Properties.Name -contains 'StartDate' -and $null -eq $Hawk.StartDate) -or
+        ($Hawk.PSObject.Properties.Name -contains 'EndDate' -and $null -eq $Hawk.EndDate))) {
         Remove-Variable -Name Hawk -Scope Global -ErrorAction SilentlyContinue
     }
 
