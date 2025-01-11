@@ -65,7 +65,8 @@
     Function Test-LoggingPath {
         param([string]$PathToTest)
         
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
+        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
     
         # First test if the path we were given exists
         if (Test-Path $PathToTest) {
@@ -75,13 +76,13 @@
             }
             # If it is not a folder return false and write an error
             else {
-                Write-Information "[$timestamp UTC] - [ERROR]  - Path provided $PathToTest was not found to be a folder."
+                Write-Information "[$timestamp] - [ERROR]  - Path provided $PathToTest was not found to be a folder."
                 Return $false
             }
         }
         # If it doesn't exist then return false and write an error
         else {
-            Write-Information "[$timestamp UTC] - [ERROR]  - Directory $PathToTest Not Found"
+            Write-Information "[$timestamp] - [ERROR]  - Directory $PathToTest Not Found"
             Return $false
         }
     }
@@ -90,19 +91,20 @@
         [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
     
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
+        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
     
         try {
             # Test Graph connection first to see if we're already connected
             try {
                 $null = Get-MgOrganization -ErrorAction Stop
-                Write-Information "[$timestamp UTC] - [INFO]   - Already connected to Microsoft Graph"
+                Write-Information "[$timestamp] - [INFO]   - Already connected to Microsoft Graph"
             }
             catch {
                 # Only show connecting message if we actually need to connect
-                Write-Information "[$timestamp UTC] - [ACTION] - Connecting to Microsoft Graph"
+                Write-Information "[$timestamp] - [ACTION] - Connecting to Microsoft Graph"
                 $null = Test-GraphConnection
-                Write-Information "[$timestamp UTC] - [INFO]   - Connected to Microsoft Graph Successfully"
+                Write-Information "[$timestamp] - [INFO]   - Connected to Microsoft Graph Successfully"
             }
     
             # Get tenant name 
@@ -112,10 +114,10 @@
             $FullOutputPath = Join-Path $RootPath $FolderID
     
             if (Test-Path $FullOutputPath) {
-                Write-Information "[$timestamp UTC] - [ERROR] - Path $FullOutputPath already exists"
+                Write-Information "[$timestamp] - [ERROR] - Path $FullOutputPath already exists"
             }
             else {
-                Write-Information "[$timestamp UTC] - [ACTION] - Creating subfolder $FullOutputPath"
+                Write-Information "[$timestamp] - [ACTION] - Creating subfolder $FullOutputPath"
                 $null = New-Item $FullOutputPath -ItemType Directory -ErrorAction Stop
             }
     
@@ -123,7 +125,7 @@
         }
         catch {
             # If it fails at any point, display an error message
-            Write-Error "[$timestamp UTC] - [ERROR] - Failed to create logging folder: $_"
+            Write-Error "[$timestamp] - [ERROR] - Failed to create logging folder: $_"
         }
     }
     
@@ -131,18 +133,19 @@
         [CmdletBinding(SupportsShouldProcess)]
         param ([string]$Path)
     
-        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
+        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
     
         # If no value for Path is provided, prompt and gather from the user
         if ([string]::IsNullOrEmpty($Path)) {
             # Setup a while loop to get a valid path
             Do {
                 # Ask the user for the output path
-                [string]$UserPath = Read-Host "[$timestamp UTC] - [PROMPT] - Please provide an output directory"
+                [string]$UserPath = Read-Host "[$timestamp] - [PROMPT] - Please provide an output directory"
     
                 # If the input is null or empty, prompt again
                 if ([string]::IsNullOrEmpty($UserPath)) {
-                    Write-Host "[$timestamp UTC] - [INFO]  - Directory path cannot be empty. Please enter in a new path."
+                    Write-Host "[$timestamp] - [INFO]  - Directory path cannot be empty. Please enter in a new path."
                     $ValidPath = $false
                 }
                 # If the path is valid, create the subfolder
@@ -152,7 +155,7 @@
                 }
                 # If the path is invalid, prompt again
                 else {
-                    Write-Host "[$timestamp UTC] - [ERROR] - Path not a valid directory: $UserPath" -ForegroundColor Red
+                    Write-Host "[$timestamp] - [ERROR] - Path not a valid directory: $UserPath" -ForegroundColor Red
                     $ValidPath = $false
                 }
             }
@@ -166,7 +169,7 @@
             }
             # If the provided path fails validation, stop the process
             else {
-                Write-Error "[$timestamp UTC] - [ERROR] - Provided path is not a valid directory: $Path" -ErrorAction Stop
+                Write-Error "[$timestamp] - [ERROR] - Provided path is not a valid directory: $Path" -ErrorAction Stop
             }
         }
     

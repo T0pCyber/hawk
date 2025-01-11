@@ -137,7 +137,7 @@
     $LogOutput = $true
 
     # Get the current date in UTC
-    [string]$timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss UTC")
+    [string]$timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ssZ")
     [string]$logstring = ""
 
     # Build the log string based on the type of message
