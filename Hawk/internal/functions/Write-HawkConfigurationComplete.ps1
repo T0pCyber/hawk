@@ -42,8 +42,8 @@
     
         process {
             Out-LogFile "Configuration Complete!" -Information
-            Out-LogFile "Your Hawk environment is now set up with the following settings:" -action
-            Out-LogFile ("Hawk Version: " + (Get-Module Hawk).version) -Action
+            Out-LogFile "Your Hawk environment is now set up with the following settings:" -Information
+            Out-LogFile ("Hawk Version: " + (Get-Module Hawk).version) -Information
     
             # Print each property of $Hawk on its own line
             foreach ($prop in $Hawk.PSObject.Properties) {
@@ -54,7 +54,7 @@
                     $prop.Value
                 }
     
-                Out-LogFile -string ("{0} = {1}" -f $prop.Name, $value) -action
+                Out-LogFile -string ("{0} = {1}" -f $prop.Name, $value) -Information
             }
     
             Out-LogFile "`Happy hunting! 🦅`n" -action

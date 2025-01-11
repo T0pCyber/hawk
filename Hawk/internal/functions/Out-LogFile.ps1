@@ -142,20 +142,20 @@
 
     # Build the log string based on the type of message
     if ($action) {
-        $logstring = "[$timestamp] [-] - $string"
+        $logstring = "[$timestamp] - [ACTION] - $string"
     }
     elseif ($isError) {
-        $logstring = "[$timestamp] [!] - ERROR: $string"
+        $logstring = "[$timestamp] - [ERROR] - $string"
     }
     elseif ($notice) {
-        $logstring = "[$timestamp] [*] - INVESTIGATE: $string"
+        $logstring = "[$timestamp] - [INVESTIGATE] - $string"
 
         # Write to the investigation file
         [string]$InvestigateFile = Join-Path (Split-Path $LogFile -Parent) "_Investigate.txt"
         $logstring | Out-File -FilePath $InvestigateFile -Append
     }
     elseif ($silentnotice) {
-        $logstring = "[$timestamp] [*] - Additional Information: $string"
+        $logstring = "[$timestamp] - [INVESTIGATE] - Additional Information: $string"
 
         # Write to the investigation file
         [string]$InvestigateFile = Join-Path (Split-Path $LogFile -Parent) "_Investigate.txt"
@@ -166,13 +166,13 @@
         $LogOutput = $false
     }
     elseif ($Information) {
-        $logstring = "[$timestamp] [+] - $string"
+        $logstring = "[$timestamp] - [INFO]   - $string"
     }
     elseif ($isWarning) {
-        $logstring = "[$timestamp] [-] - WARNING: $string"
+        $logstring = "[$timestamp] - [WARNING] - $string"
     }
     elseif ($isPrompt) {
-        $logstring = "[$timestamp] [>] - $string"
+        $logstring = "[$timestamp] - [PROMPT] - $string"
     }
     else {
         $logstring = "[$timestamp] - $string"

@@ -20,7 +20,7 @@ Function Test-EXOConnection {
     }
     catch [System.Management.Automation.CommandNotFoundException] {
         # Connect to EXO if we couldn't find the command
-        Out-LogFile "Not Connected to Exchange Online" -action
+        Out-LogFile "Not Connected to Exchange Online" -Information
         Out-LogFile "Connecting to EXO using Exchange Online Module" -Action
         Connect-ExchangeOnline
     }

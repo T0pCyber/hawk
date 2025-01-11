@@ -46,6 +46,30 @@
         [string]$FilePath
     )
 
+    # Validation to handle interrupted initialization states
+    # If Hawk initialization was interrupted (e.g., by CTRL+C during path input),
+    # it can leave behind a partially initialized Hawk object. This causes
+    # recursion errors on subsequent runs due to the partial state.
+    # 
+    # Two cleanup scenarios:
+    # 1. Force parameter: Always remove any existing Hawk object
+    # 2. Incomplete object: Remove if missing essential properties
+    #    (FilePath, StartDate, EndDate)
+    #
+    # This validation runs before any function definitions or calls to prevent
+    # call depth overflow errors from recursion.
+    # Attempted to put in its own function, but resulted in issues due to order of the call stack
+
+    if ($Force) {
+        Remove-Variable -Name Hawk -Scope Global -ErrorAction SilentlyContinue 
+    }
+
+    # Then check if the Hawk object exists but is incomplete
+    if ($null -ne (Get-Variable -Name Hawk -ErrorAction SilentlyContinue) -and 
+        ($null -eq $Hawk.FilePath -or $null -eq $Hawk.StartDate -or $null -eq $Hawk.EndDate)) {
+        Remove-Variable -Name Hawk -Scope Global -ErrorAction SilentlyContinue
+    }
+
     Function Test-LoggingPath {
         param([string]$PathToTest)
         
@@ -59,13 +83,13 @@
             }
             # If it is not a folder return false and write an error
             else {
-                Write-Information "[$timestamp UTC] [!]  - Path provided $PathToTest was not found to be a folder."
+                Write-Information "[$timestamp UTC] - [ERROR]  - Path provided $PathToTest was not found to be a folder."
                 Return $false
             }
         }
         # If it doesn't exist then return false and write an error
         else {
-            Write-Information "[$timestamp UTC] [!]  - Directory $PathToTest Not Found"
+            Write-Information "[$timestamp UTC] - [ERROR]  - Directory $PathToTest Not Found"
             Return $false
         }
     }
@@ -75,9 +99,20 @@
         param([string]$RootPath)
     
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+
+        Write-Information "[$timestamp UTC] - [ACTION] - Connecting to Microsoft Graph"
     
-        # Test Graph connection silently first
-        $null = Test-GraphConnection 2>$null
+        try {
+            # Test Graph connection
+            $null = Test-GraphConnection
+    
+            # If successful, display a success message
+            Write-Information "[$timestamp UTC] - [INFO]   - Connected to Microsoft Graph Successfully"
+        }
+        catch {
+            # If it fails, display an error message
+            Write-Error "[$timestamp UTC] - [ERROR] - Failed to connect to Microsoft Graph"
+        }
     
         # Get tenant name
         $TenantName = (Get-MGDomain -ErrorAction Stop | Where-Object { $_.isDefault }).ID
@@ -86,10 +121,10 @@
         $FullOutputPath = Join-Path $RootPath $FolderID
     
         if (Test-Path $FullOutputPath) {
-            Write-Information "[$timestamp UTC] [+]   - Path $FullOutputPath already exists"
+            Write-Information "[$timestamp UTC] - [ERROR] - Path $FullOutputPath already exists"
         }
         else {
-            Write-Information "[$timestamp UTC] [-] - Creating subfolder $FullOutputPath"
+            Write-Information "[$timestamp UTC] - [ACTION] - Creating subfolder $FullOutputPath"
             $null = New-Item $FullOutputPath -ItemType Directory -ErrorAction Stop
         }
     
@@ -107,11 +142,11 @@
             # Setup a while loop to get a valid path
             Do {
                 # Ask the user for the output path
-                [string]$UserPath = Read-Host "[$timestamp UTC] [>] - Please provide an output directory"
+                [string]$UserPath = Read-Host "[$timestamp UTC] - [PROMPT] - Please provide an output directory"
     
                 # If the input is null or empty, prompt again
                 if ([string]::IsNullOrEmpty($UserPath)) {
-                    Write-Host "[$timestamp UTC] [-] - Directory path cannot be empty. Please enter in a new path."
+                    Write-Host "[$timestamp UTC] - [INFO]  - Directory path cannot be empty. Please enter in a new path."
                     $ValidPath = $false
                 }
                 # If the path is valid, create the subfolder
@@ -121,7 +156,7 @@
                 }
                 # If the path is invalid, prompt again
                 else {
-                    Write-Host "[$timestamp UTC] [!] - Error: Path not a valid directory: $UserPath" -ForegroundColor Red
+                    Write-Host "[$timestamp UTC] - [ERROR] - Path not a valid directory: $UserPath" -ForegroundColor Red
                     $ValidPath = $false
                 }
             }
@@ -135,7 +170,7 @@
             }
             # If the provided path fails validation, stop the process
             else {
-                Write-Error "[$timestamp UTC] [!] - Error: Provided path is not a valid directory: $Path" -ErrorAction Stop
+                Write-Error "[$timestamp UTC] - [ERROR] - Provided path is not a valid directory: $Path" -ErrorAction Stop
             }
         }
     
@@ -151,8 +186,6 @@
             $Client = New-AIClient -key $insightkey
         }
     }
-
-   
 
     ### Main ###
     $InformationPreference = "Continue"
@@ -173,7 +206,7 @@
         # Set up the file path first, before any other operations
         if ([string]::IsNullOrEmpty($FilePath)) {
             # Suppress Graph connection output during initial path setup
-            $Hawk.FilePath = Set-LoggingPath -ErrorAction Stop 2>$null
+            $Hawk.FilePath = Set-LoggingPath -ErrorAction Stop
         }
         else {
             $Hawk.FilePath = Set-LoggingPath -path $FilePath -ErrorAction Stop 2>$null
@@ -198,11 +231,8 @@
 
         # Test Graph connection
         Out-LogFile "Testing Graph Connection" -Action
+
         Test-GraphConnection
-
-
-
-
 
         # If the global variable Hawk doesn't exist or we have -force then set the variable up
         Out-LogFile -string "Setting Up initial Hawk environment variable" -NoDisplay
@@ -292,7 +322,7 @@
             Write-Output "`n"
             Out-LogFile "Please specify the last day of the search window:" -isPrompt
             Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
-            Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt 
+            Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
             Out-LogFile " Default is today's date:" -isPrompt -NoNewLine
             $EndRead = Read-Host            
 
