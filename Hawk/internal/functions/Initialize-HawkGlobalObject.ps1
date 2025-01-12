@@ -114,7 +114,7 @@
             $FullOutputPath = Join-Path $RootPath $FolderID
     
             if (Test-Path $FullOutputPath) {
-                Write-Information "[$timestamp] - [ERROR] - Path $FullOutputPath already exists"
+                Write-Information "[$timestamp] - [ERROR]  - Path $FullOutputPath already exists"
             }
             else {
                 Write-Information "[$timestamp] - [ACTION] - Creating subfolder $FullOutputPath"
@@ -125,7 +125,7 @@
         }
         catch {
             # If it fails at any point, display an error message
-            Write-Error "[$timestamp] - [ERROR] - Failed to create logging folder: $_"
+            Write-Error "[$timestamp] - [ERROR]  - Failed to create logging folder: $_"
         }
     }
     
@@ -155,7 +155,7 @@
                 }
                 # If the path is invalid, prompt again
                 else {
-                    Write-Host "[$timestamp] - [ERROR] - Path not a valid directory: $UserPath" -ForegroundColor Red
+                    Write-Information "[$timestamp] - [ERROR]  - Path not a valid directory: $UserPath"
                     $ValidPath = $false
                 }
             }
@@ -169,7 +169,7 @@
             }
             # If the provided path fails validation, stop the process
             else {
-                Write-Error "[$timestamp] - [ERROR] - Provided path is not a valid directory: $Path" -ErrorAction Stop
+                Write-Error "[$timestamp] - [ERROR]  - Provided path is not a valid directory: $Path"
             }
         }
     
