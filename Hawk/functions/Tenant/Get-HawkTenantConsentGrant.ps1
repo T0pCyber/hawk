@@ -36,15 +36,64 @@
 
     # Gather the grants using the internal Graph-based implementation
     [array]$Grants = Get-AzureADPSPermission -ShowProgress
+    
+    # Create new Property for Consent_Grants output table
+    $Grants | Add-Member -NotePropertyName Flag -NotePropertyValue ""
+    
     [bool]$flag = $false
 
+    # Define list of Extremely Dangerous grants
+    [array]$ExtremelyDangerousGrants = "^AppRoleAssignment\.ReadWrite\.All$", "^RoleManagement\.ReadWrite\.Directory$"
+
+    # Define list of High Risk grants
+    [array]$HighRiskGrants = "^BitlockerKey\.Read\.All$", "^Chat\.", "^Directory\.ReadWrite\.All$", "^eDiscovery\.", 
+        "^Files\.", "^MailboxSettings\.ReadWrite$", "^Mail\.ReadWrite$", "^Mail\.Send$", "^Sites\.", "^User\."
+
     # Search the Grants for the listed bad grants that we can detect
-    if ($Grants.ConsentType -contains 'AllPrincipals') {
-        Out-LogFile "Found at least one 'AllPrincipals' Grant" -notice
+
+    #Flag broad-scope grants
+    [int]$BroadGrantCount = 0
+    $Grants | ForEach-Object -Process {
+        if($_.ConsentType -contains 'AllPrincipals' -or $_.Permission -match 'all') {
+            $_.Flag = "Broad-Scope Grant"
+            $BroadGrantCount += 1
+        }
+    }
+
+    if($BroadGrantCount -gt 0) {
+        Out-LogFile "Found $BroadGrantCount Broad-Scope ('AllPrincipals' or '*.All') Grant(s)" -notice
         $flag = $true
     }
-    if ([bool]($Grants.Permission -match 'all')) {
-        Out-LogFile "Found at least one 'All' Grant" -notice
+    
+    #Flag Extremely Dangerous grants; if a grant is both broad-scope and E.D., flag as E.D.
+    [int]$EDGrantCount = 0
+    foreach($grant in $ExtremelyDangerousGrants) {
+        $Grants | ForEach-Object -Process {
+            if($_.Permission -match $grant){
+                $_.Flag = "Extremely Dangerous"
+                $EDGrantCount += 1
+            }
+        }
+    }
+
+    if ($EDGrantCount -gt 0) {
+        Out-LogFile "Found $EDGrantCount Extremely Dangerous Grant(s)" -notice
+        $flag = $true
+    }
+    
+    #Flag High Risk grants; if a grant is both broad-scope and H.R., flag as H.R.
+    [int]$HRGrantCount = 0
+    foreach($grant in $HighRiskGrants) {
+        $Grants | ForEach-Object -Process {
+            if($_.Permission -match $grant){
+                $_.Flag = "High Risk"
+                $HRGrantCount += 1
+            }
+        }
+    }
+
+    if ($HRGrantCount -gt 0) {
+        Out-LogFile "Found $HRGrantCount High Risk Grant(s)" -notice
         $flag = $true
     }
 

@@ -89,9 +89,10 @@
 - Updated Change Log URI.
 - Removed improperly formatted JSON from Get-HawkTenantAdminInboxRuleHistory, Get-HawkTenantAdminInboxRuleRemoval, Get-HawkTenantRBACChange, Get-HawkUserAdminAudit, Search-HawkTenantEXOAuditLog
 
-  3.X.X (2025-X-XX)
+## 3.X.X (2025-X-XX)
 
 - Implemented UTC timestamps to avoid using local timestamps
 - Implemented PROMPT tag to display to screen when prompting user
 - Added functionality to expand detect M365 license type to determine max log retention time
 - Added ability to expand search up to 365 days
+

@@ -90,7 +90,7 @@
     Function New-LoggingFolder {
         [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
-    
+   
         # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
         $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
     
@@ -122,6 +122,7 @@
             }
     
             Return $FullOutputPath
+
         }
         catch {
             # If it fails at any point, display an error message
@@ -296,6 +297,7 @@
                 [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
                 Write-Output ""
                 Out-LogFile -string "Start date set to: $StartDate [UTC]" -Information
+
             }
             # Handle DateTime input
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
@@ -318,6 +320,7 @@
                 if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-365))) {
                     Out-LogFile -string "The date cannot exceed 365 days. Setting to the maximum limit of 365 days." -isWarning
                     [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-365)).Date
+
                 }
 
                 Out-LogFile -string "Start Date (UTC): $StartDate" -Information
@@ -370,6 +373,7 @@
                 Out-LogFile -string "End date set to: $EndDate [UTC]`n" -Information
             }
             elseif (!($null -eq ($EndRead -as [DateTime]))) {
+
                 [DateTime]$tempEndDate = (Get-Date $EndRead).ToUniversalTime().Date
 
                 if ($StartDate -gt $tempEndDate) {
@@ -444,6 +448,7 @@
         $Hawk.WhenCreated = (Get-Date).ToUniversalTime().ToString("g")
 
         Write-HawkConfigurationComplete -Hawk $Hawk 
+
 
     }
     else {
