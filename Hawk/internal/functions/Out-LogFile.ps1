@@ -145,7 +145,7 @@
         $logstring = "[$timestamp] - [ACTION] - $string"
     }
     elseif ($isError) {
-        $logstring = "[$timestamp] - [ERROR] - $string"
+        $logstring = "[$timestamp] - [ERROR]  - $string"
     }
     elseif ($notice) {
         $logstring = "[$timestamp] - [INVESTIGATE] - $string"
@@ -172,7 +172,7 @@
         $logstring = "[$timestamp] - [WARNING] - $string"
     }
     elseif ($isPrompt) {
-        $logstring = "[$timestamp] - [PROMPT] - $string"
+        $logstring = "[$timestamp] - [PROMPT] -  $string"
     }
     else {
         $logstring = "[$timestamp] - $string"

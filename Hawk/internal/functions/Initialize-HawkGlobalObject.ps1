@@ -145,7 +145,7 @@
     
                 # If the input is null or empty, prompt again
                 if ([string]::IsNullOrEmpty($UserPath)) {
-                    Write-Host "[$timestamp] - [INFO]  - Directory path cannot be empty. Please enter in a new path."
+                    Write-Host "[$timestamp] - [INFO]   - Directory path cannot be empty. Please enter in a new path."
                     $ValidPath = $false
                 }
                 # If the path is valid, create the subfolder
@@ -251,24 +251,32 @@
         # Ensure MaxDaysToGoBack does not exceed 365 days
         if ($MaxDaysToGoBack -gt 365) { $MaxDaysToGoBack = 365 }
 
-        # Prompt for Start Date if not set
+        # Start date validation: Add check for negative numbers
         while ($null -eq $StartDate) {
-
-            # Read input from user
             Write-Output "`n"
             Out-LogFile "Please specify the first day of the search window:" -isPrompt
-            Out-LogFile " Enter a number of days to go back (1-$MaxDaysToGoBack)" -isPrompt
+            Out-LogFile " Enter a number of days to go back (1-$MaxDaysToGoBack)" -isPrompt 
             Out-LogFile " OR enter a date in MM/DD/YYYY format" -isPrompt
             Out-LogFile " Default is 90 days back: " -isPrompt -NoNewLine
             $StartRead = (Read-Host).Trim()
-            
 
             # Determine if input is a valid date
             if ($null -eq ($StartRead -as [DateTime])) {
-
                 #### Not a DateTime ####
                 if ([string]::IsNullOrEmpty($StartRead)) {
                     $StartRead = 90
+                }
+                
+                # Validate input is a positive number
+                if ($StartRead -match '^\-') {
+                    Out-LogFile -string "Please enter a positive number of days." -isError
+                    continue
+                }
+
+                # Validate numeric value
+                if ($StartRead -notmatch '^\d+$') {
+                    Out-LogFile -string "Please enter a valid number of days." -isError
+                    continue
                 }
 
                 # Validate the entered days back
@@ -287,14 +295,19 @@
                 # Calculate start date
                 [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
                 Write-Output ""
-                Out-LogFile -string "Start date set to: $StartDate [UTC]" -Information -NoNewLine
-
-            } elseif (!($null -eq ($StartRead -as [DateTime]))) {
-
-                #### DateTime Provided ####
+                Out-LogFile -string "Start date set to: $StartDate [UTC]" -Information
+            }
+            # Handle DateTime input
+            elseif (!($null -eq ($StartRead -as [DateTime]))) {
                 [DateTime]$StartDate = (Get-Date $StartRead).ToUniversalTime().Date
 
                 # Validate the date
+                if ($StartDate -gt (Get-Date).ToUniversalTime()) {
+                    Out-LogFile -string "Start date cannot be in the future." -isError
+                    $StartDate = $null
+                    continue
+                }
+
                 if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-$MaxDaysToGoBack))) {
                     Out-LogFile -string "The date entered exceeds your license retention period of $MaxDaysToGoBack days." -isWarning
                     Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the date:" -isPrompt -NoNewLine
@@ -308,13 +321,74 @@
                 }
 
                 Out-LogFile -string "Start Date (UTC): $StartDate" -Information
-
-            } else {
+            }
+            else {
                 Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
-                break
+                $StartDate = $null
+                continue
             }
         }
 
+        # End date logic with enhanced validation
+        while ($null -eq $EndDate) {
+            Write-Output "`n"
+            Out-LogFile "Please specify the last day of the search window:" -isPrompt
+            Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
+            Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
+            Out-LogFile " Default is today's date:" -isPrompt -NoNewLine
+            $EndRead = (Read-Host).Trim()
+
+            # End date validation
+            if ($null -eq ($EndRead -as [DateTime])) {
+                if ([string]::IsNullOrEmpty($EndRead)) {
+                    [DateTime]$tempEndDate = (Get-Date).ToUniversalTime().Date
+                }
+                else {
+                    # Validate input is a positive number
+                    if ($EndRead -match '^\-') {
+                        Out-LogFile -string "Please enter a positive number of days." -isError
+                        continue
+                    }
+
+                    # Validate numeric value
+                    if ($EndRead -notmatch '^\d+$') {
+                        Out-LogFile -string "Please enter a valid number of days." -isError
+                        continue
+                    }
+
+                    Out-LogFile -string "End Date (UTC): $EndRead days." -Information
+                    [DateTime]$tempEndDate = ((Get-Date).ToUniversalTime().AddDays(-($EndRead - 1))).Date
+                }
+
+                if ($StartDate -gt $tempEndDate) {
+                    Out-LogFile -string "End date must be more recent than start date ($StartDate)." -isError
+                    continue
+                }
+                
+                $EndDate = $tempEndDate
+                Write-Output ""
+                Out-LogFile -string "End date set to: $EndDate [UTC]`n" -Information
+            }
+            elseif (!($null -eq ($EndRead -as [DateTime]))) {
+                [DateTime]$tempEndDate = (Get-Date $EndRead).ToUniversalTime().Date
+
+                if ($StartDate -gt $tempEndDate) {
+                    Out-LogFile -string "End date must be more recent than start date ($StartDate)." -isError
+                    continue
+                }
+                elseif ($tempEndDate -gt ((Get-Date).ToUniversalTime().AddDays(1))) {
+                    Out-LogFile -string "EndDate too far in the future. Setting EndDate to today." -isWarning
+                    $tempEndDate = (Get-Date).ToUniversalTime().Date
+                }
+
+                $EndDate = $tempEndDate
+                Out-LogFile -string "End date set to: $EndDate [UTC]`n" -Information
+            }
+            else {
+                Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
+                continue
+            }
+        }
         # End date logic remains unchanged
         if ($null -eq $EndDate) {
             Write-Output "`n"
@@ -370,7 +444,6 @@
         $Hawk.WhenCreated = (Get-Date).ToUniversalTime().ToString("g")
 
         Write-HawkConfigurationComplete -Hawk $Hawk 
-
 
     }
     else {
