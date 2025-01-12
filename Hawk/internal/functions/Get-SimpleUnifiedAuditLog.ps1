@@ -73,15 +73,6 @@
         $Results = @()
 
         function ConvertTo-FlatObject {
-            <#
-            .SYNOPSIS
-                Recursively flattens nested objects into a single-level hashtable.
-
-            .DESCRIPTION
-                Internal helper function that converts complex nested objects into a flat structure
-                using dot notation for property names. Handles special cases like Parameters arrays
-                and preserves type information when requested.
-            #>
             param (
                 [Parameter(Mandatory = $true)]
                 [PSObject]$InputObject,
@@ -137,7 +128,18 @@
                     # Recursively process nested hashtables
                     { $_ -is [System.Collections.IDictionary] } {
                         $nestedObject = ConvertTo-FlatObject -InputObject $_ -Prefix $key -PreserveTypes:$PreserveTypes
-                        $flatProperties += $nestedObject
+                        foreach ($nestedKey in $nestedObject.Keys) {
+                            $uniqueKey = if ($flatProperties.ContainsKey($nestedKey)) {
+                                $counter = 1
+                                while ($flatProperties.ContainsKey("${nestedKey}_$counter")) {
+                                    $counter++
+                                }
+                                "${nestedKey}_$counter"
+                            } else {
+                                $nestedKey
+                            }
+                            $flatProperties[$uniqueKey] = $nestedObject[$nestedKey]
+                        }
                     }
                     # Process arrays (excluding Parameters which was handled above)
                     { $_ -is [System.Collections.IList] -and $prop.Name -ne 'Parameters' } {
@@ -146,7 +148,18 @@
                                 # Handle array of objects
                                 for ($i = 0; $i -lt $_.Count; $i++) {
                                     $nestedObject = ConvertTo-FlatObject -InputObject $_[$i] -Prefix "${key}_${i}" -PreserveTypes:$PreserveTypes
-                                    $flatProperties += $nestedObject
+                                    foreach ($nestedKey in $nestedObject.Keys) {
+                                        $uniqueKey = if ($flatProperties.ContainsKey($nestedKey)) {
+                                            $counter = 1
+                                            while ($flatProperties.ContainsKey("${nestedKey}_$counter")) {
+                                                $counter++
+                                            }
+                                            "${nestedKey}_$counter"
+                                        } else {
+                                            $nestedKey
+                                        }
+                                        $flatProperties[$uniqueKey] = $nestedObject[$nestedKey]
+                                    }
                                 }
                             }
                             else {
@@ -162,7 +175,18 @@
                     # Recursively process nested objects
                     { $_ -is [PSObject] } {
                         $nestedObject = ConvertTo-FlatObject -InputObject $_ -Prefix $key -PreserveTypes:$PreserveTypes
-                        $flatProperties += $nestedObject
+                        foreach ($nestedKey in $nestedObject.Keys) {
+                            $uniqueKey = if ($flatProperties.ContainsKey($nestedKey)) {
+                                $counter = 1
+                                while ($flatProperties.ContainsKey("${nestedKey}_$counter")) {
+                                    $counter++
+                                }
+                                "${nestedKey}_$counter"
+                            } else {
+                                $nestedKey
+                            }
+                            $flatProperties[$uniqueKey] = $nestedObject[$nestedKey]
+                        }
                     }
                     # Handle simple values
                     default {

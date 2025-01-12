@@ -22,10 +22,12 @@ https://docs.microsoft.com/en-us/graph/api/resources/auditlog?view=graph-rest-1.
 
 #>
 BEGIN{
-    #Initializing Hawk Object if not present
-    if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
         Initialize-HawkGlobalObject
     }
+
     Out-LogFile "Gathering Azure AD Audit Logs events" -Action
 }
 PROCESS{

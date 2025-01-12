@@ -33,6 +33,11 @@
 
     )
 BEGIN {
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+    
     Out-LogFile "Starting Unified Audit Log (UAL) search for 'MailItemsAccessed'" -Action
 
 }#End Begin

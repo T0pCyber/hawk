@@ -31,7 +31,9 @@ Function Get-IPGeolocation {
         Out-LogFile "IpStack.com now requires an API access key to gather GeoIP information from their API.`nPlease get a Free access key from https://ipstack.com/ and provide it below." -Information
 
         # get the access key from the user
-        $Accesskey = Read-Host "ipstack.com accesskey"
+        # get the access key from the user
+        Out-LogFile "ipstack.com accesskey" -isPrompt -NoNewLine
+        $Accesskey = (Read-Host).Trim() 
 
         # add the access key to the appdata file
         Add-HawkAppData -name access_key -Value $Accesskey

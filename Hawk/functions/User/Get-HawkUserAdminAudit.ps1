@@ -35,6 +35,11 @@
         [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName
     )
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+    
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
@@ -81,7 +86,8 @@
                 $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -User $User
             }
             else {
-                Out-LogFile "No User Changes found." -Information
+                Out-LogFile "Get-HawkUserAdminAudit completed successfully" -Information
+                Out-LogFile "No User Changes found." -action
             }
         }
         catch {

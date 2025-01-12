@@ -38,6 +38,12 @@
         [array]$UserPrincipalName
     )
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+    
+
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
@@ -55,7 +61,8 @@
 
         # Check if forwarding is configured by user or admin
         if ([string]::IsNullOrEmpty($mbx.ForwardingSMTPAddress) -and [string]::IsNullOrEmpty($mbx.ForwardingAddress)) {
-            Out-LogFile "No forwarding configuration found" -Information
+            Out-LogFile "Get-HawkUserEmailForwarding completed successfully" -Information
+            Out-LogFile "No forwarding configuration found" -action
         }
         # If populated report it and add to a CSV file of positive finds
         else {

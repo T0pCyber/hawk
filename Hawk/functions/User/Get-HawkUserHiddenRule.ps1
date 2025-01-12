@@ -46,6 +46,12 @@
         [System.Management.Automation.PSCredential]$EWSCredential
     )
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
+
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
@@ -61,7 +67,7 @@
         # Determine if the email address is null or empty
         [string]$EmailAddress = (Get-EXOMailbox $user).PrimarySmtpAddress
         if ([string]::IsNullOrEmpty($EmailAddress)) {
-            Write-Warning "No SMTP Address found. Skipping."
+            Out-LogFile "No SMTP Address found. Skipping." -isWarning
             return $null
         }
 
@@ -131,7 +137,8 @@
 
         # Log if no hidden rules are found
         if ($FoundHidden -eq $false) {
-            Out-LogFile ("No Hidden rules found for mailbox: " + $EmailAddress) -Information
+            Out-LogFile "Get-HawkUserHiddenRule completed successfully" -Information
+            Out-LogFile ("No Hidden rules found for mailbox: " + $EmailAddress) -action
         }
     }
 }

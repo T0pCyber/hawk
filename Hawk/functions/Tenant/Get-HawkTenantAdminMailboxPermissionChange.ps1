@@ -29,6 +29,12 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
     [CmdletBinding()]
     param()
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
+
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
@@ -98,7 +104,8 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
             }
         }
         else {
-            Out-LogFile "No mailbox permission changes found in audit logs" -Information
+            Out-LogFile "Get-HawkTenantAdminMailBoxPermissionChange completed successfully" -Information
+            Out-LogFile "No mailbox permission changes found in audit logs" -action
         }
     }
     catch {

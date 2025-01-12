@@ -20,12 +20,15 @@ Function Test-GraphConnection {
     }
     catch {
         # Fallback if $Hawk is not initialized
+        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")
+
         if ($null -eq $Hawk) {
-            Write-Output "Connecting to MGGraph using MGGraph Module"
+            # Use standardized timestamp format when Hawk isn't initialized
+            Write-Output "[$timestamp UTC] - [ACTION] - Connecting to Microsoft Graph API"
         }
         else {
             # $Hawk exists, so we can safely use Out-LogFile 
-            Out-LogFile -String "Connecting to MGGraph using MGGraph Module" -Action
+            Write-Output "[$timestamp UTC] - [ACTION] - Connecting to Microsoft Graph API"
         }
 
         Connect-MGGraph

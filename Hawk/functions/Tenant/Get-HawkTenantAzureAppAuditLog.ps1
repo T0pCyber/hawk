@@ -21,9 +21,13 @@
 #>
 Begin {
 	#Initializing Hawk Object if not present
-	if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
-		Initialize-HawkGlobalObject
-	}
+    # Check if Hawk object exists and is fully initialized
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
+
 	Out-LogFile "Gathering Tenant information" -Action
 	Test-EXOConnection
 }#End BEGIN
@@ -41,7 +45,8 @@ $AzureApplicationActivityEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("S
 
 # If null we found no changes to nothing to do here
 if ($null -eq $AzureApplicationActivityEvents){
-	Out-LogFile "No Application related events found in the search time frame." -Information
+	Out-LogFile "Get-HawkTenantAzureAppAuditLog completed successfully" -Information
+	Out-LogFile "No Application related events found in the search time frame." -Action
 }
 
 # If not null then we must have found some events so flag them
@@ -67,6 +72,6 @@ else {
 }
 }#End PROCESS
 END{
-Out-LogFile "Completed gathering Tenant App Audit Logs" -Action
+Out-LogFile "Completed gathering Tenant App Audit Logs" -Information
 }#End END
 }

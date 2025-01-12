@@ -37,6 +37,11 @@ Function Get-HawkTenantAdminEmailForwardingChange {
     [CmdletBinding()]
     param()
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
     # Test the Exchange Online connection to ensure the environment is ready for operations.
     Test-EXOConnection
     # Log the execution of the function for audit and telemetry purposes.
@@ -199,8 +204,9 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
         }
         else {
             # Log a message if no forwarding changes are found in the logs.
-            Out-LogFile "No forwarding changes found in filtered results" -Information
-            Out-LogFile "Retrieved $($AllMailboxChanges.Count) total operations, but none involved forwarding changes" -Information
+            Out-LogFile "Get-HawkTenantAdminEmailForwardingChange completed successfully" -Information
+            Out-LogFile "No forwarding changes found in filtered results" -action
+            Out-LogFile "Retrieved $($AllMailboxChanges.Count) total operations, but none involved forwarding changes" -action
         }
     }
     catch {

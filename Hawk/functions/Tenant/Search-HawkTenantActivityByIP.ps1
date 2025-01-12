@@ -44,6 +44,12 @@
         [string]$IpAddress
     )
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
+
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
@@ -63,7 +69,8 @@
 
     # If we didn't get anything back log it
     if ($null -eq $ipevents) {
-        Out-LogFile ("No IP logon events found for IP "	+ $IpAddress) -Information
+        Out-LogFile "Get-HawkTenantActivityByIP completed successfully" -Information
+        Out-LogFile ("No IP logon events found for IP "	+ $IpAddress) -action
     }
 
     # If we did then process it

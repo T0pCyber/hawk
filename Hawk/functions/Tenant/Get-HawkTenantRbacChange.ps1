@@ -37,6 +37,11 @@
     #>
     [CmdletBinding()]
     param()
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
 
     # Verify EXO connection and send telemetry
     Test-EXOConnection
@@ -100,7 +105,8 @@
             }
         }
         else {
-            Out-LogFile "No RBAC changes found." -Information
+            Out-LogFile "Get-HawkTenantRbacChange completed successfully" -Information
+            Out-LogFile "No RBAC changes found." -action
         }
     }
     catch {

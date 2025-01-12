@@ -77,6 +77,11 @@
         [array]$UserPrincipalName
     )
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+    
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
@@ -118,16 +123,19 @@
                     $itemLogs | Out-MultipleFileType -FilePrefix "ExchangeItem_Logs" -csv -json -User $User
                 }
                 else {
-                    Out-LogFile "No ExchangeItem events found." -Information
+                    Out-LogFile "ExchangeItem event search completed successfully" -Information
+                    Out-LogFile "No ExchangeItem events found." -Action
                 }
 
                 # Process ExchangeItemGroup records
                 Out-LogFile "Searching Unified Audit Log for ExchangeItemGroup events." -action
+                Out-LogFile "Please be patient, this can take a while..." -action
                 $searchCommand = "Search-UnifiedAuditLog -UserIds $User -RecordType ExchangeItemGroup"
                 $groupLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
                 if ($groupLogs.Count -gt 0) {
                     Out-LogFile ("Found " + $groupLogs.Count + " ExchangeItemGroup events.") -Information
+                    Out-LogFile "Processing all ExchangeItemGroup events, this can take a while..." -action
 
                     # Process and output flattened data
                     $ParsedGroupLogs = $groupLogs | Get-SimpleUnifiedAuditLog
@@ -139,7 +147,8 @@
                     $groupLogs | Out-MultipleFileType -FilePrefix "ExchangeItemGroup_Logs" -csv -json -User $User
                 }
                 else {
-                    Out-LogFile "No ExchangeItemGroup events found." -Information
+                    Out-LogFile "ExchangeItemGroup search completed successfully" -Information
+                    Out-LogFile "No ExchangeItemGroup events found." -action
                 }
 
                 # Summary logging

@@ -20,10 +20,11 @@
         Properties selected for DFIR relevance.
     #>
     BEGIN {
-        # Initialize the Hawk environment if not already done
-        if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+        # Check if Hawk object exists and is fully initialized
+        if (Test-HawkGlobalObject) {
             Initialize-HawkGlobalObject
         }
+
         Out-LogFile "Gathering Entra ID Users" -Action
 
         # Ensure we have a valid Graph connection
@@ -56,7 +57,8 @@
                 Out-MultipleFileType -FilePrefix "EntraIDUsers" -csv -json
         }
         else {
-            Out-LogFile "No users found" -Information
+            Out-LogFile "Get-HawkTenantEntraIDUser completed successfully" -Information
+            Out-LogFile "No users found" -Action
         }
     }
     END {

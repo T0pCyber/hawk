@@ -27,15 +27,12 @@
         [int]$IntervalMinutes = 15
     )
 
-    # # Try to convert the submitted date into [datetime] format
-    # try {
-    #     [datetime]$DateToStartSearch = Get-Date $StartDate
-    # }
-    # catch {
-    #     Out-Logfile "[ERROR] - Unable to convert submitted date"
-    #     break
-    # }
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
 
+    
     # Make sure the start date isn't more than 90 days in the past
     if ((Get-Date).adddays(-91) -gt $StartDate) {
         Out-Logfile "Start date is over 90 days in the past" -isError
@@ -64,7 +61,8 @@
 
         # See if we have results if so push to csv file
         if ($null -eq $output) {
-            Out-LogFile ("No results found for time period " + $CurrentStart + " - " + $CurrentEnd) -Information
+            Out-LogFile "Get-HawkTenantAuthHistory completed successfully" -Information
+            Out-LogFile ("No results found for time period " + $CurrentStart + " - " + $CurrentEnd) -action
         }
         else {
             $output | Out-MultipleFileType -FilePrefix "Audit_Log_Full_$prefix" -Append -csv -json

@@ -27,6 +27,11 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
         [array]$UserPrincipalName
 
     )
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
