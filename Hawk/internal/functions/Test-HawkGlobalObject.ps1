@@ -9,6 +9,7 @@ Function Test-HawkGlobalObject {
         - FilePath property existence and value
         - StartDate property existence and value
         - EndDate property existence and value
+        - Domain property existence and value
     
     .EXAMPLE
         Test-HawkGlobalObject
@@ -27,8 +28,10 @@ Function Test-HawkGlobalObject {
     if ([string]::IsNullOrEmpty($Hawk.FilePath) -or 
         $null -eq $Hawk.StartDate -or 
         $null -eq $Hawk.EndDate -or 
+        [string]::IsNullOrEmpty($Hawk.Domain) -or
         ($Hawk.PSObject.Properties.Name -contains 'StartDate' -and $null -eq $Hawk.StartDate) -or
-        ($Hawk.PSObject.Properties.Name -contains 'EndDate' -and $null -eq $Hawk.EndDate)) {
+        ($Hawk.PSObject.Properties.Name -contains 'EndDate' -and $null -eq $Hawk.EndDate) -or
+        ($Hawk.PSObject.Properties.Name -contains 'Domain' -and [string]::IsNullOrEmpty($Hawk.Domain))) {
         return $true
     }
 
