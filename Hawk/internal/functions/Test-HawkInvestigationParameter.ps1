@@ -2,70 +2,65 @@
 Function Test-HawkInvestigationParameter {
     <#
     .SYNOPSIS
-        Validates investigation parameters to ensure they meet expected requirements.
+        Validates parameters for Hawk investigation commands in both interactive and non-interactive modes.
 
     .DESCRIPTION
-        This function performs internal validation of parameters used for Hawk investigations, such as StartDate, EndDate, DaysToLookBack, and FilePath. 
-        It checks for missing or invalid values and enforces rules around date ranges and file paths, ensuring investigations are configured correctly 
-        before proceeding.
+        The Test-HawkInvestigationParameters function performs comprehensive validation of parameters used in Hawk's investigation commands. 
+        It ensures that all required parameters are present and valid when running in non-interactive mode, while also validating date ranges 
+        and other constraints that apply in both modes.
+
+        The function validates:
+        - File path existence and validity
+        - Presence of required date parameters in non-interactive mode
+        - Date range constraints (max 365 days, start before end)
+        - DaysToLookBack value constraints (1-365 days)
+        - Future date restrictions
+        
+        When validation fails, the function returns detailed error messages explaining which validations failed and why.
+        These messages can be used to provide clear guidance to users about how to correct their parameter usage.
 
     .PARAMETER StartDate
-        Specifies the start date of the investigation period. This date must be provided in a valid DateTime format and cannot be more recent than EndDate.
-        When used in conjunction with EndDate, the date range must not exceed 365 days.
+        The beginning date for the investigation period. Must be provided with EndDate in non-interactive mode.
+        Cannot be later than EndDate or result in a date range exceeding 365 days.
 
     .PARAMETER EndDate
-        Specifies the end date of the investigation period. This date must be provided in a valid DateTime format and cannot be in the future.
-        If StartDate is provided, EndDate must also be specified.
+        The ending date for the investigation period. Must be provided with StartDate in non-interactive mode.
+        Cannot be in the future or result in a date range exceeding 365 days.
 
     .PARAMETER DaysToLookBack
-        Specifies the number of days to look back from the current date to gather log data. The value must be an integer between 1 and 365.
-        This parameter is typically used as an alternative to specifying a StartDate and EndDate.
+        Alternative to StartDate/EndDate. Specifies the number of days to look back from the current date.
+        Must be between 1 and 365. Cannot be used together with StartDate/EndDate parameters.
 
     .PARAMETER FilePath
-        Specifies the directory path where investigation output files will be saved. This path must be valid and accessible.
-        The parameter is required in non-interactive mode to ensure logs are written to a specified location.
+        The file system path where investigation results will be stored.
+        Must be a valid file system path. Required in non-interactive mode.
 
     .PARAMETER NonInteractive
-        A switch parameter that indicates the function is running in non-interactive mode. In this mode, required parameters must be provided upfront,
-        as user prompts are disabled. This is typically used in automated scripts or CI/CD pipelines.
+        Switch that indicates whether Hawk is running in non-interactive mode.
+        When true, enforces stricter parameter validation requirements.
 
     .OUTPUTS
-        Returns a custom PowerShell object with two properties:
-        - IsValid: A boolean value indicating whether the parameters passed validation.
-        - ErrorMessages: An array of error messages explaining why validation failed (if applicable).
+        PSCustomObject with two properties:
+        - IsValid (bool): Indicates whether all validations passed
+        - ErrorMessages (string[]): Array of error messages when validation fails
+
+    .EXAMPLE
+        $validation = Test-HawkInvestigationParameters -StartDate "2024-01-01" -EndDate "2024-01-31" -FilePath "C:\Investigation" -NonInteractive
+        
+        Validates parameters for investigating January 2024 in non-interactive mode.
+
+    .EXAMPLE
+        $validation = Test-HawkInvestigationParameters -DaysToLookBack 30 -FilePath "C:\Investigation" -NonInteractive
+        
+        Validates parameters for a 30-day lookback investigation in non-interactive mode.
 
     .NOTES
-        - The function converts StartDate and EndDate to UTC to ensure consistent date comparisons.
-        - If a date range exceeds 365 days or if EndDate is in the future, the function returns a validation error.
-        - DaysToLookBack must be between 1 and 365 to comply with log retention policies in Microsoft 365.
-
-    .EXAMPLE
-        Test-HawkInvestigationParameter -StartDate "2024-01-01" -EndDate "2024-03-31" -FilePath "C:\Logs" -NonInteractive
-
-        This example validates the parameters for a non-interactive Hawk investigation. The function checks that the FilePath is valid,
-        the date range is within limits, and that both StartDate and EndDate are provided.
-
-    .EXAMPLE
-        Test-HawkInvestigationParameter -DaysToLookBack 90 -FilePath "C:\Logs"
-
-        This example validates an investigation configured to look back 90 days from the current date. The function ensures that DaysToLookBack
-        is within the allowable range and that the FilePath is valid.
-
-    .EXAMPLE
-        $validationResult = Test-HawkInvestigationParameter -StartDate "2024-01-01" -EndDate "2024-02-15" -DaysToLookBack 45
-        if (-not $validationResult.IsValid) {
-            $validationResult.ErrorMessages | ForEach-Object { Write-Host $_ -ForegroundColor Red }
-        }
-
-        This example stores the validation result in a variable and outputs any error messages if the parameters failed validation.
-
-    .LINK
-        https://cloudforensicator.com/
-
-    .LINK
-        https://docs.microsoft.com/en-us/powershell/scripting/
-
+        This is an internal function used by Start-HawkTenantInvestigation and Start-HawkUserInvestigation.
+        It is not intended to be called directly by users of the Hawk module.
+        
+        All datetime operations use UTC internally for consistency.
     #>
+
     [CmdletBinding()]
     param (
         [DateTime]$StartDate,
