@@ -21,6 +21,9 @@
         Last day that data will be retrieved (in UTC)
     .PARAMETER FilePath
         Provide an output file path.
+    .PARAMETER NonInteractive
+    Switch to run the command in non-interactive mode. Requires all necessary parameters
+    to be provided via command line rather than through interactive prompts.
     .OUTPUTS
         Creates the $Hawk global variable and populates it with a custom PS object with the following properties
 
