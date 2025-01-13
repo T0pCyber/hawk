@@ -1,30 +1,37 @@
 ﻿Function Start-HawkTenantInvestigation {
     <#
     .SYNOPSIS
-        Validates parameters for Hawk investigation commands in both interactive and non-interactive modes.
+        Performs a comprehensive tenant-wide investigation using Hawk's automated data collection capabilities.
 
     .DESCRIPTION
-        The Test-HawkInvestigationParameters function performs comprehensive validation of parameters used in Hawk's investigation commands. 
-        It ensures that all required parameters are present and valid when running in non-interactive mode, while also validating date ranges 
-        and other constraints that apply in both modes.
+        Start-HawkTenantInvestigation automates the collection and analysis of Microsoft 365 tenant-wide security data.
+        It gathers information about tenant configuration, security settings, administrative changes, and potential security
+        issues across the environment.
 
-        The function validates:
-        - File path existence and validity
-        - Presence of required date parameters in non-interactive mode
-        - Date range constraints (max 365 days, start before end)
-        - DaysToLookBack value constraints (1-365 days)
-        - Future date restrictions
-        
-        When validation fails, the function returns detailed error messages explaining which validations failed and why.
-        These messages can be used to provide clear guidance to users about how to correct their parameter usage.
+        The command can run in either interactive mode (default) or non-interactive mode. In interactive mode, it prompts
+        for necessary information such as date ranges and output location. In non-interactive mode, these must be provided
+        as parameters.
+
+        Data collected includes:
+        - Tenant configuration settings
+        - eDiscovery configuration and logs
+        - Administrative changes and permissions
+        - Domain activities
+        - Application consents and credentials
+        - Exchange Online administrative activities
+
+        All collected data is stored in a structured format for analysis, with suspicious findings highlighted
+        for investigation.
 
     .PARAMETER StartDate
-        The beginning date for the investigation period. Must be provided with EndDate in non-interactive mode.
-        Cannot be later than EndDate or result in a date range exceeding 365 days.
+        The beginning date for the investigation period. When specified, must be used with EndDate.
+        Cannot be later than EndDate and the date range cannot exceed 365 days.
+        Format: MM/DD/YYYY
 
     .PARAMETER EndDate
-        The ending date for the investigation period. Must be provided with StartDate in non-interactive mode.
-        Cannot be in the future or result in a date range exceeding 365 days.
+        The ending date for the investigation period. When specified, must be used with StartDate.
+        Cannot be in the future and the date range cannot exceed 365 days.
+        Format: MM/DD/YYYY
 
     .PARAMETER DaysToLookBack
         Alternative to StartDate/EndDate. Specifies the number of days to look back from the current date.
@@ -32,32 +39,62 @@
 
     .PARAMETER FilePath
         The file system path where investigation results will be stored.
-        Must be a valid file system path. Required in non-interactive mode.
+        Required in non-interactive mode. Must be a valid file system path.
+
+    .PARAMETER SkipUpdate
+        Switch to bypass the automatic check for Hawk module updates.
+        Useful in automated scenarios or air-gapped environments.
 
     .PARAMETER NonInteractive
-        Switch that indicates whether Hawk is running in non-interactive mode.
-        When true, enforces stricter parameter validation requirements.
+        Switch to run the command in non-interactive mode. Requires all necessary parameters
+        to be provided via command line rather than through interactive prompts.
+
+    .PARAMETER Confirm
+        Prompts you for confirmation before executing each investigation step.
+        By default, confirmation prompts appear for operations that could collect sensitive data.
+
+    .PARAMETER WhatIf
+        Shows what would happen if the command runs. The command is not executed.
+        Use this parameter to understand which investigation steps would be performed without actually collecting data.
 
     .OUTPUTS
-        PSCustomObject with two properties:
-        - IsValid (bool): Indicates whether all validations passed
-        - ErrorMessages (string[]): Array of error messages when validation fails
+        Creates multiple CSV and JSON files containing investigation results.
+        All outputs are placed in the specified FilePath directory.
+        See individual cmdlet help for specific output details.
 
     .EXAMPLE
-        $validation = Test-HawkInvestigationParameters -StartDate "2024-01-01" -EndDate "2024-01-31" -FilePath "C:\Investigation" -NonInteractive
-        
-        Validates parameters for investigating January 2024 in non-interactive mode.
+        Start-HawkTenantInvestigation
+
+        Runs a tenant investigation in interactive mode, prompting for date range and output location.
 
     .EXAMPLE
-        $validation = Test-HawkInvestigationParameters -DaysToLookBack 30 -FilePath "C:\Investigation" -NonInteractive
-        
-        Validates parameters for a 30-day lookback investigation in non-interactive mode.
+        Start-HawkTenantInvestigation -DaysToLookBack 30 -FilePath "C:\Investigation" -NonInteractive
+
+        Performs a tenant investigation looking back 30 days from today, saving results to C:\Investigation.
+        Runs without any interactive prompts.
+
+    .EXAMPLE
+        Start-HawkTenantInvestigation -StartDate "01/01/2024" -EndDate "01/31/2024" -FilePath "C:\Investigation" -NonInteractive -SkipUpdate
+
+        Investigates tenant activity for January 2024, saving results to C:\Investigation.
+        Skips the update check and runs without prompts.
+
+    .EXAMPLE
+        Start-HawkTenantInvestigation -WhatIf
+
+        Shows what investigation steps would be performed without actually executing them.
+        Useful for understanding the investigation process or validating parameters.
 
     .NOTES
-        This is an internal function used by Start-HawkTenantInvestigation and Start-HawkUserInvestigation.
-        It is not intended to be called directly by users of the Hawk module.
-        
+        Requires appropriate Microsoft 365 administrative permissions.
         All datetime operations use UTC internally for consistency.
+        Large date ranges may result in longer processing times.
+
+    .LINK
+        https://cloudforensicator.com
+
+    .LINK
+        https://github.com/T0pCyber/hawk
     #>
 	[CmdletBinding(SupportsShouldProcess)]
     param (
