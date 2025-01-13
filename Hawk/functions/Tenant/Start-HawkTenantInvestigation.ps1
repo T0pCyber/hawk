@@ -111,7 +111,7 @@
     begin {
         # Validate parameters if in non-interactive mode
         if ($NonInteractive) {
-            $validation = Test-HawkInvestigationParameters -StartDate $StartDate -EndDate $EndDate `
+            $validation = Test-HawkInvestigationParameter -StartDate $StartDate -EndDate $EndDate `
                 -DaysToLookBack $DaysToLookBack -FilePath $FilePath -NonInteractive
 
             if (-not $validation.IsValid) {
