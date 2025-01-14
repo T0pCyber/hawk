@@ -107,62 +107,64 @@
     )
 
 	
+
+
     # begin {
-    #     # Validate parameters if in non-interactive mode
     #     if ($NonInteractive) {
+    #         ##############################################################################
+    #         # 1. SHORT-CIRCUIT CHECK: Must specify either StartDate or DaysToLookBack
+    #         ##############################################################################
+    #         if (-not $PSBoundParameters.ContainsKey('DaysToLookBack') -and -not $PSBoundParameters.ContainsKey('StartDate')) {
+    #             Stop-PSFFunction -Message "Either StartDate or DaysToLookBack must be specified in non-interactive mode" -EnableException $true
+    #         }
 
-
-    #         # if ($NonInteractive) {
-
-    #         #     Write-Output "ENTERING COMMAND LINE INTERFACE NON INTERACTIVE MODE"
-            
-    #         #     # Check if DaysToLookBack is valid before calling the conversion function
-    #         #     if ($DaysToLookBack -ne $null -and $DaysToLookBack -ge 1 -and $DaysToLookBack -le 365) {
-    #         #         $ConvertedDates = Convert-HawkDaysToDates -DaysToLookBack $DaysToLookBack
-    #         #         $StartDate = $ConvertedDates.StartDate
-    #         #         $EndDate = $ConvertedDates.EndDate
-    #         #     }
+    #         ##############################################################################
+    #         # 2. If -DaysToLookBack was explicitly passed, validate it up front
+    #         ##############################################################################
+    #         if ($PSBoundParameters.ContainsKey('DaysToLookBack')) {
+    #             if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365) {
+    #                 Stop-PSFFunction -Message "DaysToLookBack must be between 1 and 365" -EnableException $true
+    #             }
+    #             else {
+    #                 # Convert DaysToLookBack to StartDate/EndDate so they're never null
+    #                 $ConvertedDates = Convert-HawkDaysToDate -DaysToLookBack $DaysToLookBack
+    #                 $StartDate      = $ConvertedDates.StartDate
+    #                 $EndDate        = $ConvertedDates.EndDate
+    #             }
+    #         }
     
-    #         # }
-    #         # if ($NonInteractive) {
-
-    #         #     Write-Output "ENTERING COMMAND LINE INTERFACE NON INTERACTIVE MODE"
-            
-    #         #     # Check if DaysToLookBack is valid before calling the conversion function
-    #         #     if ($DaysToLookBack -ne $null -and $DaysToLookBack -ge 1 -and $DaysToLookBack -le 365) {
-    #         #         $ConvertedDates = Convert-HawkDaysToDates -DaysToLookBack $DaysToLookBack
-    #         #         $StartDate = $ConvertedDates.StartDate
-    #         #         $EndDate = $ConvertedDates.EndDate
-    #         #     }
-    
-    #         # }
-
-
-    #         $validation = Test-HawkInvestigationParameter -StartDate $StartDate -EndDate $EndDate `
+    #         # Now call validation with updated StartDate/EndDate
+    #         $validation = Test-HawkInvestigationParameter `
+    #             -StartDate $StartDate -EndDate $EndDate `
     #             -DaysToLookBack $DaysToLookBack -FilePath $FilePath -NonInteractive
-
+    
     #         if (-not $validation.IsValid) {
     #             foreach ($error in $validation.ErrorMessages) {
     #                 Stop-PSFFunction -Message $error -EnableException $true
     #             }
     #         }
-
-
+    
     #         try {
-    #             # Initialize with provided parameters
-    #             Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate -DaysToLookBack $DaysToLookBack `
-    #                 -FilePath $FilePath -SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive
+    #             Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
+    #                 -DaysToLookBack $DaysToLookBack -FilePath $FilePath `
+    #                 -SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive
     #         }
     #         catch {
     #             Stop-PSFFunction -Message "Failed to initialize Hawk: $_" -EnableException $true
     #         }
     #     }
-
     # }
     
-
     begin {
         if ($NonInteractive) {
+            ##############################################################################
+            # 0. Check if the user provided both StartDate AND DaysToLookBack
+            ##############################################################################
+            if ($PSBoundParameters.ContainsKey('DaysToLookBack') -and $PSBoundParameters.ContainsKey('StartDate')) {
+                # This is the new disallowed scenario
+                Stop-PSFFunction -Message "DaysToLookBack cannot be used together with StartDate in non-interactive mode." -EnableException $true
+            }
+
             ##############################################################################
             # 1. SHORT-CIRCUIT CHECK: Must specify either StartDate or DaysToLookBack
             ##############################################################################
@@ -178,10 +180,22 @@
                     Stop-PSFFunction -Message "DaysToLookBack must be between 1 and 365" -EnableException $true
                 }
                 else {
-                    # Convert DaysToLookBack to StartDate/EndDate so they're never null
-                    $ConvertedDates = Convert-HawkDaysToDate -DaysToLookBack $DaysToLookBack
-                    $StartDate      = $ConvertedDates.StartDate
-                    $EndDate        = $ConvertedDates.EndDate
+                    # Check if user also provided EndDate (but no StartDate)
+                    if ($PSBoundParameters.ContainsKey('EndDate') -and -not $PSBoundParameters.ContainsKey('StartDate')) {
+                        # EndDate - DaysToLookBack = StartDate
+                        # For example, if EndDate=3/1/2024 and DaysToLookBack=30 => StartDate=1/31/2024
+                        $EndDateUTC = $EndDate.ToUniversalTime()
+                        $StartDateUTC = $EndDateUTC.AddDays(-$DaysToLookBack)
+
+                        $StartDate = $StartDateUTC
+                        $EndDate   = $EndDateUTC
+                    }
+                    else {
+                        # Original: Convert DaysToLookBack to StartDate/EndDate from "today"
+                        $ConvertedDates = Convert-HawkDaysToDate -DaysToLookBack $DaysToLookBack
+                        $StartDate      = $ConvertedDates.StartDate
+                        $EndDate        = $ConvertedDates.EndDate
+                    }
                 }
             }
     
@@ -206,7 +220,6 @@
             }
         }
     }
-    
 
 	process {
 
