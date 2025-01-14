@@ -199,7 +199,13 @@
     
     if (($null -eq (Get-Variable -Name Hawk -ErrorAction SilentlyContinue)) -or ($Force -eq $true) -or ($null -eq $Hawk)) {
 
-        Write-HawkBanner
+        if ($NonInteractive) {
+            Write-HawkBanner
+        } else {
+            Write-HawkBanner -DisplayWelcomeMessage
+        }
+        
+        
         
         # Create the global $Hawk variable immediately with minimal properties
         $Global:Hawk = [PSCustomObject]@{
@@ -272,30 +278,33 @@
             Out-LogFile " OR enter a date in MM/DD/YYYY format" -isPrompt
             Out-LogFile " Default is 90 days back: " -isPrompt -NoNewLine
             $StartRead = (Read-Host).Trim()
-
+        
             # Determine if input is a valid date
             if ($null -eq ($StartRead -as [DateTime])) {
                 
-                #### Not a DateTime ####
-                # First convert StartRead to integer for comparison
+                #### Not a DateTime => interpret as # of days ####
                 if ([string]::IsNullOrEmpty($StartRead)) {
                     [int]$StartRead = 90
                 }
+                # Validates the input is an integer
+                elseif ($StartRead -match '^\d+$') {
+                    # Only convert to int if it is a valid positive number
+                    [int]$StartRead = [int]$StartRead
+                }
                 else {
-                    [int]$StartRead = $StartRead
+                    Out-LogFile -string "Invalid input. Please enter a number between 1 and 365, or a date in MM/DD/YYYY format." -isError
+                    continue
                 }
-
-                # Validate input is a positive number
-                if ($StartRead -match '^\-') {
-                    Out-LogFile -string "Please enter a positive number of days." -isError
+        
+                # We store this integer in $StartDays so we can potentially re-anchor from EndDate later
+                $StartDays = $StartRead
+        
+                # Validate the input is within range
+                if (($StartRead -gt 365) -or ($StartRead -lt 1))   {
+                    Out-LogFile -string "Days to go back must be between 1 and 365." -isError
                     continue
                 }
 
-                # Validate numeric value
-                if ($StartRead -notmatch '^\d+$') {
-                    Out-LogFile -string "Please enter a valid number of days." -isError
-                    continue
-                }
 
                 # Validate the entered days back
                 if ([int]$StartRead -gt [int]$MaxDaysToGoBack) {
@@ -305,22 +314,16 @@
                     if ($Proceed -eq 'R') { continue }
                 }
 
-                if ([int]$StartRead -gt 365) {
-                    Out-LogFile -string "Log retention cannot exceed 365 days. Setting retention to 365 days." -isWarning
-                    [int]$StartRead = 365
-                }
-
-
-                # Calculate start date
+        
+                # At this point, we do not yet have EndDate set. So temporarily anchor from "today":
                 [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
+        
                 Write-Output ""
-                Out-LogFile -string "Start date set to: $StartDate [UTC]" -Information
-
+                Out-LogFile -string "Start date set to: $StartDate" -Information
+        
             }
-            # Handle DateTime input
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
-                [DateTime]$StartDate = (Get-Date $StartRead).ToUniversalTime().Date
-
+                # ========== The user entered a DateTime, so $StartDays stays 0 ==========
                 # Validate the date
                 if ($StartDate -gt (Get-Date).ToUniversalTime()) {
                     Out-LogFile -string "Start date cannot be in the future." -isError
@@ -451,6 +454,24 @@
                 Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
             }
         }
+
+        # --- AFTER the EndDate block, do a final check to "re-anchor" StartDate if it was given in days ---
+        if ($StartDays -gt 0) {
+            # Recalculate StartDate anchored to the final EndDate
+            Out-LogFile -string "Recalculating StartDate based on EndDate = $EndDate and StartDays = $StartDays" -Information
+
+            $StartDate = $EndDate.ToUniversalTime().AddDays(-$StartDays).Date
+
+            # (Optional) Additional validations again if necessary:
+            if ($StartDate -gt (Get-Date).ToUniversalTime()) {
+                Out-LogFile -string "Start date is in the future. Resetting to today's date." -isWarning
+                $StartDate = (Get-Date).ToUniversalTime().Date
+            }
+
+
+            Out-LogFile -string "Final StartDate (UTC) after re-anchoring: $StartDate" -Information
+        }
+
 
         # Configuration Example, currently not used
         #TODO: Implement Configuration system across entire project
