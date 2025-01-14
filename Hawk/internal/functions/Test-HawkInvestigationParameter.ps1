@@ -99,6 +99,7 @@ Function Test-HawkInvestigationParameter {
     }
 
     # Validate DaysToLookBack regardless of mode
+
     if ($DaysToLookBack) {
         if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365) {
             $isValid = $false

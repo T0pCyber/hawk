@@ -34,7 +34,7 @@ Function Convert-HawkDaysToDate {
 
     # Calculate the dates
     $startDate = (Get-Date).ToUniversalTime().AddDays(-$DaysToLookBack).Date
-    $endDate = (Get-Date).ToUniversalTime().AddDays(1).Date
+    $endDate = (Get-Date).ToUniversalTime().Date
 
     # Return the dates as a PSCustomObject
     [PSCustomObject]@{
