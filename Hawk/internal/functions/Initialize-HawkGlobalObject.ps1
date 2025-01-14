@@ -275,11 +275,16 @@
 
             # Determine if input is a valid date
             if ($null -eq ($StartRead -as [DateTime])) {
-                #### Not a DateTime ####
-                if ([string]::IsNullOrEmpty($StartRead)) {
-                    $StartRead = 90
-                }
                 
+                #### Not a DateTime ####
+                # First convert StartRead to integer for comparison
+                if ([string]::IsNullOrEmpty($StartRead)) {
+                    [int]$StartRead = 90
+                }
+                else {
+                    [int]$StartRead = $StartRead
+                }
+
                 # Validate input is a positive number
                 if ($StartRead -match '^\-') {
                     Out-LogFile -string "Please enter a positive number of days." -isError
@@ -293,17 +298,18 @@
                 }
 
                 # Validate the entered days back
-                if ($StartRead -gt $MaxDaysToGoBack) {
+                if ([int]$StartRead -gt [int]$MaxDaysToGoBack) {
                     Out-LogFile -string "You have entered a time frame greater than your license allows ($MaxDaysToGoBack days)." -isWarning
                     Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the value: " -isPrompt -NoNewLine
                     $Proceed = (Read-Host).Trim()
                     if ($Proceed -eq 'R') { continue }
                 }
 
-                if ($StartRead -gt 365) {
+                if ([int]$StartRead -gt 365) {
                     Out-LogFile -string "Log retention cannot exceed 365 days. Setting retention to 365 days." -isWarning
-                    $StartRead = 365
+                    [int]$StartRead = 365
                 }
+
 
                 # Calculate start date
                 [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
