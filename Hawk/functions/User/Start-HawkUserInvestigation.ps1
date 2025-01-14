@@ -112,6 +112,11 @@
 					Out-LogFile "Running Get-HawkUserMessageTrace" -Action
 					Get-HawkUserMessageTrace -User $User
 				}
+
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkMailItemsAccessed for $User")) {
+					Out-LogFile "Running Get-HawkMailItemsAccessed" -Action
+					Get-HawkMailItemsAccessed -UserIDs $User
+				}
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMobileDevice for $User")) {
 					Out-LogFile "Running Get-HawkUserMobileDevice" -Action
