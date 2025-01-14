@@ -163,11 +163,26 @@
 
     begin {
         if ($NonInteractive) {
-            # If DaysToLookBack is specified, convert it first
-            if ($PSBoundParameters.ContainsKey('DaysToLookBack') -and $DaysToLookBack -ge 1 -and $DaysToLookBack -le 365) {
-                $convertedDates = Convert-HawkDaysToDate -DaysToLookBack $DaysToLookBack
-                $StartDate = $convertedDates.StartDate
-                $EndDate   = $convertedDates.EndDate
+            ##############################################################################
+            # 1. SHORT-CIRCUIT CHECK: Must specify either StartDate or DaysToLookBack
+            ##############################################################################
+            if (-not $PSBoundParameters.ContainsKey('DaysToLookBack') -and -not $PSBoundParameters.ContainsKey('StartDate')) {
+                Stop-PSFFunction -Message "Either StartDate or DaysToLookBack must be specified in non-interactive mode" -EnableException $true
+            }
+
+            ##############################################################################
+            # 2. If -DaysToLookBack was explicitly passed, validate it up front
+            ##############################################################################
+            if ($PSBoundParameters.ContainsKey('DaysToLookBack')) {
+                if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365) {
+                    Stop-PSFFunction -Message "DaysToLookBack must be between 1 and 365" -EnableException $true
+                }
+                else {
+                    # Convert DaysToLookBack to StartDate/EndDate so they're never null
+                    $ConvertedDates = Convert-HawkDaysToDate -DaysToLookBack $DaysToLookBack
+                    $StartDate      = $ConvertedDates.StartDate
+                    $EndDate        = $ConvertedDates.EndDate
+                }
             }
     
             # Now call validation with updated StartDate/EndDate
