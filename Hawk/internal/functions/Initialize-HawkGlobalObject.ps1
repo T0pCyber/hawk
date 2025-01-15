@@ -323,6 +323,8 @@
         
             }
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
+                [DateTime]$StartDate = $StartRead -as [DateTime]  # <--- Add this line
+
                 # ========== The user entered a DateTime, so $StartDays stays 0 ==========
                 # Validate the date
                 if ($StartDate -gt (Get-Date).ToUniversalTime()) {
@@ -337,6 +339,7 @@
                     $Proceed = (Read-Host).Trim()
                     if ($Proceed -eq 'R') { $StartDate = $null; continue }
                 }
+                
 
                 if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-365))) {
                     Out-LogFile -string "The date cannot exceed 365 days. Setting to the maximum limit of 365 days." -isWarning
@@ -391,7 +394,7 @@
                 
                 $EndDate = $tempEndDate
                 Write-Output ""
-                Out-LogFile -string "End date set to: $EndDate [UTC]`n" -Information
+                Out-LogFile -string "End date set to: $EndDate (UTC)`n" -Information
             }
             elseif (!($null -eq ($EndRead -as [DateTime]))) {
 
