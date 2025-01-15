@@ -15,7 +15,8 @@ Function Get-HawkUserMailItemsAccessed {
     Get-HawkUserMailItemsAccessed -UserIDs bsmith@contoso.com
     Gets MailItemsAccessed from Unified Audit Log (UAL) that corresponds to the User ID that is provided
 .OUTPUTS
-    MailItemsAccessed_bsmith@contoso.com.csv
+    MailItemsAccessed_bsmith@contoso.com.csv /json
+    Simple_MailItemsAccessed.csv/json
 
 .LINK
     https://www.microsoft.com/security/blog/2020/12/21/advice-for-incident-responders-on-recovery-from-systemic-identity-compromises/
