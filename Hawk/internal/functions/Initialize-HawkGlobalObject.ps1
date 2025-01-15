@@ -329,7 +329,7 @@
                 # Validate the date
                 if ($StartDate -gt (Get-Date).ToUniversalTime()) {
                     Out-LogFile -string "Start date cannot be in the future." -isError
-                    $StartDate = $null
+                    Remove-Variable -Name StartDate -ErrorAction SilentlyContinue
                     continue
                 }
 
