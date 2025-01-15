@@ -38,6 +38,7 @@ Function Get-HawkUserMailItemsAccessed {
             Initialize-HawkGlobalObject
         }
         Out-LogFile "Starting Unified Audit Log (UAL) search for 'MailItemsAccessed'" -Action
+        Out-LogFile "Please be patient, this can take a while..." -Action
         Test-EXOConnection
     }#End Begin
 
