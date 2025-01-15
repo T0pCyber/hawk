@@ -95,4 +95,5 @@
 - Implemented PROMPT tag to display to screen when prompting user
 - Added functionality to expand detect M365 license type to determine max log retention time
 - Added ability to expand search up to 365 days
-
+- Added search of mail items accessed to the User Investigation (Get-HawkUserMailItemsAccessed)
+- Add ability to pass command line arguments to Start-HawkUserInvestigation and Start-HawkTenantInvestigation
