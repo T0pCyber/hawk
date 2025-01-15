@@ -9,10 +9,10 @@ Function Get-HawkUserMailItemsAccessed {
     logs that will be present if the attacker is using the Graph API for such actions. Note: NOT all graph API actions against
     a mailbox are malicious. Review the results of this function and look for suspicious access of mailbox items associated
     with a specific user.
-.PARAMETER UserIDs
+.PARAMETER UserPrincipalName
     Specific user(s) to be investigated
 .EXAMPLE
-    Get-HawkUserMailItemsAccessed -UserIDs bsmith@contoso.com
+    Get-HawkUserMailItemsAccessed -UserPrincipalName bsmith@contoso.com
     Gets MailItemsAccessed from Unified Audit Log (UAL) that corresponds to the User ID that is provided
 .OUTPUTS
     MailItemsAccessed_bsmith@contoso.com.csv /json
