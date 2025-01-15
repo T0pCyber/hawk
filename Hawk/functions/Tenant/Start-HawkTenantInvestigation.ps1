@@ -8,9 +8,9 @@
         It gathers information about tenant configuration, security settings, administrative changes, and potential security
         issues across the environment.
 
-        The command can run in either interactive mode (default) or non-interactive mode. In interactive mode, it prompts
-        for necessary information such as date ranges and output location. In non-interactive mode, these must be provided
-        as parameters.
+        The command can run in either interactive mode (default) or non-interactive mode. Interactive mode is used
+        when no parameters are provided, while non-interactive mode is automatically enabled when any parameter is
+        specified. In interactive mode, it prompts for necessary information such as date ranges and output location.
 
         Data collected includes:
         - Tenant configuration settings
@@ -26,28 +26,29 @@
     .PARAMETER StartDate
         The beginning date for the investigation period. When specified, must be used with EndDate.
         Cannot be later than EndDate and the date range cannot exceed 365 days.
+        Providing this parameter automatically enables non-interactive mode.
         Format: MM/DD/YYYY
 
     .PARAMETER EndDate
         The ending date for the investigation period. When specified, must be used with StartDate.
         Cannot be in the future and the date range cannot exceed 365 days.
+        Providing this parameter automatically enables non-interactive mode.
         Format: MM/DD/YYYY
 
     .PARAMETER DaysToLookBack
         Alternative to StartDate/EndDate. Specifies the number of days to look back from the current date.
-        Must be between 1 and 365. Cannot be used together with StartDate/EndDate parameters.
+        Must be between 1 and 365. Cannot be used together with StartDate.
+        Providing this parameter automatically enables non-interactive mode.
 
     .PARAMETER FilePath
         The file system path where investigation results will be stored.
         Required in non-interactive mode. Must be a valid file system path.
+        Providing this parameter automatically enables non-interactive mode.
 
     .PARAMETER SkipUpdate
         Switch to bypass the automatic check for Hawk module updates.
         Useful in automated scenarios or air-gapped environments.
-
-    .PARAMETER NonInteractive
-        Switch to run the command in non-interactive mode. Requires all necessary parameters
-        to be provided via command line rather than through interactive prompts.
+        Providing this parameter automatically enables non-interactive mode.
 
     .PARAMETER Confirm
         Prompts you for confirmation before executing each investigation step.
@@ -68,27 +69,22 @@
         Runs a tenant investigation in interactive mode, prompting for date range and output location.
 
     .EXAMPLE
-        Start-HawkTenantInvestigation -DaysToLookBack 30 -FilePath "C:\Investigation" -NonInteractive
+        Start-HawkTenantInvestigation -DaysToLookBack 30 -FilePath "C:\Investigation"
 
         Performs a tenant investigation looking back 30 days from today, saving results to C:\Investigation.
-        Runs without any interactive prompts.
+        Runs in non-interactive mode because parameters were specified.
 
     .EXAMPLE
-        Start-HawkTenantInvestigation -StartDate "01/01/2024" -EndDate "01/31/2024" -FilePath "C:\Investigation" -NonInteractive -SkipUpdate
+        Start-HawkTenantInvestigation -StartDate "01/01/2024" -EndDate "01/31/2024" -FilePath "C:\Investigation" -SkipUpdate
 
         Investigates tenant activity for January 2024, saving results to C:\Investigation.
-        Skips the update check and runs without prompts.
+        Skips the update check. Runs in non-interactive mode because parameters were specified.
 
     .EXAMPLE
         Start-HawkTenantInvestigation -WhatIf
 
         Shows what investigation steps would be performed without actually executing them.
         Useful for understanding the investigation process or validating parameters.
-
-    .NOTES
-        Requires appropriate Microsoft 365 administrative permissions.
-        All datetime operations use UTC internally for consistency.
-        Large date ranges may result in longer processing times.
 
     .LINK
         https://cloudforensicator.com
