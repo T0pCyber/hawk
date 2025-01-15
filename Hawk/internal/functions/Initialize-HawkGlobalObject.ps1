@@ -376,7 +376,7 @@
 
                     # Validate numeric value
                     if ($EndRead -notmatch '^\d+$') {
-                        Out-LogFile -string "Please enter a valid number of days." -isError
+                        Out-LogFile -string "Invalid input. Please enter a number between 1 and 365, or a date in MM/DD/YYYY format." -isError
                         continue
                     }
 

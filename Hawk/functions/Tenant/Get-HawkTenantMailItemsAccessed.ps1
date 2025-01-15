@@ -37,6 +37,9 @@ BEGIN {
     if (Test-HawkGlobalObject) {
         Initialize-HawkGlobalObject
     }
+
+    Test-EXOConnection
+
     
     Out-LogFile "Starting Unified Audit Log (UAL) search for 'MailItemsAccessed'" -Action
 
