@@ -107,54 +107,6 @@
     )
 
 	
-
-
-    # begin {
-    #     if ($NonInteractive) {
-    #         ##############################################################################
-    #         # 1. SHORT-CIRCUIT CHECK: Must specify either StartDate or DaysToLookBack
-    #         ##############################################################################
-    #         if (-not $PSBoundParameters.ContainsKey('DaysToLookBack') -and -not $PSBoundParameters.ContainsKey('StartDate')) {
-    #             Stop-PSFFunction -Message "Either StartDate or DaysToLookBack must be specified in non-interactive mode" -EnableException $true
-    #         }
-
-    #         ##############################################################################
-    #         # 2. If -DaysToLookBack was explicitly passed, validate it up front
-    #         ##############################################################################
-    #         if ($PSBoundParameters.ContainsKey('DaysToLookBack')) {
-    #             if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365) {
-    #                 Stop-PSFFunction -Message "DaysToLookBack must be between 1 and 365" -EnableException $true
-    #             }
-    #             else {
-    #                 # Convert DaysToLookBack to StartDate/EndDate so they're never null
-    #                 $ConvertedDates = Convert-HawkDaysToDate -DaysToLookBack $DaysToLookBack
-    #                 $StartDate      = $ConvertedDates.StartDate
-    #                 $EndDate        = $ConvertedDates.EndDate
-    #             }
-    #         }
-    
-    #         # Now call validation with updated StartDate/EndDate
-    #         $validation = Test-HawkInvestigationParameter `
-    #             -StartDate $StartDate -EndDate $EndDate `
-    #             -DaysToLookBack $DaysToLookBack -FilePath $FilePath -NonInteractive
-    
-    #         if (-not $validation.IsValid) {
-    #             foreach ($error in $validation.ErrorMessages) {
-    #                 Stop-PSFFunction -Message $error -EnableException $true
-    #             }
-    #         }
-    
-    #         try {
-    #             Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
-    #                 -DaysToLookBack $DaysToLookBack -FilePath $FilePath `
-    #                 -SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive
-    #         }
-    #         catch {
-    #             Stop-PSFFunction -Message "Failed to initialize Hawk: $_" -EnableException $true
-    #         }
-    #     }
-    # }
-    
     begin {
         if ($NonInteractive) {
             ##############################################################################
