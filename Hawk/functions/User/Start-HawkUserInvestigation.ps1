@@ -44,22 +44,56 @@
 	.NOTES
 		Ensure the Hawk global object is initialized with a valid logging file path before running this function.
 	#>
-		[CmdletBinding(SupportsShouldProcess = $true)]
-		param (
-			[Parameter(Mandatory = $true)]
-			[array]$UserPrincipalName
-		)
+	[CmdletBinding(SupportsShouldProcess = $true)]
+	param (
+		[Parameter(Mandatory = $true)]
+		[array]$UserPrincipalName,
+
+		[DateTime]$StartDate,
+		[DateTime]$EndDate,
+		[int]$DaysToLookBack,
+		[string]$FilePath,
+		[switch]$SkipUpdate
+	)
+
+	begin {
+        $NonInteractive = Test-HawkNonInteractiveMode -PSBoundParameters $PSBoundParameters
+
+		if ($NonInteractive) {
+			$processedDates = Test-HawkDateParameter -PSBoundParameters $PSBoundParameters -StartDate $StartDate -EndDate $EndDate -DaysToLookBack $DaysToLookBack
+			$StartDate = $processedDates.StartDate
+			$EndDate = $processedDates.EndDate
+	
+			# Now call validation with updated StartDate/EndDate
+			$validation = Test-HawkInvestigationParameter `
+				-StartDate $StartDate -EndDate $EndDate `
+				-DaysToLookBack $DaysToLookBack -FilePath $FilePath -NonInteractive
+	
+			if (-not $validation.IsValid) {
+				foreach ($error in $validation.ErrorMessages) {
+					Stop-PSFFunction -Message $error -EnableException $true
+				}
+			}
+
+			try {
+				Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
+					-DaysToLookBack $DaysToLookBack -FilePath $FilePath `
+					-SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive
+			}
+			catch {
+				Stop-PSFFunction -Message "Failed to initialize Hawk: $_" -EnableException $true
+			}
+		}
+	}
+
+	process {
+		if (Test-PSFFunctionInterrupt) { return }
+
 		# Check if Hawk object exists and is fully initialized
 		if (Test-HawkGlobalObject) {
 			Initialize-HawkGlobalObject
 		}
 
-	
-		# Check if the logging filepath is set
-		if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
-			Initialize-HawkGlobalObject
-		}
-	
 		if ($PSCmdlet.ShouldProcess("Investigating Users")) {
 			Out-LogFile "Investigating Users" -Action
 			Send-AIEvent -Event "CmdRun"
@@ -119,5 +153,8 @@
 				}
 			}
 		}
+
 	}
+
+}
 	

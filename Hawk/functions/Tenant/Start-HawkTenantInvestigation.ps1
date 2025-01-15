@@ -102,19 +102,21 @@
         [DateTime]$EndDate,
         [int]$DaysToLookBack,
         [string]$FilePath,
-        [switch]$SkipUpdate,
-        [switch]$NonInteractive
+        [switch]$SkipUpdate
     )
+
 
 	
     begin {
+        $NonInteractive = Test-HawkNonInteractiveMode -PSBoundParameters $PSBoundParameters
+
         if ($NonInteractive) {
-            $processedDates = Process-HawkDateParameter -PSBoundParameters $PSBoundParameters -StartDate $StartDate -EndDate $EndDate -DaysToLookBack $DaysToLookBack
+            $processedDates = Test-HawkDateParameter -PSBoundParameters $PSBoundParameters -StartDate $StartDate -EndDate $EndDate -DaysToLookBack $DaysToLookBack
             $StartDate = $processedDates.StartDate
             $EndDate = $processedDates.EndDate
     
             # Now call validation with updated StartDate/EndDate
-            $validation = Test-HawkDateParameter `
+            $validation = Test-HawkInvestigationParameter `
                 -StartDate $StartDate -EndDate $EndDate `
                 -DaysToLookBack $DaysToLookBack -FilePath $FilePath -NonInteractive
     
