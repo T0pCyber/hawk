@@ -11,6 +11,7 @@
     Operation to be verified enabled for auditing
 .EXAMPLE
     Test-OperationEnabled -User bsmith@contoso.com -Operation 'SearchQueryInitiated'
+    Checks if the SearchQueryInitiated audit operation is enabled for user bsmith@contoso.com. Returns True if enabled, False if disabled.
 .OUTPUTS
     System.Boolean
     Output is a boolean result returned to the calling external function
