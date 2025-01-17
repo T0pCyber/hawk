@@ -1,24 +1,42 @@
 Function Test-OperationEnabled {
     <#
     .SYNOPSIS
-        Test if a user has a specific operation enabled for auditing
+        Tests if a specified audit operation is enabled for a given user.
+
     .DESCRIPTION
-        Test if a user has a specific operation enabled for auditing
-    .EXAMPLE
-        [bool]$result = Test-OperationEnabled -User bsmith@contoso.com -Operation 'SearchQueryInitiated'
+        An internal helper function that verifies whether a specific audit operation 
+        is enabled in a user's mailbox auditing configuration. This function queries
+        the mailbox settings using Get-Mailbox and checks the AuditOwner property
+        for the specified operation.
+
     .PARAMETER User
-        Specific user under investigation
+        The UserPrincipalName of the user to check auditing configuration for.
+        
     .PARAMETER Operation
-        Operation to be verified enabled for auditing
+        The specific audit operation to check for (e.g., 'SearchQueryInitiated').
+
     .EXAMPLE
-        Test-OperationEnabled -User bsmith@contoso.com -Operation 'SearchQueryInitiated'
-        Checks if the SearchQueryInitiated audit operation is enabled for user bsmith@contoso.com. Returns True if enabled, False if disabled.
+        $result = Test-OperationEnabled -User "user@contoso.com" -Operation "SearchQueryInitiated"
+        
+        Checks if the SearchQueryInitiated operation is enabled for user@contoso.com's mailbox.
+        Returns True if enabled, False if not enabled.
+
+    .EXAMPLE
+        if (Test-OperationEnabled -User $userUpn -Operation 'MailItemsAccessed') {
+            # Proceed with mail items access audit
+        }
+
+        Shows how to use the function in a conditional check before performing
+        an audit operation that requires specific permissions.
+
     .OUTPUTS
         System.Boolean
-        Output is a boolean result returned to the calling external function
+        Returns True if the operation is enabled for the user, False otherwise.
+
     .NOTES
-        This function is internal and to be called from another Hawk user-enabled function.  Return value is boolean, and
-        it is intended to be used in an if-else check verifying an operation is enabled for auditing under a given user.
+        Internal Function
+        Author: Jonathan Butler
+        Requirements: Exchange Online PowerShell session with appropriate permissions
     #>
     [CmdletBinding()]
     [OutputType([bool])]
