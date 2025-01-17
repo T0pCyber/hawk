@@ -87,7 +87,8 @@
 	'Get-HawkTenantAppAndSPNCredentialDetail',
 	'Get-HawkTenantEntraIDUser',
 	'Get-HawkTenantDomainActivity',
-	'Get-HawkTenantEDiscoveryLog'
+	'Get-HawkTenantEDiscoveryLog',
+	'Get-HawkTenantSigningKeyOperation'
 
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''

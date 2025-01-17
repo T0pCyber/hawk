@@ -97,3 +97,4 @@
 - Added ability to expand search up to 365 days
 - Added search of mail items accessed to the User Investigation (Get-HawkUserMailItemsAccessed)
 - Add ability to pass command line arguments to Start-HawkUserInvestigation and Start-HawkTenantInvestigation
+- Created Get-HawkTenantKeySigningOperation, providing the ability to collect Graph Activity Logs for Entra ID Key signing operations to include rotation, creation, and invalidation events.
