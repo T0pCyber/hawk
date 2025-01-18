@@ -10,7 +10,7 @@
     Get-IPGeolocation
     Gets all IP Geolocation data of IPs that recieved
 .NOTES
-    General notes
+    General notes (DCODEV was here)
 #>
 Function Get-IPGeolocation {
 
