@@ -101,8 +101,8 @@
             
 
             # Add IP Geo Location information to the data
-            if ($ResolveIPLocations) {
-                Out-File "Resolving IP Locations"
+            if ($PSBoundParameters.ContainsKey('ResolveIPLocations')) {
+                Out-LogFile "Resolving IP Locations" -Action
                 # Setup our counter
                 $i = 0
 
@@ -110,7 +110,7 @@
                 while ($i -lt $ExpandedUserLogonLogs.Count) {
 
                     if ([bool]($i % 25)) { }
-                    Else {
+                    else {
                         Write-Progress -Activity "Looking Up Ip Address Locations" -CurrentOperation $i -PercentComplete (($i / $ExpandedUserLogonLogs.count) * 100)
                     }
 
@@ -144,6 +144,4 @@
 
         }
     }
-
-
 }

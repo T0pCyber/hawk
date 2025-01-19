@@ -27,6 +27,7 @@ Function Get-IPGeolocation {
     }
 
     process {
+        # MOVE THIS IPSTACK API CODE CHECK TO Get-HawkUserAuthHistory within the ResolveIPLocations block!!
         try {
             # if there is no value of access_key then we need to get it from the user
             if ([string]::IsNullOrEmpty($HawkAppData.access_key)) {
@@ -37,8 +38,8 @@ Function Get-IPGeolocation {
                 Out-LogFile "Get your free API key at: https://ipstack.com/`n" -Action
 
                 # get the access key from the user
-                Out-LogFile "ipstack.com accesskey " -isPrompt -NoNewLine
-                $AccessKey = (Read-Host "Enter your IP Stack API key").Trim() 
+                Out-LogFile "Provide your IP Stack API key: " -isPrompt -NoNewLine
+                $AccessKey = (Read-Host).Trim() 
 
                 # Validate key format (basic check)
                 if ([string]::IsNullOrWhiteSpace($AccessKey)) {

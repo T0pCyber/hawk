@@ -228,6 +228,9 @@
 		}
 
 	}
-
+    end {
+		Out-LogFile "User investigation completed, clearning global environment variables" -Information
+		Clear-HawkEnvironment
+	}
  
 }

@@ -97,12 +97,12 @@
 	param (
 		[Parameter(Mandatory = $true)]
 		[array]$UserPrincipalName,
-
 		[DateTime]$StartDate,
 		[DateTime]$EndDate,
 		[int]$DaysToLookBack,
 		[string]$FilePath,
-		[switch]$SkipUpdate
+		[switch]$SkipUpdate,
+		[switch]$EnableGeoIPLocation
 	)
 
 	begin {
@@ -125,9 +125,15 @@
 			}
 
 			try {
-				Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
-					-DaysToLookBack $DaysToLookBack -FilePath $FilePath `
-					-SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive
+				if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
+					Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
+						-DaysToLookBack $DaysToLookBack -FilePath $FilePath `
+						-SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive -EnableGeoIPLocation:$EnableGeoIPLocation
+				} else {	
+					Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
+						-DaysToLookBack $DaysToLookBack -FilePath $FilePath `
+						-SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive
+				}
 			}
 			catch {
 				Stop-PSFFunction -Message "Failed to initialize Hawk: $_" -EnableException $true
@@ -138,9 +144,19 @@
 	process {
 		if (Test-PSFFunctionInterrupt) { return }
 
+		if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
+			Initialize-HawkGlobalObject -EnableGeoIPLocation
+			Out-LogFile "START-HAWKUSERINVESTIGATION -> Calling Initialize-HawkGlobalObject with EnableGeoIPLocation" -Information
+		} else {
+			Initialize-HawkGlobalObject
+			Out-LogFile "START-HAWKUSERINVESTIGATION -> Calling Initialize-HawkGlobalObject without EnableGeoIPLocation" -Information
+		}
+
 		# Check if Hawk object exists and is fully initialized
 		if (Test-HawkGlobalObject) {
-			Initialize-HawkGlobalObject
+			Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to TRUE!" -Information
+		} else {
+			Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to FALSE!" -Information
 		}
 
 		if ($PSCmdlet.ShouldProcess("Investigating Users")) {
@@ -178,7 +194,13 @@
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAuthHistory for $User")) {
 					Out-LogFile "Running Get-HawkUserAuthHistory" -Action
-					Get-HawkUserAuthHistory -User $User -ResolveIPLocations
+					if ($Hawk.EnableGeoIPLocation -or $PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
+						Out-LogFile "Calling Get-HawkUserAuthHistory WITH ResolveIPLocations enabled." -Information
+						Get-HawkUserAuthHistory -User $User -ResolveIPLocations
+					} else {
+						Out-LogFile "Calling Get-HawkUserAuthHistory WITHOUT ResolveIPLocations enabled." -Information
+						Get-HawkUserAuthHistory -User $User
+					}
 				}
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
@@ -207,7 +229,10 @@
 				}
 			}
 		}
-
+	}
+	end {
+		Out-LogFile "User investigation completed, clearning global environment variables" -Information
+		Clear-HawkEnvironment
 	}
 
 }

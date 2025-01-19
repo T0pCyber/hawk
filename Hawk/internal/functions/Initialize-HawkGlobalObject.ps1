@@ -48,7 +48,8 @@
         [string]$FilePath,
         [switch]$SkipUpdate,
         [switch]$NonInteractive,
-        [switch]$Force
+        [switch]$Force,
+        [switch]$EnableGeoIPLocation
     )
 
 
@@ -214,6 +215,8 @@
             StartDate      = $null
             EndDate        = $null
             WhenCreated    = $null
+            EnableGeoIPLocation = $null
+
         }
 
         # Set up the file path first, before any other operations
@@ -317,8 +320,6 @@
         
                 # At this point, we do not yet have EndDate set. So temporarily anchor from "today":
                 [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
-        
-                Write-Output ""
                 Out-LogFile -string "Start date set to: $StartDate" -Information
         
             }
@@ -344,7 +345,6 @@
                 if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-365))) {
                     Out-LogFile -string "The date cannot exceed 365 days. Setting to the maximum limit of 365 days." -isWarning
                     [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-365)).Date
-
                 }
 
                 Out-LogFile -string "Start Date (UTC): $StartDate" -Information
@@ -471,8 +471,35 @@
                 $StartDate = (Get-Date).ToUniversalTime().Date
             }
 
-
             Out-LogFile -string "Final StartDate (UTC) after re-anchoring: $StartDate" -Information
+        }
+
+        # Or if you want to be more specific and check if it was the immediate caller:
+        $wasDirectlyCalledByUserInvestigation = (Get-PSCallStack)[1].FunctionName -eq "Start-HawkUserInvestigation<Begin>"
+        Out-LogFile "Was directly called by UserInvestigation: $wasDirectlyCalledByUserInvestigation" -Information
+        Out-LogFile (Get-PSCallStack)[1].FunctionName -Information
+
+        if ((-not $PSBoundParameters.ContainsKey('EnableGeoIPLocation')) -and $wasDirectlyCalledByUserInvestigation) {
+            Out-LogFile "Would you like to enable GeoIP Location?" -Information
+            Out-LogFile "An API key from ipstack.com is required." -Information
+            
+            $GeoIPResponse = ''
+            while ($GeoIPResponse -notin @('Y','N')) {
+                Out-LogFile "Enable GeoIP Location? (Y/N): " -isPrompt -NoNewLine
+                $GeoIPResponse = ((Read-Host).Trim()).ToUpper()
+                
+                if ($GeoIPResponse -notin @('Y','N')) {
+                    Out-LogFile "Please enter Y or N" -Information
+                }
+                if ($GeoIPResponse -eq 'Y') {
+                    $Hawk.EnableGeoIPLocation = $true
+                    break
+                }
+                if ($GeoIPResponse -eq 'N') {
+                    $Hawk.EnableGeoIPLocation = $false
+                    break
+                }
+            }
         }
 
 
