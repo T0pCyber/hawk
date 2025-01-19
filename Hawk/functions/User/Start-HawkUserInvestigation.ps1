@@ -67,6 +67,8 @@
 		This option requires an active internet connection and may increase the time needed to complete the investigation.
 		Providing this parameter automatically enables non-interactive mode.
 
+		REQUIRED: An API key from ipstack.com is required to use this feature.
+
     .OUTPUTS
         Creates multiple CSV and JSON files containing investigation results.
         All outputs are organized in user-specific folders under the specified FilePath directory.

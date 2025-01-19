@@ -28,6 +28,8 @@
 		Switch to enable resolving IP addresses to geographic locations in the investigation.
 		This option requires an active internet connection and may increase the time needed to complete the investigation.
 		Providing this parameter automatically enables non-interactive mode.
+
+        REQUIRED: An API key from ipstack.com is required to use this feature.
     .OUTPUTS
         Creates the $Hawk global variable and populates it with a custom PS object with the following properties
 
