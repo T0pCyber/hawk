@@ -43,7 +43,7 @@ Function Get-IPGeolocation {
                 # Validate key format (basic check)
                 if ([string]::IsNullOrWhiteSpace($AccessKey)) {
                     Out-LogFile "API key cannot be empty or whitespace." -isError
-                    throw | Out-Null
+                    throw "API key cannot be empty or whitespace."
                 }
 
                 # If testing is requested, validate the key
@@ -55,7 +55,7 @@ Function Get-IPGeolocation {
                         $response = Invoke-RestMethod -Uri $testUrl -Method Get
                         if ($response.success -eq $false) {
                             Out-LogFile "API key validation failed: $($response.error.info)" -isError
-                            throw | Out-Null
+                            throw "API key validation failed: $($response.error.info)"
                         }
                         Out-LogFile "API key validated successfully!" -Information
 
@@ -64,7 +64,7 @@ Function Get-IPGeolocation {
                     }
                     catch {
                         Out-LogFile "API key validation failed: $_" -isError
-                        throw | Out-Null
+                        throw "API key validation failed: $_"
 
                     }
                 }
@@ -78,7 +78,7 @@ Function Get-IPGeolocation {
         }
         catch {
             Out-LogFile "Failed to update IP Stack API key: $_" -isError
-            throw | Out-Null
+            throw "Failed to update IP Stack API key: $_"
         }
     
 
