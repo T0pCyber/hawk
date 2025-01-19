@@ -33,7 +33,7 @@ Function Clear-HawkEnvironment {
             }
         }
 
-        # Clear the error variable
+        # Clear error variables
         $Error.Clear()
 
         Write-Verbose "Hawk environment cleanup completed successfully"

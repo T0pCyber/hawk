@@ -13,6 +13,8 @@
     Single UPN of a user, comma seperated list of UPNs, or array of objects that contain UPNs.
 .PARAMETER ResolveIPLocations
     Resolved IP Locations
+
+    If this option is specified, it will attempt to resolve IP locations (GeoIP) using ipstack.com API (API Key Required)
 .OUTPUTS
 
     File: Converted_Authentication_Logs.csv
@@ -100,13 +102,13 @@
             }
             
 
-            # Add IP Geo Location information to the data
+            # Add Geo IP location information to the data
             if ($PSBoundParameters.ContainsKey('ResolveIPLocations')) {
                 Out-LogFile "Resolving IP Locations" -Action
                 # Setup our counter
                 $i = 0
 
-                # Loop thru each connection and get the location
+                # Loop thru each connection and get the Geo IP location
                 while ($i -lt $ExpandedUserLogonLogs.Count) {
 
                     if ([bool]($i % 25)) { }

@@ -32,10 +32,10 @@ Function Get-IPGeolocation {
             # if there is no value of access_key then we need to get it from the user
             if ([string]::IsNullOrEmpty($HawkAppData.access_key)) {
 
-                Out-LogFile "IpStack.com now requires an API access key to gather GeoIP information from their API.`nPlease get a Free access key from https://ipstack.com/ and provide it below." -Information
+                Out-LogFile "IpStack.com now requires an API access key to gather GeoIP information from their API." -Information
+                Out-LogFile "Please get a Free access key from https://ipstack.com/ and provide it below." -Information
 
-                Out-LogFile "`nIP Stack API Key Configuration" -Action
-                Out-LogFile "Get your free API key at: https://ipstack.com/`n" -Action
+                Out-LogFile "Get your free API key at: https://ipstack.com/" -Information
 
                 # get the access key from the user
                 Out-LogFile "Provide your IP Stack API key: " -isPrompt -NoNewLine
@@ -47,7 +47,7 @@ Function Get-IPGeolocation {
                     throw "API key cannot be empty or whitespace."
                 }
 
-                # If testing is requested, validate the key
+                # Geo IP location is requested, validate the key first (using Google DNS).
                 if ($AccessKey) {
                     Out-LogFile "Testing API key against Google DNS..." -Action 
                     $testUrl = "http://api.ipstack.com/8.8.8.8?access_key=$AccessKey"
@@ -60,7 +60,7 @@ Function Get-IPGeolocation {
                         }
                         Out-LogFile "API key validated successfully!" -Information
 
-                        # Save to disk
+                        # Save to disk (C:\Users\%USERPROFILE%\AppData\Local\Hawk\Hawk.json)
                         Out-HawkAppData
                     }
                     catch {
@@ -74,6 +74,7 @@ Function Get-IPGeolocation {
                 Add-HawkAppData -name access_key -Value $AccessKey
             }
             else {
+                # API Key is already exists from the appdata file (Hawk\Hawk.json)
                 $AccessKey = $HawkAppData.access_key
             }
         }

@@ -132,11 +132,13 @@
 			}
 
 			try {
+				# Call Initialize-HawkGlobalObject in case of non-interactive mode
 				if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
 					Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
 						-DaysToLookBack $DaysToLookBack -FilePath $FilePath `
 						-SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive -EnableGeoIPLocation:$EnableGeoIPLocation
-				} else {	
+				} else {
+					# Call Initialize-HawkGlobalObject in case of interactive mode for EnableGeoIPLocation	
 					Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
 						-DaysToLookBack $DaysToLookBack -FilePath $FilePath `
 						-SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive
@@ -201,6 +203,9 @@
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAuthHistory for $User")) {
 					Out-LogFile "Running Get-HawkUserAuthHistory" -Action
+					# Two different use cases (interactive and non-interactive) have to be considered here
+					# $Hawk.EnableGeoIPLocation is to account for interactive mode
+					# $PSBoundParameters.ContainsKey('EnableGeoIPLocation') is to account for non-interactive mode
 					if ($Hawk.EnableGeoIPLocation -or $PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
 						Out-LogFile "Calling Get-HawkUserAuthHistory WITH ResolveIPLocations enabled." -Information
 						Get-HawkUserAuthHistory -User $User -ResolveIPLocations
