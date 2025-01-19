@@ -21,6 +21,9 @@
         Last day that data will be retrieved (in UTC)
     .PARAMETER FilePath
         Provide an output file path.
+    .PARAMETER NonInteractive
+    Switch to run the command in non-interactive mode. Requires all necessary parameters
+    to be provided via command line rather than through interactive prompts.
     .OUTPUTS
         Creates the $Hawk global variable and populates it with a custom PS object with the following properties
 
@@ -39,11 +42,13 @@
     [CmdletBinding()]
     param
     (
-        [switch]$Force,
-        [switch]$SkipUpdate,
         [DateTime]$StartDate,
         [DateTime]$EndDate,
-        [string]$FilePath
+        [int]$DaysToLookBack,
+        [string]$FilePath,
+        [switch]$SkipUpdate,
+        [switch]$NonInteractive,
+        [switch]$Force
     )
 
 
@@ -132,7 +137,8 @@
     
     Function Set-LoggingPath {
         [CmdletBinding(SupportsShouldProcess)]
-        param ([string]$Path)
+        param (
+            [string]$Path)
     
         # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
         $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
@@ -190,9 +196,16 @@
     ### Main ###
     $InformationPreference = "Continue"
 
+    
     if (($null -eq (Get-Variable -Name Hawk -ErrorAction SilentlyContinue)) -or ($Force -eq $true) -or ($null -eq $Hawk)) {
 
-        Write-HawkBanner
+        if ($NonInteractive) {
+            Write-HawkBanner
+        } else {
+            Write-HawkBanner -DisplayWelcomeMessage
+        }
+        
+        
         
         # Create the global $Hawk variable immediately with minimal properties
         $Global:Hawk = [PSCustomObject]@{
@@ -234,20 +247,25 @@
 
         Test-GraphConnection
 
-        try {
-            $LicenseInfo = Test-LicenseType
-            $MaxDaysToGoBack = $LicenseInfo.RetentionPeriod
-            $LicenseType = $LicenseInfo.LicenseType
 
-            Out-LogFile -string "Detecting M365 license type to determine maximum log retention period" -action
-            Out-LogFile -string "M365 License type detected: $LicenseType" -Information
-            Out-LogFile -string "Max log retention: $MaxDaysToGoBack days" -action -NoNewLine
-
-        } catch {
-            Out-LogFile -string "Failed to detect license type. Max days of log retention is unknown." -Information
-            $MaxDaysToGoBack = 90
-            $LicenseType = "Unknown"
+        if (-not $NonInteractive) {
+            try {
+                $LicenseInfo = Test-LicenseType
+                $MaxDaysToGoBack = $LicenseInfo.RetentionPeriod
+                $LicenseType = $LicenseInfo.LicenseType
+    
+                Out-LogFile -string "Detecting M365 license type to determine maximum log retention period" -action
+                Out-LogFile -string "M365 License type detected: $LicenseType" -Information
+                Out-LogFile -string "Max log retention: $MaxDaysToGoBack days" -action -NoNewLine
+    
+            } catch {
+                Out-LogFile -string "Failed to detect license type. Max days of log retention is unknown." -Information
+                $MaxDaysToGoBack = 90
+                $LicenseType = "Unknown"
+            }
+    
         }
+
 
         # Ensure MaxDaysToGoBack does not exceed 365 days
         if ($MaxDaysToGoBack -gt 365) { $MaxDaysToGoBack = 365 }
@@ -260,53 +278,58 @@
             Out-LogFile " OR enter a date in MM/DD/YYYY format" -isPrompt
             Out-LogFile " Default is 90 days back: " -isPrompt -NoNewLine
             $StartRead = (Read-Host).Trim()
-
+        
             # Determine if input is a valid date
             if ($null -eq ($StartRead -as [DateTime])) {
-                #### Not a DateTime ####
-                if ([string]::IsNullOrEmpty($StartRead)) {
-                    $StartRead = 90
-                }
                 
-                # Validate input is a positive number
-                if ($StartRead -match '^\-') {
-                    Out-LogFile -string "Please enter a positive number of days." -isError
+                #### Not a DateTime => interpret as # of days ####
+                if ([string]::IsNullOrEmpty($StartRead)) {
+                    [int]$StartRead = 90
+                }
+                # Validates the input is an integer
+                elseif ($StartRead -match '^\d+$') {
+                    # Only convert to int if it is a valid positive number
+                    [int]$StartRead = [int]$StartRead
+                }
+                else {
+                    Out-LogFile -string "Invalid input. Please enter a number between 1 and 365, or a date in MM/DD/YYYY format." -isError
+                    continue
+                }
+        
+                # We store this integer in $StartDays so we can potentially re-anchor from EndDate later
+                $StartDays = $StartRead
+        
+                # Validate the input is within range
+                if (($StartRead -gt 365) -or ($StartRead -lt 1))   {
+                    Out-LogFile -string "Days to go back must be between 1 and 365." -isError
                     continue
                 }
 
-                # Validate numeric value
-                if ($StartRead -notmatch '^\d+$') {
-                    Out-LogFile -string "Please enter a valid number of days." -isError
-                    continue
-                }
 
                 # Validate the entered days back
-                if ($StartRead -gt $MaxDaysToGoBack) {
+                if ([int]$StartRead -gt [int]$MaxDaysToGoBack) {
                     Out-LogFile -string "You have entered a time frame greater than your license allows ($MaxDaysToGoBack days)." -isWarning
                     Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the value: " -isPrompt -NoNewLine
                     $Proceed = (Read-Host).Trim()
                     if ($Proceed -eq 'R') { continue }
                 }
 
-                if ($StartRead -gt 365) {
-                    Out-LogFile -string "Log retention cannot exceed 365 days. Setting retention to 365 days." -isWarning
-                    $StartRead = 365
-                }
-
-                # Calculate start date
+        
+                # At this point, we do not yet have EndDate set. So temporarily anchor from "today":
                 [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
+        
                 Write-Output ""
-                Out-LogFile -string "Start date set to: $StartDate [UTC]" -Information
-
+                Out-LogFile -string "Start date set to: $StartDate" -Information
+        
             }
-            # Handle DateTime input
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
-                [DateTime]$StartDate = (Get-Date $StartRead).ToUniversalTime().Date
+                [DateTime]$StartDate = $StartRead -as [DateTime]  # <--- Add this line
 
+                # ========== The user entered a DateTime, so $StartDays stays 0 ==========
                 # Validate the date
                 if ($StartDate -gt (Get-Date).ToUniversalTime()) {
                     Out-LogFile -string "Start date cannot be in the future." -isError
-                    $StartDate = $null
+                    Remove-Variable -Name StartDate -ErrorAction SilentlyContinue
                     continue
                 }
 
@@ -316,6 +339,7 @@
                     $Proceed = (Read-Host).Trim()
                     if ($Proceed -eq 'R') { $StartDate = $null; continue }
                 }
+                
 
                 if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-365))) {
                     Out-LogFile -string "The date cannot exceed 365 days. Setting to the maximum limit of 365 days." -isWarning
@@ -355,7 +379,7 @@
 
                     # Validate numeric value
                     if ($EndRead -notmatch '^\d+$') {
-                        Out-LogFile -string "Please enter a valid number of days." -isError
+                        Out-LogFile -string "Invalid input. Please enter a number between 1 and 365, or a date in MM/DD/YYYY format." -isError
                         continue
                     }
 
@@ -370,7 +394,7 @@
                 
                 $EndDate = $tempEndDate
                 Write-Output ""
-                Out-LogFile -string "End date set to: $EndDate [UTC]`n" -Information
+                Out-LogFile -string "End date set to: $EndDate (UTC)`n" -Information
             }
             elseif (!($null -eq ($EndRead -as [DateTime]))) {
 
@@ -434,6 +458,24 @@
             }
         }
 
+        # --- AFTER the EndDate block, do a final check to "re-anchor" StartDate if it was given in days ---
+        if ($StartDays -gt 0) {
+            # Recalculate StartDate anchored to the final EndDate
+            Out-LogFile -string "Recalculating StartDate based on EndDate = $EndDate and StartDays = $StartDays" -Information
+
+            $StartDate = $EndDate.ToUniversalTime().AddDays(-$StartDays).Date
+
+            # (Optional) Additional validations again if necessary:
+            if ($StartDate -gt (Get-Date).ToUniversalTime()) {
+                Out-LogFile -string "Start date is in the future. Resetting to today's date." -isWarning
+                $StartDate = (Get-Date).ToUniversalTime().Date
+            }
+
+
+            Out-LogFile -string "Final StartDate (UTC) after re-anchoring: $StartDate" -Information
+        }
+
+
         # Configuration Example, currently not used
         #TODO: Implement Configuration system across entire project
         Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value $Days -PassThru | Register-PSFConfig
@@ -442,7 +484,7 @@
         }
 
         # Continue populating the Hawk object with other properties
-        $Hawk.DaysToLookBack = $Days
+        $Hawk.DaysToLookBack = $DaysToLookBack
         $Hawk.StartDate = $StartDate
         $Hawk.EndDate = $EndDate
         $Hawk.WhenCreated = (Get-Date).ToUniversalTime().ToString("g")
@@ -454,4 +496,5 @@
     else {
         Out-LogFile -string "Valid Hawk Object already exists no actions will be taken." -Information
     }
+
 }
