@@ -24,6 +24,10 @@
     .PARAMETER NonInteractive
     Switch to run the command in non-interactive mode. Requires all necessary parameters
     to be provided via command line rather than through interactive prompts.
+    .PARAMETER EnableGeoIPLocation
+		Switch to enable resolving IP addresses to geographic locations in the investigation.
+		This option requires an active internet connection and may increase the time needed to complete the investigation.
+		Providing this parameter automatically enables non-interactive mode.
     .OUTPUTS
         Creates the $Hawk global variable and populates it with a custom PS object with the following properties
 

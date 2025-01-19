@@ -61,6 +61,11 @@
     .PARAMETER WhatIf
         Shows what would happen if the command runs. The command is not executed.
         Use this parameter to understand which investigation steps would be performed without actually collecting data.
+	
+	.PARAMETER EnableGeoIPLocation
+		Switch to enable resolving IP addresses to geographic locations in the investigation.
+		This option requires an active internet connection and may increase the time needed to complete the investigation.
+		Providing this parameter automatically enables non-interactive mode.
 
     .OUTPUTS
         Creates multiple CSV and JSON files containing investigation results.
