@@ -14,6 +14,14 @@ Function Reset-HawkEnvironment {
         - $MSFTIPList (Microsoft IP address list)
         - $HawkAppData (Application data)
 
+    .PARAMETER Confirm
+        Prompts for confirmation before executing the command. 
+        Specify -Confirm:$false to suppress confirmation prompts.
+
+    .PARAMETER WhatIf
+        Shows what would happen if the command runs.
+        The command is not executed.
+
     .EXAMPLE
         Reset-HawkEnvironment
         
