@@ -52,7 +52,7 @@ Function Get-HawkUserExchangeSearchQuery {
                 if (Test-OperationEnabled -User $User -Operation 'SearchQueryInitiated') {
                     Out-LogFile "Operation 'SearchQueryInitiated' verified enabled for $User." -Information
                     try {
-                        #Retrieve all audit data for mailitems accessed 
+                        #Retrieve all audit data for Exchange search queries 
                         $SearchCommand = "Search-UnifiedAuditLog -Operations 'SearchQueryInitiatedExchange' -UserIds $User"
                         $ExchangeSearches = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
                         

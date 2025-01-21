@@ -52,7 +52,7 @@ Function Get-HawkUserMailSendActivity {
                 if (Test-OperationEnabled -User $User -Operation 'Send') {
                     Out-LogFile "Operation 'Send' verified enabled for $User." -Information
                     try {
-                        #Retrieve all audit data for mailitems accessed 
+                        #Retrieve all audit data for Exchange send activity
                         $SearchCommand = "Search-UnifiedAuditLog -Operations 'Send' -UserIds $User"
                         $ExchangeSends = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
                         
