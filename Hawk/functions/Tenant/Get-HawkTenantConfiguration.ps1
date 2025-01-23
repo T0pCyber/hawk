@@ -72,17 +72,17 @@
     Out-LogFile "Gathering Tenant Configuration Information" -action
 
     Out-LogFile "Gathering Admin Audit Log" -action
-    Get-AdminAuditLogConfig | Out-MultipleFileType -FilePrefix "AdminAuditLogConfig" -txt -xml
+    Get-AdminAuditLogConfig | Out-MultipleFileType -FilePrefix "AdminAuditLogConfig" -txt
 
     Out-LogFile "Gathering Organization Configuration" -action
-    Get-OrganizationConfig| Out-MultipleFileType -FilePrefix "OrgConfig" -xml -txt
+    Get-OrganizationConfig| Out-MultipleFileType -FilePrefix "OrgConfig" -txt
 
     Out-LogFile "Gathering Remote Domains" -action
-    Get-RemoteDomain | Out-MultipleFileType -FilePrefix "RemoteDomain" -xml -csv -json
+    Get-RemoteDomain | Out-MultipleFileType -FilePrefix "RemoteDomain" -csv -json
 
     Out-LogFile "Gathering Transport Rules" -action
-    Get-TransportRule | Out-MultipleFileType -FilePrefix "TransportRules" -xml -csv -json
+    Get-TransportRule | Out-MultipleFileType -FilePrefix "TransportRules" -csv -json
 
     Out-LogFile "Gathering Transport Configuration" -action
-    Get-TransportConfig | Out-MultipleFileType -FilePrefix "TransportConfig" -xml -csv -json
+    Get-TransportConfig | Out-MultipleFileType -FilePrefix "TransportConfig" -csv -json
 }
