@@ -52,10 +52,8 @@ Function Get-HawkTenantSigningKeyOperation {
             Initialize-HawkGlobalObject
         }
 
-
         # Verify Graph connection
         Test-GraphConnection
-
     }
 
     PROCESS {
@@ -68,9 +66,18 @@ Function Get-HawkTenantSigningKeyOperation {
                 "Rotate key"
             )
 
-            # Build filter for the date range
-            $startDate = $Hawk.StartDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
+            # Build filter for the date range 
+            $thirtyDaysAgo = (Get-Date).AddDays(-30)
+            $requestedStartDate = $Hawk.StartDate
             $endDate = $Hawk.EndDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+            # Check if requested start date is beyond 30 days
+            if ($requestedStartDate -lt $thirtyDaysAgo) {
+                Out-LogFile "Signing key operation logs are only available for the last 30 days. Adjusting start date accordingly." -isWarning
+                $startDate = $thirtyDaysAgo.ToString("yyyy-MM-ddTHH:mm:ssZ")
+            } else {
+                $startDate = $requestedStartDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
+            }
 
             # Query for key operations.
             $keyEvents = Get-MgAuditLogDirectoryAudit -Filter "activityDateTime ge $startDate and activityDateTime le $endDate" -All |
