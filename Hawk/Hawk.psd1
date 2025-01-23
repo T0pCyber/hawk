@@ -85,6 +85,7 @@
 	'Get-HawkTenantMailItemsAccessed',
 	'Get-HawkUserMailItemsAccessed',
 	'Get-HawkUserExchangeSearchQuery',
+	'Get-HawkUserMailSendActivity',
 	'Get-HawkTenantAppAndSPNCredentialDetail',
 	'Get-HawkTenantEntraIDUser',
 	'Get-HawkTenantDomainActivity',
