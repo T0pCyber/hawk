@@ -72,7 +72,7 @@ Function Get-HawkTenantSigningKeyOperation {
             $startDate = $Hawk.StartDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
             $endDate = $Hawk.EndDate.ToString("yyyy-MM-ddTHH:mm:ssZ")
 
-            # Query for key operations
+            # Query for key operations.
             $keyEvents = Get-MgAuditLogDirectoryAudit -Filter "activityDateTime ge $startDate and activityDateTime le $endDate" -All |
                 Where-Object { 
                     $_.ActivityDisplayName -in $keyOperations -or
