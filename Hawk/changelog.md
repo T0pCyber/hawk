@@ -96,7 +96,7 @@
 - Added functionality to expand detect M365 license type to determine max log retention time
 - Added ability to expand search up to 365 days
 - Added search of mail items accessed to the User Investigation (Get-HawkUserMailItemsAccessed)
+- Add ability to pass command line arguments to Start-HawkUserInvestigation and Start-HawkTenantInvestigation
 - Added search of Exchange Search Queries to the User Investigation (Get-HawkUserExchangeSearchQuery)
 - Implemented check to verify that an Exchange operation is enabled for auditing before attempting to pull logs
 - Added log pull of user Send activity to the User Investigation (Get-HawkUserMailSendActivity)
-
