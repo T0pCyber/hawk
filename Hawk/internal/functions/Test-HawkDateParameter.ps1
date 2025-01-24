@@ -41,7 +41,25 @@ Function Test-HawkDateParameter {
         PSCustomObject containing:
         - StartDate [DateTime]: The calculated or provided start date in UTC
         - EndDate [DateTime]: The calculated or provided end date in UTC
+    .EXAMPLE
+        $dates = Test-HawkDateParameter -PSBoundParameters $PSBoundParameters -DaysToLookBack 30
 
+        Processes a request to look back 30 days from the current date, returning appropriate 
+        start and end dates in UTC format.
+    .EXAMPLE
+        $dates = Test-HawkDateParameter `
+            -PSBoundParameters $PSBoundParameters `
+            -StartDate "2024-01-01" `
+            -EndDate "2024-01-31"
+        
+        Processes explicit start and end dates, validating them and converting to UTC format.
+    .EXAMPLE
+        $dates = Test-HawkDateParameter `
+            -PSBoundParameters $PSBoundParameters `
+            -DaysToLookBack 30 `
+            -EndDate "2024-01-31"
+        
+        Processes a request to look back 30 days from a specific end date.
     .NOTES
         Author: Jonathan Butler
         Internal Function: This function is not meant to be called directly by users
