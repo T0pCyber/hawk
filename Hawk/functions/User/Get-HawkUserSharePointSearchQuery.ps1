@@ -57,22 +57,22 @@ Function Get-HawkUserSharePointSearchQuery {
                         $SharePointSearches = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
                         
                         if ($SharePointSearches.Count -gt 0){
-                            
                             #Define output directory path for user
                             $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
-        
+                    
                             #Create user directory if it doesn't already exist
                             if (-not (Test-Path -Path $UserFolder)) {
                                 New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
                             }
-        
+                    
                             #Compress raw data into more simple view
-                            $SharePointSearchesSimple = $ExchangeSends | Get-SimpleUnifiedAuditLog
-        
+                            $SharePointSearchesSimple = $SharePointSearches | Get-SimpleUnifiedAuditLog
+                    
                             #Export both raw and simplistic views to specified user's folder
                             $SharePointSearches | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "SharePointSearches_$User" -User $User -csv -json
                             $SharePointSearchesSimple | Out-MultipleFileType -FilePrefix "Simple_SharePointSearches_$User" -User $User -csv -json
-                        } else {
+                        }
+                        else {
                             Out-LogFile "Get-HawkUserSharePointSearchQuery completed successfully" -Information
                             Out-LogFile "No items found for $User." -Information
                         }
