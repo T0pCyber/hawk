@@ -42,7 +42,31 @@ Function Test-HawkInvestigationParameter {
         PSCustomObject with two properties:
         - IsValid (bool): Indicates whether all validations passed
         - ErrorMessages (string[]): Array of error messages when validation fails
-
+    .EXAMPLE
+        $validation = Test-HawkInvestigationParameter -StartDate "2024-01-01" -EndDate "2024-01-31" -FilePath "C:\Investigation" -NonInteractive
+        
+        Validates parameters for investigating January 2024 in non-interactive mode. The function will verify:
+        - StartDate and EndDate are within valid range
+        - FilePath "C:\Investigation" exists and is valid
+        - Date range does not exceed 365 days
+        - Dates are properly ordered (start before end)
+    .EXAMPLE
+        $validation = Test-HawkInvestigationParameter -DaysToLookBack 30 -FilePath "C:\Investigation" -NonInteractive
+        
+        Validates parameters for a 30-day lookback investigation in non-interactive mode. The function will verify:
+        - DaysToLookBack is between 1 and 365
+        - FilePath exists and is valid
+        - Calculated date range falls within allowed bounds
+    .EXAMPLE
+        $validation = Test-HawkInvestigationParameter `
+            -StartDate "2024-01-01" `
+            -EndDate "2024-01-31" `
+            -FilePath "C:\Investigation" `
+            -NonInteractive:$false
+    
+        Validates parameters for an interactive mode investigation of January 2024. In interactive mode,
+        the function applies less stringent validation rules while still ensuring date ranges and paths
+        are valid.
     .NOTES
         This is an internal function used by Start-HawkTenantInvestigation and Start-HawkUserInvestigation.
         It is not intended to be called directly by users of the Hawk module.
