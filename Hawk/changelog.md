@@ -100,3 +100,4 @@
 - Added search of Exchange Search Queries to the User Investigation (Get-HawkUserExchangeSearchQuery)
 - Implemented check to verify that an Exchange operation is enabled for auditing before attempting to pull logs
 - Added log pull of user Send activity to the User Investigation (Get-HawkUserMailSendActivity)
+- Added log pull of user SharePoint Search activity to the User Investigation (Get-HawkUserSharePointSearchQuery)

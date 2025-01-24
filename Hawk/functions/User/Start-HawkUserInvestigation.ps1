@@ -210,6 +210,11 @@
 					Out-LogFile "Running Get-HawkUserMailSendActivity" -Action
 					Get-HawkUserMailSendActivity -UserPrincipalName $User
 				}
+
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserSharePointSearchQuery for $User")) {
+					Out-LogFile "Running Get-HawkUserSharePointSearchQuery" -Action
+					Get-HawkUserSharePointSearchQuery -UserPrincipalName $User
+				}
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMobileDevice for $User")) {
 					Out-LogFile "Running Get-HawkUserMobileDevice" -Action
