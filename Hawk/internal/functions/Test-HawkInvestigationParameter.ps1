@@ -1,4 +1,3 @@
-# Internal validation function
 Function Test-HawkInvestigationParameter {
     <#
     .SYNOPSIS
@@ -25,7 +24,7 @@ Function Test-HawkInvestigationParameter {
 
     .PARAMETER EndDate
         The ending date for the investigation period. Must be provided with StartDate in non-interactive mode.
-        Cannot be in the future or result in a date range exceeding 365 days.
+        Cannot be more than one day in the future or result in a date range exceeding 365 days.
 
     .PARAMETER DaysToLookBack
         Alternative to StartDate/EndDate. Specifies the number of days to look back from the current date.
@@ -44,23 +43,12 @@ Function Test-HawkInvestigationParameter {
         - IsValid (bool): Indicates whether all validations passed
         - ErrorMessages (string[]): Array of error messages when validation fails
 
-    .EXAMPLE
-        $validation = Test-HawkInvestigationParameters -StartDate "2024-01-01" -EndDate "2024-01-31" -FilePath "C:\Investigation" -NonInteractive
-        
-        Validates parameters for investigating January 2024 in non-interactive mode.
-
-    .EXAMPLE
-        $validation = Test-HawkInvestigationParameters -DaysToLookBack 30 -FilePath "C:\Investigation" -NonInteractive
-        
-        Validates parameters for a 30-day lookback investigation in non-interactive mode.
-
     .NOTES
         This is an internal function used by Start-HawkTenantInvestigation and Start-HawkUserInvestigation.
         It is not intended to be called directly by users of the Hawk module.
         
         All datetime operations use UTC internally for consistency.
     #>
-
     [CmdletBinding()]
     param (
         [DateTime]$StartDate,
@@ -99,7 +87,6 @@ Function Test-HawkInvestigationParameter {
     }
 
     # Validate DaysToLookBack regardless of mode
-
     if ($DaysToLookBack) {
         if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365) {
             $isValid = $false
@@ -119,12 +106,15 @@ Function Test-HawkInvestigationParameter {
             $errorMessages += "StartDate must be before EndDate"
         }
 
-        if ($utcEndDate -gt $currentDate) {
+        # Compare against tomorrow to allow for the extra day
+        $tomorrow = $currentDate.Date.AddDays(1)
+        if ($utcEndDate -gt $tomorrow) {
             $isValid = $false
-            $errorMessages += "EndDate cannot be in the future"
+            $errorMessages += "EndDate cannot be more than one day in the future"
         }
 
-        $daysDifference = ($utcEndDate - $utcStartDate).Days
+        # Use dates for day difference calculation
+        $daysDifference = ($utcEndDate.Date - $utcStartDate.Date).Days
         if ($daysDifference -gt 365) {
             $isValid = $false
             $errorMessages += "Date range cannot exceed 365 days"

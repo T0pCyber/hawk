@@ -47,6 +47,17 @@
     
             # Print each property of $Hawk on its own line
             foreach ($prop in $Hawk.PSObject.Properties) {
+                # TODO
+                # Days to look back is not used at all for any actual functionality in the program
+                # So it is always printed off to the user as value of 0
+                # This could be misleading, therefore we arent printig it of
+                # However, this variable is references elsehwere in the code when initialziing hawk
+                # So it will take a little work to actualyl remove this variable
+                # Overall it is unecessary to print
+                if ($prop.Name -eq 'DaysToLookBack') {
+                    continue
+                }
+    
                 # If the property value is $null or an empty string, display "N/A"
                 $value = if ($null -eq $prop.Value -or [string]::IsNullOrEmpty($prop.Value.ToString())) {
                     "N/A"
