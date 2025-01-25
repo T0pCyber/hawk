@@ -217,9 +217,14 @@
 			Get-HawkTenantConsentGrant
 		}
 
-        if ($PSCmdlet.ShouldProcess("Risky Users and Detections", "Get Entra ID Risk Users and Detections")) {
-			Out-LogFile "Running Get-HawkTenantRiskyUsersAndDetections" -action
-			Get-HawkTenantRiskyUsersAndDetections
+        if ($PSCmdlet.ShouldProcess("Risky Users", "Get Entra ID Risky Users")) {
+			Out-LogFile "Running Get-HawkTenantRiskyUsers" -action
+			Get-HawkTenantRiskyUsers
+		}
+
+        if ($PSCmdlet.ShouldProcess("Risky Detections", "Get Entra ID Risky Detections")) {
+			Out-LogFile "Running Get-HawkTenantRiskyDetections" -action
+			Get-HawkTenantRiskyDetections
 		}
 	
 		if ($PSCmdlet.ShouldProcess("Entra ID Admins", "Get Entra ID admin list")) {

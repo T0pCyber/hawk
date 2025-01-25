@@ -91,7 +91,9 @@
 	'Get-HawkUserSharePointSearchQuery',
 	'Get-HawkUserEntraIDSignInLog',
 	'Get-HawkTenantEntraIDAuditLog',
-	'Get-HawkTenantRiskyUsersAndDetections'
+	'Get-HawkTenantRiskyUsersAndDetections',
+	'Get-HawkTenantRiskyUsers',
+	'Get-HawkTenantRiskyDetections'
 
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''

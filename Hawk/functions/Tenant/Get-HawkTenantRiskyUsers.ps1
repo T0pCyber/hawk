@@ -1,31 +1,26 @@
-Function Get-HawkTenantRiskyUsersAndDetections {
+Function Get-HawkTenantRiskyUsers {
     <#
     .SYNOPSIS
-        Retrieves information about users flagged as risky in Microsoft Entra ID.
+        Retrieves and analyzes users flagged as risky in Microsoft Entra ID.
 
     .DESCRIPTION
         Uses Microsoft Graph API to retrieve a list of users that have been flagged as risky
-        in Microsoft Entra ID. The function gathers details about risk detections, risk levels,
-        and risk states, helping security teams identify potentially compromised accounts.
+        in Microsoft Entra ID. The function analyzes user risk levels and states to identify
+        potentially compromised accounts requiring immediate investigation.
 
         The function requires the following Microsoft Graph permissions:
         - IdentityRiskyUser.Read.All
-        - IdentityRiskEvent.Read.All
 
     .EXAMPLE
-        Get-HawkTenantRiskyUsersAndDetections
+        Get-HawkTenantRiskyUsers
 
-        Retrieves all risky users from Entra ID, including their risk levels, risk states,
-        and associated risk detections.
+        Retrieves all risky users from Entra ID, including their risk levels and risk states.
+        High risk users are automatically flagged for investigation.
 
     .OUTPUTS
         File: RiskyUsers.csv/.json
         Path: \Tenant
         Description: All users currently flagged as risky in Entra ID
-
-        File: RiskDetections.csv/.json
-        Path: \Tenant
-        Description: Risk detections for users in Entra ID
 
         File: _Investigate_HighRiskUsers.csv/.json
         Path: \Tenant
@@ -33,9 +28,7 @@ Function Get-HawkTenantRiskyUsersAndDetections {
 
     .NOTES
         This function requires appropriate Graph API permissions to access risky user data.
-        Ensure your authenticated account has the required permissions:
-        - IdentityRiskyUser.Read.All
-        - IdentityRiskEvent.Read.All   
+        Ensure your authenticated account has IdentityRiskyUser.Read.All permission.
     #>
     [CmdletBinding()]
     param()
@@ -70,26 +63,29 @@ Function Get-HawkTenantRiskyUsersAndDetections {
                 return
             }
 
-            Out-LogFile ("Found " + $riskyUsers.Count + " risky users") -Information
+            Out-LogFile ("Total risky users found: " + $riskyUsers.Count) -Information
+            
+            # Define risk level order
+            $riskOrder = @{
+                'high' = 1
+                'medium' = 2
+                'low' = 3
+                'none' = 4
+            }
+            
+            # Log summary of users by risk level
+            $riskLevels = $riskyUsers | Group-Object -Property RiskLevel | 
+                Sort-Object -Property { $riskOrder[$_.Name] }
+            
+            foreach ($level in $riskLevels) {
+                $capitalizedName = $level.Name.Substring(0, 1).ToUpper() + $level.Name.Substring(1).ToLower()
+                Out-LogFile ("- $($level.Count) users at Risk Level '${capitalizedName}'") -Information
+            }
+            
+            
             
             # Export all risky users
             $riskyUsers | Out-MultipleFileType -FilePrefix "RiskyUsers" -csv -json
-
-            # Get risk detections
-            Out-LogFile "Retrieving risk detections" -Action
-            $riskDetections = Get-MgRiskDetection -All
-
-            if ($riskDetections) {
-                Out-LogFile ("Found " + $riskDetections.Count + " risk detections") -Information
-                $riskDetections | Out-MultipleFileType -FilePrefix "RiskDetections" -csv -json
-
-                # Log summary of detection types
-                $detectionTypes = $riskDetections | Group-Object -Property RiskEventType | Sort-Object -Property Count -Descending
-                Out-LogFile "Risk detection types found:" -Information
-                foreach ($type in $detectionTypes) {
-                    Out-LogFile ("- $($type.Name): $($type.Count) detections") -Information
-                }
-            }
 
             # Flag high risk users for investigation
             $highRiskUsers = $riskyUsers | Where-Object { 
@@ -103,15 +99,6 @@ Function Get-HawkTenantRiskyUsersAndDetections {
                 foreach ($user in $highRiskUsers) {
                     Out-LogFile ("High risk user detected: $($user.UserPrincipalName)") -Notice
                     Out-LogFile ("Risk Level: $($user.RiskLevel), Risk State: $($user.RiskState)") -Notice
-
-                    # Get risk detections specific to this high risk user
-                    $userDetections = $riskDetections | Where-Object { $_.UserPrincipalName -eq $user.UserPrincipalName }
-                    if ($userDetections) {
-                        Out-LogFile ("Risk detections found: $($userDetections.Count)") -Notice
-                        foreach ($detection in $userDetections) {
-                            Out-LogFile ("- $($detection.RiskEventType) detected at $($detection.DetectedDateTime)") -Notice
-                        }
-                    }
                 }
                 $highRiskUsers | Out-MultipleFileType -FilePrefix "_Investigate_HighRiskUsers" -csv -json -Notice
             }

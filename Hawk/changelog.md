@@ -99,4 +99,5 @@
 - Add ability to pass command line arguments to Start-HawkUserInvestigation and Start-HawkTenantInvestigation
 - Created Get-HawkUserEntraIDSignInLog, providing the ability to collect user specific Entra Sign in logs and flag on high / medium risk sign ins
 - Created Get-HawkTenantEntraIDAuditLog function, providing the ability to collect the Entra ID Audit log of the defined max of 30 days back from the current date.
-- Created Get-HawkTenantRiskyUsersAndDetections function, providing the agility to pull list of potentially compromised accounts from Entra ID
+- Created Get-HawkTenantRiskyUsers function to retrieve and analyze users flagged as risky in Microsoft Entra ID.
+- Created Get-HawkTenantRiskyDetections function to retrieve and summarize risk detection events from Microsoft Entra ID.
