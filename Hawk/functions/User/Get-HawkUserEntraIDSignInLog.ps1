@@ -1,41 +1,57 @@
-Function Get-HawkUserEntraSignInLog {
+Function Get-HawkUserEntraIDSignInLog {
     <#
     .SYNOPSIS
-        Retrieves medium and high risk Microsoft Entra ID sign-in logs for a specific user using Microsoft Graph.
+        Retrieves medium and high-risk Microsoft Entra ID sign-in logs for specific users using Microsoft Graph.
 
     .DESCRIPTION
-        This function retrieves risky sign-in logs from Microsoft Entra ID (formerly Azure AD) 
-        for specific users using the Microsoft Graph API. It collects sign-ins that were marked as
-        medium or high risk either during sign-in or after aggregated risk analysis.
+        This function collects sign-in logs from Microsoft Entra ID (formerly Azure AD) for specified users via the Microsoft Graph API. 
+        It identifies risky sign-ins that were marked as medium or high risk during sign-in or after aggregated risk analysis.
 
-        The function:
-        - Filters for medium and high risk sign-ins at the API level
-        - Automatically handles pagination of large result sets
-        - Displays progress during data collection
-        - Exports data in both CSV and JSON formats
-        - Uses the configured Hawk date range
-        
+        Key Features:
+        - Automatically handles pagination for large data sets.
+        - Exports data in both CSV and JSON formats for analysis.
+        - Filters and highlights medium and high-risk sign-ins.
+        - Groups sign-in data by risk levels for easier review.
+        - Utilizes the configured Hawk date range for investigation.
+
+        Improvements in this version:
+        - Added standardized JSON output for sign-in logs.
+        - Enhanced grouping and reporting of risk levels.
+        - Logs grouped data for both "RiskLevelDuringSignIn" and "RiskLevelAggregated".
+
     .PARAMETER UserPrincipalName
-        Single UPN of a user, comma-separated list of UPNs, or array of objects that contain UPNs.
+        Accepts one or more User Principal Names (UPNs) as input.
+        Input can be:
+        - A single UPN (e.g., user@contoso.com)
+        - A comma-separated list of UPNs
+        - An array of objects containing UPNs
 
     .OUTPUTS
-        File: RiskySignInLog.csv/.json
-        Path: \<User>
-        Description: Medium and high risk sign-in logs for the specified user(s)
+        Files:
+            - EntraSignInLog_<User>.csv
+            - EntraSignInLog_<User>.json
+        Path:
+            - Saved under the corresponding user's folder.
+        Description:
+            - Sign-in logs highlighting medium and high-risk entries for the specified users.
 
     .EXAMPLE
-        Get-HawkUserEntraSignInLog -UserPrincipalName user@contoso.com
-
-        Retrieves risky sign-in logs for the specified user from the configured Hawk time window.
+        Get-HawkUserEntraIDSignInLog -UserPrincipalName user@contoso.com
+        Retrieves sign-in logs for the specified user and flags medium and high-risk sign-ins.
 
     .EXAMPLE
-        Get-HawkUserEntraSignInLog -UserPrincipalName "user1@contoso.com","user2@contoso.com"
-
-        Retrieves risky sign-in logs for multiple users.
+        Get-HawkUserEntraIDSignInLog -UserPrincipalName "user1@contoso.com","user2@contoso.com"
+        Retrieves sign-in logs for multiple users and exports results for each user.
 
     .NOTES
-        Requires Microsoft.Graph.Authentication module
-        Requires appropriate Microsoft Graph permissions (AuditLog.Read.All)
+        Dependencies:
+            - Requires the Microsoft.Graph.Authentication module.
+            - Requires Microsoft Graph permissions: AuditLog.Read.All.
+
+        Known Limitations:
+            - The function relies on the configured Hawk date range and cannot retrieve logs beyond Microsoft Graph's 30-day limit.
+            - Ensure appropriate permissions are granted to the connected Microsoft Graph app.
+
     #>
     [CmdletBinding()]
     param (
@@ -48,7 +64,7 @@ Function Get-HawkUserEntraSignInLog {
             Initialize-HawkGlobalObject
         }
 
-        $startTime = Get-Date
+
         Out-LogFile "Gathering Microsoft Entra ID Sign-in Logs" -Action
         Test-GraphConnection
         Send-AIEvent -Event "CmdRun"
@@ -124,9 +140,5 @@ Function Get-HawkUserEntraSignInLog {
 
     END {
         Out-LogFile "Completed exporting Entra sign-in logs" -Information
-        $endTime = Get-Date
-        $duration = $endTime - $startTime
-        $formattedDuration = ("Total Runtime: {0:N0} minutes {1} seconds" -f [math]::Floor($duration.TotalMinutes), $duration.Seconds)
-        Out-LogFile $formattedDuration -Information
     }
 }

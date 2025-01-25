@@ -175,6 +175,11 @@
 					Out-LogFile "Running Get-HawkUserAutoReply" -Action
 					Get-HawkUserAutoReply -User $User
 				}
+
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEntraIDSignInLog for $User")) {
+					Out-LogFile "Running Get-HawkUserEntraIDSignInLog" -Action
+					Get-HawkUserEntraIDSignInLog -UserPrincipalName $User
+				}
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
 					Out-LogFile "Running Get-HawkUserUALSignInLog" -Action

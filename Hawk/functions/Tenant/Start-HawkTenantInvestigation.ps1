@@ -196,6 +196,11 @@
 			Out-LogFile "Running Get-HawkTenantRBACChange" -action
 			Get-HawkTenantRBACChange
 		}
+
+        if ($PSCmdlet.ShouldProcess("Entra ID Audit Log", "Get Entra ID audit logs")) {
+			Out-LogFile "Running Get-HawkTenantEntraIDAuditLog" -action
+			Get-HawkTenantEntraIDAuditLog
+		}
 	
 		if ($PSCmdlet.ShouldProcess("Azure App Audit Log", "Get app audit logs")) {
 			Out-LogFile "Running Get-HawkTenantAzureAppAuditLog" -action
@@ -210,6 +215,11 @@
 		if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {
 			Out-LogFile "Running Get-HawkTenantConsentGrant" -action
 			Get-HawkTenantConsentGrant
+		}
+
+        if ($PSCmdlet.ShouldProcess("Risky Users and Detections", "Get Entra ID Risk Users and Detections")) {
+			Out-LogFile "Running Get-HawkTenantRiskyUsersAndDetections" -action
+			Get-HawkTenantRiskyUsersAndDetections
 		}
 	
 		if ($PSCmdlet.ShouldProcess("Entra ID Admins", "Get Entra ID admin list")) {
