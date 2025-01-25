@@ -68,6 +68,6 @@
                 Out-LogFile -string ("{0} = {1}" -f $prop.Name, $value) -Information
             }
     
-            Out-LogFile "`Happy hunting! 🦅`n" -action
+            Out-LogFile "`Happy hunting! 🦅`n" -Information
         }
     }

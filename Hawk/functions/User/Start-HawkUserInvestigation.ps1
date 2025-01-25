@@ -176,9 +176,9 @@
 					Get-HawkUserAutoReply -User $User
 				}
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAuthHistory for $User")) {
-					Out-LogFile "Running Get-HawkUserAuthHistory" -Action
-					Get-HawkUserAuthHistory -User $User -ResolveIPLocations
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
+					Out-LogFile "Running Get-HawkUserUALSignInLog" -Action
+					Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
 				}
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {

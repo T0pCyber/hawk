@@ -56,7 +56,7 @@
 	'Get-HawkTenantConsentGrant',
 	'Get-HawkTenantRBACChange',
 	'Get-HawkTenantAzureAppAuditLog',
-	'Get-HawkUserAuthHistory',
+	'Get-HawkUserUALSignInLog',
 	'Get-HawkUserConfiguration',
 	'Get-HawkUserEmailForwarding',
 	'Get-HawkUserInboxRule',
@@ -89,7 +89,7 @@
 	'Get-HawkTenantDomainActivity',
 	'Get-HawkTenantEDiscoveryLog',
 	'Get-HawkUserSharePointSearchQuery',
-	'Get-HawkTenantEntraSignInLog'
+	'Get-HawkUserEntraSignInLog'
 
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''
