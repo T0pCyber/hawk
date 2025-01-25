@@ -88,8 +88,8 @@
 	'Get-HawkTenantEntraIDUser',
 	'Get-HawkTenantDomainActivity',
 	'Get-HawkTenantEDiscoveryLog',
-	'Get-HawkTenantSigningKeyOperation',
-	'Get-HawkUserSharePointSearchQuery'
+	'Get-HawkUserSharePointSearchQuery',
+	'Get-HawkTenantEntraSignInLog'
 
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''

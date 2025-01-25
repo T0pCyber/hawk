@@ -28,7 +28,7 @@ BEGIN{
         Initialize-HawkGlobalObject
     }
 
-    Out-LogFile "Gathering Azure AD Audit Logs events" -Action
+    Out-LogFile "Gathering Entra ID Audit Logs events" -Action
 }
 PROCESS{
         $auditLogsResponse = Get-MgAuditLogDirectoryAudit -All
@@ -48,7 +48,7 @@ PROCESS{
         }
     }
     END{
-        $auditLogs | Sort-Object -Property ActivityDateTime | Out-MultipleFileType -FilePrefix "AzureADAuditLog" -csv -json
-        Out-Logfile "Completed exporting Azure AD audit logs" -Information
+        $auditLogs | Sort-Object -Property ActivityDateTime | Out-MultipleFileType -FilePrefix "EntraIDAuditLog" -csv -json
+        Out-Logfile "Completed exporting Entra ID audit logs" -Information
     }
 }
