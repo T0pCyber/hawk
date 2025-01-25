@@ -1,4 +1,4 @@
-Function Get-HawkTenantRiskyDetections {
+Function Get-HawkTenantRiskDetections {
     <#
     .SYNOPSIS
         Retrieves risk detection events from Microsoft Entra ID.
@@ -17,9 +17,9 @@ Function Get-HawkTenantRiskyDetections {
         Retrieves all risk detections from Entra ID, including detection types and details.
 
     .OUTPUTS
-        File: RiskDetections.csv/.json
+        File: Risk_Detections.csv/.json
         Path: \Tenant
-        Description: Risk detections for users in Entra ID
+        Description: Risky detections for users in Entra ID
 
     .NOTES
         This function requires appropriate Graph API permissions to access risk detection data.
@@ -50,6 +50,7 @@ Function Get-HawkTenantRiskyDetections {
     process {
         try {
             # Get risk detections
+            Out-LogFile "Retrieving risk detections" -Action
             $riskDetections = Get-MgRiskDetection -All
 
             if ($null -eq $riskDetections -or $riskDetections.Count -eq 0) {
@@ -57,11 +58,16 @@ Function Get-HawkTenantRiskyDetections {
                 return
             }
 
-            Out-LogFile ("Found " + $riskDetections.Count + " risk detections") -Information
-            $riskDetections | Out-MultipleFileType -FilePrefix "RiskDetections" -csv -json
+            # Process and flatten risk detection data
+            $processedDetections = Convert-HawkRiskData -RiskData $riskDetections 
 
-            # Log summary of detections by risk level
-            Out-LogFile ("Total risk detections found: " + $riskDetections.Count) -Information
+            Out-LogFile ("Total risk detections found: " + $processedDetections.Count) -Information
+
+            # Export flattened data to CSV for analysis
+            $processedDetections | Out-MultipleFileType -FilePrefix "Risk_Detections" -csv
+
+            # Export original data to JSON to preserve structure
+            $riskDetections | Out-MultipleFileType -FilePrefix "Risk_Detections" -json
             
             # Define risk level order
             $riskOrder = @{
@@ -71,17 +77,17 @@ Function Get-HawkTenantRiskyDetections {
                 'none' = 4
             }
             
-            $riskLevels = $riskDetections | Group-Object -Property RiskLevel | 
+            # Log summary of detections by risk level
+            $riskLevels = $processedDetections | Group-Object -Property RiskLevel | 
                 Sort-Object -Property { $riskOrder[$_.Name] }
             
             foreach ($level in $riskLevels) {
                 $capitalizedName = $level.Name.Substring(0, 1).ToUpper() + $level.Name.Substring(1).ToLower()
-                Out-LogFile ("- $($level.Count) detections at Risk Level '${capitalizedName}'") -Information
+                Out-LogFile ("- $($level.Count) Risk Detections at Risk Level '${capitalizedName}'") -Information
             }
-            
 
             # Identify high risk detections
-            $highRiskDetections = $riskDetections | Where-Object { 
+            $highRiskDetections = $processedDetections | Where-Object { 
                 $_.RiskLevel -eq 'high' -or
                 $_.RiskState -eq 'atRisk' -or
                 $_.RiskState -eq 'confirmedCompromised'
@@ -99,8 +105,8 @@ Function Get-HawkTenantRiskyDetections {
                     }
                 }
 
-                # Export high risk detections for investigation
-                $highRiskDetections | Out-MultipleFileType -FilePrefix "_Investigate_HighRiskDetections" -csv -json -Notice
+                # Export flattened high risk detections for investigation
+                $highRiskDetections | Out-MultipleFileType -FilePrefix "_Investigate_HighDetections" -csv -json -Notice
             }
         }
         catch {

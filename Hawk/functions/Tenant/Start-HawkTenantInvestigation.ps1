@@ -222,9 +222,9 @@
 			Get-HawkTenantRiskyUsers
 		}
 
-        if ($PSCmdlet.ShouldProcess("Risky Detections", "Get Entra ID Risky Detections")) {
-			Out-LogFile "Running Get-HawkTenantRiskyDetections" -action
-			Get-HawkTenantRiskyDetections
+        if ($PSCmdlet.ShouldProcess("Risk Detections", "Get Entra ID Risk Detections")) {
+			Out-LogFile "Running Get-HawkTenantRiskDetections" -action
+			Get-HawkTenantRiskDetections
 		}
 	
 		if ($PSCmdlet.ShouldProcess("Entra ID Admins", "Get Entra ID admin list")) {
