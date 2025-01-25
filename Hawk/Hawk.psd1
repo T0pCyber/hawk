@@ -72,7 +72,6 @@
 	'Start-HawkUserInvestigation',
 	'Update-HawkModule',
 	'Get-HawkUserAdminAudit',
-	'Get-HawkTenantAuditLog',
 	'Get-HawkTenantAuthHistory',
 	'Get-HawkUserHiddenRule',
 	'Get-HawkMessageHeader',
