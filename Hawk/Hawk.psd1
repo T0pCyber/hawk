@@ -91,7 +91,6 @@
 	'Get-HawkUserSharePointSearchQuery',
 	'Get-HawkUserEntraIDSignInLog',
 	'Get-HawkTenantEntraIDAuditLog',
-	'Get-HawkTenantRiskyUsersAndDetections',
 	'Get-HawkTenantRiskyUsers',
 	'Get-HawkTenantRiskyDetections'
 
