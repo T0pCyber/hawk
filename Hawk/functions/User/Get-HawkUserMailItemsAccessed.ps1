@@ -115,11 +115,11 @@ Function Get-HawkUserMailItemsAccessed {
                 Out-LogFile "No data recorded for $User." -Information
             }
         }
-        
+         
     }#End Process
 
     END{
         Out-Logfile "Completed exporting MailItemsAccessed logs" -Information
     }#End End
-
+}
 }
