@@ -90,7 +90,6 @@
 	'Get-HawkTenantEntraIDUser',
 	'Get-HawkTenantDomainActivity',
 	'Get-HawkTenantEDiscoveryLog',
-	'Get-HawkUserSharePointSearchQuery',
 	'Get-HawkUserEntraIDSignInLog',
 	'Get-HawkTenantEntraIDAuditLog',
 	'Get-HawkTenantRiskyUsers',
