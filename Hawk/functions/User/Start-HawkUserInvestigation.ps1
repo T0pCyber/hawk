@@ -142,9 +142,11 @@
 		if (Test-HawkGlobalObject) {
 			Initialize-HawkGlobalObject
 		}
+		$investigationStartTime = Get-Date
+
 
 		if ($PSCmdlet.ShouldProcess("Investigating Users")) {
-			Out-LogFile "Investigating Users" -Action
+			Out-LogFile "Starting User Investigation" -Action
 			Send-AIEvent -Event "CmdRun"
 	
 			# Pull the tenant configuration
@@ -218,6 +220,10 @@
 			}
 		}
 
+	} end {
+        # Calculate end time and display summary
+        $investigationEndTime = Get-Date
+		Write-HawkInvestigationSummary -StartTime $investigationStartTime -EndTime $investigationEndTime -InvestigationType 'User' -UserPrincipalName $UserPrincipalName
 	}
 
 }

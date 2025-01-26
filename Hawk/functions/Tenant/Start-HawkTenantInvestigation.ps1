@@ -141,8 +141,8 @@
 		if (Test-HawkGlobalObject) {
 			Initialize-HawkGlobalObject
 		}
-	
-		Out-LogFile "Starting Tenant Sweep" -action
+        $investigationStartTime = Get-Date
+		Out-LogFile "Starting Tenant Investigation" -action
 		Send-AIEvent -Event "CmdRun"
 	
 		# Wrap operations in ShouldProcess checks
@@ -180,8 +180,7 @@
 			Out-LogFile "Running Get-HawkTenantAdminEmailForwardingChange" -action
 			Get-HawkTenantAdminEmailForwardingChange
 		}
-	
-	
+		
 		if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
 			Out-LogFile "Running Get-HawkTenantEDiscoveryLog" -action
 			Get-HawkTenantEDiscoveryLog
@@ -243,6 +242,11 @@
 		}
 
 	}
+    end {
+        # Calculate end time and display summary
+        $investigationEndTime = Get-Date
+        Write-HawkInvestigationSummary -StartTime $investigationStartTime -EndTime $investigationEndTime -InvestigationType 'Tenant'
+    }
 
  
 }

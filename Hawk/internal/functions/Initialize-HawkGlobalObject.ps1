@@ -92,7 +92,9 @@
         }
     }
     
+
     Function New-LoggingFolder {
+        [OutputType([System.Collections.Hashtable])]
         [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
    
@@ -113,8 +115,22 @@
             }
     
             # Get tenant name 
-            $TenantName = (Get-MGDomain -ErrorAction Stop | Where-Object { $_.isDefault }).ID
-            [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmmss")
+            $org = Get-MgOrganization -ErrorAction Stop
+            if (!$org) {
+                throw "Could not retrieve tenant organization information"
+            }
+            
+            # Use display name if available, otherwise fall back to tenant name
+            $TenantName = if ($org.DisplayName) { 
+                $org.DisplayName 
+            } else { 
+                $org.Id
+            }
+            
+            # Remove any invalid file system characters and spaces
+            $TenantName = $TenantName -replace '[\\/:*?"<>|]', '' -replace '\s+', '_'
+            
+            [string]$FolderID = "Hawk_" + $TenantName + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmmss")
     
             $FullOutputPath = Join-Path $RootPath $FolderID
     
@@ -126,7 +142,11 @@
                 $null = New-Item $FullOutputPath -ItemType Directory -ErrorAction Stop
             }
     
-            Return $FullOutputPath
+            # Return both path and tenant name
+            return @{
+                Path = $FullOutputPath
+                TenantName = $TenantName
+            }
 
         }
         catch {
@@ -157,7 +177,7 @@
                 }
                 # If the path is valid, create the subfolder
                 elseif (Test-LoggingPath -PathToTest $UserPath) {
-                    $Folder = New-LoggingFolder -RootPath $UserPath
+                    $folderInfo = New-LoggingFolder -RootPath $UserPath
                     $ValidPath = $true
                 }
                 # If the path is invalid, prompt again
@@ -172,7 +192,7 @@
         else {
             # If the provided path is valid, create the subfolder
             if (Test-LoggingPath -PathToTest $Path) {
-                $Folder = New-LoggingFolder -RootPath $Path
+                $folderInfo = New-LoggingFolder -RootPath $Path  # Changed variable name for clarity
             }
             # If the provided path fails validation, stop the process
             else {
@@ -180,7 +200,7 @@
             }
         }
     
-        Return $Folder
+        Return $folderInfo
     }
     Function New-ApplicationInsight {
         [CmdletBinding(SupportsShouldProcess)]
@@ -214,15 +234,21 @@
             StartDate      = $null
             EndDate        = $null
             WhenCreated    = $null
+            TenantName     = $null
         }
 
         # Set up the file path first, before any other operations
+        # Set up the file path first, before any other operations
         if ([string]::IsNullOrEmpty($FilePath)) {
             # Suppress Graph connection output during initial path setup
-            $Hawk.FilePath = Set-LoggingPath -ErrorAction Stop
+            $folderInfo = Set-LoggingPath -ErrorAction Stop
+            $Hawk.FilePath = $folderInfo.Path
+            $Hawk.TenantName = $folderInfo.TenantName
         }
         else {
-            $Hawk.FilePath = Set-LoggingPath -path $FilePath -ErrorAction Stop 2>$null
+            $folderInfo = Set-LoggingPath -path $FilePath -ErrorAction Stop 2>$null
+            $Hawk.FilePath = $folderInfo.Path
+            $Hawk.TenantName = $folderInfo.TenantName
         }
 
         # Now that FilePath is set, we can use Out-LogFile
@@ -357,7 +383,6 @@
 
         # End date logic with enhanced validation
         while ($null -eq $EndDate) {
-            Write-Output "`n"
             Out-LogFile "Please specify the last day of the search window:" -isPrompt
             Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
             Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
@@ -423,7 +448,6 @@
 
         # End date logic remains unchanged except for final +1 day fix
         if ($null -eq $EndDate) {
-            Write-Output "`n"
             Out-LogFile "Please specify the last day of the search window:" -isPrompt
             Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
             Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
@@ -475,7 +499,7 @@
         # --- AFTER the EndDate block, do a final check to "re-anchor" StartDate if it was given in days ---
         if ($StartDays -gt 0) {
             # Recalculate StartDate based on EndDate = $EndDate and StartDays = $StartDays
-            Out-LogFile -string "End date set to midnight UTC of next day to include all data from $($EndDate.AddDays(-1).Date.ToString('yyyy-MM-dd'))Z`n" -Information
+            Out-LogFile -string "End date set to midnight UTC of next day to include all data from $($EndDate.AddDays(-1).Date.ToString('yyyy-MM-dd'))Z" -Information
             $StartDate = $EndDate.ToUniversalTime().AddDays(-$StartDays).Date
 
             # (Optional) Additional validations again if necessary:
@@ -506,7 +530,6 @@
         $Hawk.StartDate = $StartDate
         $Hawk.EndDate = $EndDate
         $Hawk.WhenCreated = (Get-Date).ToUniversalTime().ToString("g")
-
         Write-HawkConfigurationComplete -Hawk $Hawk 
 
 
