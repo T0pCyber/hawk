@@ -97,7 +97,13 @@
 - Added ability to expand search up to 365 days
 - Added search of mail items accessed to the User Investigation (Get-HawkUserMailItemsAccessed)
 - Add ability to pass command line arguments to Start-HawkUserInvestigation and Start-HawkTenantInvestigation
+- Created Get-HawkUserEntraIDSignInLog, providing the ability to collect user specific Entra Sign in logs and flag on high / medium risk sign ins
+- Created Get-HawkTenantEntraIDAuditLog function, providing the ability to collect the Entra ID Audit log of the defined max of 30 days back from the current date.
+- Created Get-HawkTenantRiskyUsers function to retrieve and analyze users flagged as risky in Microsoft Entra ID.
+- Created Get-HawkTenantRiskDetections function to retrieve and summarize risk detection events from Microsoft Entra ID.
+- Created Get-HawkTenantRiskyServicePrincipals function, providing the ability to retrive and analyst users flagged as risky in Microsoft Entra ID.
 - Added search of Exchange Search Queries to the User Investigation (Get-HawkUserExchangeSearchQuery)
 - Implemented check to verify that an Exchange operation is enabled for auditing before attempting to pull logs
 - Added log pull of user Send activity to the User Investigation (Get-HawkUserMailSendActivity)
 - Added log pull of user SharePoint Search activity to the User Investigation (Get-HawkUserSharePointSearchQuery)
+

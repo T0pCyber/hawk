@@ -56,7 +56,7 @@
 	'Get-HawkTenantConsentGrant',
 	'Get-HawkTenantRBACChange',
 	'Get-HawkTenantAzureAppAuditLog',
-	'Get-HawkUserAuthHistory',
+	'Get-HawkUserUALSignInLog',
 	'Get-HawkUserConfiguration',
 	'Get-HawkUserEmailForwarding',
 	'Get-HawkUserInboxRule',
@@ -72,7 +72,6 @@
 	'Start-HawkUserInvestigation',
 	'Update-HawkModule',
 	'Get-HawkUserAdminAudit',
-	'Get-HawkTenantAuditLog',
 	'Get-HawkTenantAuthHistory',
 	'Get-HawkUserHiddenRule',
 	'Get-HawkMessageHeader',
@@ -90,7 +89,13 @@
 	'Get-HawkTenantAppAndSPNCredentialDetail',
 	'Get-HawkTenantEntraIDUser',
 	'Get-HawkTenantDomainActivity',
-	'Get-HawkTenantEDiscoveryLog'
+	'Get-HawkTenantEDiscoveryLog',
+	'Get-HawkUserSharePointSearchQuery',
+	'Get-HawkUserEntraIDSignInLog',
+	'Get-HawkTenantEntraIDAuditLog',
+	'Get-HawkTenantRiskyUsers',
+	'Get-HawkTenantRiskDetections',
+	'Get-HawkTenantRiskyServicePrincipals'
 
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''

@@ -92,7 +92,9 @@
         }
     }
     
+
     Function New-LoggingFolder {
+        [OutputType([System.Collections.Hashtable])]
         [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
    
@@ -113,8 +115,22 @@
             }
     
             # Get tenant name 
-            $TenantName = (Get-MGDomain -ErrorAction Stop | Where-Object { $_.isDefault }).ID
-            [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmmss")
+            $org = Get-MgOrganization -ErrorAction Stop
+            if (!$org) {
+                throw "Could not retrieve tenant organization information"
+            }
+            
+            # Use display name if available, otherwise fall back to tenant name
+            $TenantName = if ($org.DisplayName) { 
+                $org.DisplayName 
+            } else { 
+                $org.Id
+            }
+            
+            # Remove any invalid file system characters and spaces
+            $TenantName = $TenantName -replace '[\\/:*?"<>|]', '' -replace '\s+', '_'
+            
+            [string]$FolderID = "Hawk_" + $TenantName + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmmss")
     
             $FullOutputPath = Join-Path $RootPath $FolderID
     
@@ -126,7 +142,11 @@
                 $null = New-Item $FullOutputPath -ItemType Directory -ErrorAction Stop
             }
     
-            Return $FullOutputPath
+            # Return both path and tenant name
+            return @{
+                Path = $FullOutputPath
+                TenantName = $TenantName
+            }
 
         }
         catch {
@@ -157,7 +177,7 @@
                 }
                 # If the path is valid, create the subfolder
                 elseif (Test-LoggingPath -PathToTest $UserPath) {
-                    $Folder = New-LoggingFolder -RootPath $UserPath
+                    $folderInfo = New-LoggingFolder -RootPath $UserPath
                     $ValidPath = $true
                 }
                 # If the path is invalid, prompt again
@@ -172,7 +192,7 @@
         else {
             # If the provided path is valid, create the subfolder
             if (Test-LoggingPath -PathToTest $Path) {
-                $Folder = New-LoggingFolder -RootPath $Path
+                $folderInfo = New-LoggingFolder -RootPath $Path  # Changed variable name for clarity
             }
             # If the provided path fails validation, stop the process
             else {
@@ -180,7 +200,7 @@
             }
         }
     
-        Return $Folder
+        Return $folderInfo
     }
     Function New-ApplicationInsight {
         [CmdletBinding(SupportsShouldProcess)]
@@ -214,15 +234,21 @@
             StartDate      = $null
             EndDate        = $null
             WhenCreated    = $null
+            TenantName     = $null
         }
 
         # Set up the file path first, before any other operations
+        # Set up the file path first, before any other operations
         if ([string]::IsNullOrEmpty($FilePath)) {
             # Suppress Graph connection output during initial path setup
-            $Hawk.FilePath = Set-LoggingPath -ErrorAction Stop
+            $folderInfo = Set-LoggingPath -ErrorAction Stop
+            $Hawk.FilePath = $folderInfo.Path
+            $Hawk.TenantName = $folderInfo.TenantName
         }
         else {
-            $Hawk.FilePath = Set-LoggingPath -path $FilePath -ErrorAction Stop 2>$null
+            $folderInfo = Set-LoggingPath -path $FilePath -ErrorAction Stop 2>$null
+            $Hawk.FilePath = $folderInfo.Path
+            $Hawk.TenantName = $folderInfo.TenantName
         }
 
         # Now that FilePath is set, we can use Out-LogFile
@@ -318,8 +344,7 @@
                 # At this point, we do not yet have EndDate set. So temporarily anchor from "today":
                 [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
         
-                Write-Output ""
-                Out-LogFile -string "Start date set to: $StartDate" -Information
+                Out-LogFile -string "Start date set to: ${StartDate}Z" -Information
         
             }
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
@@ -347,7 +372,7 @@
 
                 }
 
-                Out-LogFile -string "Start Date (UTC): $StartDate" -Information
+                Out-LogFile -string "Start Date: ${StartDate}Z" -Information
             }
             else {
                 Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
@@ -358,7 +383,6 @@
 
         # End date logic with enhanced validation
         while ($null -eq $EndDate) {
-            Write-Output "`n"
             Out-LogFile "Please specify the last day of the search window:" -isPrompt
             Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
             Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
@@ -376,14 +400,12 @@
                         Out-LogFile -string "Please enter a positive number of days." -isError
                         continue
                     }
-
                     # Validate numeric value
                     if ($EndRead -notmatch '^\d+$') {
                         Out-LogFile -string "Invalid input. Please enter a number between 1 and 365, or a date in MM/DD/YYYY format." -isError
                         continue
                     }
-
-                    Out-LogFile -string "End Date (UTC): $EndRead days." -Information
+                    Out-LogFile -string "End Date: $EndRead days." -Information
                     [DateTime]$tempEndDate = ((Get-Date).ToUniversalTime().AddDays(-($EndRead - 1))).Date
                 }
 
@@ -391,10 +413,13 @@
                     Out-LogFile -string "End date must be more recent than start date ($StartDate)." -isError
                     continue
                 }
-                
+
+                # --- FINAL FIX: Always move to next day at 00:00 UTC ---
+                $tempEndDate = $tempEndDate.ToUniversalTime().Date.AddDays(1)
+
                 $EndDate = $tempEndDate
-                Write-Output ""
-                Out-LogFile -string "End date set to: $EndDate (UTC)`n" -Information
+                # Write-Output ""
+                # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
             }
             elseif (!($null -eq ($EndRead -as [DateTime]))) {
 
@@ -409,17 +434,20 @@
                     $tempEndDate = (Get-Date).ToUniversalTime().Date
                 }
 
+                # --- FINAL FIX: Always move to next day at 00:00 UTC ---
+                $tempEndDate = $tempEndDate.ToUniversalTime().Date.AddDays(1)
+
                 $EndDate = $tempEndDate
-                Out-LogFile -string "End date set to: $EndDate [UTC]`n" -Information
+                # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
             }
             else {
                 Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
                 continue
             }
         }
-        # End date logic remains unchanged
+
+        # End date logic remains unchanged except for final +1 day fix
         if ($null -eq $EndDate) {
-            Write-Output "`n"
             Out-LogFile "Please specify the last day of the search window:" -isPrompt
             Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
             Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
@@ -431,38 +459,47 @@
                 if ([string]::IsNullOrEmpty($EndRead)) {
                     [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
                 } else {
-                    Out-LogFile -string "End Date (UTC): $EndRead days." -Information
+                    Out-LogFile -string "End Date: $EndRead days." -Information
                     [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(-($EndRead - 1))).Date
                 }
 
                 if ($StartDate -gt $EndDate) {
                     Out-LogFile -string "StartDate cannot be more recent than EndDate" -isError
-                } else {
-                    Write-Output ""
-                    Out-LogFile -string "End date set to: $EndDate [UTC]`n" -Information
                 }
-            } elseif (!($null -eq ($EndRead -as [DateTime]))) {
+                else {
+                    # --- FINAL FIX: Always move to next day at 00:00 UTC ---
+                    $EndDate = $EndDate.ToUniversalTime().Date.AddDays(1)
+
+                    # Write-Output ""
+                    # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
+                }
+            }
+            elseif (!($null -eq ($EndRead -as [DateTime]))) {
                 [DateTime]$EndDate = (Get-Date $EndRead).ToUniversalTime().Date
 
                 if ($StartDate -gt $EndDate) {
                     Out-LogFile -string "EndDate is earlier than StartDate. Setting EndDate to today." -isWarning
                     [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
-                } elseif ($EndDate -gt ((Get-Date).ToUniversalTime().AddDays(1))) {
+                }
+                elseif ($EndDate -gt ((Get-Date).ToUniversalTime().AddDays(1))) {
                     Out-LogFile -string "EndDate too far in the future. Setting EndDate to today." -isWarning
                     [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
                 }
 
-                Out-LogFile -string "End date set to: $EndDate [UTC]`n" -Information
-            } else {
+                # --- FINAL FIX: Always move to next day at 00:00 UTC ---
+                $EndDate = $EndDate.ToUniversalTime().Date.AddDays(1)
+
+                # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
+            }
+            else {
                 Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
             }
         }
 
         # --- AFTER the EndDate block, do a final check to "re-anchor" StartDate if it was given in days ---
         if ($StartDays -gt 0) {
-            # Recalculate StartDate anchored to the final EndDate
-            Out-LogFile -string "Recalculating StartDate based on EndDate = $EndDate and StartDays = $StartDays" -Information
-
+            # Recalculate StartDate based on EndDate = $EndDate and StartDays = $StartDays
+            Out-LogFile -string "End date set to midnight UTC of next day to include all data from $($EndDate.AddDays(-1).Date.ToString('yyyy-MM-dd'))Z" -Information
             $StartDate = $EndDate.ToUniversalTime().AddDays(-$StartDays).Date
 
             # (Optional) Additional validations again if necessary:
@@ -471,9 +508,14 @@
                 $StartDate = (Get-Date).ToUniversalTime().Date
             }
 
+            # If EndDate is today, adjust to current time
+            if ($EndDate.Date -eq (Get-Date).Date) {
+                $EndDate = (Get-Date).ToUniversalTime()
+                Out-LogFile -string "Adjusting EndDate to current time: $EndDate" -Information
+            }
 
-            Out-LogFile -string "Final StartDate (UTC) after re-anchoring: $StartDate" -Information
         }
+
 
 
         # Configuration Example, currently not used
@@ -488,7 +530,6 @@
         $Hawk.StartDate = $StartDate
         $Hawk.EndDate = $EndDate
         $Hawk.WhenCreated = (Get-Date).ToUniversalTime().ToString("g")
-
         Write-HawkConfigurationComplete -Hawk $Hawk 
 
 

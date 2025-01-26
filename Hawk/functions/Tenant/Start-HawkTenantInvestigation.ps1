@@ -141,8 +141,8 @@
 		if (Test-HawkGlobalObject) {
 			Initialize-HawkGlobalObject
 		}
-	
-		Out-LogFile "Starting Tenant Sweep" -action
+        $investigationStartTime = Get-Date
+		Out-LogFile "Starting Tenant Investigation" -action
 		Send-AIEvent -Event "CmdRun"
 	
 		# Wrap operations in ShouldProcess checks
@@ -180,8 +180,7 @@
 			Out-LogFile "Running Get-HawkTenantAdminEmailForwardingChange" -action
 			Get-HawkTenantAdminEmailForwardingChange
 		}
-	
-	
+		
 		if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
 			Out-LogFile "Running Get-HawkTenantEDiscoveryLog" -action
 			Get-HawkTenantEDiscoveryLog
@@ -195,6 +194,11 @@
 		if ($PSCmdlet.ShouldProcess("RBAC Changes", "Get RBAC changes")) {
 			Out-LogFile "Running Get-HawkTenantRBACChange" -action
 			Get-HawkTenantRBACChange
+		}
+
+        if ($PSCmdlet.ShouldProcess("Entra ID Audit Log", "Get Entra ID audit logs")) {
+			Out-LogFile "Running Get-HawkTenantEntraIDAuditLog" -action
+			Get-HawkTenantEntraIDAuditLog
 		}
 	
 		if ($PSCmdlet.ShouldProcess("Azure App Audit Log", "Get app audit logs")) {
@@ -210,6 +214,16 @@
 		if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {
 			Out-LogFile "Running Get-HawkTenantConsentGrant" -action
 			Get-HawkTenantConsentGrant
+		}
+
+        if ($PSCmdlet.ShouldProcess("Risky Users", "Get Entra ID Risky Users")) {
+			Out-LogFile "Running Get-HawkTenantRiskyUsers" -action
+			Get-HawkTenantRiskyUsers
+		}
+
+        if ($PSCmdlet.ShouldProcess("Risk Detections", "Get Entra ID Risk Detections")) {
+			Out-LogFile "Running Get-HawkTenantRiskDetections" -action
+			Get-HawkTenantRiskDetections
 		}
 	
 		if ($PSCmdlet.ShouldProcess("Entra ID Admins", "Get Entra ID admin list")) {
@@ -228,6 +242,11 @@
 		}
 
 	}
+    end {
+        # Calculate end time and display summary
+        $investigationEndTime = Get-Date
+        Write-HawkInvestigationSummary -StartTime $investigationStartTime -EndTime $investigationEndTime -InvestigationType 'Tenant'
+    }
 
  
 }

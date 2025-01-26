@@ -10,5 +10,7 @@
         'PSUseDeclaredVarsMoreThanAssignments' 
         # Exclude this to allow the use of Write-Host
         'PSAvoidUsingWriteHost'
+        # Exclude this to allow plural nouns in cmdlet names
+        'PSUseSingularNouns'
     )
 }

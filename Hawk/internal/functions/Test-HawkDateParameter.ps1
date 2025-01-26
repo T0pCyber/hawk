@@ -41,43 +41,30 @@ Function Test-HawkDateParameter {
         PSCustomObject containing:
         - StartDate [DateTime]: The calculated or provided start date in UTC
         - EndDate [DateTime]: The calculated or provided end date in UTC
-
     .EXAMPLE
-        $dates = Test-HawkDateParmeter -PSBoundParameters $PSBoundParameters -DaysToLookBack 30
-        
+        $dates = Test-HawkDateParameter -PSBoundParameters $PSBoundParameters -DaysToLookBack 30
+
         Processes a request to look back 30 days from the current date, returning appropriate 
         start and end dates in UTC format.
-
     .EXAMPLE
-        $dates = Test-HawkDateParmeter `
+        $dates = Test-HawkDateParameter `
             -PSBoundParameters $PSBoundParameters `
             -StartDate "2024-01-01" `
             -EndDate "2024-01-31"
-
+        
         Processes explicit start and end dates, validating them and converting to UTC format.
-
     .EXAMPLE
-        $dates = Test-HawkDateParmeter `
+        $dates = Test-HawkDateParameter `
             -PSBoundParameters $PSBoundParameters `
             -DaysToLookBack 30 `
             -EndDate "2024-01-31"
-
+        
         Processes a request to look back 30 days from a specific end date.
-
     .NOTES
         Author: Jonathan Butler
         Internal Function: This function is not meant to be called directly by users
         Dependencies: Requires PSFramework module for error handling
         Validation: Initial parameter validation only; complete validation is done by Test-HawkInvestigationParameter
-
-    .LINK
-        Test-HawkInvestigationParameter
-
-    .LINK
-        Start-HawkTenantInvestigation
-
-    .LINK
-        Start-HawkUserInvestigation
     #>
     [CmdletBinding()]
     param (
@@ -108,20 +95,52 @@ Function Test-HawkDateParameter {
         if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365) {
             Stop-PSFFunction -Message "DaysToLookBack must be between 1 and 365" -EnableException $true
         }
-        else {
-            # Handle EndDate with DaysToLookBack but no StartDate
-            if ($PSBoundParameters.ContainsKey('EndDate') -and -not $PSBoundParameters.ContainsKey('StartDate')) {
-                $EndDateUTC = $EndDate.ToUniversalTime()
-                $StartDateUTC = $EndDateUTC.AddDays(-$DaysToLookBack)
-
-                $StartDate = $StartDateUTC
-                $EndDate = $EndDateUTC
+        
+        if ($PSBoundParameters.ContainsKey('EndDate') -and -not $PSBoundParameters.ContainsKey('StartDate')) {
+            # Check EndDate is not more than one day in future
+            $tomorrow = (Get-Date).ToUniversalTime().Date.AddDays(1)
+            if ($EndDate.ToUniversalTime().Date -gt $tomorrow) {
+                Stop-PSFFunction -Message "EndDate cannot be more than one day in the future" -EnableException $true
             }
-            else {
-                # Convert DaysToLookBack to StartDate/EndDate from "today"
-                $ConvertedDates = Convert-HawkDaysToDate -DaysToLookBack $DaysToLookBack
-                $StartDate = $ConvertedDates.StartDate
-                $EndDate = $ConvertedDates.EndDate
+
+            $EndDateUTC = $EndDate.ToUniversalTime().Date.AddDays(1)
+            $StartDateUTC = $EndDate.ToUniversalTime().Date.AddDays(-$DaysToLookBack)
+
+            $StartDate = $StartDateUTC
+            $EndDate = $EndDateUTC
+        }
+        else {
+            # Convert DaysToLookBack to StartDate/EndDate
+            $ConvertedDates = Convert-HawkDaysToDate -DaysToLookBack $DaysToLookBack
+            $StartDate = $ConvertedDates.StartDate
+            $EndDate = $ConvertedDates.EndDate
+        }
+    }
+    else {
+        # For explicit start/end dates
+        if ($StartDate) {
+            $StartDate = $StartDate.ToUniversalTime().Date
+        }
+
+        if ($EndDate) {
+            # Validate against tomorrow to allow for the extra day
+            $tomorrow = (Get-Date).ToUniversalTime().Date.AddDays(1)
+            if ($EndDate.ToUniversalTime().Date -gt $tomorrow) {
+                Stop-PSFFunction -Message "EndDate cannot be more than one day in the future" -EnableException $true
+            }
+            # Add one day to include full end date
+            $EndDate = $EndDate.ToUniversalTime().Date.AddDays(1)
+        }
+
+        # Validate date range
+        if ($StartDate -and $EndDate) {
+            if ($StartDate -gt $EndDate) {
+                Stop-PSFFunction -Message "StartDate must be before EndDate" -EnableException $true
+            }
+
+            $daysDifference = ($EndDate.Date - $StartDate.Date).Days
+            if ($daysDifference -gt 365) {
+                Stop-PSFFunction -Message "Date range cannot exceed 365 days" -EnableException $true
             }
         }
     }
