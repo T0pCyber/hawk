@@ -1,4 +1,4 @@
-﻿@{
+@{
 	# Script module or binary module file associated with this manifest
 	RootModule         = 'Hawk.psm1'
 
@@ -85,7 +85,6 @@
 	'Get-HawkUserMailItemsAccessed',
 	'Get-HawkUserExchangeSearchQuery',
 	'Get-HawkUserMailSendActivity',
-	'Get-HawkUserSharePointSearchQuery',
 	'Get-HawkTenantAppAndSPNCredentialDetail',
 	'Get-HawkTenantEntraIDUser',
 	'Get-HawkTenantDomainActivity',
