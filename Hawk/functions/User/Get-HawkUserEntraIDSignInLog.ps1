@@ -103,8 +103,8 @@ Function Get-HawkUserEntraIDSignInLog {
 
                     # Check for risky sign-ins
                     $riskySignIns = $signInLogs | Where-Object {
-                        $_.RiskLevelDuringSignIn -in @('high', 'medium') -or
-                        $_.RiskLevelAggregated -in @('high', 'medium')
+                        $_.RiskLevelDuringSignIn -in @('high', 'medium', 'low') -or
+                        $_.RiskLevelAggregated -in @('high', 'medium', 'low')
                     }
 
                     if ($riskySignIns.Count -gt 0) {
@@ -113,13 +113,13 @@ Function Get-HawkUserEntraIDSignInLog {
                         
                         # Group and report risk levels
                         $duringSignIn = $riskySignIns | Group-Object -Property RiskLevelDuringSignIn | 
-                            Where-Object {$_.Name -in @('high', 'medium')}
+                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
                         foreach ($risk in $duringSignIn) {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -silentnotice
                         }
 
                         $aggregated = $riskySignIns | Group-Object -Property RiskLevelAggregated | 
-                            Where-Object {$_.Name -in @('high', 'medium')}
+                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
                         foreach ($risk in $aggregated) {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -silentnotice
                         }
