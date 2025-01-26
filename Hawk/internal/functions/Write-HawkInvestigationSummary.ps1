@@ -1,4 +1,40 @@
 function Write-HawkInvestigationSummary {
+    <#
+    .SYNOPSIS
+        Outputs a summary of a Hawk investigation session.
+
+    .DESCRIPTION
+        Creates and displays a summary report of a Hawk investigation session, including
+        the time range, investigation type, and if applicable, the users investigated.
+        This summary helps track and document investigation scope and parameters.
+
+    .PARAMETER StartTime
+        The UTC start time of the investigation period.
+
+    .PARAMETER EndTime
+        The UTC end time of the investigation period.
+
+    .PARAMETER InvestigationType
+        The type of investigation performed. Valid values include "Tenant" and "User".
+
+    .PARAMETER UserPrincipalName
+        For user investigations, an array of user principal names that were investigated.
+        Not required for tenant-wide investigations.
+
+    .EXAMPLE
+        PS C:\> Write-HawkInvestigationSummary -StartTime "2024-01-01" -EndTime "2024-01-31" -InvestigationType "Tenant"
+        
+        Outputs a summary of a tenant-wide investigation covering January 2024.
+
+    .EXAMPLE
+        PS C:\> Write-HawkInvestigationSummary -StartTime "2024-01-01" -EndTime "2024-01-31" -InvestigationType "User" -UserPrincipalName "user@contoso.com"
+        
+        Outputs a summary of a user investigation for a specific user during January 2024.
+
+    .NOTES
+        This function should be called at the end of investigation sessions to document
+        the scope and parameters of the investigation.
+    #>
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
