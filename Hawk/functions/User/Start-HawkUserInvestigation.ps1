@@ -88,7 +88,7 @@
         Investigates all users with CustomAttribute1="C-level" for January 2024.
         Runs in non-interactive mode because multiple parameters were specified.
     .LINK
-        https://cloudforensicator.com
+        https://hawkforensics.io
 
     .LINK
         https://github.com/T0pCyber/hawk

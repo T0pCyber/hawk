@@ -87,7 +87,7 @@
         Useful for understanding the investigation process or validating parameters.
 
     .LINK
-        https://cloudforensicator.com
+        https://hawkforensics.io
 
     .LINK
         https://github.com/T0pCyber/hawk
