@@ -1,5 +1,5 @@
 ﻿Function Start-HawkUserInvestigation {
-    <#
+	<#
     .SYNOPSIS
         Performs a comprehensive user-specific investigation using Hawk's automated data collection capabilities.
 
@@ -106,7 +106,7 @@
 	)
 
 	begin {
-        $NonInteractive = Test-HawkNonInteractiveMode -PSBoundParameters $PSBoundParameters
+		$NonInteractive = Test-HawkNonInteractiveMode -PSBoundParameters $PSBoundParameters
 
 		if ($NonInteractive) {
 			$processedDates = Test-HawkDateParameter -PSBoundParameters $PSBoundParameters -StartDate $StartDate -EndDate $EndDate -DaysToLookBack $DaysToLookBack
@@ -227,16 +227,12 @@
 					Get-HawkUserMobileDevice -User $User
 				}
 
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserSharePointSearchQuery for $User")) {
-					Out-LogFile "Running Get-HawkUserSharePointSearchQuery" -Action
-					Get-HawkUserSharePointSearchQuery -UserPrincipalName $User
-				}
 			}
 		}
 
 	} end {
-        # Calculate end time and display summary
-        $investigationEndTime = Get-Date
+		# Calculate end time and display summary
+		$investigationEndTime = Get-Date
 		Write-HawkInvestigationSummary -StartTime $investigationStartTime -EndTime $investigationEndTime -InvestigationType 'User' -UserPrincipalName $UserPrincipalName
 	}
 
