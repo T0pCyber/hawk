@@ -123,7 +123,8 @@
             # Use display name if available, otherwise fall back to tenant name
             $TenantName = if ($org.DisplayName) { 
                 $org.DisplayName 
-            } else { 
+            }
+            else { 
                 $org.Id
             }
             
@@ -144,7 +145,7 @@
     
             # Return both path and tenant name
             return @{
-                Path = $FullOutputPath
+                Path       = $FullOutputPath
                 TenantName = $TenantName
             }
 
@@ -221,7 +222,8 @@
 
         if ($NonInteractive) {
             Write-HawkBanner
-        } else {
+        }
+        else {
             Write-HawkBanner -DisplayWelcomeMessage
         }
         
@@ -284,7 +286,8 @@
                 Out-LogFile -string "M365 License type detected: $LicenseType" -Information
                 Out-LogFile -string "Max log retention: $MaxDaysToGoBack days" -action -NoNewLine
     
-            } catch {
+            }
+            catch {
                 Out-LogFile -string "Failed to detect license type. Max days of log retention is unknown." -Information
                 $MaxDaysToGoBack = 90
                 $LicenseType = "Unknown"
@@ -326,7 +329,7 @@
                 $StartDays = $StartRead
         
                 # Validate the input is within range
-                if (($StartRead -gt 365) -or ($StartRead -lt 1))   {
+                if (($StartRead -gt 365) -or ($StartRead -lt 1)) {
                     Out-LogFile -string "Days to go back must be between 1 and 365." -isError
                     continue
                 }
@@ -383,6 +386,7 @@
 
         # End date logic with enhanced validation
         while ($null -eq $EndDate) {
+            Write-Output ""
             Out-LogFile "Please specify the last day of the search window:" -isPrompt
             Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
             Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
@@ -406,7 +410,7 @@
                         continue
                     }
                     Out-LogFile -string "End Date: $EndRead days." -Information
-                    [DateTime]$tempEndDate = ((Get-Date).ToUniversalTime().AddDays(-($EndRead - 1))).Date
+                    [DateTime]$tempEndDate = ((Get-Date).ToUniversalTime().AddDays( - ($EndRead - 1))).Date
                 }
 
                 if ($StartDate -gt $tempEndDate) {
@@ -458,9 +462,10 @@
             if ($null -eq ($EndRead -as [DateTime])) {
                 if ([string]::IsNullOrEmpty($EndRead)) {
                     [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
-                } else {
+                }
+                else {
                     Out-LogFile -string "End Date: $EndRead days." -Information
-                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(-($EndRead - 1))).Date
+                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays( - ($EndRead - 1))).Date
                 }
 
                 if ($StartDate -gt $EndDate) {

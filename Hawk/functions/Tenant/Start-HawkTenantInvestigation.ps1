@@ -156,10 +156,10 @@
         # 	Get-HawkTenantEDiscoveryConfiguration
         # }
 	
-        # if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Creation Audit Log", "Search Admin Inbox Rule Creation")) {
-        # 	Out-LogFile "Running Get-HawkTenantAdminInboxRuleCreation" -action
-        # 	Get-HawkTenantAdminInboxRuleCreation
-        # }
+        if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Creation Audit Log", "Search Admin Inbox Rule Creation")) {
+            Out-LogFile "Running Get-HawkTenantAdminInboxRuleCreation" -action
+            Get-HawkTenantAdminInboxRuleCreation
+        }
 	
         # if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Modification Audit Log", "Search Admin Inbox Rule Modification")) {
         # 	Out-LogFile "Running Get-HawkTenantInboxRuleModification" -action
@@ -212,14 +212,14 @@
         # }
 	
         # if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {
-        # 	Out-LogFile "Running Get-HawkTenantConsentGrant" -action
-        # 	Get-HawkTenantConsentGrant
+        #     Out-LogFile "Running Get-HawkTenantConsentGrant" -action
+        #     Get-HawkTenantConsentGrant
         # }
 
-        # if ($PSCmdlet.ShouldProcess("Risky Users", "Get Entra ID Risky Users")) {
-        # 	Out-LogFile "Running Get-HawkTenantRiskyUsers" -action
-        # 	Get-HawkTenantRiskyUsers
-        # }
+        if ($PSCmdlet.ShouldProcess("Risky Users", "Get Entra ID Risky Users")) {
+            Out-LogFile "Running Get-HawkTenantRiskyUsers" -action
+            Get-HawkTenantRiskyUsers
+        }
 
         # if ($PSCmdlet.ShouldProcess("Risk Detections", "Get Entra ID Risk Detections")) {
         # 	Out-LogFile "Running Get-HawkTenantRiskDetections" -action
