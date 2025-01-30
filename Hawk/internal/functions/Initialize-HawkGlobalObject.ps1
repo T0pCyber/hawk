@@ -123,7 +123,8 @@
             # Use display name if available, otherwise fall back to tenant name
             $TenantName = if ($org.DisplayName) { 
                 $org.DisplayName 
-            } else { 
+            }
+            else { 
                 $org.Id
             }
             
@@ -144,7 +145,7 @@
     
             # Return both path and tenant name
             return @{
-                Path = $FullOutputPath
+                Path       = $FullOutputPath
                 TenantName = $TenantName
             }
 
@@ -221,7 +222,8 @@
 
         if ($NonInteractive) {
             Write-HawkBanner
-        } else {
+        }
+        else {
             Write-HawkBanner -DisplayWelcomeMessage
         }
         
@@ -284,7 +286,8 @@
                 Out-LogFile -string "M365 License type detected: $LicenseType" -Information
                 Out-LogFile -string "Max log retention: $MaxDaysToGoBack days" -action -NoNewLine
     
-            } catch {
+            }
+            catch {
                 Out-LogFile -string "Failed to detect license type. Max days of log retention is unknown." -Information
                 $MaxDaysToGoBack = 90
                 $LicenseType = "Unknown"
@@ -303,41 +306,43 @@
             Out-LogFile " Enter a number of days to go back (1-$MaxDaysToGoBack)" -isPrompt 
             Out-LogFile " OR enter a date in MM/DD/YYYY format" -isPrompt
             Out-LogFile " Default is 90 days back: " -isPrompt -NoNewLine
-            $StartRead = (Read-Host).Trim()
+            [string]$StartRead = (Read-Host).Trim()
         
+            # Determine if input is a valid date
             # Determine if input is a valid date
             if ($null -eq ($StartRead -as [DateTime])) {
                 
                 #### Not a DateTime => interpret as # of days ####
                 if ([string]::IsNullOrEmpty($StartRead)) {
-                    [int]$StartRead = 90
+                    $StartRead = "90"
                 }
-                # Validates the input is an integer
-                elseif ($StartRead -match '^\d+$') {
-                    # Only convert to int if it is a valid positive number
-                    [int]$StartRead = [int]$StartRead
-                }
-                else {
+
+                # First check if it's a valid integer without converting
+                if (-not ($StartRead -match '^\d+$')) {
                     Out-LogFile -string "Invalid input. Please enter a number between 1 and 365, or a date in MM/DD/YYYY format." -isError
                     continue
                 }
-        
-                # We store this integer in $StartDays so we can potentially re-anchor from EndDate later
+
+                # Now safe to convert to integer since we validated the format
+                [int]$StartRead = [int]$StartRead
+
                 $StartDays = $StartRead
         
                 # Validate the input is within range
+                # Validate the input is within range
                 if (($StartRead -gt 365) -or ($StartRead -lt 1))   {
                     Out-LogFile -string "Days to go back must be between 1 and 365." -isError
+                    Remove-Variable -Name StartDate -ErrorAction SilentlyContinue
                     continue
                 }
 
 
                 # Validate the entered days back
-                if ([int]$StartRead -gt [int]$MaxDaysToGoBack) {
-                    Out-LogFile -string "You have entered a time frame greater than your license allows ($MaxDaysToGoBack days)." -isWarning
-                    Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the value: " -isPrompt -NoNewLine
+                if ($StartRead -gt $MaxDaysToGoBack) {
+                    Out-LogFile -string "The date entered exceeds your license retention period of $MaxDaysToGoBack days." -isWarning
+                    Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the date:" -isPrompt -NoNewLine
                     $Proceed = (Read-Host).Trim()
-                    if ($Proceed -eq 'R') { continue }
+                    if ($Proceed -eq 'R') { Remove-Variable -Name StartDate -ErrorAction SilentlyContinue; continue }
                 }
 
         
@@ -362,9 +367,9 @@
                     Out-LogFile -string "The date entered exceeds your license retention period of $MaxDaysToGoBack days." -isWarning
                     Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the date:" -isPrompt -NoNewLine
                     $Proceed = (Read-Host).Trim()
-                    if ($Proceed -eq 'R') { $StartDate = $null; continue }
+                    if ($Proceed -eq 'R') { Remove-Variable -Name StartDate -ErrorAction SilentlyContinue; continue }
                 }
-                
+
 
                 if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-365))) {
                     Out-LogFile -string "The date cannot exceed 365 days. Setting to the maximum limit of 365 days." -isWarning
@@ -407,11 +412,11 @@
                         continue
                     }
                     Out-LogFile -string "End Date: $EndRead days." -Information
-                    [DateTime]$tempEndDate = ((Get-Date).ToUniversalTime().AddDays(-($EndRead - 1))).Date
+                    [DateTime]$tempEndDate = ((Get-Date).ToUniversalTime().AddDays( - ($EndRead - 1))).Date
                 }
 
                 if ($StartDate -gt $tempEndDate) {
-                    Out-LogFile -string "End date must be more recent than start date ($StartDate)." -isError
+                    Out-LogFile -string "End date must be more recent than start date ($StartDate)" -isError
                     continue
                 }
 
@@ -459,9 +464,10 @@
             if ($null -eq ($EndRead -as [DateTime])) {
                 if ([string]::IsNullOrEmpty($EndRead)) {
                     [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
-                } else {
+                }
+                else {
                     Out-LogFile -string "End Date: $EndRead days." -Information
-                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays(-($EndRead - 1))).Date
+                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays( - ($EndRead - 1))).Date
                 }
 
                 if ($StartDate -gt $EndDate) {
@@ -501,7 +507,7 @@
         if ($StartDays -gt 0) {
             # Recalculate StartDate based on EndDate = $EndDate and StartDays = $StartDays
             Out-LogFile -string "End date set to midnight UTC of next day to include all data from $($EndDate.AddDays(-1).Date.ToString('yyyy-MM-dd'))Z" -Information
-            $StartDate = $EndDate.ToUniversalTime().AddDays(-$StartDays).Date
+            $StartDate = $EndDate.AddDays(-1).AddDays(-$StartDays).Date
 
             # (Optional) Additional validations again if necessary:
             if ($StartDate -gt (Get-Date).ToUniversalTime()) {
@@ -525,6 +531,9 @@
         if ($OutputPath) {
             Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
         }
+
+
+        
 
         # Continue populating the Hawk object with other properties
         $Hawk.DaysToLookBack = $DaysToLookBack
