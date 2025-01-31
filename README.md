@@ -54,7 +54,7 @@ Hawk offers two main investigation approaches:
 
 - Performs deep-dive analysis into individual user accounts
 - Examines mailbox configurations, inbox rules, and login histories
-- Use `Start-HawkUserInvestigation` to investigate specific users
+- Use `Start-HawkUserInvestigation -UserPrincipleName <user@domain.com>` to investigate specific users
 
 # Understanding Output
 
