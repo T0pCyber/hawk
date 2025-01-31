@@ -101,7 +101,7 @@
 - Created Get-HawkTenantEntraIDAuditLog function, providing the ability to collect the Entra ID Audit log of the defined max of 30 days back from the current date.
 - Created Get-HawkTenantRiskyUsers function to retrieve and analyze users flagged as risky in Microsoft Entra ID.
 - Created Get-HawkTenantRiskDetections function to retrieve and summarize risk detection events from Microsoft Entra ID.
-- Created Get-HawkTenantRiskyServicePrincipals function, providing the ability to retrive and analyst users flagged as risky in Microsoft Entra ID.
+- Created Get-HawkTenantRiskyServicePrincipals function, providing the ability to retrieve and analyst users flagged as risky in Microsoft Entra ID.
 - Added search of Exchange Search Queries to the User Investigation (Get-HawkUserExchangeSearchQuery)
 - Implemented check to verify that an Exchange operation is enabled for auditing before attempting to pull logs
 - Added log pull of user Send activity to the User Investigation (Get-HawkUserMailSendActivity)
