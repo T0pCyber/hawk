@@ -18,7 +18,7 @@
 	Copyright          = 'Copyright (c) 2025 Paul Navarro'
 
 	# Description of the functionality provided by this module
-	Description        = 'A free, open-source Microsoft Cloud forensics PowerShell module for incident response and threat hunting. 
+	Description        = 'A free, open-source forensics PowerShell module for conducting incident response and threat hunting of Microsoft Cloud environments. 
     Hawk streamlines the collection of forensic data from Microsoft 365 and Entra ID environments to help security professionals, 
     incident responders, and administrators quickly gather critical log data and identify potential security concerns. 
     While it includes basic analysis capabilities to flag items of interest, it focuses on efficient data collection rather than automated detection.'
