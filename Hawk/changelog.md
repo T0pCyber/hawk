@@ -89,7 +89,7 @@
 - Updated Change Log URI.
 - Removed improperly formatted JSON from Get-HawkTenantAdminInboxRuleHistory, Get-HawkTenantAdminInboxRuleRemoval, Get-HawkTenantRBACChange, Get-HawkUserAdminAudit, Search-HawkTenantEXOAuditLog
 
-## 3.X.X (2025-X-XX)
+## 4.0 (2025-2-XX)
 
 - Implemented UTC timestamps to avoid using local timestamps
 - Implemented PROMPT tag to display to screen when prompting user
