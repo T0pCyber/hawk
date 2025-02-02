@@ -12,5 +12,7 @@
         'PSAvoidUsingWriteHost'
         # Exclude this to allow plural nouns in cmdlet names
         'PSUseSingularNouns'
+        # Exclude this to allow test assignments to $PSBoundParameters for mocking
+        'PSAvoidAssignmentToAutomaticVariable'
     )
 }

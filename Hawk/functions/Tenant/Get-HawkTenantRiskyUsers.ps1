@@ -65,7 +65,7 @@ Function Get-HawkTenantRiskyUsers {
 
             Out-LogFile ("Total risky users found: " + $riskyUsers.Count) -Information
             
-            # Define risk level order
+            # Define risk level order for consistent sorting
             $riskOrder = @{
                 'high' = 1
                 'medium' = 2
@@ -82,15 +82,13 @@ Function Get-HawkTenantRiskyUsers {
                 Out-LogFile ("- $($level.Count) users at Risk Level '${capitalizedName}'") -Information
             }
             
-            
-            
             # Export all risky users
             $riskyUsers | Out-MultipleFileType -FilePrefix "RiskyUsers" -csv -json
 
             # Flag high risk users for investigation
+            # Only includes users with high risk level or confirmed compromise state
             $highRiskUsers = $riskyUsers | Where-Object { 
                 $_.RiskLevel -eq 'high' -or
-                $_.RiskState -eq 'atRisk' -or
                 $_.RiskState -eq 'confirmedCompromised'
             }
 

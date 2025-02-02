@@ -45,7 +45,7 @@ Function Write-HawkBanner {
 ========================================
                              
 Microsoft Cloud Security Analysis Tool
-https://cloudforensicator.com
+https://hawkforensics.io
 
 ========================================
 

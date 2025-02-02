@@ -1,5 +1,5 @@
 ﻿Function Start-HawkUserInvestigation {
-    <#
+	<#
     .SYNOPSIS
         Performs a comprehensive user-specific investigation using Hawk's automated data collection capabilities.
 
@@ -88,7 +88,7 @@
         Investigates all users with CustomAttribute1="C-level" for January 2024.
         Runs in non-interactive mode because multiple parameters were specified.
     .LINK
-        https://cloudforensicator.com
+        https://hawkforensics.io
 
     .LINK
         https://github.com/T0pCyber/hawk
@@ -106,7 +106,7 @@
 	)
 
 	begin {
-        $NonInteractive = Test-HawkNonInteractiveMode -PSBoundParameters $PSBoundParameters
+		$NonInteractive = Test-HawkNonInteractiveMode -PSBoundParameters $PSBoundParameters
 
 		if ($NonInteractive) {
 			$processedDates = Test-HawkDateParameter -PSBoundParameters $PSBoundParameters -StartDate $StartDate -EndDate $EndDate -DaysToLookBack $DaysToLookBack
@@ -149,8 +149,6 @@
 			Out-LogFile "Starting User Investigation" -Action
 			Send-AIEvent -Event "CmdRun"
 	
-			# Pull the tenant configuration
-			Get-HawkTenantConfiguration
 	
 			# Verify the UPN input
 			[array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
@@ -227,16 +225,12 @@
 					Get-HawkUserMobileDevice -User $User
 				}
 
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserSharePointSearchQuery for $User")) {
-					Out-LogFile "Running Get-HawkUserSharePointSearchQuery" -Action
-					Get-HawkUserSharePointSearchQuery -UserPrincipalName $User
-				}
 			}
 		}
 
 	} end {
-        # Calculate end time and display summary
-        $investigationEndTime = Get-Date
+		# Calculate end time and display summary
+		$investigationEndTime = Get-Date
 		Write-HawkInvestigationSummary -StartTime $investigationStartTime -EndTime $investigationEndTime -InvestigationType 'User' -UserPrincipalName $UserPrincipalName
 	}
 
