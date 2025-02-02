@@ -71,15 +71,22 @@ if ($TestGeneral)
 $global:__pester_data.ScriptAnalyzer | Out-Host
 
 #region Test Commands
+#region Test Commands
 if ($TestFunctions)
 {
 	Write-PSFMessage -Level Important -Message "Proceeding with individual tests"
-	foreach ($file in (Get-ChildItem "$PSScriptRoot\functions" -Recurse -File | Where-Object Name -like "*Tests.ps1"))
+	    # Get both regular and internal function tests
+	$testFiles = @(
+		Get-ChildItem "$PSScriptRoot\functions" -Recurse -File | Where-Object Name -like "*Tests.ps1"
+		Get-ChildItem "$PSScriptRoot\internal\functions" -Recurse -File | Where-Object Name -like "*Tests.ps1"
+	)
+	foreach ($file in $testFiles)
 	{
 		if ($file.Name -notlike $Include) { continue }
 		if ($file.Name -like $Exclude) { continue }
 
-		Write-PSFMessage -Level Significant -Message "  Executing $($file.Name)"
+		# Changed to match the format of general tests output
+		Write-PSFMessage -Level Significant -Message "  Executing <c='em'>$($file.Name)</c>"
 		$config.TestResult.OutputPath = Join-Path "$PSScriptRoot\..\..\TestResults" "TEST-$($file.BaseName).xml"
 		$config.Run.Path = $file.FullName
 		$config.Run.PassThru = $true

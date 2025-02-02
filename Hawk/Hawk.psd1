@@ -1,26 +1,27 @@
-﻿@{
+@{
 	# Script module or binary module file associated with this manifest
 	RootModule         = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion      = '3.2.4'
+	ModuleVersion      = '4.0'
 
 	# ID used to uniquely identify this module
 	GUID               = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
 
 	# Author of this module
-	Author             = 'Paul Navarro, Jonathan Butler'
+	Author             = 'Paul Navarro, Jonathan Butler, Lorenzo Ireland, Julius Perez'
 
 	# Company or vendor of this module
-	CompanyName        = 'Cloud Forensicator'
+	CompanyName        = 'Hawk Forensics'
 
 	# Copyright statement for this module
 	Copyright          = 'Copyright (c) 2025 Paul Navarro'
 
 	# Description of the functionality provided by this module
-	Description        = 'Microsoft 365 Incident Response and Threat Hunting PowerShell tool.
-	The Hawk is designed to ease the burden on M365 administrators who are performing Cloud forensic tasks for their organization.
-	It accelerates the gathering of data from multiple sources in the service that be used to quickly identify malicious presence and activity.'
+	Description        = 'A free, open-source forensics PowerShell module for conducting incident response and threat hunting of Microsoft Cloud environments. 
+    Hawk streamlines the collection of forensic data from Microsoft 365 and Entra ID environments to help security professionals, 
+    incident responders, and administrators quickly gather critical log data and identify potential security concerns. 
+    While it includes basic analysis capabilities to flag items of interest, it focuses on efficient data collection rather than automated detection.'
 
 	# Minimum version of the Windows PowerShell engine required by this module
 	PowerShellVersion  = '5.0'
@@ -56,7 +57,7 @@
 	'Get-HawkTenantConsentGrant',
 	'Get-HawkTenantRBACChange',
 	'Get-HawkTenantAzureAppAuditLog',
-	'Get-HawkUserAuthHistory',
+	'Get-HawkUserUALSignInLog',
 	'Get-HawkUserConfiguration',
 	'Get-HawkUserEmailForwarding',
 	'Get-HawkUserInboxRule',
@@ -72,7 +73,6 @@
 	'Start-HawkUserInvestigation',
 	'Update-HawkModule',
 	'Get-HawkUserAdminAudit',
-	'Get-HawkTenantAuditLog',
 	'Get-HawkTenantAuthHistory',
 	'Get-HawkUserHiddenRule',
 	'Get-HawkMessageHeader',
@@ -85,10 +85,17 @@
 	'Get-HawkTenantMailItemsAccessed',
 	'Get-HawkUserMailItemsAccessed',
 	'Get-HawkUserExchangeSearchQuery',
+	'Get-HawkUserMailSendActivity',
 	'Get-HawkTenantAppAndSPNCredentialDetail',
 	'Get-HawkTenantEntraIDUser',
 	'Get-HawkTenantDomainActivity',
-	'Get-HawkTenantEDiscoveryLog'
+	'Get-HawkTenantEDiscoveryLog',
+	'Get-HawkUserSharePointSearchQuery',
+	'Get-HawkUserEntraIDSignInLog',
+	'Get-HawkTenantEntraIDAuditLog',
+	'Get-HawkTenantRiskyUsers',
+	'Get-HawkTenantRiskDetections',
+	'Get-HawkTenantRiskyServicePrincipals'
 
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''

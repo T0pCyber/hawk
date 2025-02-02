@@ -1,5 +1,5 @@
 ﻿Function Start-HawkUserInvestigation {
-    <#
+	<#
     .SYNOPSIS
         Performs a comprehensive user-specific investigation using Hawk's automated data collection capabilities.
 
@@ -95,7 +95,7 @@
         Investigates all users with CustomAttribute1="C-level" for January 2024.
         Runs in non-interactive mode because multiple parameters were specified.
     .LINK
-        https://cloudforensicator.com
+        https://hawkforensics.io
 
     .LINK
         https://github.com/T0pCyber/hawk
@@ -113,7 +113,7 @@
 	)
 
 	begin {
-        $NonInteractive = Test-HawkNonInteractiveMode -PSBoundParameters $PSBoundParameters
+		$NonInteractive = Test-HawkNonInteractiveMode -PSBoundParameters $PSBoundParameters
 
 		if ($NonInteractive) {
 			$processedDates = Test-HawkDateParameter -PSBoundParameters $PSBoundParameters -StartDate $StartDate -EndDate $EndDate -DaysToLookBack $DaysToLookBack
@@ -167,13 +167,13 @@
 		} else {
 			Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to FALSE!" -Information
 		}
+		$investigationStartTime = Get-Date
+
 
 		if ($PSCmdlet.ShouldProcess("Investigating Users")) {
-			Out-LogFile "Investigating Users" -Action
+			Out-LogFile "Starting User Investigation" -Action
 			Send-AIEvent -Event "CmdRun"
 	
-			# Pull the tenant configuration
-			Get-HawkTenantConfiguration
 	
 			# Verify the UPN input
 			[array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
@@ -200,6 +200,11 @@
 					Out-LogFile "Running Get-HawkUserAutoReply" -Action
 					Get-HawkUserAutoReply -User $User
 				}
+
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEntraIDSignInLog for $User")) {
+					Out-LogFile "Running Get-HawkUserEntraIDSignInLog" -Action
+					Get-HawkUserEntraIDSignInLog -UserPrincipalName $User
+				}
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAuthHistory for $User")) {
 					Out-LogFile "Running Get-HawkUserAuthHistory" -Action
@@ -213,6 +218,9 @@
 						Out-LogFile "Calling Get-HawkUserAuthHistory WITHOUT ResolveIPLocations enabled." -Information
 						Get-HawkUserAuthHistory -User $User
 					}
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
+					Out-LogFile "Running Get-HawkUserUALSignInLog" -Action
+					Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
 				}
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
@@ -234,17 +242,33 @@
 					Out-LogFile "Running Get-HawkUserMailItemsAccessed" -Action
 					Get-HawkUserMailItemsAccessed -UserPrincipalName $User
 				}
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserExchangeSearchQuery for $User")) {
+					Out-LogFile "Running Get-HawkUserExchangeSearchQuery" -Action
+					Get-HawkUserExchangeSearchQuery -UserPrincipalName $User
+				}
+
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailSendActivity for $User")) {
+					Out-LogFile "Running Get-HawkUserMailSendActivity" -Action
+					Get-HawkUserMailSendActivity -UserPrincipalName $User
+				}
+
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserSharePointSearchQuery for $User")) {
+					Out-LogFile "Running Get-HawkUserSharePointSearchQuery" -Action
+					Get-HawkUserSharePointSearchQuery -UserPrincipalName $User
+				}
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMobileDevice for $User")) {
 					Out-LogFile "Running Get-HawkUserMobileDevice" -Action
 					Get-HawkUserMobileDevice -User $User
 				}
+
 			}
 		}
-	}
-	end {
-		Out-LogFile "User investigation completed, clearning global environment variables" -Information
-		Clear-HawkEnvironment
+
+	} end {
+		# Calculate end time and display summary
+		$investigationEndTime = Get-Date
+		Write-HawkInvestigationSummary -StartTime $investigationStartTime -EndTime $investigationEndTime -InvestigationType 'User' -UserPrincipalName $UserPrincipalName
 	}
 
 }

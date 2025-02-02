@@ -1,4 +1,4 @@
-﻿Function Get-HawkUserAuthHistory {
+﻿Function Get-HawkUserUALSignInLog {
 <#
 .SYNOPSIS
     Gathers ip addresses that logged into the user account
@@ -22,13 +22,13 @@
     Description: All authentication activity for the user in a more readable form
 .EXAMPLE
 
-    Get-HawkUserAuthHistory -UserPrincipalName user@contoso.com -ResolveIPLocations
+    Get-HawkUserUALSignInLog -UserPrincipalName user@contoso.com -ResolveIPLocations
 
     Gathers authentication information for user@contoso.com.
     Attempts to resolve the IP locations for all authentication IPs found.
 .EXAMPLE
 
-    Get-HawkUserAuthHistory -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"}) -ResolveIPLocations
+    Get-HawkUserUALSignInLog -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"}) -ResolveIPLocations
 
     Gathers authentication information for all users that have "C-Level" set in CustomAttribute1
     Attempts to resolve the IP locations for all authentication IPs found.
