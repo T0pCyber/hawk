@@ -71,15 +71,15 @@ Function Get-HawkTenantRiskDetections {
             
             # Define risk level order
             $riskOrder = @{
-                'high' = 1
+                'high'   = 1
                 'medium' = 2
-                'low' = 3
-                'none' = 4
+                'low'    = 3
+                'none'   = 4
             }
             
             # Log summary of detections by risk level
             $riskLevels = $processedDetections | Group-Object -Property RiskLevel | 
-                Sort-Object -Property { $riskOrder[$_.Name] }
+            Sort-Object -Property { $riskOrder[$_.Name] }
             
             foreach ($level in $riskLevels) {
                 $capitalizedName = $level.Name.Substring(0, 1).ToUpper() + $level.Name.Substring(1).ToLower()
@@ -106,7 +106,7 @@ Function Get-HawkTenantRiskDetections {
                 }
 
                 # Export flattened high risk detections for investigation
-                $highRiskDetections | Out-MultipleFileType -FilePrefix "_Investigate_HighDetections" -csv -json -Notice
+                $highRiskDetections | Out-MultipleFileType -FilePrefix "_Investigate_High_Risk_Detections" -csv -json -Notice
             }
         }
         catch {
