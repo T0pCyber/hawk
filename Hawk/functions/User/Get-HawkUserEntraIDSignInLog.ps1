@@ -1,57 +1,47 @@
 Function Get-HawkUserEntraIDSignInLog {
     <#
     .SYNOPSIS
-        Retrieves medium and high-risk Microsoft Entra ID sign-in logs for specific users using Microsoft Graph.
-
+        Retrieves Microsoft Entra ID sign-in logs for specified users from the most recent 14 days.
+    
     .DESCRIPTION
-        This function collects sign-in logs from Microsoft Entra ID (formerly Azure AD) for specified users via the Microsoft Graph API. 
-        It identifies risky sign-ins that were marked as medium or high risk during sign-in or after aggregated risk analysis.
-
-        Key Features:
-        - Automatically handles pagination for large data sets.
-        - Exports data in both CSV and JSON formats for analysis.
-        - Filters and highlights medium and high-risk sign-ins.
-        - Groups sign-in data by risk levels for easier review.
-        - Utilizes the configured Hawk date range for investigation.
-
-        Improvements in this version:
-        - Added standardized JSON output for sign-in logs.
-        - Enhanced grouping and reporting of risk levels.
-        - Logs grouped data for both "RiskLevelDuringSignIn" and "RiskLevelAggregated".
-
+        This function retrieves sign-in logs from Microsoft Entra ID (formerly Azure AD) for specified users.
+        Due to Microsoft Graph API limitations, this function can only retrieve logs from the past 14 days
+        or less. If you specify a longer time range, the function will automatically use only the most 
+        recent 14 days of data from your specified end date.
+    
+        The function analyzes sign-in patterns to identify:
+        - Risky sign-ins based on Microsoft's detection
+        - Both real-time and aggregated risk levels
+        - Risk level distributions and trends
+    
     .PARAMETER UserPrincipalName
-        Accepts one or more User Principal Names (UPNs) as input.
-        Input can be:
-        - A single UPN (e.g., user@contoso.com)
-        - A comma-separated list of UPNs
-        - An array of objects containing UPNs
-
+        Specifies which users to investigate. Accepts:
+        - Single user: "user@contoso.com"
+        - Multiple users: @("user1@contoso.com", "user2@contoso.com")
+        - Object array: (Get-Mailbox -Filter {CustomAttribute1 -eq "VIP"})
+    
     .OUTPUTS
-        Files:
-            - EntraSignInLog_<User>.csv
-            - EntraSignInLog_<User>.json
-        Path:
-            - Saved under the corresponding user's folder.
-        Description:
-            - Sign-in logs highlighting medium and high-risk entries for the specified users.
-
+        Creates the following files in the user's output directory:
+        - EntraSignInLog_[user].csv - All sign-in data in CSV format
+        - EntraSignInLog_[user].json - All sign-in data in JSON format
+    
+        Note: Only contains data from the most recent 14 days relative to the specified end date.
+    
     .EXAMPLE
-        Get-HawkUserEntraIDSignInLog -UserPrincipalName user@contoso.com
-        Retrieves sign-in logs for the specified user and flags medium and high-risk sign-ins.
-
+        Get-HawkUserEntraIDSignInLog -UserPrincipalName "user@contoso.com"
+    
+        Gets the most recent 14 days of sign-in logs for user@contoso.com.
+    
     .EXAMPLE
-        Get-HawkUserEntraIDSignInLog -UserPrincipalName "user1@contoso.com","user2@contoso.com"
-        Retrieves sign-in logs for multiple users and exports results for each user.
-
+        Get-HawkUserEntraIDSignInLog -UserPrincipalName (Get-Mailbox -Filter {CustomAttribute1 -eq "VIP"})
+    
+        Gets the most recent 14 days of sign-in logs for all VIP users.
+    
     .NOTES
-        Dependencies:
-            - Requires the Microsoft.Graph.Authentication module.
-            - Requires Microsoft Graph permissions: AuditLog.Read.All.
-
-        Known Limitations:
-            - The function relies on the configured Hawk date range and cannot retrieve logs beyond Microsoft Graph's 30-day limit.
-            - Ensure appropriate permissions are granted to the connected Microsoft Graph app.
-
+        Due to Microsoft Graph API limitations:
+        - Can only retrieve up to 14 days of historical data
+        - Longer date ranges will be automatically adjusted
+        - Data outside the 14-day window is not available through this API
     #>
     [CmdletBinding()]
     param (
@@ -71,6 +61,27 @@ Function Get-HawkUserEntraIDSignInLog {
         
         # Track overall success
         $global:processSuccess = $true
+
+        # Calculate date range - limit to 2 weeks from end date
+        $endDateUtc = $Hawk.EndDate.ToUniversalTime()
+        $twoWeeksAgo = $endDateUtc.AddDays(-14)
+        $requestedStart = $Hawk.StartDate.ToUniversalTime()
+        
+        # Compare dates manually since PowerShell doesn't have DateTime.Max
+        $effectiveStartDate = if ($requestedStart -gt $twoWeeksAgo) {
+            $requestedStart
+        } else {
+            $twoWeeksAgo
+        }
+
+        # Notify user about 14-day limit and any date adjustment
+        Out-LogFile "Hawk Entra ID Sign-in logs is limited to the most recent 14 days" -Information
+        
+        if ($Hawk.StartDate.ToUniversalTime() -lt $twoWeeksAgo) {
+            Out-LogFile "Your requested date range exceeds this limit. Data will only be available from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
+        } else {
+            Out-LogFile "Retrieving data from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
+        }
     }
 
     PROCESS {
@@ -80,8 +91,13 @@ Function Get-HawkUserEntraIDSignInLog {
             try {
                 Out-LogFile ("Retrieving sign-in logs for " + $User) -Action
 
-                # Create date filter using Hawk dates
-                $startDateUtc = $Hawk.StartDate.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+                # Use adjusted date range and ensure we have valid dates
+                $startDateUtc = if ($effectiveStartDate) {
+                    $effectiveStartDate.ToString('yyyy-MM-ddTHH:mm:ssZ')
+                } else {
+                    $twoWeeksAgo.ToString('yyyy-MM-ddTHH:mm:ssZ')
+                }
+                
                 $endDateUtc = $Hawk.EndDate.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
                 
                 # Combine user and date filters
@@ -109,8 +125,8 @@ Function Get-HawkUserEntraIDSignInLog {
 
                     # Check for risky sign-ins
                     $riskySignIns = $signInLogs | Where-Object {
-                        $_.RiskLevelDuringSignIn -in @('high', 'medium', 'low') -or
-                        $_.RiskLevelAggregated -in @('high', 'medium', 'low')
+                        $_.RiskLevelDuringSignIn -in @('high', 'medium') -or
+                        $_.RiskLevelAggregated -in @('high', 'medium')
                     }
 
                     if ($riskySignIns.Count -gt 0) {
@@ -119,18 +135,18 @@ Function Get-HawkUserEntraIDSignInLog {
                         
                         # Group and report risk levels
                         $duringSignIn = $riskySignIns | Group-Object -Property RiskLevelDuringSignIn | 
-                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
+                            Where-Object {$_.Name -in @('high', 'medium')}
                         foreach ($risk in $duringSignIn) {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -silentnotice
                         }
 
                         $aggregated = $riskySignIns | Group-Object -Property RiskLevelAggregated | 
-                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
+                            Where-Object {$_.Name -in @('high', 'medium')}
                         foreach ($risk in $aggregated) {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -silentnotice
                         }
 
-                        Out-LogFile ("Review SignInLog.csv/json in the " + $User + " folder for complete details") -silentnotice
+                        Out-LogFile ("Review EntraSignInLog_$User.csv/json for complete details") -silentnotice
                     }
                 }
                 else {
