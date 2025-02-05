@@ -64,11 +64,13 @@ Function Get-HawkUserEntraIDSignInLog {
             Initialize-HawkGlobalObject
         }
 
-
         Out-LogFile "Gathering Microsoft Entra ID Sign-in Logs" -Action
         Test-GraphConnection
         Send-AIEvent -Event "CmdRun"
         [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
+        
+        # Track overall success
+        $global:processSuccess = $true
     }
 
     PROCESS {
@@ -78,8 +80,12 @@ Function Get-HawkUserEntraIDSignInLog {
             try {
                 Out-LogFile ("Retrieving sign-in logs for " + $User) -Action
 
-                # Filter just on user - get all sign-ins
-                $filter = "userPrincipalName eq '$User'"
+                # Create date filter using Hawk dates
+                $startDateUtc = $Hawk.StartDate.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+                $endDateUtc = $Hawk.EndDate.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+                
+                # Combine user and date filters
+                $filter = "userPrincipalName eq '$User' and createdDateTime ge $startDateUtc and createdDateTime le $endDateUtc"
                 
                 $processedCount = 0
                 $signInLogs = Get-MgAuditLogSignIn -Filter $filter -All -ErrorAction Stop
@@ -132,6 +138,7 @@ Function Get-HawkUserEntraIDSignInLog {
                 }
             }
             catch {
+                $global:processSuccess = $false
                 Out-LogFile ("Error retrieving sign-in logs for " + $User + " : " + $_.Exception.Message) -isError
                 Write-Error -ErrorRecord $_ -ErrorAction Continue
             }
@@ -139,6 +146,10 @@ Function Get-HawkUserEntraIDSignInLog {
     }
 
     END {
-        Out-LogFile "Completed exporting Entra sign-in logs" -Information
+        # Only show completion message if successful
+        if ($global:processSuccess) {
+            Out-LogFile "Completed exporting Entra sign-in logs" -Information
+        }
+        Remove-Variable -Name processSuccess -Scope Global -ErrorAction SilentlyContinue
     }
 }
