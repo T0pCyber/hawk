@@ -31,119 +31,132 @@
     Gathers authentication information for all users that have "C-Level" set in CustomAttribute1
     Attempts to resolve the IP locations for all authentication IPs found.
 #>
-    param
-    (
+    param (
         [Parameter(Mandatory = $true)]
-        [array]$UserPrincipalName,
-        [switch]$ResolveIPLocations
+        [array]$UserPrincipalName
     )
 
-    # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
-        Initialize-HawkGlobalObject
+    BEGIN {
+        if (Test-HawkGlobalObject) {
+            Initialize-HawkGlobalObject
+        }
+
+        Out-LogFile "Gathering Microsoft Entra ID Sign-in Logs" -Action
+        Test-GraphConnection
+        Send-AIEvent -Event "CmdRun"
+        [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
+        
+        # Track overall success
+        $global:processSuccess = $true
+
+        # Configure timeout settings - increase from default 100 seconds to 600 seconds
+        $originalTimeout = [System.Threading.Timeout]::Infinite
+        [Microsoft.Graph.PowerShell.Runtime.RuntimeHandler]::SetDefaultConfiguration((New-GraphRequestConfiguration -Timeout 600000))
     }
 
-
-    Test-EXOConnection
-    Send-AIEvent -Event "CmdRun"
-
-    # Verify our UPN input
-    [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
-    [array]$RecordTypes = "AzureActiveDirectoryAccountLogon", "AzureActiveDirectory", "AzureActiveDirectoryStsLogon"
-
-    foreach ($Object in $UserArray) {
-
-        [string]$User = $Object.UserPrincipalName
-
-        # Make sure our array is null
-        [array]$UserLogonLogs = $null
-
-        Out-LogFile ("Retrieving Logon History for " + $User) -action
-
-        # Get back the account logon logs for the user
-        foreach ($Type in $RecordTypes) {
-            Out-LogFile ("Searching Unified Audit log for Records of type: " + $Type) -action
-            $UserLogonLogs += Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -UserIds " + $User + " -RecordType " + $Type)
-        }
-
-        # Make sure we have results
-        if ($null -eq $UserLogonLogs) {
-            Out-LogFile "No results found when searching UAL for AzureActiveDirectoryAccountLogon events" -isError
-        }
-        else {
-
-            # Expand out the AuditData and convert from JSON
-            Out-LogFile "Converting AuditData" -action
-            $ExpandedUserLogonLogs = $null
-            $ExpandedUserLogonLogs = New-Object System.Collections.ArrayList
-            $FailedConversions = $null
-            $FailedConversions = New-Object System.Collections.ArrayList
-
-            # Process our results in a way to deal with JSON Errors
-            Foreach ($Entry in $UserLogonLogs){
-
-                try {
-                    $jsonEntry = $Entry.AuditData | ConvertFrom-Json
-                    $ExpandedUserLogonLogs.Add($jsonEntry) | Out-Null
-                }
-                catch {
-                    $FailedConversions.Add($Entry) | Out-Null
-                }
-            }
-
-            if ($FailedConversions.Count -le 0) {
-                # Do nothing or handle the zero-case
-            }
-            else {
-                Out-LogFile ("$($FailedConversions.Count) Entries failed JSON Conversion") -isError
-                $FailedConversions | Out-MultipleFileType -FilePrefix "Failed_Conversion_Authentication_Logs" -User $User -Csv -Json
-            }
+    PROCESS {
+        foreach ($Object in $UserArray) {
+            [string]$User = $Object.UserPrincipalName
             
+            try {
+                Out-LogFile ("Retrieving sign-in logs for " + $User) -Action
 
-            # Add IP Geo Location information to the data
-            if ($ResolveIPLocations) {
-                Out-File "Resolving IP Locations"
-                # Setup our counter
-                $i = 0
+                # Create date filter using Hawk dates
+                $startDateUtc = $Hawk.StartDate.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+                $endDateUtc = $Hawk.EndDate.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+                
+                # Combine user and date filters
+                $filter = "userPrincipalName eq '$User' and createdDateTime ge $startDateUtc and createdDateTime le $endDateUtc"
 
-                # Loop thru each connection and get the location
-                while ($i -lt $ExpandedUserLogonLogs.Count) {
-
-                    if ([bool]($i % 25)) { }
-                    Else {
-                        Write-Progress -Activity "Looking Up Ip Address Locations" -CurrentOperation $i -PercentComplete (($i / $ExpandedUserLogonLogs.count) * 100)
+                # Initialize collection for all sign-in logs
+                $allSignInLogs = [System.Collections.ArrayList]@()
+                
+                try {
+                    # Get initial page with smaller page size
+                    $params = @{
+                        Filter = $filter
+                        PageSize = 50  # Smaller page size to avoid timeouts
+                        All = $false   # Handle pagination manually
                     }
 
-                    # Get the location information for this IP address
-                    if($ExpandedUserLogonLogs.item($i).clientip){
-                    $Location = Get-IPGeolocation -ipaddress $ExpandedUserLogonLogs.item($i).clientip
-                    }
-                    else {
-                        $Location = "IP Address Null"
-                    }
+                    do {
+                        $currentBatch = Get-MgAuditLogSignIn @params
+                        
+                        if ($currentBatch) {
+                            $allSignInLogs.AddRange($currentBatch)
+                            
+                            # Update progress
+                            Write-Progress -Activity "Retrieving Entra Sign-in Logs" `
+                                -Status "Retrieved $($allSignInLogs.Count) logs" `
+                                -PercentComplete -1
+                        }
 
-                    # Combine the connection object and the location object so that we have a single output ready
-                    $ExpandedUserLogonLogs.item($i) = ($ExpandedUserLogonLogs.item($i) | Select-Object -Property *, @{Name = "CountryName"; Expression = { $Location.CountryName } }, @{Name = "RegionCode"; Expression = { $Location.RegionCode } }, @{Name = "RegionName"; Expression = { $Location.RegionName } }, @{Name = "City"; Expression = { $Location.City } }, @{Name = "KnownMicrosoftIP"; Expression = { $Location.KnownMicrosoftIP } })
+                        # Get next page link if available
+                        $params = @{}
+                        if ($currentBatch.'@odata.nextLink') {
+                            $params['Next'] = $true
+                        }
+                    } while ($params.Count -gt 0 -and $currentBatch.'@odata.nextLink')
 
-                    # increment our counter for the progress bar
-                    $i++
+                } catch {
+                    Out-LogFile ("Error during pagination for $User : " + $_.Exception.Message) -isError
+                    throw  # Re-throw to be caught by outer try-catch
                 }
 
-                Write-Progress -Completed -Activity "Looking Up Ip Address Locations" -Status " "
+                Write-Progress -Activity "Retrieving Entra Sign-in Logs" -Completed
+
+                if ($allSignInLogs.Count -gt 0) {
+                    Out-LogFile ("Retrieved " + $allSignInLogs.Count + " sign-in log entries for " + $User) -Information
+
+                    # Write all logs to CSV/JSON
+                    $allSignInLogs | Out-MultipleFileType -FilePrefix "EntraSignInLog_$User" -User $User -csv -json
+
+                    # Check for risky sign-ins
+                    $riskySignIns = $allSignInLogs | Where-Object {
+                        $_.RiskLevelDuringSignIn -in @('high', 'medium', 'low') -or
+                        $_.RiskLevelAggregated -in @('high', 'medium', 'low')
+                    }
+
+                    if ($riskySignIns.Count -gt 0) {
+                        # Flag for investigation
+                        Out-LogFile ("Found " + $riskySignIns.Count + " risky sign-ins for " + $User) -notice
+                        
+                        # Group and report risk levels
+                        $duringSignIn = $riskySignIns | Group-Object -Property RiskLevelDuringSignIn | 
+                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
+                        foreach ($risk in $duringSignIn) {
+                            Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -silentnotice
+                        }
+
+                        $aggregated = $riskySignIns | Group-Object -Property RiskLevelAggregated | 
+                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
+                        foreach ($risk in $aggregated) {
+                            Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -silentnotice
+                        }
+
+                        Out-LogFile ("Review SignInLog.csv/json in the " + $User + " folder for complete details") -silentnotice
+                    }
+                }
+                else {
+                    Out-LogFile ("No sign-in logs found for " + $User + " in the specified time period") -Information
+                }
             }
-            else {
-                Out-LogFile "ResolveIPLocations not specified" -Information
+            catch {
+                $global:processSuccess = $false
+                Out-LogFile ("Error retrieving sign-in logs for " + $User + " : " + $_.Exception.Message) -isError
+                Write-Error -ErrorRecord $_ -ErrorAction Continue
             }
-
-            # Convert to human readable and export
-            Out-LogFile "Converting to Human Readable" -action
-            (Import-AzureAuthenticationLog -JsonConvertedLogs $ExpandedUserLogonLogs) | Out-MultipleFileType -fileprefix "Converted_Authentication_Logs" -User $User -csv -json
-
-            # Export RAW data
-            $UserLogonLogs | Out-MultipleFileType -fileprefix "Raw_Authentication_Logs" -user $User -csv -json
-
         }
     }
 
+    END {
+        # Reset timeout to original value
+        [Microsoft.Graph.PowerShell.Runtime.RuntimeHandler]::SetDefaultConfiguration((New-GraphRequestConfiguration -Timeout $originalTimeout))
 
+        # Only show completion message if successful
+        if ($global:processSuccess) {
+            Out-LogFile "Completed exporting Entra sign-in logs" -Information
+        }
+        Remove-Variable -Name processSuccess -Scope Global -ErrorAction SilentlyContinue
+    }
 }
