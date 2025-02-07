@@ -23,6 +23,7 @@ Function Get-IPGeolocation {
         # Read in existing HawkAppData
         if (!([bool](Get-Variable HawkAppData -ErrorAction SilentlyContinue))) {
             Read-HawkAppData
+            [string]$AccessKeyOnFile = $HawkAppData.access_key
         }
     }
 
@@ -30,7 +31,7 @@ Function Get-IPGeolocation {
         # MOVE THIS IPSTACK API CODE CHECK TO Get-HawkUserAuthHistory within the ResolveIPLocations block!!
         try {
             # if there is no value of access_key then we need to get it from the user
-            if ([string]::IsNullOrEmpty($HawkAppData.access_key)) {
+            if ([string]::IsNullOrEmpty($AccessKeyFromFile)) {
 
                 Out-LogFile "IpStack.com now requires an API access key to gather GeoIP information from their API." -Information
                 Out-LogFile "Please get a Free access key from https://ipstack.com/ and provide it below." -Information
@@ -41,42 +42,65 @@ Function Get-IPGeolocation {
                 Out-LogFile "Provide your IP Stack API key: " -isPrompt -NoNewLine
                 $AccessKey = (Read-Host).Trim() 
 
-                # Validate key format (basic check)
-                if ([string]::IsNullOrWhiteSpace($AccessKey)) {
-                    Out-LogFile "API key cannot be empty or whitespace." -isError
-                    throw "API key cannot be empty or whitespace."
+                # TEST FOR EMPTY STRING BEFORE CALLING TEST-GEOIPAPIKEY
+                # Check for empty string or null entered by the user.
+                if ([string]::IsNullOrEmpty($AccessKey)) {
+                    Out-LogFile "Failed to update IP Stack API key: Cannot bind argument to parameter 'Key' because it is an empty string." -isError
+                    throw "Failed to update IP Stack API key: Cannot bind argument to parameter 'Key' because it is an empty string."
                 }
+                $IsValidAccessKey = Test-GeoIPAPIKey -Key $AccessKey
 
-                # Geo IP location is requested, validate the key first (using Google DNS).
-                if ($AccessKey) {
-                    Out-LogFile "Testing API key against Google DNS..." -Action 
-                    $testUrl = "http://api.ipstack.com/8.8.8.8?access_key=$AccessKey"
-                    
-                    try {
-                        $response = Invoke-RestMethod -Uri $testUrl -Method Get
-                        if ($response.success -eq $false) {
-                            Out-LogFile "API key validation failed: $($response.error.info)" -isError
-                            throw "API key validation failed: $($response.error.info)"
-                        }
-                        Out-LogFile "API key validated successfully!" -Information
-
-                        # Save to disk (C:\Users\%USERPROFILE%\AppData\Local\Hawk\Hawk.json)
-                        Out-HawkAppData
-                    }
-                    catch {
-                        Out-LogFile "API key validation failed: $_" -isError
-                        throw "API key validation failed: $_"
-
-                    }
-                }
-
-                # The ipstack API key is valid. Add the access key to the appdata file
-                Add-HawkAppData -name access_key -Value $AccessKey
             }
-            else {
+
+            if (![string]::IsNullOrEmpty($AccessKeyFromFile)) {
+                try {
+                    if (Test-GeoIPAPIKey -Key $AccessKeyFromFile) {
+                        $AccessKey = $AccessKeyFromFile
+                        $IsValidAccessKey = $true
+                    }
+                } catch {
+                    Out-LogFile "API key is malformed!" -isError
+                    throw "API key validation failed: $($response.error.info)"
+                }
+
+            }
+
+            # Validate key format (basic check)
+            #if ([string]::IsNullOrWhiteSpace($AccessKey)) {
+            #    Out-LogFile "API key cannot be empty or whitespace." -isError
+            #    throw "API key cannot be empty or whitespace."
+            #}
+
+            # Geo IP location is requested, validate the key first (using Google DNS).
+            if ($IsValidAccessKey) {
+                Out-LogFile "Testing API key against Google DNS..." -Action 
+                $testUrl = "http://api.ipstack.com/8.8.8.8?access_key=$AccessKey"
+                
+                try {
+                    $response = Invoke-RestMethod -Uri $testUrl -Method Get
+                    if ($response.success -eq $false) {
+                        Out-LogFile "API key validation failed: $($response.error.info)" -isError
+                        throw "API key validation failed: $($response.error.info)"
+                    }
+                    Out-LogFile "API key validated successfully!" -Information
+
+                    # Save to disk (C:\Users\%USERPROFILE%\AppData\Local\Hawk\Hawk.json)
+                    # PROMPT USER TO SEE IF THEY WANT TO WRITE API KEY TO DISK (PLAINTEXT)
+                    # The ipstack API key is valid. Add the access key to the appdata file
+                    Add-HawkAppData -name access_key -Value $AccessKey
+                    Out-HawkAppData
+                }
+                catch {
+                    Out-LogFile "API key validation failed: $_" -isError
+                    throw "API key validation failed: $_"
+
+                }
+            }
+            
+            #else {
                 # API Key is already exists from the appdata file (Hawk\Hawk.json)
-                $AccessKey = $HawkAppData.access_key
-            }
+            #    $AccessKey = $HawkAppData.access_key
+            #}
         }
         catch {
             Out-LogFile "Failed to update IP Stack API key: $_" -isError
