@@ -71,7 +71,7 @@ Function Get-IPGeolocation {
                             # This is to ensure the user doesn't get prompted to save a key that is already on disk
                             $IsExistingValidAccessKey = $true
                             Out-LogFile "Using existing API key from disk." -Information
-                            break # USE RETURN OR BREAK!!!!
+                            break
                         }
                         
                     }
@@ -103,12 +103,6 @@ Function Get-IPGeolocation {
             throw "An unexpected error occurred: $_"
         }
 
-        # Validate key format (basic check)
-        #if ([string]::IsNullOrWhiteSpace($AccessKey)) {
-        #    Out-LogFile "API key cannot be empty or whitespace." -isError
-        #    throw "API key cannot be empty or whitespace."
-        #}
-
         # Geo IP location is requested, validate the key first (using Google DNS).
         if ($IsValidUserEnteredAccessKey -or $IsExistingValidAccessKey) {
             Out-LogFile "Testing API key against Google DNS..." -Action 
@@ -135,7 +129,7 @@ Function Get-IPGeolocation {
 
                         # Display warning banner about storage location
                         $appDataPath = Join-Path $env:LOCALAPPDATA "Hawk\Hawk.json"
-                        Out-LogFile "`nWARNING: Your API key has been saved to: $appDataPath" -Action
+                        Out-LogFile "WARNING: Your API key has been saved to: $appDataPath" -Action
                         Out-LogFile "NOTE: The API key is stored in plaintext format" -Information
                         break
                     }
@@ -144,11 +138,11 @@ Function Get-IPGeolocation {
                         break
                     }
                 }
-                break # TRYING TO PREVENT THE PROMPT OF IP STACK API KEY FROM LOOPING!
+                # We have a valid key from disk and do not need to prompt the user to save what is already saved.
+                break
             }
             catch {
                 Out-LogFile "API key validation failed: $_" -isError
-                #throw "API key validation failed: $_"
                 return
             }
         }
