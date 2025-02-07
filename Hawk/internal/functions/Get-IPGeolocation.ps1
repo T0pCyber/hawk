@@ -111,8 +111,6 @@ Function Get-IPGeolocation {
                     Out-LogFile "API key will not be saved to disk." -Information
                     return
                 }
-                #Add-HawkAppData -name access_key -Value $AccessKey
-                #Out-HawkAppData
             }
             catch {
                 Out-LogFile "API key validation failed: $_" -isError
@@ -121,17 +119,6 @@ Function Get-IPGeolocation {
             }
         }
             
-            #else {
-                # API Key is already exists from the appdata file (Hawk\Hawk.json)
-            #    $AccessKey = $HawkAppData.access_key
-            #}
-        #}
-        #catch {
-        #    Out-LogFile "Failed to update IP Stack API key: $_" -isError
-        #    throw "Failed to update IP Stack API key: $_"
-        #}
-    
-
 
         # Check the global IP cache and see if we already have the IP there
         if ($IPLocationCache.ip -contains $IPAddress) {
