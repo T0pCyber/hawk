@@ -23,13 +23,13 @@ Function Get-IPGeolocation {
         # Read in existing HawkAppData
         if (!([bool](Get-Variable HawkAppData -ErrorAction SilentlyContinue))) {
             Read-HawkAppData
-            [string]$AccessKeyOnFile = $HawkAppData.access_key
+            [string]$AccessKeyFromFile = $HawkAppData.access_key
         }
     }
 
     process {
         try {
-            # If there is no value of access_key then we need to get it from the user
+            # If there is no access_key on disk (file) then we need to get it from the user
             if ([string]::IsNullOrEmpty($AccessKeyFromFile)) {
                 Out-LogFile "IpStack.com now requires an API access key to gather GeoIP information from their API." -Information
                 Out-LogFile "Please get a Free access key from https://ipstack.com/ and provide it below." -Information
@@ -45,9 +45,9 @@ Function Get-IPGeolocation {
                     return
                 }
     
-                # Only test the key if it's not empty
-                $IsValidAccessKey = Test-GeoIPAPIKey -Key $AccessKey
-                if (-not $IsValidAccessKey) {
+                # Test the existing key
+                $IsExistingValidAccessKey = Test-GeoIPAPIKey -Key $AccessKey
+                if (-not $IsExistingValidAccessKey) {
                     Out-LogFile "API key validation failed" -isError
                     return
                 }
@@ -55,9 +55,41 @@ Function Get-IPGeolocation {
             # Handle existing key from file
             elseif (-not [string]::IsNullOrEmpty($AccessKeyFromFile)) {
                 try {
-                    if (Test-GeoIPAPIKey -Key $AccessKeyFromFile) {
-                        $AccessKey = $AccessKeyFromFile
-                        $IsValidAccessKey = $true
+                    # Get last 6 characters of the API key
+                    $maskedKey = "**************************" + $AccessKeyFromFile.Substring($AccessKeyFromFile.Length - 6)
+                    
+                    # Prompt user about using existing key
+                    Out-LogFile "Found existing API key ending in: $maskedKey" -Information
+                    Out-LogFile "Would you like to use this existing key? (Y/N): " -isPrompt -NoNewLine
+                    $useExistingKey = (Read-Host).Trim().ToUpper()
+
+                    if ($useExistingKey -eq 'Y') {
+                        if (Test-GeoIPAPIKey -Key $AccessKeyFromFile) {
+                            # Set the API access key from the file to $AccessKey, which is used to test against IP Stack API.
+                            $AccessKey = $AccessKeyFromFile
+
+                            # This is to ensure the user doesn't get prompted to save a key that is already on disk
+                            $IsExistingValidAccessKey = $true
+                            Out-LogFile "Using existing API key from disk." -Information
+                            break # USE RETURN OR BREAK!!!!
+                        }
+                        
+                    }
+                    else {
+                        # No access key was obtained from the file on disk
+                        # This is to ensure the user doesn't get prompted to save a key that is already on disk
+                        $IsExistingValidAccessKey = $false
+                        Out-LogFile "Please provide a new IP Stack API key: " -isPrompt -NoNewLine
+                        $AccessKey = (Read-Host).Trim()
+                        
+                        # Check for empty string or null entered by the user
+                        if ([string]::IsNullOrEmpty($AccessKey)) {
+                            Out-LogFile "Failed to update IP Stack API key: Cannot bind argument to parameter 'Key' because it is an empty string." -isError
+                            return
+                        }
+
+                        # Test the new key
+                        $IsValidUserEnteredAccessKey = Test-GeoIPAPIKey -Key $AccessKey
                     }
                 }
                 catch {
@@ -68,7 +100,7 @@ Function Get-IPGeolocation {
         }
         catch {
             Out-LogFile "An unexpected error occurred: $_" -isError
-            throw
+            throw "An unexpected error occurred: $_"
         }
 
         # Validate key format (basic check)
@@ -78,7 +110,7 @@ Function Get-IPGeolocation {
         #}
 
         # Geo IP location is requested, validate the key first (using Google DNS).
-        if ($IsValidAccessKey) {
+        if ($IsValidUserEnteredAccessKey -or $IsExistingValidAccessKey) {
             Out-LogFile "Testing API key against Google DNS..." -Action 
             $testUrl = "http://api.ipstack.com/8.8.8.8?access_key=$AccessKey"
             
@@ -86,36 +118,38 @@ Function Get-IPGeolocation {
                 $response = Invoke-RestMethod -Uri $testUrl -Method Get
                 if ($response.success -eq $false) {
                     Out-LogFile "API key validation failed: $($response.error.info)" -isError
-                    return "API key validation failed: $($response.error.info)"
+                    throw "API key validation failed: $($response.error.info)"
                 }
                 Out-LogFile "API key validated successfully!" -Information
 
                 # Save to disk (C:\Users\%USERPROFILE%\AppData\Local\Hawk\Hawk.json)
                 # PROMPT USER TO SEE IF THEY WANT TO WRITE API KEY TO DISK (PLAINTEXT)
-                # The ipstack API key is valid. Add the access key to the appdata file
-                # Prompt user about saving the API key
-                Out-LogFile "Would you like to save your API key to disk? (Y/N): " -isPrompt -NoNewLine
-                $saveChoice = (Read-Host).Trim().ToUpper()
+                # No key is on disk or was omitted AND the user entered a proper functioning IP Stack API access key
+                if (!$IsExistingValidAccessKey -and $IsValidUserEnteredAccessKey) {
+                    Out-LogFile "Would you like to save your API key to disk? (Y/N): " -isPrompt -NoNewLine
+                    $saveChoice = (Read-Host).Trim().ToUpper()
 
-                if ($saveChoice -eq 'Y') {
-                    # Save to disk
-                    Add-HawkAppData -name access_key -Value $AccessKey
+                    if ($saveChoice -eq 'Y') {
+                        # Save to disk
+                        Add-HawkAppData -name access_key -Value $AccessKey
 
-                    # Display warning banner about storage location
-                    $appDataPath = Join-Path $env:LOCALAPPDATA "Hawk\Hawk.json"
-                    Out-LogFile "`nWARNING: Your API key has been saved to: $appDataPath" -Action
-                    Out-LogFile "NOTE: The API key is stored in plaintext format" -Information
-                    return
+                        # Display warning banner about storage location
+                        $appDataPath = Join-Path $env:LOCALAPPDATA "Hawk\Hawk.json"
+                        Out-LogFile "`nWARNING: Your API key has been saved to: $appDataPath" -Action
+                        Out-LogFile "NOTE: The API key is stored in plaintext format" -Information
+                        break
+                    }
+                    else {
+                        Out-LogFile "API key will not be saved to disk." -Information
+                        break
+                    }
                 }
-                else {
-                    Out-LogFile "API key will not be saved to disk." -Information
-                    return
-                }
+                break # TRYING TO PREVENT THE PROMPT OF IP STACK API KEY FROM LOOPING!
             }
             catch {
                 Out-LogFile "API key validation failed: $_" -isError
-                throw "API key validation failed: $_"
-
+                #throw "API key validation failed: $_"
+                return
             }
         }
             
@@ -183,5 +217,6 @@ Function Get-IPGeolocation {
             # Return the result to the user
             return $result
         }
+        return
     }
 }

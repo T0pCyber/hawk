@@ -52,6 +52,12 @@ Function Test-GeoIPAPIKey {
 
     process {
 
+        # Check for empty string or null entered by the user
+        if ([string]::IsNullOrEmpty($Key)) {
+            Out-LogFile "Failed to update IP Stack API key: Cannot bind argument to parameter 'Key' because it is an empty string." -isError
+            return $false
+        }
+
         # Check length is 32 characters
         if ($Key.Length -ne 32) {
             return $false
