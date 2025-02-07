@@ -20,7 +20,7 @@ Function Get-IPGeolocation {
     )
 
     begin {
-        # Read in existing HawkAppData
+        # Read in existing HawkAppData and IP Stack API Access Key
         if (!([bool](Get-Variable HawkAppData -ErrorAction SilentlyContinue))) {
             Read-HawkAppData
             [string]$AccessKeyFromFile = $HawkAppData.access_key
