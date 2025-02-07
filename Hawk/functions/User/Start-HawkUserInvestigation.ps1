@@ -153,6 +153,7 @@
 	process {
 		if (Test-PSFFunctionInterrupt) { return }
 
+		# Be sure to remove comments after testing!
 		if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
 			Initialize-HawkGlobalObject -EnableGeoIPLocation
 			Out-LogFile "START-HAWKUSERINVESTIGATION -> Calling Initialize-HawkGlobalObject with EnableGeoIPLocation" -Information
@@ -206,21 +207,17 @@
 					Get-HawkUserEntraIDSignInLog -UserPrincipalName $User
 				}
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAuthHistory for $User")) {
-					Out-LogFile "Running Get-HawkUserAuthHistory" -Action
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
 					# Two different use cases (interactive and non-interactive) have to be considered here
 					# $Hawk.EnableGeoIPLocation is to account for interactive mode
 					# $PSBoundParameters.ContainsKey('EnableGeoIPLocation') is to account for non-interactive mode
 					if ($Hawk.EnableGeoIPLocation -or $PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
-						Out-LogFile "Calling Get-HawkUserAuthHistory WITH ResolveIPLocations enabled." -Information
-						Get-HawkUserAuthHistory -User $User -ResolveIPLocations
+						Out-LogFile "Running Get-HawkUserUALSignInLog and resolving IP locations" -Action
+						Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
 					} else {
-						Out-LogFile "Calling Get-HawkUserAuthHistory WITHOUT ResolveIPLocations enabled." -Information
-						Get-HawkUserAuthHistory -User $User
+						Out-LogFile "Running Get-HawkUserUALSignInLog without resolving IP locations" -Action
+						Get-HawkUserUALSignInLog -User $User
 					}
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
-					Out-LogFile "Running Get-HawkUserUALSignInLog" -Action
-					Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
 				}
 	
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {

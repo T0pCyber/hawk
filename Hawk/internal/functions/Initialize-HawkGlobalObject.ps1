@@ -530,7 +530,9 @@
 
         }
 
+        # Be sure to remove the two comments below once you're done validating the logic
         # Or if you want to be more specific and check if it was the immediate caller:
+        # I believe the logic is incorrect here. It should be checking if the immediate caller was UserInvestigation
         $wasDirectlyCalledByUserInvestigation = (Get-PSCallStack)[1].FunctionName -eq "Start-HawkUserInvestigation<Begin>"
         Out-LogFile "Was directly called by UserInvestigation: $wasDirectlyCalledByUserInvestigation" -Information
         Out-LogFile (Get-PSCallStack)[1].FunctionName -Information
@@ -556,6 +558,10 @@
                     break
                 }
             }
+        }
+
+        if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
+            $Hawk.EnableGeoIPLocation = $EnableGeoIPLocation
         }
 
 
