@@ -533,6 +533,10 @@
         # Be sure to remove the two comments below once you're done validating the logic
         # Or if you want to be more specific and check if it was the immediate caller:
         # I believe the logic is incorrect here. It should be checking if the immediate caller was UserInvestigation
+        # FIX-ME: modify -eq to startswith bec there are cases where we can have <PROCESS> or <Begin> and we just 
+        # need to account for Start-HawkUserInvestigation getting called!
+        # FIX-ME: Account for the logic case where Get-HawkUserUALSignInLogs is called
+        # ((Get-PSCallStack)[1].FunctionName -contains "Get-HawkUserUALSignInLog") -or (Get-PSCallStack)[1].FunctionName -startswith "Start-HawkUserInvestigation)
         $wasDirectlyCalledByUserInvestigation = (Get-PSCallStack)[1].FunctionName -eq "Start-HawkUserInvestigation<Begin>"
         Out-LogFile "Was directly called by UserInvestigation: $wasDirectlyCalledByUserInvestigation" -Information
         Out-LogFile (Get-PSCallStack)[1].FunctionName -Information
