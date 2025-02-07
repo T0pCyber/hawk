@@ -536,12 +536,13 @@
         # FIX-ME: modify -eq to startswith bec there are cases where we can have <PROCESS> or <Begin> and we just 
         # need to account for Start-HawkUserInvestigation getting called!
         # FIX-ME: Account for the logic case where Get-HawkUserUALSignInLogs is called
-        # ((Get-PSCallStack)[1].FunctionName -contains "Get-HawkUserUALSignInLog") -or (Get-PSCallStack)[1].FunctionName -startswith "Start-HawkUserInvestigation)
-        $wasDirectlyCalledByUserInvestigation = (Get-PSCallStack)[1].FunctionName -eq "Start-HawkUserInvestigation<Begin>"
-        Out-LogFile "Was directly called by UserInvestigation: $wasDirectlyCalledByUserInvestigation" -Information
+        $BoolDirectlyCalledByUserInvestigation = ((Get-PSCallStack)[1].FunctionName -like "Start-HawkUserInvestigation*") -or `
+                                                 ((Get-PSCallStack)[1].FunctionName -like "Get-HawkUserUALSignInLog*") -or `
+                                                 ((Get-PSCallStack)[1].FunctionName -like "Get-HawkUserEntraIDSignInLog*")
+        Out-LogFile "Was directly called by: $BoolDirectlyCalledByUserInvestigation" -Information
         Out-LogFile (Get-PSCallStack)[1].FunctionName -Information
 
-        if ((-not $PSBoundParameters.ContainsKey('EnableGeoIPLocation')) -and $wasDirectlyCalledByUserInvestigation) {
+        if ((-not $PSBoundParameters.ContainsKey('EnableGeoIPLocation')) -and $BoolDirectlyCalledByUserInvestigation) {
             Out-LogFile "Would you like to enable GeoIP Location?" -Information
             Out-LogFile "An API key from ipstack.com is required." -Information
             
@@ -569,7 +570,6 @@
         }
 
 
-
         # Configuration Example, currently not used
         #TODO: Implement Configuration system across entire project
         Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value $Days -PassThru | Register-PSFConfig
@@ -577,8 +577,6 @@
             Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
         }
 
-
-        
 
         # Continue populating the Hawk object with other properties
         $Hawk.DaysToLookBack = $DaysToLookBack
