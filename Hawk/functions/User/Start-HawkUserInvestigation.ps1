@@ -154,17 +154,18 @@
 		if (Test-PSFFunctionInterrupt) { return }
 
 		# Be sure to remove comments after testing!
-		if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
-			Initialize-HawkGlobalObject -EnableGeoIPLocation
-			Out-LogFile "START-HAWKUSERINVESTIGATION -> Calling Initialize-HawkGlobalObject with EnableGeoIPLocation" -Information
-		} else {
-			Initialize-HawkGlobalObject
-			Out-LogFile "START-HAWKUSERINVESTIGATION -> Calling Initialize-HawkGlobalObject without EnableGeoIPLocation" -Information
-		}
+		#if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
+		#	Initialize-HawkGlobalObject -EnableGeoIPLocation
+		#	Out-LogFile "START-HAWKUSERINVESTIGATION -> Calling Initialize-HawkGlobalObject with EnableGeoIPLocation" -Information
+		#} else {
+		#	Initialize-HawkGlobalObject
+		#	Out-LogFile "START-HAWKUSERINVESTIGATION -> Calling Initialize-HawkGlobalObject without EnableGeoIPLocation" -Information
+		#}
 
 		# Check if Hawk object exists and is fully initialized
 		if (Test-HawkGlobalObject) {
 			Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to TRUE!" -Information
+			Initialize-HawkGlobalObject
 		} else {
 			Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to FALSE!" -Information
 		}
@@ -182,6 +183,7 @@
 			foreach ($Object in $UserArray) {
 				[string]$User = $Object.UserPrincipalName
 	
+				<#
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserConfiguration for $User")) {
 					Out-LogFile "Running Get-HawkUserConfiguration" -Action
 					Get-HawkUserConfiguration -User $User
@@ -206,7 +208,7 @@
 					Out-LogFile "Running Get-HawkUserEntraIDSignInLog" -Action
 					Get-HawkUserEntraIDSignInLog -UserPrincipalName $User
 				}
-	
+				#>
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
 					# Two different use cases (interactive and non-interactive) have to be considered here
 					# $Hawk.EnableGeoIPLocation is to account for interactive mode
@@ -220,6 +222,7 @@
 					}
 				}
 	
+				<#
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
 					Out-LogFile "Running Get-HawkUserMailboxAuditing" -Action
 					Get-HawkUserMailboxAuditing -User $User
@@ -258,6 +261,7 @@
 					Out-LogFile "Running Get-HawkUserMobileDevice" -Action
 					Get-HawkUserMobileDevice -User $User
 				}
+				#>
 
 			}
 		}
