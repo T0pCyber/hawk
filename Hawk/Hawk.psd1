@@ -56,7 +56,7 @@
 	'Get-HawkTenantInboxRule',
 	'Get-HawkTenantConsentGrant',
 	'Get-HawkTenantRBACChange',
-	'Get-HawkTenantAzureAppAuditLog',
+	'Get-HawkTenantEntraIDAppAuditLog',
 	'Get-HawkUserUALSignInLog',
 	'Get-HawkUserConfiguration',
 	'Get-HawkUserEmailForwarding',
