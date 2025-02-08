@@ -67,10 +67,10 @@ Function Get-HawkTenantRiskyUsers {
             
             # Define risk level order for consistent sorting
             $riskOrder = @{
-                'high' = 1
+                'high'   = 1
                 'medium' = 2
-                'low' = 3
-                'none' = 4
+                'low'    = 3
+                'none'   = 4
             }
             
             # Log summary of users by risk level
@@ -84,21 +84,66 @@ Function Get-HawkTenantRiskyUsers {
             
             # Export all risky users
             $riskyUsers | Out-MultipleFileType -FilePrefix "RiskyUsers" -csv -json
-
-            # Flag high risk users for investigation
-            # Only includes users with high risk level or confirmed compromise state
-            $highRiskUsers = $riskyUsers | Where-Object { 
-                $_.RiskLevel -eq 'high' -or
-                $_.RiskState -eq 'confirmedCompromised'
+            
+            # Group users by risk level and compromise state for investigation
+            $riskyUserGroups = @{
+                Compromised = $riskyUsers | Where-Object { 
+                    $_.RiskState -eq 'confirmedCompromised' 
+                }
+                High = $riskyUsers | Where-Object { 
+                    $_.RiskLevel -eq 'high' 
+                }
+                Medium = $riskyUsers | Where-Object { 
+                    $_.RiskLevel -eq 'medium'
+                }
+                Low = $riskyUsers | Where-Object { 
+                    $_.RiskLevel -eq 'low'
+                }
             }
 
-            if ($highRiskUsers) {
-                Out-LogFile ("Found " + $highRiskUsers.Count + " high risk users requiring investigation") -Notice
-                foreach ($user in $highRiskUsers) {
-                    Out-LogFile ("High risk user detected: $($user.UserPrincipalName)") -Notice
+            # Process compromised users separately (export to JSON only)
+            if ($riskyUserGroups.Compromised) {
+                Out-LogFile ("Found " + $riskyUserGroups.Compromised.Count + " Confirmed Compromised account requiring investigation") -Notice
+                foreach ($user in $riskyUserGroups.Compromised) {
+                    Out-LogFile ("Compromised account detected: $($user.UserPrincipalName)") -Notice
                     Out-LogFile ("Risk Level: $($user.RiskLevel), Risk State: $($user.RiskState)") -Notice
                 }
-                $highRiskUsers | Out-MultipleFileType -FilePrefix "_Investigate_HighRiskUsers" -csv -json -Notice
+                Out-LogFile "For more details view: _Investigate_Compromised_Users.csv/ json" -Notice
+                $riskyUserGroups.Compromised | Out-MultipleFileType -FilePrefix "_Investigate_Compromised_Users" -json -Notice
+            }
+
+            # Combine High, Medium, and Low risk users into a single collection
+            $nonCompromisedRiskUsers = @()
+            if ($riskyUserGroups.High) {
+                Out-LogFile ("Found " + $riskyUserGroups.High.Count + " High Risk users requiring immediate investigation") -Notice
+                foreach ($user in $riskyUserGroups.High) {
+                    Out-LogFile ("High Risk user detected: $($user.UserPrincipalName)") -Notice
+                    Out-LogFile ("Risk Level: $($user.RiskLevel), Risk State: $($user.RiskState)") -Notice
+                }
+                $nonCompromisedRiskUsers += $riskyUserGroups.High
+            }
+
+            if ($riskyUserGroups.Medium) {
+                Out-LogFile ("Found " + $riskyUserGroups.Medium.Count + " Medium Risk users requiring investigation") -Notice
+                foreach ($user in $riskyUserGroups.Medium) {
+                    Out-LogFile ("Medium Risk user detected: $($user.UserPrincipalName)") -Notice
+                    Out-LogFile ("Risk Level: $($user.RiskLevel), Risk State: $($user.RiskState)") -Notice
+                }
+                $nonCompromisedRiskUsers += $riskyUserGroups.Medium
+            }
+
+            if ($riskyUserGroups.Low) {
+                Out-LogFile ("Found " + $riskyUserGroups.Low.Count + " Low Risk users for review") -Notice
+                foreach ($user in $riskyUserGroups.Low) {
+                    Out-LogFile ("Low Risk user detected: $($user.UserPrincipalName)") -Notice
+                    Out-LogFile ("Risk Level: $($user.RiskLevel), Risk State: $($user.RiskState)") -Notice
+                }
+                $nonCompromisedRiskUsers += $riskyUserGroups.Low
+            }
+
+            if ($nonCompromisedRiskUsers.Count -gt 0) {
+                Out-LogFile "Risky Users detected, for more details view: _Investigate_Risky_Users.csv/ json" -Notice
+                $nonCompromisedRiskUsers | Out-MultipleFileType -FilePrefix "_Investigate_Risky_Users" -csv -json -Notice
             }
         }
         catch {
@@ -108,6 +153,6 @@ Function Get-HawkTenantRiskyUsers {
     }
 
     end {
-        Out-LogFile "Completed gathering risky user data" -Information
+        Out-LogFile "Completed gathering Risky User Log" -Information
     }
 }
