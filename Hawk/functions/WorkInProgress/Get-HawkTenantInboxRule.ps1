@@ -49,6 +49,10 @@
         - For historical data on when rules were created, refer to Get-HawkTenantInboxRuleHistory.
     #>
 
+    ###############################################################################################
+    #TODO SEE TICKET DETAILS FOR THIS: https://github.com/T0pCyber/hawk/issues/156
+    ###############################################################################################
+
 
     param (
         [string]$CSVPath,

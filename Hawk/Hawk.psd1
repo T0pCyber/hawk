@@ -72,7 +72,6 @@
 	'Start-HawkUserInvestigation',
 	'Update-HawkModule',
 	'Get-HawkUserAdminAudit',
-	'Get-HawkTenantAuthHistory',
 	'Get-HawkUserHiddenRule',
 	'Get-HawkMessageHeader',
 	'Get-HawkUserPWNCheck',
@@ -81,7 +80,6 @@
 	'Get-HawkUserMobileDevice',
 	'Get-HawkTenantEntraIDAdmin',
 	'Get-HawkTenantEXOAdmin',
-	'Get-HawkTenantMailItemsAccessed',
 	'Get-HawkUserMailItemsAccessed',
 	'Get-HawkUserExchangeSearchQuery',
 	'Get-HawkUserMailSendActivity',
@@ -95,7 +93,6 @@
 	'Get-HawkTenantRiskyUsers',
 	'Get-HawkTenantRiskDetections',
 	'Get-HawkTenantRiskyServicePrincipals'
-
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''
 
