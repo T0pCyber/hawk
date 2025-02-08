@@ -79,34 +79,36 @@ Function Get-HawkTenantRiskDetections {
             
             # Log summary of detections by risk level
             $riskLevels = $processedDetections | Group-Object -Property RiskLevel | 
-            Sort-Object -Property { $riskOrder[$_.Name] }
+                Sort-Object -Property { $riskOrder[$_.Name] }
             
             foreach ($level in $riskLevels) {
                 $capitalizedName = $level.Name.Substring(0, 1).ToUpper() + $level.Name.Substring(1).ToLower()
                 Out-LogFile ("- $($level.Count) Risk Detections at Risk Level '${capitalizedName}'") -Information
             }
 
-            # Identify high risk detections
-            $highRiskDetections = $processedDetections | Where-Object { 
-                $_.RiskLevel -eq 'high' -or
-                $_.RiskState -eq 'atRisk' -or
-                $_.RiskState -eq 'confirmedCompromised'
+            # Split detections into confirmed compromised and other (high/medium/low) groups
+            $confirmedCompromisedDetections = $processedDetections | Where-Object { $_.RiskState -eq 'confirmedCompromised' }
+            $otherDetections = $processedDetections | Where-Object { 
+                $_.RiskState -ne 'confirmedCompromised' -and 
+                ($_.RiskLevel -eq 'high' -or $_.RiskLevel -eq 'medium' -or $_.RiskLevel -eq 'low')
             }
 
-            if ($highRiskDetections) {
-                Out-LogFile ("Found " + $highRiskDetections.Count + " high risk detections requiring investigation") -Notice
-                
-                # Group high risk detections by user for clearer reporting
-                $groupedDetections = $highRiskDetections | Group-Object -Property UserPrincipalName
-                foreach ($group in $groupedDetections) {
-                    Out-LogFile ("High risk detections for user: $($group.Name)") -Notice
-                    foreach ($detection in $group.Group) {
-                        Out-LogFile ("- $($detection.RiskEventType) at $($detection.DetectedDateTime): Risk Level = $($detection.RiskLevel), Risk State = $($detection.RiskState)") -Notice
-                    }
+            # Process confirmed compromised risk detections (export as CSV and JSON)
+            if ($confirmedCompromisedDetections) {
+                Out-LogFile ("Found " + $confirmedCompromisedDetections.Count + " confirmed compromised risk detection events requiring investigation") -Notice
+                foreach ($detection in $confirmedCompromisedDetections) {
+                    Out-LogFile ("Confirmed compromised detection: $($detection.RiskEventType) for user $($detection.UserPrincipalName) at $($detection.DetectedDateTime)") -Notice
                 }
+                $confirmedCompromisedDetections | Out-MultipleFileType -FilePrefix "_Investigate_Confirmed_Compromised_Risk_Detection" -csv -json -Notice
+            }
 
-                # Export flattened high risk detections for investigation
-                $highRiskDetections | Out-MultipleFileType -FilePrefix "_Investigate_High_Risk_Detections" -csv -json -Notice
+            # Process other risk detections (combined high/medium/low) (export as CSV and JSON)
+            if ($otherDetections) {
+                Out-LogFile ("Found " + $otherDetections.Count + " risk detection events (high/medium/low) for investigation") -Notice
+                foreach ($detection in $otherDetections) {
+                    Out-LogFile ("Risk detection: $($detection.RiskEventType) for user $($detection.UserPrincipalName) at $($detection.DetectedDateTime) with Risk Level = $($detection.RiskLevel)") -Notice
+                }
+                $otherDetections | Out-MultipleFileType -FilePrefix "_Investigate_Risk_Detection" -csv -json -Notice
             }
         }
         catch {
