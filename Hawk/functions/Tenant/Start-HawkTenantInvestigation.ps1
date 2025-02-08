@@ -155,6 +155,11 @@
         	Out-LogFile "Running Get-HawkTenantEDiscoveryConfiguration" -action
         	Get-HawkTenantEDiscoveryConfiguration
         }
+
+        if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
+        	Out-LogFile "Running Get-HawkTenantEDiscoveryLog" -action
+        	Get-HawkTenantEDiscoveryLog
+        }
 	
         if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Creation Audit Log", "Search Admin Inbox Rule Creation")) {
             Out-LogFile "Running Get-HawkTenantAdminInboxRuleCreation" -action
@@ -180,12 +185,7 @@
         	Out-LogFile "Running Get-HawkTenantAdminEmailForwardingChange" -action
         	Get-HawkTenantAdminEmailForwardingChange
         }
-		
-        if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
-        	Out-LogFile "Running Get-HawkTenantEDiscoveryLog" -action
-        	Get-HawkTenantEDiscoveryLog
-        }
-	
+			
         if ($PSCmdlet.ShouldProcess("Domain Activity", "Get domain activity")) {
         	Out-LogFile "Running Get-HawkTenantDomainActivity" -action
         	Get-HawkTenantDomainActivity
