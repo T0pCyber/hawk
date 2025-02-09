@@ -40,6 +40,11 @@
 
     Looks for hidden inbox rules for all users who have "C-Level" set in CustomAttribute1
     #>
+
+    ###############################################################################################
+    #TODO SEE TICKET DETAILS FOR THIS: https://github.com/T0pCyber/hawk/issues/265
+    ###############################################################################################
+
     param (
         [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName,

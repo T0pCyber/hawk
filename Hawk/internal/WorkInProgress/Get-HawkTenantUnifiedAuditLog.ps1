@@ -45,6 +45,10 @@
         Same as above but uses 30-minute collection intervals. Useful for environments with lower
         audit log volume where longer intervals won't risk missing data.
     #>
+
+    ###############################################################################################
+    #TODO SEE TICKET DETAILS FOR THIS: https://github.com/T0pCyber/hawk/issues/263
+    ###############################################################################################
     Param (
         [Parameter(Mandatory = $true)]
         [datetime]$StartDate,
