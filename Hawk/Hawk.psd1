@@ -72,7 +72,6 @@
 	'Start-HawkUserInvestigation',
 	'Update-HawkModule',
 	'Get-HawkUserAdminAudit',
-	'Get-HawkUserHiddenRule',
 	'Get-HawkMessageHeader',
 	'Get-HawkUserPWNCheck',
 	'Get-HawkUserAutoReply',
