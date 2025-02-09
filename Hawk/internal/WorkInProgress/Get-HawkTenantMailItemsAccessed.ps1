@@ -26,6 +26,10 @@
     for those fields.
 
 #>
+
+    ###############################################################################################
+    #TODO SEE TICKET DETAILS FOR THIS: https://github.com/T0pCyber/hawk/issues/264
+    ###############################################################################################
     [cmdletbinding()]
     param(
         [parameter(Mandatory)]

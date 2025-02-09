@@ -61,7 +61,7 @@
     }
 
     if($BroadGrantCount -gt 0) {
-        Out-LogFile "Found $BroadGrantCount Broad-Scope ('AllPrincipals' or '*.All') Grant(s)" -notice
+        Out-LogFile "Found $BroadGrantCount broad-scoped grants ('AllPrincipals' or '*.All')" -notice
         $flag = $true
     }
     

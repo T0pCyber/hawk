@@ -155,6 +155,11 @@
         	Out-LogFile "Running Get-HawkTenantEDiscoveryConfiguration" -action
         	Get-HawkTenantEDiscoveryConfiguration
         }
+
+        if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
+        	Out-LogFile "Running Get-HawkTenantEDiscoveryLog" -action
+        	Get-HawkTenantEDiscoveryLog
+        }
 	
         if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Creation Audit Log", "Search Admin Inbox Rule Creation")) {
             Out-LogFile "Running Get-HawkTenantAdminInboxRuleCreation" -action
@@ -180,12 +185,7 @@
         	Out-LogFile "Running Get-HawkTenantAdminEmailForwardingChange" -action
         	Get-HawkTenantAdminEmailForwardingChange
         }
-		
-        if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
-        	Out-LogFile "Running Get-HawkTenantEDiscoveryLog" -action
-        	Get-HawkTenantEDiscoveryLog
-        }
-	
+			
         if ($PSCmdlet.ShouldProcess("Domain Activity", "Get domain activity")) {
         	Out-LogFile "Running Get-HawkTenantDomainActivity" -action
         	Get-HawkTenantDomainActivity
@@ -201,9 +201,9 @@
         	Get-HawkTenantEntraIDAuditLog
         }
 	
-        if ($PSCmdlet.ShouldProcess("Azure App Audit Log", "Get app audit logs")) {
-        	Out-LogFile "Running Get-HawkTenantAzureAppAuditLog" -action
-        	Get-HawkTenantAzureAppAuditLog
+        if ($PSCmdlet.ShouldProcess("Entra ID App Audit Log", "Get Entra ID app audit logs")) {
+        	Out-LogFile "Running Get-HawkTenantEntraIDAppAuditLog" -action
+        	Get-HawkTenantEntraIDAppAuditLog
         }
 	
         if ($PSCmdlet.ShouldProcess("Exchange Admins", "Get Exchange admin list")) {
@@ -225,6 +225,10 @@
         	Out-LogFile "Running Get-HawkTenantRiskDetections" -action
         	Get-HawkTenantRiskDetections
         }
+
+        ####################################################################################
+        #TODO: If DCODev's test of Get-RiskyServicePrincipals is good, add a call to it here
+        ####################################################################################
 	
         if ($PSCmdlet.ShouldProcess("Entra ID Admins", "Get Entra ID admin list")) {
         	Out-LogFile "Running Get-HawkTenantEntraIDAdmin" -action

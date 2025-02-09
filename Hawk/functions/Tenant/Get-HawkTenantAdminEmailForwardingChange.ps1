@@ -89,7 +89,7 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
                     'ForwardingSMTPAddress',
                     'ExternalEmailAddress',
                     'PrimarySmtpAddress',
-                    'RedirectTo',             # Added from other LLM suggestion
+                    'RedirectTo',            
                     'DeliverToMailboxAndForward',  # Corrected parameter name
                     'DeliverToAndForward'     # Alternative parameter name
                 ) -or

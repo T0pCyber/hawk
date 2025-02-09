@@ -10,7 +10,7 @@
     PS C:\> Export-EXOAdmin -EngagementFolder foldername
     Exports Exchange Admins UserPrincipalName to .csv
 .OUTPUTS
-    EXOAdmins.csv
+    ExchangeOnlineAdministrators.csv/.json
 .NOTES
 #>
 BEGIN{
