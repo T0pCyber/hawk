@@ -22,8 +22,9 @@ Function Get-HawkUserEntraIDSignInLog {
     
     .OUTPUTS
         Creates the following files in the user's output directory:
-        - EntraSignInLog_[user].csv - All sign-in data in CSV format
-        - EntraSignInLog_[user].json - All sign-in data in JSON format
+        - Entra_Sign_In_Log_[user].csv - All sign-in data in CSV format
+        - Entra_Sign_In_Log_[user].json - All sign-in data in JSON format
+        - _Investigate_Entra_Sign_In_Log_$User - Only sign in logs for those with an associated risk level.
     
         Note: Only contains data from the most recent 14 days relative to the specified end date.
     
@@ -121,32 +122,35 @@ Function Get-HawkUserEntraIDSignInLog {
                     Out-LogFile ("Retrieved " + $signInLogs.Count + " sign-in log entries for " + $User) -Information
 
                     # Write all logs to CSV/JSON
-                    $signInLogs | Out-MultipleFileType -FilePrefix "EntraSignInLog_$User" -User $User -csv -json
+                    $signInLogs | Out-MultipleFileType -FilePrefix "Entra_Sign_In_Log_$User" -User $User -csv -json
 
                     # Check for risky sign-ins
                     $riskySignIns = $signInLogs | Where-Object {
-                        $_.RiskLevelDuringSignIn -in @('high', 'medium') -or
-                        $_.RiskLevelAggregated -in @('high', 'medium')
+                        $_.RiskLevelDuringSignIn -in @('high', 'medium', 'low') -or
+                        $_.RiskLevelAggregated -in @('high', 'medium', 'low')
                     }
 
                     if ($riskySignIns.Count -gt 0) {
                         # Flag for investigation
-                        Out-LogFile ("Found " + $riskySignIns.Count + " risky sign-ins for " + $User) -notice
+                        Out-LogFile ("Found " + $riskySignIns.Count + " risky sign-ins for " + $User) -Notice
+                        
+                        # Export risky sign-ins for investigation
+                        $riskySignIns | Out-MultipleFileType -FilePrefix "_Investigate_Entra_Sign_In_Log_$User" -User $User -csv -json -Notice
                         
                         # Group and report risk levels
                         $duringSignIn = $riskySignIns | Group-Object -Property RiskLevelDuringSignIn | 
-                            Where-Object {$_.Name -in @('high', 'medium')}
+                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
                         foreach ($risk in $duringSignIn) {
-                            Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -silentnotice
+                            Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -Notice
                         }
 
                         $aggregated = $riskySignIns | Group-Object -Property RiskLevelAggregated | 
-                            Where-Object {$_.Name -in @('high', 'medium')}
+                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
                         foreach ($risk in $aggregated) {
-                            Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -silentnotice
+                            Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -Notice
                         }
 
-                        Out-LogFile ("Review EntraSignInLog_$User.csv/json for complete details") -silentnotice
+                        Out-LogFile ("Review _Investigate_Entra_Sign_In_Log_$User.csv/json for complete details") -Notice
                     }
                 }
                 else {
