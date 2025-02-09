@@ -28,7 +28,7 @@ Function Add-HawkAppData {
 
     # Test if our HawkAppData variable exists
     if ([bool](get-variable HawkAppData -ErrorAction SilentlyContinue)) {
-        $global:HawkAppData | Add-Member -MemberType NoteProperty -Name $Name -Value $Value
+        $global:HawkAppData | Add-Member -MemberType NoteProperty -Name $Name -Value $Value -Force
     }
     else {
         $global:HawkAppData = New-Object -TypeName PSObject

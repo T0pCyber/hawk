@@ -38,5 +38,6 @@ Function Test-HawkNonInteractiveMode {
            $PSBoundParameters.ContainsKey('EndDate') -or 
            $PSBoundParameters.ContainsKey('DaysToLookBack') -or 
            $PSBoundParameters.ContainsKey('FilePath') -or
-           $PSBoundParameters.ContainsKey('SkipUpdate')
+           $PSBoundParameters.ContainsKey('SkipUpdate') -or
+           $PSBoundParameters.ContainsKey('EnableGeoIPLocation')
 }

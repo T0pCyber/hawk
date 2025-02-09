@@ -195,7 +195,7 @@
         	Out-LogFile "Running Get-HawkTenantRBACChange" -action
         	Get-HawkTenantRBACChange
         }
-
+    
         if ($PSCmdlet.ShouldProcess("Entra ID Audit Log", "Get Entra ID audit logs")) {
         	Out-LogFile "Running Get-HawkTenantEntraIDAuditLog" -action
         	Get-HawkTenantEntraIDAuditLog
@@ -251,6 +251,4 @@
         $investigationEndTime = Get-Date
         Write-HawkInvestigationSummary -StartTime $investigationStartTime -EndTime $investigationEndTime -InvestigationType 'Tenant'
     }
-
- 
 }
