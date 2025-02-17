@@ -156,74 +156,74 @@
 			foreach ($Object in $UserArray) {
 				[string]$User = $Object.UserPrincipalName
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserConfiguration for $User")) {
-					Out-LogFile "Running Get-HawkUserConfiguration" -Action
-					Get-HawkUserConfiguration -User $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserConfiguration for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserConfiguration" -Action
+				# 	Get-HawkUserConfiguration -User $User
+				# }
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserInboxRule for $User")) {
-					Out-LogFile "Running Get-HawkUserInboxRule" -Action
-					Get-HawkUserInboxRule -User $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserInboxRule for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserInboxRule" -Action
+				# 	Get-HawkUserInboxRule -User $User
+				# }
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEmailForwarding for $User")) {
-					Out-LogFile "Running Get-HawkUserEmailForwarding" -Action
-					Get-HawkUserEmailForwarding -User $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEmailForwarding for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserEmailForwarding" -Action
+				# 	Get-HawkUserEmailForwarding -User $User
+				# }
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAutoReply for $User")) {
-					Out-LogFile "Running Get-HawkUserAutoReply" -Action
-					Get-HawkUserAutoReply -User $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAutoReply for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserAutoReply" -Action
+				# 	Get-HawkUserAutoReply -User $User
+				# }
 
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEntraIDSignInLog for $User")) {
-					Out-LogFile "Running Get-HawkUserEntraIDSignInLog" -Action
-					Get-HawkUserEntraIDSignInLog -UserPrincipalName $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEntraIDSignInLog for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserEntraIDSignInLog" -Action
+				# 	Get-HawkUserEntraIDSignInLog -UserPrincipalName $User
+				# }
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
-					Out-LogFile "Running Get-HawkUserUALSignInLog" -Action
-					Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserUALSignInLog" -Action
+				# 	Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
+				# }
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
-					Out-LogFile "Running Get-HawkUserMailboxAuditing" -Action
-					Get-HawkUserMailboxAuditing -User $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserMailboxAuditing" -Action
+				# 	Get-HawkUserMailboxAuditing -User $User
+				# }
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAdminAudit for $User")) {
-					Out-LogFile "Running Get-HawkUserAdminAudit" -Action
-					Get-HawkUserAdminAudit -User $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAdminAudit for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserAdminAudit" -Action
+				# 	Get-HawkUserAdminAudit -User $User
+				# }
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMessageTrace for $User")) {
-					Out-LogFile "Running Get-HawkUserMessageTrace" -Action
-					Get-HawkUserMessageTrace -User $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMessageTrace for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserMessageTrace" -Action
+				# 	Get-HawkUserMessageTrace -User $User
+				# }
 
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailItemsAccessed for $User")) {
-					Out-LogFile "Running Get-HawkUserMailItemsAccessed" -Action
-					Get-HawkUserMailItemsAccessed -UserPrincipalName $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailItemsAccessed for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserMailItemsAccessed" -Action
+				# 	Get-HawkUserMailItemsAccessed -UserPrincipalName $User
+				# }
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserExchangeSearchQuery for $User")) {
 					Out-LogFile "Running Get-HawkUserExchangeSearchQuery" -Action
 					Get-HawkUserExchangeSearchQuery -UserPrincipalName $User
 				}
 
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailSendActivity for $User")) {
-					Out-LogFile "Running Get-HawkUserMailSendActivity" -Action
-					Get-HawkUserMailSendActivity -UserPrincipalName $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailSendActivity for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserMailSendActivity" -Action
+				# 	Get-HawkUserMailSendActivity -UserPrincipalName $User
+				# }
 
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserSharePointSearchQuery for $User")) {
 					Out-LogFile "Running Get-HawkUserSharePointSearchQuery" -Action
 					Get-HawkUserSharePointSearchQuery -UserPrincipalName $User
 				}
 	
-				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMobileDevice for $User")) {
-					Out-LogFile "Running Get-HawkUserMobileDevice" -Action
-					Get-HawkUserMobileDevice -User $User
-				}
+				# if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMobileDevice for $User")) {
+				# 	Out-LogFile "Running Get-HawkUserMobileDevice" -Action
+				# 	Get-HawkUserMobileDevice -User $User
+				# }
 
 			}
 		}
