@@ -90,8 +90,7 @@
 	'Get-HawkUserEntraIDSignInLog',
 	'Get-HawkTenantEntraIDAuditLog',
 	'Get-HawkTenantRiskyUsers',
-	'Get-HawkTenantRiskDetections',
-	'Get-HawkTenantRiskyServicePrincipals'
+	'Get-HawkTenantRiskDetections'
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''
 
