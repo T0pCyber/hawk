@@ -79,24 +79,9 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
                 }
 
                 if ($SensitiveGrants) {
-                    Out-LogFile "Found sensitive permission grants requiring investigation" -Notice
+                    Out-LogFile "Found $($SensitiveGrants.Count) mailbox permission changes" -Notice
+                    Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_Mailbox_Permission_Change files" -Notice
                     $SensitiveGrants | Out-MultipleFileType -FilePrefix "_Investigate_Mailbox_Permission_Change" -csv -json -Notice
-
-                    # Log details about sensitive permission grants
-                    foreach ($change in $SensitiveGrants) {
-                        $permType = if ($change.Param_AccessRights -match 'FullAccess') {
-                            "FullAccess"
-                        } elseif ($change.Param_AccessRights -match 'SendAs' -or 
-                                 $change.Operation -eq 'Add-ADPermission' -or
-                                 $change.Operation -match 'Add-RecipientPermission') {
-                            "SendAs/Send on Behalf"
-                        } else {
-                            "Other sensitive permission"
-                        }
-                        
-                        Out-LogFile "Permission change by $($change.UserId) at $($change.CreationTime)" -Notice
-                        Out-LogFile "Details: Granted $permType to $($change.Param_User) on mailbox $($change.Param_Identity)" -Notice
-                    }
                 }
             }
             else {

@@ -101,14 +101,10 @@ Function Get-HawkTenantRiskyUsers {
                 }
             }
 
-            # Process compromised users separately (export to JSON only)
+            # Process compromised users
             if ($riskyUserGroups.Compromised) {
-                Out-LogFile ("Found " + $riskyUserGroups.Compromised.Count + " Confirmed Compromised account requiring investigation") -Notice
-                foreach ($user in $riskyUserGroups.Compromised) {
-                    Out-LogFile ("Compromised account detected: $($user.UserPrincipalName)") -Notice
-                    Out-LogFile ("Risk Level: $($user.RiskLevel), Risk State: $($user.RiskState)") -Notice
-                }
-                Out-LogFile "For more details view: _Investigate_Compromised_Users.csv/ json" -Notice
+                Out-LogFile "Found $($riskyUserGroups.Compromised.Count) confirmed compromised accounts" -Notice
+                Out-LogFile "Details in _Investigate_Compromised_Users files" -Notice
                 $riskyUserGroups.Compromised | Out-MultipleFileType -FilePrefix "_Investigate_Compromised_Users" -json -Notice
             }
 
@@ -141,8 +137,14 @@ Function Get-HawkTenantRiskyUsers {
                 $nonCompromisedRiskUsers += $riskyUserGroups.Low
             }
 
+            # Combine High, Medium, and Low risk users summary
             if ($nonCompromisedRiskUsers.Count -gt 0) {
-                Out-LogFile "Risky Users detected, for more details view: _Investigate_Risky_Users.csv/ json" -Notice
+                $highRisk = ($riskyUserGroups.High).Count
+                $mediumRisk = ($riskyUserGroups.Medium).Count
+                $lowRisk = ($riskyUserGroups.Low).Count
+                
+                Out-LogFile "Found risky users: $highRisk High, $mediumRisk Medium, $lowRisk Low" -Notice
+                Out-LogFile "Details in _Investigate_Risky_Users files" -Notice
                 $nonCompromisedRiskUsers | Out-MultipleFileType -FilePrefix "_Investigate_Risky_Users" -csv -json -Notice
             }
         }

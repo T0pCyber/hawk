@@ -85,19 +85,9 @@ Function Get-HawkTenantAdminInboxRuleModification {
                 }
 
                 if ($SuspiciousModifications) {
-                    Out-LogFile "Found suspicious rule modifications requiring investigation" -Notice
-                
-                    Out-LogFile "Writing suspicious rule modification data" -Action
+                    Out-LogFile "Found $($SuspiciousModifications.Count) inbox rule modification events" -Notice
+                    Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_Admin_Inbox_Rules_Modification files" -Notice
                     $SuspiciousModifications | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Modification" -csv -json -Notice
-                
-                    # Log details about why each modification was flagged
-                    foreach ($rule in $SuspiciousModifications) {
-                        $reasons = @()
-                        if (Test-SuspiciousInboxRule -Rule $rule -Reasons ([ref]$reasons)) {
-                            # Just enhance the log message but keep all data processing the same
-                            Out-LogFile "Found suspicious rule modification: Operation=$($rule.Operation) User=$($rule.UserId)" -Notice
-                        }
-                    }
                 }
             }
             else {

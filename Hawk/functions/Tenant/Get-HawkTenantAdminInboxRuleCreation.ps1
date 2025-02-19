@@ -81,19 +81,9 @@ Function Get-HawkTenantAdminInboxRuleCreation {
                 }
 
                 if ($SuspiciousRules) {
-                    Out-LogFile "Found suspicious admin inbox rule creation requiring investigation" -Notice
-
-                    Out-LogFile "Writing suspicious rule creation data" -Action
+                    Out-LogFile "Found $($SuspiciousRules.Count) inbox rule creation events" -Notice
+                    Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_Admin_Inbox_Rules_Creation files" -Notice
                     $SuspiciousRules | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Creation" -csv -json -Notice
-
-                    # Log details about why each rule was flagged
-                    foreach ($rule in $SuspiciousRules) {
-                        $reasons = @()
-                        if (Test-SuspiciousInboxRule -Rule $rule -Reasons ([ref]$reasons)) {
-                            Out-LogFile "Found suspicious rule creation: '$($rule.Param_Name)'" -Notice
-                      
-                        }
-                    }
                 }
             }
             else {
