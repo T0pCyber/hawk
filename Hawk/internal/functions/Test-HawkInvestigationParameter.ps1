@@ -138,8 +138,9 @@ Function Test-HawkInvestigationParameter {
         }
 
         # Use dates for day difference calculation
+        # Test against 366 days to account for extra day added for last day inclusiveness
         $daysDifference = ($utcEndDate.Date - $utcStartDate.Date).Days
-        if ($daysDifference -gt 365) {
+        if ($daysDifference -gt 366) {
             $isValid = $false
             $errorMessages += "Date range cannot exceed 365 days"
         }

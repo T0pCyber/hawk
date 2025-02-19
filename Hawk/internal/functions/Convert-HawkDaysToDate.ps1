@@ -28,7 +28,6 @@ Function Convert-HawkDaysToDate {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [ValidateRange(1, 365)]
         [int]$DaysToLookBack
     )
 

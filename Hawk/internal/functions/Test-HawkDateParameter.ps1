@@ -138,8 +138,9 @@ Function Test-HawkDateParameter {
                 Stop-PSFFunction -Message "StartDate must be before EndDate" -EnableException $true
             }
 
+            # Test against 366 days to account for extra day added for last day inclusiveness
             $daysDifference = ($EndDate.Date - $StartDate.Date).Days
-            if ($daysDifference -gt 365) {
+            if ($daysDifference -gt 366) {
                 Stop-PSFFunction -Message "Date range cannot exceed 365 days" -EnableException $true
             }
         }

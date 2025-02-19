@@ -1,17 +1,4 @@
 ﻿Describe 'Convert-HawkDaysToDate' {
-    Context 'When validating input parameters' {
-        It 'Should throw when DaysToLookBack is less than 1' {
-            # Act & Assert
-            { Convert-HawkDaysToDate -DaysToLookBack 0 } | 
-            Should -Throw -ExpectedMessage 'Cannot validate argument on parameter ''DaysToLookBack''. The 0 argument is less than the minimum allowed range of 1. Supply an argument that is greater than or equal to 1 and then try the command again.'
-        }
-
-        It 'Should throw when DaysToLookBack is greater than 365' {
-            # Act & Assert
-            { Convert-HawkDaysToDate -DaysToLookBack 366 } | 
-            Should -Throw -ExpectedMessage 'Cannot validate argument on parameter ''DaysToLookBack''. The 366 argument is greater than the maximum allowed range of 365. Supply an argument that is less than or equal to 365 and then try the command again.'
-        }
-    }
 
     Context 'When converting valid days to dates' {
         BeforeEach {
