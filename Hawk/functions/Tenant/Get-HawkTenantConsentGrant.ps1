@@ -38,7 +38,7 @@
     [array]$Grants = Get-AzureADPSPermission -ShowProgress
     
     # Create new Property for Consent_Grants output table
-    $Grants | Add-Member -NotePropertyName Flag -NotePropertyValue ""
+    $Grants | Add-Member -NotePropertyName ConsentGrantRiskCategory -NotePropertyValue ""
     
     [bool]$flag = $false
 
@@ -55,7 +55,7 @@
     [int]$BroadGrantCount = 0
     $Grants | ForEach-Object -Process {
         if($_.ConsentType -contains 'AllPrincipals' -or $_.Permission -match 'all') {
-            $_.Flag = "Broad-Scope Grant"
+            $_.ConsentGrantRiskCategory = "Broad-Scope Grant"
             $BroadGrantCount += 1
         }
     }
@@ -70,7 +70,7 @@
     foreach($grant in $ExtremelyDangerousGrants) {
         $Grants | ForEach-Object -Process {
             if($_.Permission -match $grant){
-                $_.Flag = "Extremely Dangerous"
+                $_.ConsentGrantRiskCategory = "Extremely Dangerous"
                 $EDGrantCount += 1
             }
         }
@@ -86,7 +86,7 @@
     foreach($grant in $HighRiskGrants) {
         $Grants | ForEach-Object -Process {
             if($_.Permission -match $grant){
-                $_.Flag = "High Risk"
+                $_.ConsentGrantRiskCategory = "High Risk"
                 $HRGrantCount += 1
             }
         }
@@ -100,11 +100,16 @@
     if ($flag) {
         Out-LogFile 'Review the information at the following link to understand these results' -Information
         Out-LogFile 'https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants' -Information
+        
+        # Create investigation file for concerning grants
+        $grantsForInvestigation = $Grants | Where-Object { $_.ConsentGrantRiskCategory -ne "" }
+        $grantsForInvestigation | Out-MultipleFileType -FilePrefix "_Investigate_Consent_Grants" -csv -json -Notice
     }
     else {
         Out-LogFile "To review this data follow:" -Information
         Out-LogFile "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants" -Information
     }
 
+    # Output all grants
     $Grants | Out-MultipleFileType -FilePrefix "Consent_Grants" -csv -json
 }
