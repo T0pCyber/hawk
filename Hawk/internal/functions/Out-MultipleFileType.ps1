@@ -193,13 +193,13 @@ Function Out-MultipleFileType {
                     Out-LogFile ("Appending Data to " + $filename) -NoDisplay
 
                     # Write it out to json making sture to append
-                    $AllObject | ConvertTo-Json -Depth 100 | Out-File -FilePath $filename -Append
+                    $AllObject | ConvertTo-Json -Depth 100 | Out-File -FilePath $filename -Encoding UTF8 -Append
                 }
 
                 # Otherwise overwrite
                 else {
                     Out-LogFile ("Writing Data to " + $filename) -Action
-                    $AllObject | ConvertTo-Json -Depth 100 | Out-File -FilePath $filename
+                    $AllObject | ConvertTo-Json -Depth 100 | Out-File -FilePath $filename -Encoding utf8
                 }
 
                 # If notice is set we need to write the file name to _Investigate.txt
