@@ -80,7 +80,7 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
 
                 if ($SensitiveGrants) {
                     Out-LogFile "Found $($SensitiveGrants.Count) mailbox permission changes" -Notice
-                    Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_Mailbox_Permission_Change.csv/json" -Notice
+                    Out-LogFile "Please verify this activity is legitimate."-Notice
                     $SensitiveGrants | Out-MultipleFileType -FilePrefix "_Investigate_Mailbox_Permission_Change" -csv -json -Notice
                 }
             }

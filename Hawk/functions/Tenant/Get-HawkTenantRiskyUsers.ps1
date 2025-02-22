@@ -144,7 +144,6 @@ Function Get-HawkTenantRiskyUsers {
                 $lowRisk = ($riskyUserGroups.Low).Count
                 
                 Out-LogFile "Found risky users: $highRisk High, $mediumRisk Medium, $lowRisk Low" -Notice
-                Out-LogFile "Details in _Investigate_Risky_Users.csv/json" -Notice
                 $nonCompromisedRiskUsers | Out-MultipleFileType -FilePrefix "_Investigate_Risky_Users" -csv -json -Notice
             }
         }

@@ -98,7 +98,7 @@
     }
 
     if ($flag) {
-        Out-LogFile "Please verify these grants are legitimate / required. Details in _Investigate_Consent_Grants.csv/json" -Notice
+        Out-LogFile "Please verify these grants are legitimate / required." -Notice
         Out-LogFile 'For more information on understanding these results results, visit' -Notice
         Out-LogFile 'https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants' -Notice
         

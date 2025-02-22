@@ -115,7 +115,7 @@ Function Get-HawkUserInboxRule {
             $InboxRules | Out-MultipleFileType -FilePreFix "InboxRules" -User $user -csv -json
 
             # Add all of the inbox rules to a generic collection file
-            $InboxRules | Out-MultipleFileType -FilePrefix "All_InboxRules" -csv -json -Append
+            $InboxRules | Out-MultipleFileType -FilePrefix "All_InboxRules" -User $user -csv -json -Append
         }
 
         # Get any Sweep Rules

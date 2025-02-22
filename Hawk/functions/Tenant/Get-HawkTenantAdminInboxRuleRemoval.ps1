@@ -80,7 +80,7 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
 
                 if ($SuspiciousRemovals) {
                     Out-LogFile "Found $($SuspiciousRemovals.Count) inbox rule removal events" -Notice
-                    Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_Admin_Inbox_Rules_Removal.csv/json" -Notice
+                    Out-LogFile "Please verify this activity is legitimate." -Notice
                     $SuspiciousRemovals | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Removal" -csv -json -Notice
                 }
             }
