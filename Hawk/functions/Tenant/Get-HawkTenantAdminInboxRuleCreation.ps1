@@ -82,7 +82,7 @@ Function Get-HawkTenantAdminInboxRuleCreation {
 
                 if ($SuspiciousRules) {
                     Out-LogFile "Found $($SuspiciousRules.Count) inbox rule creation events" -Notice
-                    Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_Admin_Inbox_Rules_Creation files" -Notice
+                    Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_Admin_Inbox_Rules_Creation.csv/json" -Notice
                     $SuspiciousRules | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Creation" -csv -json -Notice
                 }
             }

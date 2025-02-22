@@ -107,7 +107,7 @@ Function Get-HawkTenantRiskDetections {
                 $lowRisk = ($otherDetections | Where-Object { $_.RiskLevel -eq 'low' }).Count
                 
                 Out-LogFile "Found risk detections: $highRisk High, $mediumRisk Medium, $lowRisk Low" -Notice
-                Out-LogFile "Details in _Investigate_Risk_Detection files" -Notice
+                Out-LogFile "Details in _Investigate_Risk_Detection.csv/json" -Notice
                 $otherDetections | Out-MultipleFileType -FilePrefix "_Investigate_Risk_Detection" -csv -json -Notice
             }
         }
