@@ -65,7 +65,10 @@ Function Get-HawkUserInboxRule {
             Out-LogFile "No Inbox Rules found" -action
         } 
         else {
-            # If the rules contains one of a number of known suspecious properties flag them
+            # Track if we found any suspicious rules
+            $foundSuspiciousRules = $false
+            
+            # If the rules contains one of a number of known suspicious properties flag them
             foreach ($Rule in $InboxRules) {
                 # Set our flag to false
                 $Investigate = $false
@@ -76,13 +79,26 @@ Function Get-HawkUserInboxRule {
                 if (!([string]::IsNullOrEmpty($Rule.ForwardTo))) { $Investigate = $true }
                 if (!([string]::IsNullOrEmpty($Rule.RedirectTo))) { $Investigate = $true }
 
-                # If we have set the Investigate flag then report it and output it to a seperate file
+                # If we have set the Investigate flag then output to investigation file
                 if ($Investigate -eq $true) {
-                    Out-LogFile ("Possible Investigate inbox rule found ID:" + $Rule.Identity + " Rule:" + $Rule.Name) -notice
-					# Description is multiline
-					$Rule.Description = $Rule.Description.replace("`r`n", " ").replace("`t", "")
-                    $Rule | Out-MultipleFileType -FilePreFix "_Investigate_InboxRules" -user $user -csv -json -append -Notice
+                    $foundSuspiciousRules = $true
+                    # Description is multiline
+                    $Rule.Description = $Rule.Description.replace("`r`n", " ").replace("`t", "")
+                    $Rule | Out-MultipleFileType -FilePreFix "_Investigate_InboxRules" -user $user -csv -json -append
                 }
+            }
+
+            # Output notice only once if suspicious rules were found
+            if ($foundSuspiciousRules) {
+                $suspiciousRuleCount = ($InboxRules | Where-Object { 
+                    $_.DeleteMessage -eq $true -or 
+                    ![string]::IsNullOrEmpty($_.ForwardAsAttachmentTo) -or 
+                    ![string]::IsNullOrEmpty($_.ForwardTo) -or 
+                    ![string]::IsNullOrEmpty($_.RedirectTo)
+                }).Count
+
+                Out-LogFile "Found $suspiciousRuleCount inbox rules requiring investigation for $User" -Notice
+                Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_InboxRules.csv/json" -Notice
             }
 
 			# Description is multiline
