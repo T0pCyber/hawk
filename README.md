@@ -1,4 +1,4 @@
-﻿﻿# Hawk Documentation and Resources
+﻿# Hawk Documentation and Resources
 
 Visit [hawkforensics.io](https://hawkforensics.io/) for comprehensive documentation including:
 
@@ -101,6 +101,8 @@ For critical issues or inquiries, email hawkpsmodule@gmail.com.
 
 ## **Overview**
 
+<<<<<<< HEAD
+
 Hawk, the open-source PowerShell module, collects limited usage data to help improve the module by identifying the most frequently used features. This data assists in prioritizing updates, enhancements, and new functionality.
 
 ## **What Data is Collected?**
@@ -112,6 +114,21 @@ Hawk collects **only** the names of the functions that are executed.
 - Function names that are run within Hawk.
 
 ❌ **Not Collected:**
+
+=======
+Hawk, the open-source PowerShell module, collects limited usage data to help improve the module by identifying the most frequently used features. This data assists in prioritizing updates, enhancements, and new functionality.
+
+## **What Data is Collected?**
+
+Hawk collects **only** the names of the functions that are executed.
+
+✅ **Collected Data:**
+
+- Function names that are run within Hawk.
+
+❌ **Not Collected:**
+
+> > > > > > > 4fc2a6fce93b52e0358c9de9e1ad81dfa8779220
 
 - No user-identifiable data.
 - No environmental or system data.
