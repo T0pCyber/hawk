@@ -24,6 +24,12 @@
     .PARAMETER NonInteractive
     Switch to run the command in non-interactive mode. Requires all necessary parameters
     to be provided via command line rather than through interactive prompts.
+    .PARAMETER EnableGeoIPLocation
+		Switch to enable resolving IP addresses to geographic locations in the investigation.
+		This option requires an active internet connection and may increase the time needed to complete the investigation.
+		Providing this parameter automatically enables non-interactive mode.
+
+        REQUIRED: An API key from ipstack.com is required to use this feature.
     .OUTPUTS
         Creates the $Hawk global variable and populates it with a custom PS object with the following properties
 
@@ -48,7 +54,8 @@
         [string]$FilePath,
         [switch]$SkipUpdate,
         [switch]$NonInteractive,
-        [switch]$Force
+        [switch]$Force,
+        [switch]$EnableGeoIPLocation
     )
 
 
@@ -236,6 +243,7 @@
             StartDate      = $null
             EndDate        = $null
             WhenCreated    = $null
+            EnableGeoIPLocation = $null
             TenantName     = $null
         }
 
@@ -374,7 +382,6 @@
                 if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-365))) {
                     Out-LogFile -string "The date cannot exceed 365 days. Setting to the maximum limit of 365 days." -isWarning
                     [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-365)).Date
-
                 }
 
                 Out-LogFile -string "Start Date: ${StartDate}Z" -Information
@@ -523,6 +530,44 @@
 
         }
 
+        # Be sure to remove the two comments below once you're done validating the logic
+        # Or if you want to be more specific and check if it was the immediate caller:
+        # I believe the logic is incorrect here. It should be checking if the immediate caller was UserInvestigation
+        # FIX-ME: modify -eq to startswith bec there are cases where we can have <PROCESS> or <Begin> and we just 
+        # need to account for Start-HawkUserInvestigation getting called!
+        # FIX-ME: Account for the logic case where Get-HawkUserUALSignInLogs is called
+        $BoolDirectlyCalledByUserInvestigation = ((Get-PSCallStack)[1].FunctionName -like "Start-HawkUserInvestigation*") -or `
+                                                 ((Get-PSCallStack)[1].FunctionName -like "Get-HawkUserUALSignInLog*") -or `
+                                                 ((Get-PSCallStack)[1].FunctionName -like "Get-HawkUserEntraIDSignInLog*")
+        Out-LogFile "Was directly called by: $BoolDirectlyCalledByUserInvestigation" -Information
+        Out-LogFile (Get-PSCallStack)[1].FunctionName -Information
+
+        if ((-not $PSBoundParameters.ContainsKey('EnableGeoIPLocation')) -and $BoolDirectlyCalledByUserInvestigation) {
+            Out-LogFile "Would you like to enable GeoIP Location?" -Information
+            Out-LogFile "An API key from ipstack.com is required." -Information
+            
+            $GeoIPResponse = ''
+            while ($GeoIPResponse -notin @('Y','N')) {
+                Out-LogFile "Enable GeoIP Location? (Y/N): " -isPrompt -NoNewLine
+                $GeoIPResponse = ((Read-Host).Trim()).ToUpper()
+                
+                if ($GeoIPResponse -notin @('Y','N')) {
+                    Out-LogFile "Please enter Y or N" -Information
+                }
+                if ($GeoIPResponse -eq 'Y') {
+                    $Hawk.EnableGeoIPLocation = $true
+                    break
+                }
+                if ($GeoIPResponse -eq 'N') {
+                    $Hawk.EnableGeoIPLocation = $false
+                    break
+                }
+            }
+        }
+
+        if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
+            $Hawk.EnableGeoIPLocation = $EnableGeoIPLocation
+        }
 
 
         # Configuration Example, currently not used
@@ -532,8 +577,6 @@
             Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
         }
 
-
-        
 
         # Continue populating the Hawk object with other properties
         $Hawk.DaysToLookBack = $DaysToLookBack

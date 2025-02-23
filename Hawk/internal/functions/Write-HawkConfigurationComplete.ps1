@@ -53,10 +53,15 @@
         }
 
         # Format property names and create array of formatted names
+        # Use Claude to help format properties
         $formattedNames = @()
         foreach ($prop in $properties) {
-            $name = $prop.Name -creplace '([A-Z])', ' $1' -replace '_', ' '
-            $formattedNames += $name.Trim()
+            if ($prop.Name -eq 'EnableGeoIPLocation') {
+                $formattedNames += "Enable Geo IP Location"
+            } else {
+                $name = $prop.Name -creplace '([A-Z])', ' $1' -replace '_', ' '
+                $formattedNames += $name.Trim()
+            }
         }
 
         # Find the longest property name

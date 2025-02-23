@@ -61,6 +61,13 @@
     .PARAMETER WhatIf
         Shows what would happen if the command runs. The command is not executed.
         Use this parameter to understand which investigation steps would be performed without actually collecting data.
+	
+	.PARAMETER EnableGeoIPLocation
+		Switch to enable resolving IP addresses to geographic locations in the investigation.
+		This option requires an active internet connection and may increase the time needed to complete the investigation.
+		Providing this parameter automatically enables non-interactive mode.
+
+		REQUIRED: An API key from ipstack.com is required to use this feature.
 
     .OUTPUTS
         Creates multiple CSV and JSON files containing investigation results.
@@ -97,12 +104,12 @@
 	param (
 		[Parameter(Mandatory = $true)]
 		[array]$UserPrincipalName,
-
 		[DateTime]$StartDate,
 		[DateTime]$EndDate,
 		[int]$DaysToLookBack,
 		[string]$FilePath,
-		[switch]$SkipUpdate
+		[switch]$SkipUpdate,
+		[switch]$EnableGeoIPLocation
 	)
 
 	begin {
@@ -125,9 +132,17 @@
 			}
 
 			try {
-				Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
-					-DaysToLookBack $DaysToLookBack -FilePath $FilePath `
-					-SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive
+				# Call Initialize-HawkGlobalObject in case of non-interactive mode
+				if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
+					Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
+						-DaysToLookBack $DaysToLookBack -FilePath $FilePath `
+						-SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive -EnableGeoIPLocation:$EnableGeoIPLocation
+				} else {
+					# Call Initialize-HawkGlobalObject in case of interactive mode for EnableGeoIPLocation	
+					Initialize-HawkGlobalObject -StartDate $StartDate -EndDate $EndDate `
+						-DaysToLookBack $DaysToLookBack -FilePath $FilePath `
+						-SkipUpdate:$SkipUpdate -NonInteractive:$NonInteractive
+				}
 			}
 			catch {
 				Stop-PSFFunction -Message "Failed to initialize Hawk: $_" -EnableException $true
@@ -138,9 +153,21 @@
 	process {
 		if (Test-PSFFunctionInterrupt) { return }
 
+		# Be sure to remove comments after testing!
+		#if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
+		#	Initialize-HawkGlobalObject -EnableGeoIPLocation
+		#	Out-LogFile "START-HAWKUSERINVESTIGATION -> Calling Initialize-HawkGlobalObject with EnableGeoIPLocation" -Information
+		#} else {
+		#	Initialize-HawkGlobalObject
+		#	Out-LogFile "START-HAWKUSERINVESTIGATION -> Calling Initialize-HawkGlobalObject without EnableGeoIPLocation" -Information
+		#}
+
 		# Check if Hawk object exists and is fully initialized
 		if (Test-HawkGlobalObject) {
+			Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to TRUE!" -Information
 			Initialize-HawkGlobalObject
+		} else {
+			Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to FALSE!" -Information
 		}
 		$investigationStartTime = Get-Date
 
@@ -156,6 +183,7 @@
 			foreach ($Object in $UserArray) {
 				[string]$User = $Object.UserPrincipalName
 	
+				<#
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserConfiguration for $User")) {
 					Out-LogFile "Running Get-HawkUserConfiguration" -Action
 					Get-HawkUserConfiguration -User $User
@@ -180,12 +208,21 @@
 					Out-LogFile "Running Get-HawkUserEntraIDSignInLog" -Action
 					Get-HawkUserEntraIDSignInLog -UserPrincipalName $User
 				}
-	
+				#>
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
-					Out-LogFile "Running Get-HawkUserUALSignInLog" -Action
-					Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
+					# Two different use cases (interactive and non-interactive) have to be considered here
+					# $Hawk.EnableGeoIPLocation is to account for interactive mode
+					# $PSBoundParameters.ContainsKey('EnableGeoIPLocation') is to account for non-interactive mode
+					if ($Hawk.EnableGeoIPLocation -or $PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
+						Out-LogFile "Running Get-HawkUserUALSignInLog and resolving IP locations" -Action
+						Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
+					} else {
+						Out-LogFile "Running Get-HawkUserUALSignInLog without resolving IP locations" -Action
+						Get-HawkUserUALSignInLog -User $User
+					}
 				}
 	
+				<#
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
 					Out-LogFile "Running Get-HawkUserMailboxAuditing" -Action
 					Get-HawkUserMailboxAuditing -User $User
@@ -224,6 +261,7 @@
 					Out-LogFile "Running Get-HawkUserMobileDevice" -Action
 					Get-HawkUserMobileDevice -User $User
 				}
+				#>
 
 			}
 		}
