@@ -53,14 +53,14 @@
 
 
     if ($Force) {
-        Remove-Variable -Name Hawk -Scope Global -ErrorAction SilentlyContinue 
+        Remove-Variable -Name Hawk -Scope Global -ErrorAction SilentlyContinue
     }
 
     # Check for incomplete/interrupted initialization and force a fresh start
     if ($null -ne (Get-Variable -Name Hawk -ErrorAction SilentlyContinue)) {
         if (Test-HawkGlobalObject) {
             Remove-Variable -Name Hawk -Scope Global -ErrorAction SilentlyContinue
-            
+
             # Remove other related global variables that might exist
             Remove-Variable -Name IPlocationCache -Scope Global -ErrorAction SilentlyContinue
             Remove-Variable -Name MSFTIPList -Scope Global -ErrorAction SilentlyContinue
@@ -69,10 +69,10 @@
 
     Function Test-LoggingPath {
         param([string]$PathToTest)
-        
+
         # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
         $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
-    
+
         # First test if the path we were given exists
         if (Test-Path $PathToTest) {
             # If the path exists verify that it is a folder
@@ -91,16 +91,16 @@
             Return $false
         }
     }
-    
+
 
     Function New-LoggingFolder {
         [OutputType([System.Collections.Hashtable])]
         [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
-   
+
         # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
         $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
-    
+
         try {
             # Test Graph connection first to see if we're already connected
             try {
@@ -113,28 +113,28 @@
                 $null = Test-GraphConnection
                 Write-Information "[$timestamp] - [INFO]   - Connected to Microsoft Graph Successfully"
             }
-    
-            # Get tenant name 
+
+            # Get tenant name
             $org = Get-MgOrganization -ErrorAction Stop
             if (!$org) {
                 throw "Could not retrieve tenant organization information"
             }
-            
+
             # Use display name if available, otherwise fall back to tenant name
-            $TenantName = if ($org.DisplayName) { 
-                $org.DisplayName 
+            $TenantName = if ($org.DisplayName) {
+                $org.DisplayName
             }
-            else { 
+            else {
                 $org.Id
             }
-            
+
             # Remove any invalid file system characters and spaces
             $TenantName = $TenantName -replace '[\\/:*?"<>|]', '' -replace '\s+', '_'
-            
+
             [string]$FolderID = "Hawk_" + $TenantName + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmmss")
-    
+
             $FullOutputPath = Join-Path $RootPath $FolderID
-    
+
             if (Test-Path $FullOutputPath) {
                 Write-Information "[$timestamp] - [ERROR]  - Path $FullOutputPath already exists"
             }
@@ -142,7 +142,7 @@
                 Write-Information "[$timestamp] - [ACTION] - Creating subfolder $FullOutputPath"
                 $null = New-Item $FullOutputPath -ItemType Directory -ErrorAction Stop
             }
-    
+
             # Return both path and tenant name
             return @{
                 Path       = $FullOutputPath
@@ -155,22 +155,22 @@
             Write-Error "[$timestamp] - [ERROR]  - Failed to create logging folder: $_"
         }
     }
-    
+
     Function Set-LoggingPath {
         [CmdletBinding(SupportsShouldProcess)]
         param (
             [string]$Path)
-    
+
         # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
         $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
-    
+
         # If no value for Path is provided, prompt and gather from the user
         if ([string]::IsNullOrEmpty($Path)) {
             # Setup a while loop to get a valid path
             Do {
                 # Ask the user for the output path
                 [string]$UserPath = (Read-Host "[$timestamp] - [PROMPT] - Please provide an output directory").Trim()
-    
+
                 # If the input is null or empty, prompt again
                 if ([string]::IsNullOrEmpty($UserPath)) {
                     Write-Host "[$timestamp] - [INFO]   - Directory path cannot be empty. Please enter in a new path."
@@ -200,14 +200,14 @@
                 Write-Error "[$timestamp] - [ERROR]  - Provided path is not a valid directory: $Path"
             }
         }
-    
+
         Return $folderInfo
     }
     Function New-ApplicationInsight {
         [CmdletBinding(SupportsShouldProcess)]
         param()
         # Initialize Application Insights client
-        $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
+        $insightkey = "aa3d4e74-29c0-4b4c-83ad-865669402baa"
         if ($Null -eq $Client) {
             Out-LogFile "Initializing Application Insights" -Action
             $Client = New-AIClient -key $insightkey
@@ -217,7 +217,7 @@
     ### Main ###
     $InformationPreference = "Continue"
 
-    
+
     if (($null -eq (Get-Variable -Name Hawk -ErrorAction SilentlyContinue)) -or ($Force -eq $true) -or ($null -eq $Hawk)) {
 
         if ($NonInteractive) {
@@ -226,9 +226,9 @@
         else {
             Write-HawkBanner -DisplayWelcomeMessage
         }
-        
-        
-        
+
+
+
         # Create the global $Hawk variable immediately with minimal properties
         $Global:Hawk = [PSCustomObject]@{
             FilePath       = $null  # Will be set shortly
@@ -255,7 +255,7 @@
 
         # Now that FilePath is set, we can use Out-LogFile
         Out-LogFile "Hawk output directory created at: $($Hawk.FilePath)" -Information
-        
+
         # Setup Application insights
         Out-LogFile "Setting up Application Insights" -Action
         New-ApplicationInsight
@@ -281,18 +281,18 @@
                 $LicenseInfo = Test-LicenseType
                 $MaxDaysToGoBack = $LicenseInfo.RetentionPeriod
                 $LicenseType = $LicenseInfo.LicenseType
-    
+
                 Out-LogFile -string "Detecting M365 license type to determine maximum log retention period" -action
                 Out-LogFile -string "M365 License type detected: $LicenseType" -Information
                 Out-LogFile -string "Max log retention: $MaxDaysToGoBack days" -action -NoNewLine
-    
+
             }
             catch {
                 Out-LogFile -string "Failed to detect license type. Max days of log retention is unknown." -Information
                 $MaxDaysToGoBack = 90
                 $LicenseType = "Unknown"
             }
-    
+
         }
 
 
@@ -303,15 +303,15 @@
         while ($null -eq $StartDate) {
             Write-Output "`n"
             Out-LogFile "Please specify the first day of the search window:" -isPrompt
-            Out-LogFile " Enter a number of days to go back (1-$MaxDaysToGoBack)" -isPrompt 
+            Out-LogFile " Enter a number of days to go back (1-$MaxDaysToGoBack)" -isPrompt
             Out-LogFile " OR enter a date in MM/DD/YYYY format" -isPrompt
             Out-LogFile " Default is 90 days back: " -isPrompt -NoNewLine
             [string]$StartRead = (Read-Host).Trim()
-        
+
             # Determine if input is a valid date
             # Determine if input is a valid date
             if ($null -eq ($StartRead -as [DateTime])) {
-                
+
                 #### Not a DateTime => interpret as # of days ####
                 if ([string]::IsNullOrEmpty($StartRead)) {
                     $StartRead = "90"
@@ -327,7 +327,7 @@
                 [int]$StartRead = [int]$StartRead
 
                 $StartDays = $StartRead
-        
+
                 # Validate the input is within range
                 # Validate the input is within range
                 if (($StartRead -gt 365) -or ($StartRead -lt 1))   {
@@ -345,12 +345,12 @@
                     if ($Proceed -eq 'R') { Remove-Variable -Name StartDate -ErrorAction SilentlyContinue; continue }
                 }
 
-        
+
                 # At this point, we do not yet have EndDate set. So temporarily anchor from "today":
                 [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
-        
+
                 Out-LogFile -string "Start date set to: ${StartDate}Z" -Information
-        
+
             }
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
                 [DateTime]$StartDate = $StartRead -as [DateTime]  # <--- Add this line
@@ -458,7 +458,7 @@
             Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
             Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
             Out-LogFile " Default is today's date:" -isPrompt -NoNewLine
-            $EndRead = (Read-Host).Trim()            
+            $EndRead = (Read-Host).Trim()
 
             # End date validation
             if ($null -eq ($EndRead -as [DateTime])) {
@@ -533,14 +533,14 @@
         }
 
 
-        
+
 
         # Continue populating the Hawk object with other properties
         $Hawk.DaysToLookBack = $DaysToLookBack
         $Hawk.StartDate = $StartDate
         $Hawk.EndDate = $EndDate
         $Hawk.WhenCreated = (Get-Date).ToUniversalTime().ToString("g")
-        Write-HawkConfigurationComplete -Hawk $Hawk 
+        Write-HawkConfigurationComplete -Hawk $Hawk
 
 
     }

@@ -26,6 +26,7 @@
            # Check if Hawk object exists and is fully initialized
            if (Test-HawkGlobalObject) {
                Initialize-HawkGlobalObject
+               Send-AIEvent -Event "CmdRun"
            }
 
            if ($null -eq $hibpkey) {
@@ -39,7 +40,7 @@
 
                # get the access key from the user
                Out-LogFile "haveibeenpwned.com apikey" -isPrompt -NoNewLine
-               $hibpkey = (Read-Host).Trim() 
+               $hibpkey = (Read-Host).Trim()
            }
        }#End of BEGIN block
 
@@ -93,7 +94,7 @@
 
            }
        }#End of PROCESS block
-       
+
        END {
            Start-Sleep -Milliseconds 1500
        }#End of END block

@@ -38,6 +38,7 @@ Function Get-HawkUserMailItemsAccessed {
             Initialize-HawkGlobalObject
         }
         Test-EXOConnection
+        Send-AIEvent -Event "CmdRun"
     }
 
     PROCESS {
@@ -48,27 +49,27 @@ Function Get-HawkUserMailItemsAccessed {
             [string]$User = $UserObject.UserPrincipalName
             Out-LogFile "Initiating collection of MailItemsAccessed for $User from the UAL." -Action
             Out-LogFile "Please be patient, this can take a while..." -Information
-           
+
             # Verify that user has operation enabled for auditing. Otherwise, move onto next user.
             if (Test-OperationEnabled -User $User -Operation 'MailItemsAccessed') {
                 Out-LogFile "Operation 'MailItemsAccessed' verified enabled for $User." -Information
                 try {
-                    #Retrieve all audit data for mailitems accessed 
+                    #Retrieve all audit data for mailitems accessed
                     $SearchCommand = "Search-UnifiedAuditLog -Operations 'MailItemsAccessed' -UserIds $User"
                     $MailboxItemsAccessed = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
-                    
+
                     if ($MailboxItemsAccessed.Count -gt 0) {
                         #Define output directory path for user
                         $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
-                    
+
                         #Create user directory if it doesn't already exist
                         if (-not (Test-Path -Path $UserFolder)) {
                             New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
                         }
-                    
+
                         #Compress raw data into more simple view
                         $MailboxItemsAccessedSimple = $MailboxItemsAccessed | Get-SimpleUnifiedAuditLog
-                    
+
                         #Export both raw and simplistic views to specified user's folder
                         $MailboxItemsAccessed | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "MailItemsAccessed_$User" -User $User -csv -json
                         $MailboxItemsAccessedSimple | Out-MultipleFileType -FilePrefix "Simple_MailItemsAccessed_$User" -User $User -csv -json
