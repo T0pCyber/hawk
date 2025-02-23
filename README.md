@@ -97,6 +97,29 @@ For critical issues or inquiries, email hawkpsmodule@gmail.com.
 - [GitHub Discussions](https://github.com/T0pCyber/hawk/discussions)
 - Email: hawkpsmodule@gmail.com
 
-# Disclaimer
+# **Hawk Telemetry Disclosure**
 
-Hawk is NOT an official MICROSOFT tool. Use of the tool is covered exclusively by the license associated with this GitHub repository.
+## **Overview**
+Hawk, the open-source PowerShell module, collects limited usage data to help improve the module by identifying the most frequently used features. This data assists in prioritizing updates, enhancements, and new functionality.
+
+## **What Data is Collected?**
+Hawk collects **only** the names of the functions that are executed.
+
+✅ **Collected Data:**
+- Function names that are run within Hawk.
+
+❌ **Not Collected:**
+- No user-identifiable data.
+- No environmental or system data.
+- No script inputs, outputs, or arguments.
+- No personal, confidential, or sensitive data.
+- No data is shared or sold.
+
+## **Why is This Data Collected?**
+The telemetry helps us understand which functions are used most frequently so we can:
+- Prioritize updates and improvements.
+- Optimize performance for widely used features.
+- Make data-driven decisions about future development.
+
+## **How is the Data Used?**
+The collected data is strictly used for internal development purposes to enhance the Hawk module. It is never shared, sold, or used for any form of tracking beyond feature usage.
