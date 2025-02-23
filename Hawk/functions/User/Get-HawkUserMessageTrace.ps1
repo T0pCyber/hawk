@@ -1,5 +1,5 @@
 ﻿Function Get-HawkUserMessageTrace {
-<#
+    <#
 .SYNOPSIS
     Pull that last 7 days of message trace data for the specified user.
 .DESCRIPTION
@@ -27,6 +27,11 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
         [array]$UserPrincipalName
 
     )
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
@@ -36,6 +41,7 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
 
     # Gather the trace
     foreach ($Object in $UserArray) {
+        Out-LogFile "Initiating collection of Message Trace Data for $User from Exchange Online." -Action
 
         [string]$User = $Object.UserPrincipalName
 
@@ -51,5 +57,7 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
 
             (Get-MessageTrace -Sender $PrimarySMTP) | Out-MultipleFileType -FilePreFix "Message_Trace" -user $User -csv -json
         }
+        Out-LogFile "Completed collection of Message Trace Data for $User from Exchange Online." -Information
+
     }
 }

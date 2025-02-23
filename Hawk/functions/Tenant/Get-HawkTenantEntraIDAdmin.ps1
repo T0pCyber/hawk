@@ -20,11 +20,12 @@
         param()
 
         BEGIN {
-            # Initializing Hawk Object if not present
-            if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+            # Check if Hawk object exists and is fully initialized
+            if (Test-HawkGlobalObject) {
                 Initialize-HawkGlobalObject
             }
-            Out-LogFile "Gathering Microsoft Entra ID Administrators" -Action
+
+            Out-LogFile "Initiating collection of Microsoft Entra ID Administrators from Microsoft Graph." -Action
 
             # Verify Graph API connection
             Test-GraphConnection
@@ -82,7 +83,8 @@
                     Out-LogFile "Successfully exported Microsoft Entra ID Administrators data" -Information
                 }
                 else {
-                    Out-LogFile "No administrator roles found or accessible" -Information
+                    Out-LogFile "Get-HawkTenantEntraID completed" -Information
+                    Out-LogFile "No administrator roles found or accessible" -Action
                 }
             }
             catch {
@@ -93,6 +95,6 @@
         }
 
         END {
-            Out-LogFile "Completed exporting Microsoft Entra ID Admins" -Information
+            Out-LogFile "Completed collection of Microsoft Entra ID Administrators from Microsoft Graph." -Information
         }
     }

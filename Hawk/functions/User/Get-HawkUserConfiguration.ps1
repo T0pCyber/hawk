@@ -43,6 +43,10 @@
 		[Parameter(Mandatory = $true)]
 		[array]$UserPrincipalName
 	)
+	# Check if Hawk object exists and is fully initialized
+	if (Test-HawkGlobalObject) {
+		Initialize-HawkGlobalObject
+	}
 
 	Test-EXOConnection
 	Send-AIEvent -Event "CmdRun"
@@ -53,10 +57,9 @@
 	foreach ($Object in $UserArray) {
 		[string]$User = $Object.UserPrincipalName
 
-		Out-LogFile ("Gathering information about " + $User) -action
+		Out-LogFile "Initiating collection of mailbox configuration for $User from Exchange Online." -Action
 
 		#Gather mailbox information
-		Out-LogFile "Gathering Mailbox Information" -action
 		$mbx = Get-EXOMailbox -Identity $user
 
 		# Test to see if we have an archive and include that info as well
@@ -71,5 +74,7 @@
 		# Gather cas mailbox sessions
 		Out-LogFile "Gathering CAS Mailbox Information" -action
 		Get-EXOCasMailbox -identity $user | Out-MultipleFileType -FilePrefix "CAS_Mailbox_Info" -User $User -txt
+
+		Out-LogFile "Completed collection of mailbox configuration for $User from Exchange Online." -Information
 	}
 }

@@ -1,5 +1,5 @@
 ﻿Function Get-HawkUserMobileDevice {
-<#
+    <#
 .SYNOPSIS
     Gathers mobile devices that are connected to the account
 .DESCRIPTION
@@ -31,6 +31,11 @@
         [array]$UserPrincipalName
 
     )
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
@@ -43,20 +48,23 @@
 
         [string]$User = $Object.UserPrincipalName
 
+        Out-LogFile "Initiating collection of mobile devices attached to $User inbox from Exchange Online." -Action
+
+
         # Get all mobile devices
         Out-Logfile ("Gathering Mobile Devices for: " + $User) -Action
         [array]$MobileDevices = Get-MobileDevice -mailbox $User
 
         if ($Null -eq $MobileDevices) {
-            Out-Logfile ("No devices found for user: " + $User) -Information
+            Out-Logfile ("No mobile devices found for user: " + $User) -action
         }
         else {
             Out-Logfile ("Found " + $MobileDevices.count + " Devices") -Information
 
             # Check each device to see if it was NEW
             # If so flag it for investigation
-            foreach ($Device in $MobileDevices){
-                if ($Device.FirstSyncTime -gt $Hawk.StartDate){
+            foreach ($Device in $MobileDevices) {
+                if ($Device.FirstSyncTime -gt $Hawk.StartDate) {
                     Out-Logfile ("Device found that was first synced inside investigation window") -notice
                     Out-LogFile ("DeviceID: " + $Device.DeviceID) -notice
                     $Device | Out-MultipleFileType -FilePreFix "_Investigate_MobileDevice" -user $user -csv -json -append -Notice
@@ -66,5 +74,7 @@
             # Output all devices found
             $MobileDevices | Out-MultipleFileType -FilePreFix "MobileDevices" -user $user -csv -json
         }
+        Out-LogFile "Completed collection of mobile devices attached to $User inbox from Exchange Online." -Information
+
     }
 }

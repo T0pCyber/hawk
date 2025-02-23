@@ -10,11 +10,15 @@
     PS C:\> Export-EXOAdmin -EngagementFolder foldername
     Exports Exchange Admins UserPrincipalName to .csv
 .OUTPUTS
-    EXOAdmins.csv
+    ExchangeOnlineAdministrators.csv/.json
 .NOTES
 #>
 BEGIN{
-    Out-LogFile "Gathering Exchange Online Administrators" -Action
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+    Out-LogFile "Initiating collection of Exchange Online Admins." -Action
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
@@ -43,7 +47,7 @@ PROCESS{
 
 }
 END{
-    Out-Logfile "Completed exporting Exchange Online Admins" -Information
+    Out-Logfile "Completed exporting Exchange Online Admins." -Information
 }
 
 }#End Function

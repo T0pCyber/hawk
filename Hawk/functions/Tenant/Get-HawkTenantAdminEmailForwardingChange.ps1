@@ -37,6 +37,13 @@ Function Get-HawkTenantAdminEmailForwardingChange {
     [CmdletBinding()]
     param()
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
+    Out-LogFile "Initiating collection of email forwarding configuration changes from the UAL." -Action
+
     # Test the Exchange Online connection to ensure the environment is ready for operations.
     Test-EXOConnection
     # Log the execution of the function for audit and telemetry purposes.
@@ -47,7 +54,7 @@ Function Get-HawkTenantAdminEmailForwardingChange {
     $lastUpdate = $startTime
 
     # Log the start of the analysis process for email forwarding configuration changes.
-    Out-LogFile "Analyzing email forwarding configuration changes from audit logs" -Action
+    Out-LogFile "Collecting email forwarding configuration changes from the UAL." -Action
 
     # Ensure the tenant-specific folder exists to store output files. If not, create it.
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -70,7 +77,7 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
         [array]$AllMailboxChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
         # Log search completion time
-        Out-LogFile "Unified Audit Log search completed" -Information
+        Out-LogFile "Completed collection of email forwarding configuration changes from the UAL." -Information
 
         Out-LogFile "Filtering results for forwarding changes..." -Action
 
@@ -84,7 +91,7 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
                     'ForwardingSMTPAddress',
                     'ExternalEmailAddress',
                     'PrimarySmtpAddress',
-                    'RedirectTo',             # Added from other LLM suggestion
+                    'RedirectTo',            
                     'DeliverToMailboxAndForward',  # Corrected parameter name
                     'DeliverToAndForward'     # Alternative parameter name
                 ) -or
@@ -94,11 +101,11 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
             })
         }
 
-        Out-LogFile "Completed filtering for forwarding changes" -Information
+        Out-LogFile "Completed filtering for forwarding changes." -Information
 
         if ($ForwardingChanges.Count -gt 0) {
             # Log the number of forwarding configuration changes found.
-            Out-LogFile ("Found " + $ForwardingChanges.Count + " change(s) to user email forwarding") -Information
+            Out-LogFile ("Found " + $ForwardingChanges.Count + " change(s) to user email forwarding.") -Information
 
             # Parse the audit data into a simpler format for further processing and output.
             $ParsedChanges = $ForwardingChanges | Get-SimpleUnifiedAuditLog
@@ -117,7 +124,7 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
                     # Add a status update every 30 seconds
                     $currentTime = Get-Date
                     if (($currentTime - $lastUpdate).TotalSeconds -ge 30) {
-                        Out-LogFile "Processing forwarding changes... ($($ForwardingDestinations.Count) destinations found so far)" -Action
+                        Out-LogFile "Processing forwarding changes... ($($ForwardingDestinations.Count) destinations found so far)." -Action
                         $lastUpdate = $currentTime
                     }
 
@@ -199,8 +206,9 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
         }
         else {
             # Log a message if no forwarding changes are found in the logs.
-            Out-LogFile "No forwarding changes found in filtered results" -Information
-            Out-LogFile "Retrieved $($AllMailboxChanges.Count) total operations, but none involved forwarding changes" -Information
+            Out-LogFile "Get-HawkTenantAdminEmailForwardingChange completed successfully" -Information
+            Out-LogFile "No forwarding changes found in filtered results" -action
+            Out-LogFile "Retrieved $($AllMailboxChanges.Count) total operations, but none involved forwarding changes" -action
         }
     }
     catch {
@@ -208,5 +216,7 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
         Out-LogFile "Error analyzing email forwarding changes: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
+
+    Out-LogFile "Completed collection of email forwarding configuration changes from the UAL." -Information
 }
            

@@ -23,7 +23,8 @@
     param()
 
     BEGIN {
-        if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+        # Check if Hawk object exists and is fully initialized
+        if (Test-HawkGlobalObject) {
             Initialize-HawkGlobalObject
         }
 
@@ -32,6 +33,8 @@
         if (-not (Test-Path -Path $tenantPath)) {
             New-Item -Path $tenantPath -ItemType Directory -Force | Out-Null
         }
+
+        Out-LogFile "Initiating collection of application and service principal credentials." -Action
 
         Test-GraphConnection
         Send-AIEvent -Event "CmdRun"
@@ -145,6 +148,6 @@
     }
 
     END {
-        Out-Logfile "Completed exporting Azure AD Service Principal and App Registration Certificate and Password Details" -Information
+        Out-LogFile "Completed collection of application and service principal credentials from Microsoft Graph." -Information
     }
 }

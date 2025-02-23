@@ -35,6 +35,11 @@
         [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName
     )
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+    
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
@@ -48,7 +53,7 @@
         # Get the mailbox name since that is what we store in the admin audit log
         $MailboxName = (Get-Mailbox -Identity $User).Name
 
-        Out-LogFile ("Searching for changes made to: " + $MailboxName) -action
+        Out-LogFile "Initiating collection of admin audit events for $User from the UAL." -Action
 
         try {
             # Build search command for Get-AllUnifiedAuditLogEntry
@@ -81,12 +86,16 @@
                 $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -User $User
             }
             else {
-                Out-LogFile "No User Changes found." -Information
+                Out-LogFile "Get-HawkUserAdminAudit completed successfully" -Information
+                Out-LogFile "No User Changes found." -action
             }
         }
         catch {
             Out-LogFile "Error processing audit logs for $User : $_" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
+        }
+        finally {
+            Out-LogFile "Completed collection of admin audit events for $User from the UAL." -Information
         }
     }
 }

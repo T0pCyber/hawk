@@ -44,8 +44,17 @@
         [string]$IpAddress
     )
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
+
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
+
+
+    Out-LogFile "Initiating collection of IP-based activity from the UAL." -Information
 
     # Replace an : in the IP address with . since : isn't allowed in a directory name
     $DirectoryName = $IpAddress.replace(":", ".")
@@ -63,7 +72,8 @@
 
     # If we didn't get anything back log it
     if ($null -eq $ipevents) {
-        Out-LogFile ("No IP logon events found for IP "	+ $IpAddress) -Information
+        Out-LogFile "Get-HawkTenantActivityByIP completed successfully" -Information
+        Out-LogFile ("No IP logon events found for IP "	+ $IpAddress) -action
     }
 
     # If we did then process it
@@ -94,5 +104,7 @@
         }
 
     }
+
+    Out-LogFile "Completed collection of IP-based activity from the UAL." -Information
 
 }

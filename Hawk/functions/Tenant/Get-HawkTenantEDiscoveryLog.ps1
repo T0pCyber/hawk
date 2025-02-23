@@ -18,7 +18,7 @@
         Get-HawkTenantEDiscoveryLog
 
         This will search for all eDiscovery-related activities in the Unified Audit Log
-        for the configured time period and export the results to CSV format.
+        for the configured time period and export the results to CSV and JSON formats.
 
     .EXAMPLE
         $logs = Get-HawkTenantEDiscoveryLog
@@ -28,7 +28,11 @@
         operations like new search creation.
 
     .OUTPUTS
-        File: eDiscoveryLogs.csv
+        File: Simple_eDiscoveryLogs.csv/.json
+        Path: \Tenant
+        Description: Simplified view of eDiscovery activities.
+
+        File: eDiscoveryLogs.csv/.json
         Path: \Tenant
         Description: Contains all eDiscovery activities found in the UAL with fields for:
         - CreationTime: When the activity occurred
@@ -40,37 +44,37 @@
         - CaseId: Unique identifier for the eDiscovery case
         - Cmdlet: Command that was executed (if applicable)
     #>
-    # Search UAL audit logs for any Domain configuration changes
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Gathering any eDiscovery logs" -action
-
-    # Search UAL audit logs for any Domain configuration changes
+    Out-LogFile "Initiating collection of eDiscovery configuration data from Exchange Online." -Action
+    # Search UAL audit logs for any eDiscovery activities
     $eDiscoveryLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'Discovery'")
-    # If null we found no changes to nothing to do here
+    
     if ($null -eq $eDiscoveryLogs) {
-        Out-LogFile "No eDiscovery Logs found" -Information
+        Out-LogFile "Get-HawkTenantEDiscoveryLog completed successfully" -Information
+        Out-LogFile "No eDiscovery Logs found" -Action
     }
-
-    # If not null then we must have found some events so flag them
     else {
-        Out-LogFile "eDiscovery Log have been found." -Notice
+        Out-LogFile "eDiscovery Logs have been found." -Notice
         Out-LogFile "Please review these eDiscoveryLogs.csv to validate the activity is legitimate." -Notice
-        # Go thru each even and prepare it to output to CSV
-        Foreach ($log in $eDiscoveryLogs) {
-            $log1 = $log.auditdata | ConvertFrom-Json
-            $report = $log1  | Select-Object -Property CreationTime,
-            Id,
-            Operation,
-            Workload,
-            UserID,
-            Case,
-            @{Name = 'CaseID'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'CaseId' }).value } },
-            @{Name = 'Cmdlet'; Expression = { ($_.Parameters | Where-Object { $_.Name -eq 'Cmdlet' }).value } }
 
-            $report | Out-MultipleFileType -fileprefix "eDiscoveryLogs" -csv -append
+        # Process and output both simple and detailed formats
+        $ParsedLogs = $eDiscoveryLogs | Get-SimpleUnifiedAuditLog
+        if ($ParsedLogs) {
+            Out-LogFile "Writing parsed eDiscovery log data" -Action
+            $ParsedLogs | Out-MultipleFileType -FilePrefix "Simple_eDiscoveryLogs" -csv -json
+            $eDiscoveryLogs | Out-MultipleFileType -FilePrefix "eDiscoveryLogs" -csv -json
         }
-
+        else {
+            Out-LogFile "Error: Failed to parse eDiscovery log data" -isError
+        }
     }
+    Out-LogFile "Completed collection of eDiscovery logs from Exchange Online." -Information
+
 }

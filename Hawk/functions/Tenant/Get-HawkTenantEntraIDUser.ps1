@@ -20,14 +20,16 @@
         Properties selected for DFIR relevance.
     #>
     BEGIN {
-        # Initialize the Hawk environment if not already done
-        if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+        # Check if Hawk object exists and is fully initialized
+        if (Test-HawkGlobalObject) {
             Initialize-HawkGlobalObject
         }
-        Out-LogFile "Gathering Entra ID Users" -Action
+
+        Out-LogFile "Initiating collection of users from Entra ID." -Action
 
         # Ensure we have a valid Graph connection
         Test-GraphConnection
+        Send-AIEvent -Event "CmdRun"
     }
     PROCESS {
         # Get all users with specific properties needed for DFIR
@@ -56,10 +58,11 @@
                 Out-MultipleFileType -FilePrefix "EntraIDUsers" -csv -json
         }
         else {
-            Out-LogFile "No users found" -Information
+            Out-LogFile "Get-HawkTenantEntraIDUser completed successfully" -Information
+            Out-LogFile "No users found" -Action
         }
     }
     END {
-        Out-Logfile "Completed exporting Entra ID users" -Information
+        Out-LogFile "Completed collection of users from Entra ID." -Information
     }
  }

@@ -16,24 +16,20 @@
     .NOTES
         General notes
     #>
-        param
-        (
+        param (
             [Parameter(Mandatory = $true)]
             [string]$UnifiedSearch,
             [datetime]$StartDate = $Hawk.StartDate,
             [datetime]$EndDate = $Hawk.EndDate
         )
-    
+
         # Validate the incoming search command
-        if (($UnifiedSearch -match "-StartDate") -or ($UnifiedSearch -match "-EndDate") -or ($UnifiedSearch -match "-SessionCommand") -or ($UnifiedSearch -match "-ResultSize") -or ($UnifiedSearch -match "-SessionId")) {
+        if ($UnifiedSearch -match "-StartDate|-EndDate|-SessionCommand|-ResultSize|-SessionId") {
             Out-LogFile "Do not include any of the following in the Search Command" -isError
             Out-LogFile "-StartDate, -EndDate, -SessionCommand, -ResultSize, -SessionID" -isError
             Write-Error -Message "Unable to process search command, switch in UnifiedSearch that is handled by this cmdlet specified" -ErrorAction Stop
         }
-    
-        # Make sure key variables are null
-        [string]$cmd = $null
-    
+
         # build our search command to execute
         $cmd = $UnifiedSearch + " -StartDate `'" + (get-date ($StartDate) -UFormat %m/%d/%Y) + "`' -EndDate `'" + (get-date ($endDate) -UFormat %m/%d/%Y) + "`' -SessionCommand ReturnLargeSet -resultsize 5000 -sessionid " + (Get-Date -UFormat %H%M%S)
         Out-LogFile ("Running Unified Audit Log Search") -Action

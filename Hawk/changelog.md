@@ -7,7 +7,7 @@
 ## 2.0.1 (2021-02-07)
 
 - Incorporated workflow and pester tests
-- Readme file updated with https://cloudforensicator.com link
+- Readme file updated with https://hawkforensics.io link
 - Updated Azure AD SKU options that identity "Premium Licensing"
 - Issue #25 - Unified Audit Log AuditData JSON parsing added to "Exchange_UAL_Audit.csv"
 
@@ -88,3 +88,23 @@
 - Updated Get-HawkTenantEDiscoveryConfiguration to use non-deprecated means of collecting / analyzing eDiscovery role assignments.
 - Updated Change Log URI.
 - Removed improperly formatted JSON from Get-HawkTenantAdminInboxRuleHistory, Get-HawkTenantAdminInboxRuleRemoval, Get-HawkTenantRBACChange, Get-HawkUserAdminAudit, Search-HawkTenantEXOAuditLog
+
+## 4.0 (2025-2-23)
+
+- Implemented UTC timestamps to avoid using local timestamps
+- Implemented PROMPT tag to display to screen when prompting user
+- Added functionality to expand detect M365 license type to determine max log retention time
+- Added ability to expand search up to 365 days
+- Added search of mail items accessed to the User Investigation (Get-HawkUserMailItemsAccessed)
+- Add ability to pass command line arguments to Start-HawkUserInvestigation and Start-HawkTenantInvestigation
+- Created Get-HawkUserEntraIDSignInLog, providing the ability to collect user specific Entra Sign in logs and flag on high / medium risk sign ins
+- Created Get-HawkTenantEntraIDAuditLog function, providing the ability to collect the Entra ID Audit log of the defined max of 30 days back from the current date.
+- Created Get-HawkTenantRiskyUsers function to retrieve and analyze users flagged as risky in Microsoft Entra ID.
+- Created Get-HawkTenantRiskDetections function to retrieve and summarize risk detection events from Microsoft Entra ID.
+- Created Get-HawkTenantRiskyServicePrincipals function, providing the ability to retrieve and analyst users flagged as risky in Microsoft Entra ID.
+- Added search of Exchange Search Queries to the User Investigation (Get-HawkUserExchangeSearchQuery)
+- Implemented check to verify that an Exchange operation is enabled for auditing before attempting to pull logs
+- Added log pull of user Send activity to the User Investigation (Get-HawkUserMailSendActivity)
+- Added log pull of user SharePoint Search activity to the User Investigation (Get-HawkUserSharePointSearchQuery)
+- Added telemetry discloser on Readme and updated license
+- Added AppInsight GUID

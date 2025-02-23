@@ -30,6 +30,11 @@
 
     )
 
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+    
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
@@ -41,7 +46,7 @@
         [string]$User = $Object.UserPrincipalName
 
         # Get Autoreply Configuration
-        Out-LogFile ("Retrieving AutoReply Configuration: " + $User) -action
+        Out-LogFile "Initiating collection of auto-reply configuration for $User from Exchange Online." -Action
         $AutoReply = Get-MailboxAutoReplyConfiguration -Identity  $User
 
         # Check if the Autoreply is Disabled
@@ -54,6 +59,7 @@
 
             $AutoReply | Out-MultipleFileType -FilePreFix "AutoReply" -User $user -txt
         }
+        Out-LogFile "Completed collection of auto-reply configuration for $User from Exchange Online." -Information
     }
 
 }

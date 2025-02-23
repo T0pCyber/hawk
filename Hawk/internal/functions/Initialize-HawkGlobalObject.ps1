@@ -1,148 +1,215 @@
 ﻿Function Initialize-HawkGlobalObject {
     <#
-.SYNOPSIS
-    Create global variable $Hawk for use by all Hawk cmdlets.
-.DESCRIPTION
-    Creates the global variable $Hawk and populates it with information needed by the other Hawk cmdlets.
+    .SYNOPSIS
+        Create global variable $Hawk for use by all Hawk cmdlets.
+    .DESCRIPTION
+        Creates the global variable $Hawk and populates it with information needed by the other Hawk cmdlets.
 
-    * Checks for latest version of the Hawk module
-    * Creates path for output files
-    * Records target start and end dates for searches
-.PARAMETER Force
-    Switch to force the function to run and allow the variable to be recreated
-.PARAMETER SkipUpdate
-    Skips checking for the latest version of the Hawk Module
-.PARAMETER DaysToLookBack
-    Defines the # of days to look back in the availible logs.
-    Valid values are 1-90
-.PARAMETER StartDate
-    First day that data will be retrieved
-.PARAMETER EndDate
-    Last day that data will be retrieved
-.PARAMETER FilePath
-    Provide an output file path.
-.OUTPUTS
-    Creates the $Hawk global variable and populates it with a custom PS object with the following properties
+        * Checks for latest version of the Hawk module
+        * Creates path for output files
+        * Records target start and end dates for searches (in UTC)
+    .PARAMETER Force
+        Switch to force the function to run and allow the variable to be recreated
+    .PARAMETER SkipUpdate
+        Skips checking for the latest version of the Hawk Module
+    .PARAMETER DaysToLookBack
+        Defines the # of days to look back in the availible logs.
+        Valid values are 1-90
+    .PARAMETER StartDate
+        First day that data will be retrieved (in UTC)
+    .PARAMETER EndDate
+        Last day that data will be retrieved (in UTC)
+    .PARAMETER FilePath
+        Provide an output file path.
+    .PARAMETER NonInteractive
+    Switch to run the command in non-interactive mode. Requires all necessary parameters
+    to be provided via command line rather than through interactive prompts.
+    .OUTPUTS
+        Creates the $Hawk global variable and populates it with a custom PS object with the following properties
 
-    Property Name	Contents
-    ==========		==========
-    FilePath		Path to output files
-    DaysToLookBack	Number of day back in time we are searching
-    StartDate		Calculated start date for searches based on DaysToLookBack
-    EndDate			One day in the future
-    WhenCreated		Date and time that the variable was created
-.EXAMPLE
-    Initialize-HawkGlobalObject -Force
+        Property Name	Contents
+        ==========		==========
+        FilePath		Path to output files
+        DaysToLookBack	Number of day back in time we are searching
+        StartDate		Calculated start date for searches based on DaysToLookBack (UTC)
+        EndDate			One day in the future (UTC)
+        WhenCreated		Date and time that the variable was created (UTC)
+    .EXAMPLE
+        Initialize-HawkGlobalObject -Force
 
-    This Command will force the creation of a new $Hawk variable even if one already exists.
-#>
+        This Command will force the creation of a new $Hawk variable even if one already exists.
+    #>
     [CmdletBinding()]
     param
     (
-        [switch]$Force,
-        [switch]$SkipUpdate,
         [DateTime]$StartDate,
         [DateTime]$EndDate,
-        [string]$FilePath
+        [int]$DaysToLookBack,
+        [string]$FilePath,
+        [switch]$SkipUpdate,
+        [switch]$NonInteractive,
+        [switch]$Force
     )
+
+
+    if ($Force) {
+        Remove-Variable -Name Hawk -Scope Global -ErrorAction SilentlyContinue
+    }
+
+    # Check for incomplete/interrupted initialization and force a fresh start
+    if ($null -ne (Get-Variable -Name Hawk -ErrorAction SilentlyContinue)) {
+        if (Test-HawkGlobalObject) {
+            Remove-Variable -Name Hawk -Scope Global -ErrorAction SilentlyContinue
+
+            # Remove other related global variables that might exist
+            Remove-Variable -Name IPlocationCache -Scope Global -ErrorAction SilentlyContinue
+            Remove-Variable -Name MSFTIPList -Scope Global -ErrorAction SilentlyContinue
+        }
+    }
 
     Function Test-LoggingPath {
         param([string]$PathToTest)
 
+        # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
+        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
+
         # First test if the path we were given exists
         if (Test-Path $PathToTest) {
-
             # If the path exists verify that it is a folder
             if ((Get-Item $PathToTest).PSIsContainer -eq $true) {
                 Return $true
             }
             # If it is not a folder return false and write an error
             else {
-                Write-Information ("Path provided " + $PathToTest + " was not found to be a folder.")
+                Write-Information "[$timestamp] - [ERROR]  - Path provided $PathToTest was not found to be a folder."
                 Return $false
             }
         }
         # If it doesn't exist then return false and write an error
         else {
-            Write-Information ("Directory " + $PathToTest + " Not Found")
+            Write-Information "[$timestamp] - [ERROR]  - Directory $PathToTest Not Found"
             Return $false
         }
     }
 
+
     Function New-LoggingFolder {
+        [OutputType([System.Collections.Hashtable])]
         [CmdletBinding(SupportsShouldProcess)]
         param([string]$RootPath)
 
-        # Create a folder ID based on date
-        [string]$TenantName = (Get-MGDomain | Where-Object { $_.isDefault }).ID
-        [string]$FolderID = "Hawk_" + $TenantName.Substring(0, $TenantName.IndexOf('.')) + "_" + (Get-Date -UFormat %Y%m%d_%H%M).tostring()
+        # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
+        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
 
-        # Add that ID to the given path
-        $FullOutputPath = Join-Path $RootPath $FolderID
+        try {
+            # Test Graph connection first to see if we're already connected
+            try {
+                $null = Get-MgOrganization -ErrorAction Stop
+                Write-Information "[$timestamp] - [INFO]   - Already connected to Microsoft Graph"
+            }
+            catch {
+                # Only show connecting message if we actually need to connect
+                Write-Information "[$timestamp] - [ACTION] - Connecting to Microsoft Graph"
+                $null = Test-GraphConnection
+                Write-Information "[$timestamp] - [INFO]   - Connected to Microsoft Graph Successfully"
+            }
 
-        # Just in case we run this twice in a min lets not throw an error
-        if (Test-Path $FullOutputPath) {
-            Write-Information "Path Exists"
+            # Get tenant name
+            $org = Get-MgOrganization -ErrorAction Stop
+            if (!$org) {
+                throw "Could not retrieve tenant organization information"
+            }
+
+            # Use display name if available, otherwise fall back to tenant name
+            $TenantName = if ($org.DisplayName) {
+                $org.DisplayName
+            }
+            else {
+                $org.Id
+            }
+
+            # Remove any invalid file system characters and spaces
+            $TenantName = $TenantName -replace '[\\/:*?"<>|]', '' -replace '\s+', '_'
+
+            [string]$FolderID = "Hawk_" + $TenantName + "_" + (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmmss")
+
+            $FullOutputPath = Join-Path $RootPath $FolderID
+
+            if (Test-Path $FullOutputPath) {
+                Write-Information "[$timestamp] - [ERROR]  - Path $FullOutputPath already exists"
+            }
+            else {
+                Write-Information "[$timestamp] - [ACTION] - Creating subfolder $FullOutputPath"
+                $null = New-Item $FullOutputPath -ItemType Directory -ErrorAction Stop
+            }
+
+            # Return both path and tenant name
+            return @{
+                Path       = $FullOutputPath
+                TenantName = $TenantName
+            }
+
         }
-        # If it is not there make it
-        else {
-            Write-Information ("Creating subfolder with name " + $FullOutputPath)
-            $null = New-Item $FullOutputPath -ItemType Directory
+        catch {
+            # If it fails at any point, display an error message
+            Write-Error "[$timestamp] - [ERROR]  - Failed to create logging folder: $_"
         }
-
-        Return $FullOutputPath
     }
 
     Function Set-LoggingPath {
         [CmdletBinding(SupportsShouldProcess)]
-        param ([string]$Path)
+        param (
+            [string]$Path)
 
-        # If no value of Path is provided prompt and gather from the user
+        # Get the current timestamp in the format yyyy-MM-dd HH:mm:ssZ
+        $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss'Z'")
+
+        # If no value for Path is provided, prompt and gather from the user
         if ([string]::IsNullOrEmpty($Path)) {
-
-            # Setup a while loop so we can get a valid path
+            # Setup a while loop to get a valid path
             Do {
+                # Ask the user for the output path
+                [string]$UserPath = (Read-Host "[$timestamp] - [PROMPT] - Please provide an output directory").Trim()
 
-                # Ask the customer for the output path
-                [string]$UserPath = Read-Host "Please provide an output directory"
-
-                # If the path is valid then create the subfolder
-                if (Test-LoggingPath -PathToTest $UserPath) {
-
-                    $Folder = New-LoggingFolder -RootPath $UserPath
-                    $ValidPath = $true
-                }
-                # If the path if not valid then we need to loop thru again
-                else {
-                    Write-Information ("Path not a valid Directory " + $UserPath)
+                # If the input is null or empty, prompt again
+                if ([string]::IsNullOrEmpty($UserPath)) {
+                    Write-Host "[$timestamp] - [INFO]   - Directory path cannot be empty. Please enter in a new path."
                     $ValidPath = $false
                 }
-
+                # If the path is valid, create the subfolder
+                elseif (Test-LoggingPath -PathToTest $UserPath) {
+                    $folderInfo = New-LoggingFolder -RootPath $UserPath
+                    $ValidPath = $true
+                }
+                # If the path is invalid, prompt again
+                else {
+                    Write-Information "[$timestamp] - [ERROR]  - Path not a valid directory: $UserPath"
+                    $ValidPath = $false
+                }
             }
             While ($ValidPath -eq $false)
         }
-        # If a value if provided go from there
+        # If a value for Path is provided, validate it
         else {
-            # If the provided path is valid then we can create the subfolder
+            # If the provided path is valid, create the subfolder
             if (Test-LoggingPath -PathToTest $Path) {
-                $Folder = New-LoggingFolder -RootPath $Path
+                $folderInfo = New-LoggingFolder -RootPath $Path  # Changed variable name for clarity
             }
-            # If the provided path fails validation then we just need to stop
+            # If the provided path fails validation, stop the process
             else {
-                Write-Error ("Provided Path is not valid " + $Path) -ErrorAction Stop
+                Write-Error "[$timestamp] - [ERROR]  - Provided path is not a valid directory: $Path"
             }
         }
 
-        Return $Folder
+        Return $folderInfo
     }
-
     Function New-ApplicationInsight {
         [CmdletBinding(SupportsShouldProcess)]
         param()
         # Initialize Application Insights client
-        $insightkey = "b69ffd8b-4569-497c-8ee7-b71b8257390e"
+        $insightkey = "aa3d4e74-29c0-4b4c-83ad-865669402baa"
         if ($Null -eq $Client) {
-            Write-Output "Initializing Application Insights"
+            Out-LogFile "Initializing Application Insights" -Action
             $Client = New-AIClient -key $insightkey
         }
     }
@@ -150,147 +217,313 @@
     ### Main ###
     $InformationPreference = "Continue"
 
+
     if (($null -eq (Get-Variable -Name Hawk -ErrorAction SilentlyContinue)) -or ($Force -eq $true) -or ($null -eq $Hawk)) {
 
-        # Setup Applicaiton insights
+        if ($NonInteractive) {
+            Write-HawkBanner
+        }
+        else {
+            Write-HawkBanner -DisplayWelcomeMessage
+        }
+
+
+
+        # Create the global $Hawk variable immediately with minimal properties
+        $Global:Hawk = [PSCustomObject]@{
+            FilePath       = $null  # Will be set shortly
+            DaysToLookBack = $null
+            StartDate      = $null
+            EndDate        = $null
+            WhenCreated    = $null
+            TenantName     = $null
+        }
+
+        # Set up the file path first, before any other operations
+        # Set up the file path first, before any other operations
+        if ([string]::IsNullOrEmpty($FilePath)) {
+            # Suppress Graph connection output during initial path setup
+            $folderInfo = Set-LoggingPath -ErrorAction Stop
+            $Hawk.FilePath = $folderInfo.Path
+            $Hawk.TenantName = $folderInfo.TenantName
+        }
+        else {
+            $folderInfo = Set-LoggingPath -path $FilePath -ErrorAction Stop 2>$null
+            $Hawk.FilePath = $folderInfo.Path
+            $Hawk.TenantName = $folderInfo.TenantName
+        }
+
+        # Now that FilePath is set, we can use Out-LogFile
+        Out-LogFile "Hawk output directory created at: $($Hawk.FilePath)" -Information
+
+        # Setup Application insights
+        Out-LogFile "Setting up Application Insights" -Action
         New-ApplicationInsight
 
         ### Checking for Updates ###
         # If we are skipping the update log it
         if ($SkipUpdate) {
-            Write-Information "Skipping Update Check"
+            Out-LogFile -string "Skipping Update Check" -Information
         }
         # Check to see if there is an Update for Hawk
         else {
             Update-HawkModule
         }
 
-        # Test if we have a connection to Microsoft Graph
-        Write-Information "Testing Graph Connection"
+        # Test Graph connection
+        Out-LogFile "Testing Graph Connection" -Action
+
         Test-GraphConnection
 
-        # If the global variable Hawk doesn't exist or we have -force then set the variable up
-        Write-Information "Setting Up initial Hawk environment variable"
 
-        #### Checking log path and setting up subdirectory ###
-        # If we have a path passed in then we need to check that otherwise ask
-        if ([string]::IsNullOrEmpty($FilePath)) {
-            [string]$OutputPath = Set-LoggingPath
+        if (-not $NonInteractive) {
+            try {
+                $LicenseInfo = Test-LicenseType
+                $MaxDaysToGoBack = $LicenseInfo.RetentionPeriod
+                $LicenseType = $LicenseInfo.LicenseType
+
+                Out-LogFile -string "Detecting M365 license type to determine maximum log retention period" -action
+                Out-LogFile -string "M365 License type detected: $LicenseType" -Information
+                Out-LogFile -string "Max log retention: $MaxDaysToGoBack days" -action -NoNewLine
+
+            }
+            catch {
+                Out-LogFile -string "Failed to detect license type. Max days of log retention is unknown." -Information
+                $MaxDaysToGoBack = 90
+                $LicenseType = "Unknown"
+            }
+
         }
-        else {
-            [string]$OutputPath = Set-LoggingPath -path $FilePath
-        }
 
-        # We need to ask for start and end date if daystolookback was not set
-        if ($null -eq $StartDate) {
 
-            # Read in our # of days back or the actual start date
-            $StartRead = Read-Host "`nPlease Enter First Day of Search Window (1-90, Date, Default 90)"
+        # Ensure MaxDaysToGoBack does not exceed 365 days
+        if ($MaxDaysToGoBack -gt 365) { $MaxDaysToGoBack = 365 }
 
-            # Determine if the input was a date time
-            # True means it was NOT a datetime
-            if ($Null -eq ($StartRead -as [DateTime])) {
-                #### Not a Date time ####
+        # Start date validation: Add check for negative numbers
+        while ($null -eq $StartDate) {
+            Write-Output "`n"
+            Out-LogFile "Please specify the first day of the search window:" -isPrompt
+            Out-LogFile " Enter a number of days to go back (1-$MaxDaysToGoBack)" -isPrompt
+            Out-LogFile " OR enter a date in MM/DD/YYYY format" -isPrompt
+            Out-LogFile " Default is 90 days back: " -isPrompt -NoNewLine
+            [string]$StartRead = (Read-Host).Trim()
 
-                # if we have a null entry (just hit enter) then set startread to the default of 90
-                if ([string]::IsNullOrEmpty($StartRead)) { $StartRead = 90 }
-                elseif (($StartRead -gt 90) -or ($StartRead -lt 1)) {
-                    Write-Information "Value provided is outside of valid Range 1-90"
-                    Write-Information "Setting StartDate to default of Today - 90 days"
-                    $StartRead = 90
+            # Determine if input is a valid date
+            # Determine if input is a valid date
+            if ($null -eq ($StartRead -as [DateTime])) {
+
+                #### Not a DateTime => interpret as # of days ####
+                if ([string]::IsNullOrEmpty($StartRead)) {
+                    $StartRead = "90"
                 }
 
-                # Calculate our startdate setting it to midnight
-                [DateTime]$StartDate = ((Get-Date).AddDays(-$StartRead)).Date
-                Write-Information ("Start Date: " + $StartDate + "")
+                # First check if it's a valid integer without converting
+                if (-not ($StartRead -match '^\d+$')) {
+                    Out-LogFile -string "Invalid input. Please enter a number between 1 and 365, or a date in MM/DD/YYYY format." -isError
+                    continue
+                }
+
+                # Now safe to convert to integer since we validated the format
+                [int]$StartRead = [int]$StartRead
+
+                $StartDays = $StartRead
+
+                # Validate the input is within range
+                # Validate the input is within range
+                if (($StartRead -gt 365) -or ($StartRead -lt 1))   {
+                    Out-LogFile -string "Days to go back must be between 1 and 365." -isError
+                    Remove-Variable -Name StartDate -ErrorAction SilentlyContinue
+                    continue
+                }
+
+
+                # Validate the entered days back
+                if ($StartRead -gt $MaxDaysToGoBack) {
+                    Out-LogFile -string "The date entered exceeds your license retention period of $MaxDaysToGoBack days." -isWarning
+                    Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the date:" -isPrompt -NoNewLine
+                    $Proceed = (Read-Host).Trim()
+                    if ($Proceed -eq 'R') { Remove-Variable -Name StartDate -ErrorAction SilentlyContinue; continue }
+                }
+
+
+                # At this point, we do not yet have EndDate set. So temporarily anchor from "today":
+                [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-$StartRead)).Date
+
+                Out-LogFile -string "Start date set to: ${StartDate}Z" -Information
+
             }
             elseif (!($null -eq ($StartRead -as [DateTime]))) {
-                #### DATE TIME Provided ####
+                [DateTime]$StartDate = $StartRead -as [DateTime]  # <--- Add this line
 
-                # Convert the input to a date time object
-                [DateTime]$StartDate = (Get-Date $StartRead).Date
+                # ========== The user entered a DateTime, so $StartDays stays 0 ==========
+                # Validate the date
+                if ($StartDate -gt (Get-Date).ToUniversalTime()) {
+                    Out-LogFile -string "Start date cannot be in the future." -isError
+                    Remove-Variable -Name StartDate -ErrorAction SilentlyContinue
+                    continue
+                }
 
-                # Test to make sure the date time is > 90 and < today
-                if ($StartDate -ge ((Get-date).AddDays(-90).Date) -and ($StartDate -le (Get-Date).Date)) {
-                    #Valid Date do nothing
+                if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-$MaxDaysToGoBack))) {
+                    Out-LogFile -string "The date entered exceeds your license retention period of $MaxDaysToGoBack days." -isWarning
+                    Out-LogFile "Press ENTER to proceed or type 'R' to re-enter the date:" -isPrompt -NoNewLine
+                    $Proceed = (Read-Host).Trim()
+                    if ($Proceed -eq 'R') { Remove-Variable -Name StartDate -ErrorAction SilentlyContinue; continue }
                 }
-                else {
-                    Write-Information ("Date provided beyond acceptable range of 90 days.")
-                    Write-Information ("Setting date to default of Today - 90 days.")
-                    [DateTime]$StartDate = ((Get-Date).AddDays(-90)).Date
+
+
+                if ($StartDate -lt ((Get-Date).ToUniversalTime().AddDays(-365))) {
+                    Out-LogFile -string "The date cannot exceed 365 days. Setting to the maximum limit of 365 days." -isWarning
+                    [DateTime]$StartDate = ((Get-Date).ToUniversalTime().AddDays(-365)).Date
+
                 }
+
+                Out-LogFile -string "Start Date: ${StartDate}Z" -Information
             }
             else {
-                Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
+                Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
+                $StartDate = $null
+                continue
             }
         }
 
-        if ($null -eq $EndDate) {
-            # Read in the end date
-            $EndRead = Read-Host "`nPlease Enter Last Day of Search Window (1-90, date, Default Today)"
+        # End date logic with enhanced validation
+        while ($null -eq $EndDate) {
+            Write-Output ""
+            Out-LogFile "Please specify the last day of the search window:" -isPrompt
+            Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
+            Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
+            Out-LogFile " Default is today's date:" -isPrompt -NoNewLine
+            $EndRead = (Read-Host).Trim()
 
-            # Determine if the input was a date time
-            # True means it was NOT a datetime
-            if ($Null -eq ($EndRead -as [DateTime])) {
-                #### Not a Date time ####
-
-                # if we have a null entry (just hit enter) then set startread to the default of 90
+            # End date validation
+            if ($null -eq ($EndRead -as [DateTime])) {
                 if ([string]::IsNullOrEmpty($EndRead)) {
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                    [DateTime]$tempEndDate = (Get-Date).ToUniversalTime().Date
                 }
                 else {
-                    # Calculate our startdate setting it to midnight
-                    Write-Information ("End Date: " + $EndRead + " days.")
-                    # Subtract 1 from the EndRead entry so that we get one day less for the purpose of how searching works with times
-                    [DateTime]$EndDate = ((Get-Date).AddDays( - ($EndRead - 1))).Date
+                    # Validate input is a positive number
+                    if ($EndRead -match '^\-') {
+                        Out-LogFile -string "Please enter a positive number of days." -isError
+                        continue
+                    }
+                    # Validate numeric value
+                    if ($EndRead -notmatch '^\d+$') {
+                        Out-LogFile -string "Invalid input. Please enter a number between 1 and 365, or a date in MM/DD/YYYY format." -isError
+                        continue
+                    }
+                    Out-LogFile -string "End Date: $EndRead days." -Information
+                    [DateTime]$tempEndDate = ((Get-Date).ToUniversalTime().AddDays( - ($EndRead - 1))).Date
                 }
 
-                # Validate that the start date is further back in time than the end date
-                if ($StartDate -gt $EndDate) {
-                    Write-Error "StartDate Cannot be More Recent than EndDate" -ErrorAction Stop
+                if ($StartDate -gt $tempEndDate) {
+                    Out-LogFile -string "End date must be more recent than start date ($StartDate)" -isError
+                    continue
+                }
+
+                # --- FINAL FIX: Always move to next day at 00:00 UTC ---
+                $tempEndDate = $tempEndDate.ToUniversalTime().Date.AddDays(1)
+
+                $EndDate = $tempEndDate
+                # Write-Output ""
+                # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
+            }
+            elseif (!($null -eq ($EndRead -as [DateTime]))) {
+
+                [DateTime]$tempEndDate = (Get-Date $EndRead).ToUniversalTime().Date
+
+                if ($StartDate -gt $tempEndDate) {
+                    Out-LogFile -string "End date must be more recent than start date ($StartDate)." -isError
+                    continue
+                }
+                elseif ($tempEndDate -gt ((Get-Date).ToUniversalTime().AddDays(1))) {
+                    Out-LogFile -string "EndDate too far in the future. Setting EndDate to today." -isWarning
+                    $tempEndDate = (Get-Date).ToUniversalTime().Date
+                }
+
+                # --- FINAL FIX: Always move to next day at 00:00 UTC ---
+                $tempEndDate = $tempEndDate.ToUniversalTime().Date.AddDays(1)
+
+                $EndDate = $tempEndDate
+                # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
+            }
+            else {
+                Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
+                continue
+            }
+        }
+
+        # End date logic remains unchanged except for final +1 day fix
+        if ($null -eq $EndDate) {
+            Out-LogFile "Please specify the last day of the search window:" -isPrompt
+            Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
+            Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
+            Out-LogFile " Default is today's date:" -isPrompt -NoNewLine
+            $EndRead = (Read-Host).Trim()
+
+            # End date validation
+            if ($null -eq ($EndRead -as [DateTime])) {
+                if ([string]::IsNullOrEmpty($EndRead)) {
+                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
                 }
                 else {
-                    Write-Information ("End Date: " + $EndDate + "`n")
+                    Out-LogFile -string "End Date: $EndRead days." -Information
+                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays( - ($EndRead - 1))).Date
+                }
+
+                if ($StartDate -gt $EndDate) {
+                    Out-LogFile -string "StartDate cannot be more recent than EndDate" -isError
+                }
+                else {
+                    # --- FINAL FIX: Always move to next day at 00:00 UTC ---
+                    $EndDate = $EndDate.ToUniversalTime().Date.AddDays(1)
+
+                    # Write-Output ""
+                    # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
                 }
             }
             elseif (!($null -eq ($EndRead -as [DateTime]))) {
-                #### DATE TIME Provided ####
+                [DateTime]$EndDate = (Get-Date $EndRead).ToUniversalTime().Date
 
-                # Convert the input to a date time object
-                [DateTime]$EndDate = ((Get-Date $EndRead).AddDays(1)).Date
-
-                # Test to make sure the end date is newer than the start date
                 if ($StartDate -gt $EndDate) {
-                    Write-Information "EndDate Selected was older than start date."
-                    Write-Information "Setting EndDate to today."
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                    Out-LogFile -string "EndDate is earlier than StartDate. Setting EndDate to today." -isWarning
+                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
                 }
-                elseif ($EndDate -gt (get-Date).AddDays(2)) {
-                    Write-Information "EndDate to Far in the furture."
-                    Write-Information "Setting EndDate to Today."
-                    [DateTime]$EndDate = ((Get-Date).AddDays(1)).Date
+                elseif ($EndDate -gt ((Get-Date).ToUniversalTime().AddDays(1))) {
+                    Out-LogFile -string "EndDate too far in the future. Setting EndDate to today." -isWarning
+                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
                 }
 
-                Write-Information ("Setting EndDate by Date to " + $EndDate + "`n")
+                # --- FINAL FIX: Always move to next day at 00:00 UTC ---
+                $EndDate = $EndDate.ToUniversalTime().Date.AddDays(1)
+
+                # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
             }
-
             else {
-                Write-Error "Invalid date information provided.  Could not determine if this was a date or an integer." -ErrorAction Stop
+                Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
             }
         }
 
-        # Determine if we have access to a P1 or P2 Azure Ad License
-        # EMS SKU contains Azure P1 as part of the sku
-        # This uses Graph instead of MSOL
-        Test-GraphConnection
-        if ([bool] (Get-MgSubscribedSku | Where-Object { ($_.SkuPartNumber -like "*aad_premium*") -or ($_.SkuPartNumber -like "*EMS*") -or ($_.SkuPartNumber -like "*E5*") -or ($_.SkuPartNumber -like "*G5*") } )) {
-            Write-Information "Advanced Azure AD License Found"
-            [bool]$AdvancedAzureLicense = $true
+        # --- AFTER the EndDate block, do a final check to "re-anchor" StartDate if it was given in days ---
+        if ($StartDays -gt 0) {
+            # Recalculate StartDate based on EndDate = $EndDate and StartDays = $StartDays
+            Out-LogFile -string "End date set to midnight UTC of next day to include all data from $($EndDate.AddDays(-1).Date.ToString('yyyy-MM-dd'))Z" -Information
+            $StartDate = $EndDate.AddDays(-1).AddDays(-$StartDays).Date
+
+            # (Optional) Additional validations again if necessary:
+            if ($StartDate -gt (Get-Date).ToUniversalTime()) {
+                Out-LogFile -string "Start date is in the future. Resetting to today's date." -isWarning
+                $StartDate = (Get-Date).ToUniversalTime().Date
+            }
+
+            # If EndDate is today, adjust to current time
+            if ($EndDate.Date -eq (Get-Date).Date) {
+                $EndDate = (Get-Date).ToUniversalTime()
+                Out-LogFile -string "Adjusting EndDate to current time: $EndDate" -Information
+            }
+
         }
-        else {
-            Write-Information "Advanced Azure AD License NOT Found"
-            [bool]$AdvancedAzureLicense = $false
-        }
+
+
 
         # Configuration Example, currently not used
         #TODO: Implement Configuration system across entire project
@@ -299,36 +532,20 @@
             Set-PSFConfig -Module 'Hawk' -Name 'FilePath' -Value $OutputPath -PassThru | Register-PSFConfig
         }
 
-        #TODO: Discard below once migration to configuration is completed
-        $Output = [PSCustomObject]@{
-            FilePath             = $OutputPath
-            DaysToLookBack       = $Days
-            StartDate            = $StartDate
-            EndDate              = $EndDate
-            AdvancedAzureLicense = $AdvancedAzureLicense
-            WhenCreated          = (Get-Date -Format g)
-        }
 
-        # Create the script hawk variable
-        Write-Information "Setting up Script Hawk environment variable`n"
-        New-Variable -Name Hawk -Scope Script -value $Output -Force
-        Out-LogFile "Script Variable Configured" -Information
-        Out-LogFile ("Hawk Version: " + (Get-Module Hawk).version) -Information
-        # Print each property of $Hawk on its own line
-        foreach ($prop in $Hawk.PSObject.Properties) {
-            # If the property value is $null or an empty string, display "N/A"
-            $value = if ($null -eq $prop.Value -or [string]::IsNullOrEmpty($prop.Value.ToString())) {
-                "N/A"
-            } else {
-                $prop.Value
-            }
-        
-            Out-LogFile ("{0} = {1}" -f $prop.Name, $value) -Information
-        }
-        #### End of IF
+
+
+        # Continue populating the Hawk object with other properties
+        $Hawk.DaysToLookBack = $DaysToLookBack
+        $Hawk.StartDate = $StartDate
+        $Hawk.EndDate = $EndDate
+        $Hawk.WhenCreated = (Get-Date).ToUniversalTime().ToString("g")
+        Write-HawkConfigurationComplete -Hawk $Hawk
+
+
     }
-
     else {
-        Write-Information "Valid Hawk Object already exists no actions will be taken."
+        Out-LogFile -string "Valid Hawk Object already exists no actions will be taken." -Information
     }
+
 }

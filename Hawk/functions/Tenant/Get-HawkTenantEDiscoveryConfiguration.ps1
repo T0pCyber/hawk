@@ -59,14 +59,16 @@
     #TO DO: UPDATE THIS FUNCTION TO FIND E-Discovery roles created via the graph API
 
     BEGIN {
-        if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+        # Check if Hawk object exists and is fully initialized
+        if (Test-HawkGlobalObject) {
             Initialize-HawkGlobalObject
         }
+
 
         Test-EXOConnection
         Send-AIEvent -Event "CmdRun"
 
-        Out-LogFile "Gathering complete E-Discovery Configuration" -action
+        Out-LogFile "Initiating collection of eDiscovery configuration data from Exchange Online." -Action
 
         # Create tenant folder if needed
         $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -116,11 +118,13 @@
                     $RoleAssignements | Export-Csv -Path (Join-Path -Path $TenantPath -ChildPath "CustomEDiscoveryRoles.csv") -NoTypeInformation
                 }
                 else {
-                    Out-LogFile "No role assignments found" -Information
+                    Out-LogFile "Get-HawkTenantEDiscoveryConfiguration completed successfully" -Information
+                    Out-LogFile "No role assignments found" -action
                 }
             }
             else {
-                Out-LogFile "No roles with eDiscovery cmdlets found" -Information
+                Out-LogFile "Get-HawkTenantEDiscoveryConfiguration completed successfully" -Information
+                Out-LogFile "No roles with eDiscovery cmdlets found" -action
             }
 
             #endregion
@@ -132,6 +136,6 @@
     }
 
     END {
-        Out-LogFile "Completed gathering eDiscovery configuration" -Information
+        Out-LogFile "Completed collection of eDiscovery configuration data from Exchange Online." -Information
     }
 }

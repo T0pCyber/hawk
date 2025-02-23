@@ -1,66 +1,149 @@
-﻿# Hawk Documentation and "How to" videos
+﻿# Hawk Documentation and Resources
 
-https://cloudforensicator.com/
+Visit [hawkforensics.io](https://hawkforensics.io/) for comprehensive documentation including:
 
-# Hawk + Github
+- Detailed installation and permissions guides
+- Step-by-step tutorials and "How to" videos
+- Troubleshooting help
+- Best practices and usage examples
 
-## Who can contribute:
+# What is Hawk?
 
-Everyone is welcome to contribute to this tool. The goal of the Hawk tool is to be a community lead tool and provides
-security support professionals with the tools they need to quickly and easily gather data from O365 and Azure.
+Hawk is a free, open-source PowerShell module that streamlines the collection of forensic data from Microsoft cloud environments. Designed primarily for security professionals, incident responders, and administrators, Hawk automates the gathering of critical log data across Microsoft services, with a focus on Microsoft 365 (M365) and Microsoft Entra ID.
+
+## Core Capabilities
+
+- **Data Collection**: Efficiently gather forensic data with automated collection processes
+- **Security Analysis**: Examine security configurations, audit logs, and user activities
+- **Export & Report**: Generate both CSV reports and JSON data for SIEM integration
 
 ## What Hawk is and isn't
 
-Hawk provides Limited analysis of the gathered data. This is by design!
-Hawk is here to help get all of the data in a single place it is not designed to make any significant
-conclusions about this data. This is intentional since it is impossible for the tool to know enough about
-your environment or what you are concerned about to make a legitimate analysis of the data.
+While Hawk includes basic analysis capabilities to flag potential items of interest (such as suspicious mail forwarding rules, over-privileged applications, or risky user activities), it is fundamentally a data collection tool rather than an automated threat detection system.
 
-Hawk's goal is to quickly get you the data that is needed to come to a conclusion; not to make the conclusion for you.
-We've structured the exported data in a manner of which can help analysts quickly triage known malicious Indicators Of Compromise (IOC) but again
-is NOT an all exhaustive list.
+Hawk streamlines data collection compared to manually running individual queries through web interfaces, freeing up those resources for other administrative tasks. The tool's goal is to quickly get you the data needed to come to a conclusion; not to make the conclusion for you.
 
-## How can I contribute:
+# Getting Started
 
-Please post any issues you find to the Issue section. Those issues will be incorporated into your future capability implementation.
+## System Requirements
 
-If something is critical or I seem to have not done anything in some time please feel free to send an email to the
-Hawk support alias hawkpsmodule@gmail.com.
+- Windows operating system with administrator access
+- PowerShell 5.0 or above (PowerShell Core will be supported in future)
+- Network connectivity to:
+  - PowerShell Gallery
+  - Graph API
+  - Microsoft 365 services
 
-# HAWK
+## Installation
 
-Powershell Based tool for gathering information related to O365 intrusions and potential Breaches
+```powershell
+Install-Module -Name Hawk
+```
 
-## PURPOSE:
+# Investigation Types
 
-The Hawk module has been designed to ease the burden on O365 administrators who are performing
-a forensic analysis in their organization.
+Hawk offers two main investigation approaches:
 
-It does NOT take the place of a human reviewing the data generated and is simply here to make
-data gathering easier.
+## Tenant Investigations
 
-## HOW TO USE:
+- Examines broader Microsoft Cloud tenant settings, audit logs, and security configurations
+- Provides an excellent starting point for identifying suspicious patterns
+- Use `Start-HawkTenantInvestigation` to begin a tenant-wide investigation
 
-Hawk is divided into two primary forms of cmdlets; _user_ based Cmdlets and _tenant_ based cmdlets.
+## User Investigations
 
-User based cmdlets take the form Verb-HawkUser<action>. They all expect a -user switch and
-will retrieve information specific to the user that is specified. Tenant based cmdlets take
-the form Verb-HawkTenant<Action>. They don't need any switches and will return information
-about the whole tenant.
+- Performs deep-dive analysis into individual user accounts
+- Examines mailbox configurations, inbox rules, and login histories
+- Use `Start-HawkUserInvestigation -UserPrincipleName <user@domain.com>` to investigate specific users
 
-A good starting place is the Start-HawkTenantInvestigation this will run all the tenant based
-cmdlets and provide a collection of data to start with. Once this data has been reviewed
-if there are specific user(s) that more information should be gathered on
-Start-HawkUserInvestigation will gather all the User specific information for a single user.
+# Understanding Output
 
-All Hawk cmdlets include help that provides an overview of the data they gather and a listing
-of all possible output files. Run Get-Help <cmdlet> -full to see the full help output for a
-given Hawk cmdlet.
+Hawk organizes investigation results into a structured directory hierarchy:
 
-Some of the Hawk cmdlets will flag results that should be further reviewed. These will appear
-in \_Investigate files. These are NOT indicative of unwanted activity but are simply things
-that should reviewed.
+```
+📂 [Investigation Root]
+├── 📂 Tenant/
+│   ├── AdminAuditLogConfig.csv
+│   ├── OrgConfig.csv
+│   ├── _Investigate_*.csv
+│   └── [other tenant files]
+├── 📂 [user1@domain.com]/
+│   ├── Mailbox_Info.csv
+│   ├── InboxRules.csv
+│   ├── _Investigate_*.csv
+│   └── [other user files]
+└── 📂 [user2@domain.com]/
+    └── [similar structure]
+```
 
-## Disclaimer
+Files prefixed with `_Investigate_` contain potentially suspicious findings that warrant further review.
 
-Hawk is NOT an official MICROSOFT tool. Therefore use of the tool is covered exclusively by the license associated with this github repository.
+# Contributing
+
+Everyone is welcome to contribute to Hawk. The goal is to maintain a community-led tool that provides security professionals with the resources they need.
+
+## Ways to Contribute
+
+1. **Join the Development Team**: Contact us at hawkpsmodule@gmail.com
+2. **Submit Feature Requests**: Use our [feature request template](https://github.com/T0pCyber/hawk/issues/new?template=01_feature_request_form.yml)
+3. **Report Issues**: Use our [bug report template](https://github.com/T0pCyber/hawk/issues/new?template=02_bug_report_form.yml)
+
+For critical issues or inquiries, email hawkpsmodule@gmail.com.
+
+# Support
+
+- [PowerShell Gallery Package](https://www.powershellgallery.com/packages/HAWK)
+- [GitHub Issues](https://github.com/T0pCyber/hawk/issues)
+- [GitHub Discussions](https://github.com/T0pCyber/hawk/discussions)
+- Email: hawkpsmodule@gmail.com
+
+# **Hawk Telemetry Disclosure**
+
+## **Overview**
+
+<<<<<<< HEAD
+
+Hawk, the open-source PowerShell module, collects limited usage data to help improve the module by identifying the most frequently used features. This data assists in prioritizing updates, enhancements, and new functionality.
+
+## **What Data is Collected?**
+
+Hawk collects **only** the names of the functions that are executed.
+
+✅ **Collected Data:**
+
+- Function names that are run within Hawk.
+
+❌ **Not Collected:**
+
+=======
+Hawk, the open-source PowerShell module, collects limited usage data to help improve the module by identifying the most frequently used features. This data assists in prioritizing updates, enhancements, and new functionality.
+
+## **What Data is Collected?**
+
+Hawk collects **only** the names of the functions that are executed.
+
+✅ **Collected Data:**
+
+- Function names that are run within Hawk.
+
+❌ **Not Collected:**
+
+> > > > > > > 4fc2a6fce93b52e0358c9de9e1ad81dfa8779220
+
+- No user-identifiable data.
+- No environmental or system data.
+- No script inputs, outputs, or arguments.
+- No personal, confidential, or sensitive data.
+- No data is shared or sold.
+
+## **Why is This Data Collected?**
+
+The telemetry helps us understand which functions are used most frequently so we can:
+
+- Prioritize updates and improvements.
+- Optimize performance for widely used features.
+- Make data-driven decisions about future development.
+
+## **How is the Data Used?**
+
+The collected data is strictly used for internal development purposes to enhance the Hawk module. It is never shared, sold, or used for any form of tracking beyond feature usage.

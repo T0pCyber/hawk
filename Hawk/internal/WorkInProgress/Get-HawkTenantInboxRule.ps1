@@ -49,12 +49,21 @@
         - For historical data on when rules were created, refer to Get-HawkTenantInboxRuleHistory.
     #>
 
+    ###############################################################################################
+    #TODO SEE TICKET DETAILS FOR THIS: https://github.com/T0pCyber/hawk/issues/156
+    ###############################################################################################
+
 
     param (
         [string]$CSVPath,
         [Parameter(Mandatory = $true)]
         [string]$UserPrincipalName
     )
+    # Check if Hawk object exists and is fully initialized
+    if (Test-HawkGlobalObject) {
+        Initialize-HawkGlobalObject
+    }
+
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"

@@ -59,18 +59,6 @@ Function Test-SuspiciousInboxRule {
         $suspiciousReasons += "moves to Deleted Items" 
     }
 
-    # Check for suspicious keywords in subject filters
-    if ($Rule.Param_SubjectContainsWords -match 'password|credentials|login|secure|security') {
-        $isSuspicious = $true
-        $suspiciousReasons += "suspicious subject filter: $($Rule.Param_SubjectContainsWords)"
-    }
-
-    # Check for targeting of security-related senders
-    if ($Rule.Param_From -match 'security|admin|support|microsoft|helpdesk') {
-        $isSuspicious = $true
-        $suspiciousReasons += "targets security sender: $($Rule.Param_From)"
-    }
-
     # Update the reasons array with our findings
     $Reasons.Value = $suspiciousReasons
 
