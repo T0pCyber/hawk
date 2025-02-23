@@ -65,14 +65,14 @@ Function Get-HawkTenantRiskyServicePrincipals {
         Send-AIEvent -Event "CmdRun"
 
         # Check for required license
-        $licenseCheck = Test-EntraWorkloadIDPremium
-        if (-not $licenseCheck.HasLicense) {
-            Out-LogFile "Entra Workload ID Premium license not found" -isWarning
-            Out-LogFile "No Entra Workload ID Premium capable licenses found." -Information
-            Out-LogFile "Required licenses: AAD_PREMIUM_P2, ENTERPRISEPREMIUM, SPE_E5, IDENTITY_THREAT_PROTECTION" -Information
-            Out-LogFile "The service principal risk detection requires one of these licenses to function" -Information
-            return
-        }
+        # $licenseCheck = Test-EntraWorkloadIDPremium
+        # if (-not $licenseCheck.HasLicense) {
+        #     Out-LogFile "Entra Workload ID Premium license not found" -isWarning
+        #     Out-LogFile "No Entra Workload ID Premium capable licenses found." -Information
+        #     Out-LogFile "Required licenses: AAD_PREMIUM_P2, ENTERPRISEPREMIUM, SPE_E5, IDENTITY_THREAT_PROTECTION" -Information
+        #     Out-LogFile "The service principal risk detection requires one of these licenses to function" -Information
+        #     return
+        # }
 
         Out-LogFile "Retrieving risky service principals from Microsoft Entra ID" -Action
 

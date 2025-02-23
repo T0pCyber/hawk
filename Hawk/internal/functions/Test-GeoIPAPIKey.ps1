@@ -64,6 +64,7 @@ Function Test-GeoIPAPIKey {
         }
 
         # Check each character is valid hex using regex
+        # ADD: CALL IPSTACK API AND DEPENDING ON RESULT, RETURN TRUE OR FALSE
         return ($Key -match '^[0-9a-f]{32}$')
     }
 }
