@@ -41,7 +41,6 @@ Function Get-HawkTenantAdminInboxRuleModification {
         suspicious patterns. Output files will be created in the configured Hawk output directory under
         the Tenant subfolder.
     #>
-    #>
     [CmdletBinding()]
     param()
 
@@ -54,7 +53,7 @@ Function Get-HawkTenantAdminInboxRuleModification {
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Analyzing admin inbox rule modifications from audit logs" -Action
+    Out-LogFile "Initiating collection of admin inbox rule modification events from the UAL." -Action
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -103,4 +102,7 @@ Function Get-HawkTenantAdminInboxRuleModification {
         Out-LogFile "Error analyzing admin inbox rule modifications: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
+
+    Out-LogFile "Completed collection of admin inbox rule modification events from the UAL." -Information
+ 
 }

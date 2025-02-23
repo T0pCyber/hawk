@@ -28,7 +28,7 @@ Function Get-HawkUserMailItemsAccessed {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [array]$UserPrincipalName
     )
 
@@ -37,8 +37,6 @@ Function Get-HawkUserMailItemsAccessed {
         if (Test-HawkGlobalObject) {
             Initialize-HawkGlobalObject
         }
-        Out-LogFile "Starting Unified Audit Log (UAL) search for 'MailItemsAccessed'" -Action
-        Out-LogFile "Please be patient, this can take a while..." -Information
         Test-EXOConnection
     }
 
@@ -46,9 +44,11 @@ Function Get-HawkUserMailItemsAccessed {
         #Verify UPN input
         [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-        foreach($UserObject in $UserArray) {
+        foreach ($UserObject in $UserArray) {
             [string]$User = $UserObject.UserPrincipalName
-            
+            Out-LogFile "Initiating collection of MailItemsAccessed for $User from the UAL." -Action
+            Out-LogFile "Please be patient, this can take a while..." -Information
+           
             # Verify that user has operation enabled for auditing. Otherwise, move onto next user.
             if (Test-OperationEnabled -User $User -Operation 'MailItemsAccessed') {
                 Out-LogFile "Operation 'MailItemsAccessed' verified enabled for $User." -Information
@@ -57,7 +57,7 @@ Function Get-HawkUserMailItemsAccessed {
                     $SearchCommand = "Search-UnifiedAuditLog -Operations 'MailItemsAccessed' -UserIds $User"
                     $MailboxItemsAccessed = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
                     
-                    if ($MailboxItemsAccessed.Count -gt 0){
+                    if ($MailboxItemsAccessed.Count -gt 0) {
                         #Define output directory path for user
                         $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
                     
@@ -72,22 +72,26 @@ Function Get-HawkUserMailItemsAccessed {
                         #Export both raw and simplistic views to specified user's folder
                         $MailboxItemsAccessed | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "MailItemsAccessed_$User" -User $User -csv -json
                         $MailboxItemsAccessedSimple | Out-MultipleFileType -FilePrefix "Simple_MailItemsAccessed_$User" -User $User -csv -json
-                    } else {
-                        Out-LogFile "Get-HawkUserMailItemsAccesed completed successfully" -Information
-                        Out-LogFile "No items found for $User." -Information
                     }
-                } catch {
+                    else {
+                        Out-LogFile "No MailItemsAccessed found for $User." -Information
+                    }
+                }
+                catch {
                     Out-LogFile "Error processing mail items accessed for $User : $_" -isError
                     Write-Error -ErrorRecord $_ -ErrorAction Continue
                 }
-            } else {
+            }
+            else {
                 Out-LogFile "Operation 'MailItemsAccessed' is not enabled for $User." -Information
                 Out-LogFile "No data recorded for $User." -Information
             }
+
+            Out-LogFile "Completed collection of MailItemsAccessed for $User from the UAL." -Information
+
         }
     }
 
     END {
-        Out-Logfile "Completed exporting MailItemsAccessed logs" -Information
     }
 }

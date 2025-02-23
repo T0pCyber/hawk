@@ -91,7 +91,7 @@
     foreach ($Object in $UserArray) {
         [string]$User = $Object.UserPrincipalName
 
-        Out-LogFile ("Attempting to Gather Mailbox Audit logs for: " + $User) -action
+        Out-LogFile "Initiating collection of Mailbox Audit Logs for $User from the UAL." -Action
 
         # Test if mailbox auditing is enabled
         $mbx = Get-Mailbox -Identity $User
@@ -164,5 +164,7 @@
             Out-LogFile ("Auditing not enabled for " + $User) -Information
             Out-LogFile "Enable auditing to track mailbox access patterns." -Information
         }
+        Out-LogFile "Completed collection of Mailbox Audit Logs for $User from the UAL." -Information
+
     }
 }

@@ -55,8 +55,7 @@
         [string]$User = $Object.UserPrincipalName
 
         # Looking for email forwarding stored in AD
-        Out-LogFile ("Gathering possible Forwarding changes for: " + $User) -action
-        Out-LogFile "Collecting AD Forwarding Settings" -action
+        Out-LogFile "Initiating collection of email forwarding configuration for $User from Exchange Online." -Action
         $mbx = Get-Mailbox -identity $User
 
         # Check if forwarding is configured by user or admin
@@ -75,6 +74,8 @@
         $mbx | Select-Object DisplayName, UserPrincipalName, PrimarySMTPAddress, ForwardingSMTPAddress, ForwardingAddress, DeliverToMailboxAndForward, WhenChangedUTC | Out-MultipleFileType -FilePreFix "User_ForwardingReport" -append -csv -json
         # Also add to an output specific to this user
         $mbx | Select-Object DisplayName, UserPrincipalName, PrimarySMTPAddress, ForwardingSMTPAddress, ForwardingAddress, DeliverToMailboxAndForward, WhenChangedUTC | Out-MultipleFileType -FilePreFix "ForwardingReport" -user $user -csv -json
+
+        Out-LogFile "Completed collection of email forwarding configuration for $User from Exchange Online." -Information
 
     }
 }

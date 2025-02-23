@@ -47,8 +47,6 @@
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Gathering any changes to RBAC configuration" -action
-
     # Define the operations to search for
     [array]$RBACOperations = @(
         "New-ManagementRole",
@@ -75,12 +73,12 @@
         New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
     }
 
+    Out-LogFile "Initiating collection of RBAC Changes from the UAL." -Action
+
     try {
         # Build search command for Get-AllUnifiedAuditLogEntry
         $searchCommand = "Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations " +
             "'$($RBACOperations -join "','")'"
-
-        Out-LogFile "Searching for RBAC changes using Unified Audit Log." -Action
 
         # Get all RBAC changes using Get-AllUnifiedAuditLogEntry
         [array]$RBACChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
@@ -113,4 +111,6 @@
         Out-LogFile "Error searching for RBAC changes: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
+
+    Out-LogFile "Completed collection of RBAC configuration changes from the UAL." -Information
 }

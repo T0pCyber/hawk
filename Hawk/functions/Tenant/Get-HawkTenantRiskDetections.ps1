@@ -38,7 +38,7 @@ Function Get-HawkTenantRiskDetections {
         Test-GraphConnection
         Send-AIEvent -Event "CmdRun"
 
-        Out-LogFile "Retrieving risk detections from Microsoft Entra ID" -Action
+        Out-LogFile "Initiating collection of Risk Detection events from Entra ID." -Action
 
         # Create tenant folder if it doesn't exist
         $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -118,6 +118,6 @@ Function Get-HawkTenantRiskDetections {
     }
 
     end {
-        Out-LogFile "Completed gathering risk detection data" -Information
+        Out-LogFile "Completed collection of Risk Detection events from Entra ID." -Information
     }
 }

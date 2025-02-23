@@ -30,7 +30,7 @@
         Initialize-HawkGlobalObject
     }
 
-    Out-LogFile "Gathering OAuth / Application Grants" -Action
+    Out-LogFile "Initiating collection of OAuth / Application Grants from Microsoft Graph." -Action
 
     Test-GraphConnection
 
@@ -113,4 +113,6 @@
 
     # Output all grants
     $Grants | Out-MultipleFileType -FilePrefix "Consent_Grants" -csv -json
+
+    Out-LogFile "Completed collection of OAuth / Application Grants from Microsoft Graph." -Information
 }

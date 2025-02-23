@@ -55,7 +55,6 @@ Function Get-HawkUserEntraIDSignInLog {
             Initialize-HawkGlobalObject
         }
 
-        Out-LogFile "Gathering Microsoft Entra ID Sign-in Logs" -Action
         Test-GraphConnection
         Send-AIEvent -Event "CmdRun"
         [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
@@ -71,18 +70,12 @@ Function Get-HawkUserEntraIDSignInLog {
         # Compare dates manually since PowerShell doesn't have DateTime.Max
         $effectiveStartDate = if ($requestedStart -gt $twoWeeksAgo) {
             $requestedStart
-        } else {
+        }
+        else {
             $twoWeeksAgo
         }
 
-        # Notify user about 14-day limit and any date adjustment
-        Out-LogFile "Hawk Entra ID Sign-in logs is limited to the most recent 14 days" -Information
-        
-        if ($Hawk.StartDate.ToUniversalTime() -lt $twoWeeksAgo) {
-            Out-LogFile "Your requested date range exceeds this limit. Data will only be available from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
-        } else {
-            Out-LogFile "Retrieving data from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
-        }
+
     }
 
     PROCESS {
@@ -90,12 +83,23 @@ Function Get-HawkUserEntraIDSignInLog {
             [string]$User = $Object.UserPrincipalName
             
             try {
-                Out-LogFile ("Retrieving sign-in logs for " + $User) -Action
+                Out-LogFile "Initiating collection of sign-in logs for $User from Entra ID." -Action
+
+                # Notify user about 14-day limit and any date adjustment
+                Out-LogFile "Hawk Entra ID Sign-in logs is limited to the most recent 14 days" -Information
+                
+                if ($Hawk.StartDate.ToUniversalTime() -lt $twoWeeksAgo) {
+                    Out-LogFile "Your requested date range exceeds this limit. Data will only be available from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
+                }
+                else {
+                    Out-LogFile "Retrieving data from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
+                }
 
                 # Use adjusted date range and ensure we have valid dates
                 $startDateUtc = if ($effectiveStartDate) {
                     $effectiveStartDate.ToString('yyyy-MM-ddTHH:mm:ssZ')
-                } else {
+                }
+                else {
                     $twoWeeksAgo.ToString('yyyy-MM-ddTHH:mm:ssZ')
                 }
                 
@@ -139,13 +143,13 @@ Function Get-HawkUserEntraIDSignInLog {
                         
                         # Group and report risk levels
                         $duringSignIn = $riskySignIns | Group-Object -Property RiskLevelDuringSignIn | 
-                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
+                        Where-Object { $_.Name -in @('high', 'medium', 'low') }
                         foreach ($risk in $duringSignIn) {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -Notice
                         }
 
                         $aggregated = $riskySignIns | Group-Object -Property RiskLevelAggregated | 
-                            Where-Object {$_.Name -in @('high', 'medium', 'low')}
+                        Where-Object { $_.Name -in @('high', 'medium', 'low') }
                         foreach ($risk in $aggregated) {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -Notice
                         }
@@ -156,20 +160,22 @@ Function Get-HawkUserEntraIDSignInLog {
                 else {
                     Out-LogFile ("No sign-in logs found for " + $User + " in the specified time period") -Information
                 }
+
             }
             catch {
                 $global:processSuccess = $false
                 Out-LogFile ("Error retrieving sign-in logs for " + $User + " : " + $_.Exception.Message) -isError
                 Write-Error -ErrorRecord $_ -ErrorAction Continue
             }
+            # Only show completion message if successful
+            if ($global:processSuccess) {
+                Out-LogFile "Completed collection of Entra sign-in logs for $User from Entra ID." -Information
+            }
         }
     }
 
     END {
-        # Only show completion message if successful
-        if ($global:processSuccess) {
-            Out-LogFile "Completed exporting Entra sign-in logs" -Information
-        }
+
         Remove-Variable -Name processSuccess -Scope Global -ErrorAction SilentlyContinue
     }
 }

@@ -38,7 +38,7 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Analyzing mailbox permission changes from audit logs" -Action
+    Out-LogFile "Initiating collection of mailbox permission changes from the UAL." -Action
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -97,4 +97,7 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
         Out-LogFile "Error analyzing mailbox permission changes: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
+
+    Out-LogFile "Completed collection of mailbox permission changes from the UAL." -Information
+
 }

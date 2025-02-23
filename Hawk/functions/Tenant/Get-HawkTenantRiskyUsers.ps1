@@ -43,7 +43,7 @@ Function Get-HawkTenantRiskyUsers {
         Test-GraphConnection
         Send-AIEvent -Event "CmdRun"
 
-        Out-LogFile "Retrieving risky users from Microsoft Entra ID" -Action
+        Out-LogFile "Initiating collection of Risky Users from Entra ID." -Action
 
         # Create tenant folder if it doesn't exist
         $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -154,6 +154,6 @@ Function Get-HawkTenantRiskyUsers {
     }
 
     end {
-        Out-LogFile "Completed gathering Risky User Log" -Information
+        Out-LogFile "Completed collection of Risky Users from Entra ID." -Information
     }
 }

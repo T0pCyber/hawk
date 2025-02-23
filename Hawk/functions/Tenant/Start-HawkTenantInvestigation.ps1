@@ -142,102 +142,121 @@
             Initialize-HawkGlobalObject
         }
         $investigationStartTime = Get-Date
-        Out-LogFile "Starting Tenant Investigation" -action
+        Out-LogFile "Starting Tenant Investigation." -action
         Send-AIEvent -Event "CmdRun"
 	
         # Wrap operations in ShouldProcess checks
         if ($PSCmdlet.ShouldProcess("Tenant Configuration", "Get configuration data")) {
-            Out-LogFile "Running Get-HawkTenantConfiguration" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantConfiguration." -action
             Get-HawkTenantConfiguration
         }
 	
         if ($PSCmdlet.ShouldProcess("EDiscovery Configuration", "Get eDiscovery configuration")) {
-            Out-LogFile "Running Get-HawkTenantEDiscoveryConfiguration" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantEDiscoveryConfiguration." -action
             Get-HawkTenantEDiscoveryConfiguration
         }
 
         if ($PSCmdlet.ShouldProcess("EDiscovery Logs", "Get eDiscovery logs")) {
-            Out-LogFile "Running Get-HawkTenantEDiscoveryLog" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantEDiscoveryLog." -action
             Get-HawkTenantEDiscoveryLog
         }
 	
         if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Creation Audit Log", "Search Admin Inbox Rule Creation")) {
-            Out-LogFile "Running Get-HawkTenantAdminInboxRuleCreation" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantAdminInboxRuleCreation." -action
             Get-HawkTenantAdminInboxRuleCreation
         }
 	
         if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Modification Audit Log", "Search Admin Inbox Rule Modification")) {
-            Out-LogFile "Running Get-HawkTenantInboxRuleModification" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantInboxRuleModification." -action
             Get-HawkTenantAdminInboxRuleModification
         }
 	
         if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Removal Audit Log", "Search Admin Inbox Rule Removal")) {
-            Out-LogFile "Running Get-HawkTenantAdminInboxRuleRemoval" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantAdminInboxRuleRemoval." -action
             Get-HawkTenantAdminInboxRuleRemoval
         }
 	
         if ($PSCmdlet.ShouldProcess("Admin Inbox Rule Permission Change Audit Log", "Search Admin Inbox Permission Changes")) {
-            Out-LogFile "Running Get-HawkTenantAdminMailboxPermissionChange" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantAdminMailboxPermissionChange." -action
             Get-HawkTenantAdminMailboxPermissionChange
         }
 		
         if ($PSCmdlet.ShouldProcess("Admin Email Forwarding Change Change Audit Log", "Search Admin Email Forwarding Changes")) {
-            Out-LogFile "Running Get-HawkTenantAdminEmailForwardingChange" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantAdminEmailForwardingChange." -action
             Get-HawkTenantAdminEmailForwardingChange
         }
 			
         if ($PSCmdlet.ShouldProcess("Domain Activity", "Get domain activity")) {
-            Out-LogFile "Running Get-HawkTenantDomainActivity" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantDomainActivity." -action
             Get-HawkTenantDomainActivity
         }
 	
         if ($PSCmdlet.ShouldProcess("RBAC Changes", "Get RBAC changes")) {
-            Out-LogFile "Running Get-HawkTenantRBACChange" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantRBACChange." -action
             Get-HawkTenantRBACChange
         }
 
         if ($PSCmdlet.ShouldProcess("Entra ID Audit Log", "Get Entra ID audit logs")) {
-            Out-LogFile "Running Get-HawkTenantEntraIDAuditLog" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantEntraIDAuditLog." -action
             Get-HawkTenantEntraIDAuditLog
         }
 	
         if ($PSCmdlet.ShouldProcess("Entra ID App Audit Log", "Get Entra ID app audit logs")) {
-            Out-LogFile "Running Get-HawkTenantEntraIDAppAuditLog" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantEntraIDAppAuditLog." -action
             Get-HawkTenantEntraIDAppAuditLog
         }
 	
         if ($PSCmdlet.ShouldProcess("Exchange Admins", "Get Exchange admin list")) {
-            Out-LogFile "Running Get-HawkTenantEXOAdmin" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantEXOAdmin." -action
             Get-HawkTenantEXOAdmin
         }
 	
         if ($PSCmdlet.ShouldProcess("Consent Grants", "Get consent grants")) {
-            Out-LogFile "Running Get-HawkTenantConsentGrant" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantConsentGrant." -action
             Get-HawkTenantConsentGrant
         }
 
         if ($PSCmdlet.ShouldProcess("Risky Users", "Get Entra ID Risky Users")) {
-            Out-LogFile "Running Get-HawkTenantRiskyUsers" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantRiskyUsers." -action
             Get-HawkTenantRiskyUsers
         }
 
         if ($PSCmdlet.ShouldProcess("Risk Detections", "Get Entra ID Risk Detections")) {
-            Out-LogFile "Running Get-HawkTenantRiskDetections" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantRiskDetections." -action
             Get-HawkTenantRiskDetections
         }
 	
         if ($PSCmdlet.ShouldProcess("Entra ID Admins", "Get Entra ID admin list")) {
-            Out-LogFile "Running Get-HawkTenantEntraIDAdmin" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantEntraIDAdmin." -action
             Get-HawkTenantEntraIDAdmin
         }
 	
         if ($PSCmdlet.ShouldProcess("App and SPN Credentials", "Get credential details")) {
-            Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetail" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetail." -action
             Get-HawkTenantAppAndSPNCredentialDetail
         }
 	
         if ($PSCmdlet.ShouldProcess("Entra ID Users", "Get Entra ID user list")) {
-            Out-LogFile "Running Get-HawkTenantEntraIDUser" -action
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantEntraIDUser." -action
             Get-HawkTenantEntraIDUser
         }
 

@@ -1,6 +1,6 @@
 ﻿# Gets user inbox rules and looks for Investigate rules
 Function Get-HawkUserInboxRule {
-<#
+    <#
 .SYNOPSIS
     Exports inbox rules for the specified user.
 .DESCRIPTION
@@ -57,12 +57,11 @@ Function Get-HawkUserInboxRule {
         [string]$User = $Object.UserPrincipalName
 
         # Get Inbox rules
-        Out-LogFile ("Gathering Inbox Rules: " + $User) -action
+        Out-LogFile "Initiating collection of Exchange Inbox Rules for $User from Exchange Online." -Action
         $InboxRules = Get-InboxRule -mailbox  $User
 
         if ($null -eq $InboxRules) { 
-            Out-LogFile "Get-HawkUserInboxRule completed successfully" -Information
-            Out-LogFile "No Inbox Rules found" -action
+            Out-LogFile "No Inbox Rules found for $user" -action
         } 
         else {
             # Track if we found any suspicious rules
@@ -91,25 +90,25 @@ Function Get-HawkUserInboxRule {
             # Output notice only once if suspicious rules were found
             if ($foundSuspiciousRules) {
                 $suspiciousRuleCount = ($InboxRules | Where-Object { 
-                    $_.DeleteMessage -eq $true -or 
-                    ![string]::IsNullOrEmpty($_.ForwardAsAttachmentTo) -or 
-                    ![string]::IsNullOrEmpty($_.ForwardTo) -or 
-                    ![string]::IsNullOrEmpty($_.RedirectTo)
-                }).Count
+                        $_.DeleteMessage -eq $true -or 
+                        ![string]::IsNullOrEmpty($_.ForwardAsAttachmentTo) -or 
+                        ![string]::IsNullOrEmpty($_.ForwardTo) -or 
+                        ![string]::IsNullOrEmpty($_.RedirectTo)
+                    }).Count
 
                 Out-LogFile "Found $suspiciousRuleCount inbox rules requiring investigation for $User" -Notice
                 Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_InboxRules.csv/json" -Notice
             }
 
-			# Description is multiline
-			$inboxrulesRawDescription = $InboxRules
-			$InboxRules = New-Object -TypeName "System.Collections.ArrayList"
+            # Description is multiline
+            $inboxrulesRawDescription = $InboxRules
+            $InboxRules = New-Object -TypeName "System.Collections.ArrayList"
 
-			$inboxrulesRawDescription | ForEach-Object {
-				$_.Description = $_.Description.Replace("`r`n", " ").replace("`t", "")
+            $inboxrulesRawDescription | ForEach-Object {
+                $_.Description = $_.Description.Replace("`r`n", " ").replace("`t", "")
 
-				$null = $InboxRules.Add($_)
-			}
+                $null = $InboxRules.Add($_)
+            }
 
             # Output all of the inbox rules to a generic csv
             $InboxRules | Out-MultipleFileType -FilePreFix "InboxRules" -User $user -csv -json
@@ -123,7 +122,7 @@ Function Get-HawkUserInboxRule {
         Out-LogFile ("Gathering Sweep Rules: " + $User) -action
         $SweepRules = Get-SweepRule -Mailbox $User
 
-        if ($null -eq $SweepRules) { Out-LogFile "No Sweep Rules found" -Information}
+        if ($null -eq $SweepRules) { Out-LogFile "No Sweep Rules found" -Information }
         else {
 
             # Output all rules to a user CSV
@@ -133,5 +132,7 @@ Function Get-HawkUserInboxRule {
             $SweepRules | Out-MultipleFileType -FilePreFix "All_SweepRules" -csv -json -append
 
         }
+        Out-LogFile "Completed collection of Exchange Inbox Rules for $User from Exchange Online." -Information
+
     }
 }

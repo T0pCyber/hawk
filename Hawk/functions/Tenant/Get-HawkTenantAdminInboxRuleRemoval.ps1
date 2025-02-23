@@ -46,7 +46,7 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Analyzing admin inbox rule removals from audit logs" -Action
+    Out-LogFile "Initiating collection of admin inbox rule removal events from the UAL." -Action
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -97,4 +97,8 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
         Out-LogFile "Error analyzing admin inbox rule removals: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
+
+
+    Out-LogFile "Completed collection of admin inbox rule removal events from the UAL." -Information
+
 }

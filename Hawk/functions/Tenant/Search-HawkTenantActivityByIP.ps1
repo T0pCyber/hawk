@@ -53,6 +53,9 @@
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
+
+    Out-LogFile "Initiating collection of IP-based activity from the UAL." -Information
+
     # Replace an : in the IP address with . since : isn't allowed in a directory name
     $DirectoryName = $IpAddress.replace(":", ".")
 
@@ -101,5 +104,7 @@
         }
 
     }
+
+    Out-LogFile "Completed collection of IP-based activity from the UAL." -Information
 
 }

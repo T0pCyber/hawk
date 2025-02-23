@@ -56,7 +56,7 @@
     Test-GraphConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Gathering Entra ID audit log" -Action
+    Out-LogFile "Initiating collection of Entra ID audit events from Microsoft Graph." -Action
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -96,4 +96,6 @@
         Out-LogFile "Error retrieving Entra ID audit logs: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
+
+    Out-LogFile "Completed collection of Entra ID audit events from Microsoft Graph." -Information
 }

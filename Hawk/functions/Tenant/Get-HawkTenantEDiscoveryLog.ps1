@@ -52,8 +52,7 @@
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Gathering any eDiscovery logs" -action
-
+    Out-LogFile "Initiating collection of eDiscovery configuration data from Exchange Online." -Action
     # Search UAL audit logs for any eDiscovery activities
     $eDiscoveryLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'Discovery'")
     
@@ -76,4 +75,6 @@
             Out-LogFile "Error: Failed to parse eDiscovery log data" -isError
         }
     }
+    Out-LogFile "Completed collection of eDiscovery logs from Exchange Online." -Information
+
 }

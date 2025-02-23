@@ -18,8 +18,7 @@ BEGIN{
     if (Test-HawkGlobalObject) {
         Initialize-HawkGlobalObject
     }
-    
-    Out-LogFile "Gathering Exchange Online Administrators" -Action
+    Out-LogFile "Initiating collection of Exchange Online Admins." -Action
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
@@ -48,7 +47,7 @@ PROCESS{
 
 }
 END{
-    Out-Logfile "Completed exporting Exchange Online Admins" -Information
+    Out-Logfile "Completed exporting Exchange Online Admins." -Information
 }
 
 }#End Function

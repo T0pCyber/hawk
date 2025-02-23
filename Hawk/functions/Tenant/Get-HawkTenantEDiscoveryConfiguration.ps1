@@ -68,7 +68,7 @@
         Test-EXOConnection
         Send-AIEvent -Event "CmdRun"
 
-        Out-LogFile "Gathering complete E-Discovery Configuration" -action
+        Out-LogFile "Initiating collection of eDiscovery configuration data from Exchange Online." -Action
 
         # Create tenant folder if needed
         $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -136,6 +136,6 @@
     }
 
     END {
-        Out-LogFile "Completed gathering eDiscovery configuration" -Information
+        Out-LogFile "Completed collection of eDiscovery configuration data from Exchange Online." -Information
     }
 }
