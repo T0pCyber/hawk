@@ -53,7 +53,7 @@
         # Get the mailbox name since that is what we store in the admin audit log
         $MailboxName = (Get-Mailbox -Identity $User).Name
 
-        Out-LogFile ("Searching for changes made to: " + $MailboxName) -action
+        Out-LogFile "Initiating collection of admin audit events for $User from the UAL." -Action
 
         try {
             # Build search command for Get-AllUnifiedAuditLogEntry
@@ -93,6 +93,9 @@
         catch {
             Out-LogFile "Error processing audit logs for $User : $_" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
+        }
+        finally {
+            Out-LogFile "Completed collection of admin audit events for $User from the UAL." -Information
         }
     }
 }

@@ -25,7 +25,7 @@
             Initialize-HawkGlobalObject
         }
 
-        Out-LogFile "Gathering Entra ID Users" -Action
+        Out-LogFile "Initiating collection of users from Entra ID." -Action
 
         # Ensure we have a valid Graph connection
         Test-GraphConnection
@@ -62,6 +62,6 @@
         }
     }
     END {
-        Out-Logfile "Completed exporting Entra ID users" -Information
+        Out-LogFile "Completed collection of users from Entra ID." -Information
     }
  }

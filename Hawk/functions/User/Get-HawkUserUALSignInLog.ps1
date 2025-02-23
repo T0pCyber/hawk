@@ -1,5 +1,5 @@
 ﻿Function Get-HawkUserUALSignInLog {
-<#
+    <#
 .SYNOPSIS
     Gathers ip addresses that logged into the user account
 .DESCRIPTION
@@ -58,7 +58,7 @@
         # Make sure our array is null
         [array]$UserLogonLogs = $null
 
-        Out-LogFile ("Retrieving Logon History for " + $User) -action
+        Out-LogFile "Initiating collection of Sign-In logs for $User from the UAL." -Action
 
         # Get back the account logon logs for the user
         foreach ($Type in $RecordTypes) {
@@ -80,7 +80,7 @@
             $FailedConversions = New-Object System.Collections.ArrayList
 
             # Process our results in a way to deal with JSON Errors
-            Foreach ($Entry in $UserLogonLogs){
+            Foreach ($Entry in $UserLogonLogs) {
 
                 try {
                     $jsonEntry = $Entry.AuditData | ConvertFrom-Json
@@ -115,8 +115,8 @@
                     }
 
                     # Get the location information for this IP address
-                    if($ExpandedUserLogonLogs.item($i).clientip){
-                    $Location = Get-IPGeolocation -ipaddress $ExpandedUserLogonLogs.item($i).clientip
+                    if ($ExpandedUserLogonLogs.item($i).clientip) {
+                        $Location = Get-IPGeolocation -ipaddress $ExpandedUserLogonLogs.item($i).clientip
                     }
                     else {
                         $Location = "IP Address Null"
@@ -143,6 +143,9 @@
             $UserLogonLogs | Out-MultipleFileType -fileprefix "Raw_Authentication_Logs" -user $User -csv -json
 
         }
+
+        Out-LogFile "Completed collection of Sign-In logs for $User from the UAL." -Information
+
     }
 
 

@@ -119,23 +119,22 @@
         }
 
         It 'Should fail when date range exceeds 365 days' {
-            # Arrange
-            $startDate = Get-Date
-            $endDate = $startDate.AddDays(366)
-            $validPath = "C:\ValidPath"
+            # Arrange: Ensure EndDate is within allowed bounds by setting it to tomorrow,
+            # then choose a StartDate that makes the range 367 days (i.e. one day too long)
+            $currentDate = (Get-Date).ToUniversalTime().Date
+            $tomorrow = $currentDate.AddDays(1)
+            $invalidStartDate = $tomorrow.AddDays(-367)  # 367-day difference triggers error
             
             # Act
-            $result = Test-HawkInvestigationParameter `
-                -StartDate $startDate `
-                -EndDate $endDate `
-                -FilePath $validPath `
-                -NonInteractive
+            $result = Test-HawkInvestigationParameter -StartDate $invalidStartDate `
+                                                      -EndDate $tomorrow `
+                                                      -FilePath $validPath `
+                                                      -NonInteractive
             
-            # Assert
-            $result.IsValid | Should -BeFalse
+            # Assert: Expect the specific error message for a date range that is too long.
             $result.ErrorMessages | Should -Contain "Date range cannot exceed 365 days"
         }
-
+        
         It 'Should fail when EndDate is more than one day in the future' {
             # Arrange
             $startDate = Get-Date

@@ -100,15 +100,36 @@ For critical issues or inquiries, email hawkpsmodule@gmail.com.
 # **Hawk Telemetry Disclosure**
 
 ## **Overview**
+
+<<<<<<< HEAD
+
 Hawk, the open-source PowerShell module, collects limited usage data to help improve the module by identifying the most frequently used features. This data assists in prioritizing updates, enhancements, and new functionality.
 
 ## **What Data is Collected?**
+
 Hawk collects **only** the names of the functions that are executed.
 
 ✅ **Collected Data:**
+
 - Function names that are run within Hawk.
 
 ❌ **Not Collected:**
+
+=======
+Hawk, the open-source PowerShell module, collects limited usage data to help improve the module by identifying the most frequently used features. This data assists in prioritizing updates, enhancements, and new functionality.
+
+## **What Data is Collected?**
+
+Hawk collects **only** the names of the functions that are executed.
+
+✅ **Collected Data:**
+
+- Function names that are run within Hawk.
+
+❌ **Not Collected:**
+
+> > > > > > > 4fc2a6fce93b52e0358c9de9e1ad81dfa8779220
+
 - No user-identifiable data.
 - No environmental or system data.
 - No script inputs, outputs, or arguments.
@@ -116,10 +137,13 @@ Hawk collects **only** the names of the functions that are executed.
 - No data is shared or sold.
 
 ## **Why is This Data Collected?**
+
 The telemetry helps us understand which functions are used most frequently so we can:
+
 - Prioritize updates and improvements.
 - Optimize performance for widely used features.
 - Make data-driven decisions about future development.
 
 ## **How is the Data Used?**
+
 The collected data is strictly used for internal development purposes to enhance the Hawk module. It is never shared, sold, or used for any form of tracking beyond feature usage.

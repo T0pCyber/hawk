@@ -22,8 +22,9 @@ Function Get-HawkUserEntraIDSignInLog {
     
     .OUTPUTS
         Creates the following files in the user's output directory:
-        - EntraSignInLog_[user].csv - All sign-in data in CSV format
-        - EntraSignInLog_[user].json - All sign-in data in JSON format
+        - Entra_Sign_In_Log_[user].csv - All sign-in data in CSV format
+        - Entra_Sign_In_Log_[user].json - All sign-in data in JSON format
+        - _Investigate_Entra_Sign_In_Log_$User - Only sign in logs for those with an associated risk level.
     
         Note: Only contains data from the most recent 14 days relative to the specified end date.
     
@@ -54,7 +55,6 @@ Function Get-HawkUserEntraIDSignInLog {
             Initialize-HawkGlobalObject
         }
 
-        Out-LogFile "Gathering Microsoft Entra ID Sign-in Logs" -Action
         Test-GraphConnection
         Send-AIEvent -Event "CmdRun"
         [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
@@ -70,18 +70,12 @@ Function Get-HawkUserEntraIDSignInLog {
         # Compare dates manually since PowerShell doesn't have DateTime.Max
         $effectiveStartDate = if ($requestedStart -gt $twoWeeksAgo) {
             $requestedStart
-        } else {
+        }
+        else {
             $twoWeeksAgo
         }
 
-        # Notify user about 14-day limit and any date adjustment
-        Out-LogFile "Hawk Entra ID Sign-in logs is limited to the most recent 14 days" -Information
-        
-        if ($Hawk.StartDate.ToUniversalTime() -lt $twoWeeksAgo) {
-            Out-LogFile "Your requested date range exceeds this limit. Data will only be available from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
-        } else {
-            Out-LogFile "Retrieving data from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
-        }
+
     }
 
     PROCESS {
@@ -89,12 +83,23 @@ Function Get-HawkUserEntraIDSignInLog {
             [string]$User = $Object.UserPrincipalName
             
             try {
-                Out-LogFile ("Retrieving sign-in logs for " + $User) -Action
+                Out-LogFile "Initiating collection of sign-in logs for $User from Entra ID." -Action
+
+                # Notify user about 14-day limit and any date adjustment
+                Out-LogFile "Hawk Entra ID Sign-in logs is limited to the most recent 14 days" -Information
+                
+                if ($Hawk.StartDate.ToUniversalTime() -lt $twoWeeksAgo) {
+                    Out-LogFile "Your requested date range exceeds this limit. Data will only be available from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
+                }
+                else {
+                    Out-LogFile "Retrieving data from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
+                }
 
                 # Use adjusted date range and ensure we have valid dates
                 $startDateUtc = if ($effectiveStartDate) {
                     $effectiveStartDate.ToString('yyyy-MM-ddTHH:mm:ssZ')
-                } else {
+                }
+                else {
                     $twoWeeksAgo.ToString('yyyy-MM-ddTHH:mm:ssZ')
                 }
                 
@@ -121,51 +126,56 @@ Function Get-HawkUserEntraIDSignInLog {
                     Out-LogFile ("Retrieved " + $signInLogs.Count + " sign-in log entries for " + $User) -Information
 
                     # Write all logs to CSV/JSON
-                    $signInLogs | Out-MultipleFileType -FilePrefix "EntraSignInLog_$User" -User $User -csv -json
+                    $signInLogs | Out-MultipleFileType -FilePrefix "Entra_Sign_In_Log_$User" -User $User -csv -json
 
                     # Check for risky sign-ins
                     $riskySignIns = $signInLogs | Where-Object {
-                        $_.RiskLevelDuringSignIn -in @('high', 'medium') -or
-                        $_.RiskLevelAggregated -in @('high', 'medium')
+                        $_.RiskLevelDuringSignIn -in @('high', 'medium', 'low') -or
+                        $_.RiskLevelAggregated -in @('high', 'medium', 'low')
                     }
 
                     if ($riskySignIns.Count -gt 0) {
                         # Flag for investigation
-                        Out-LogFile ("Found " + $riskySignIns.Count + " risky sign-ins for " + $User) -notice
+                        Out-LogFile ("Found " + $riskySignIns.Count + " risky sign-ins for " + $User) -Notice
+                        
+                        # Export risky sign-ins for investigation
+                        $riskySignIns | Out-MultipleFileType -FilePrefix "_Investigate_Entra_Sign_In_Log_$User" -User $User -csv -json -Notice
                         
                         # Group and report risk levels
                         $duringSignIn = $riskySignIns | Group-Object -Property RiskLevelDuringSignIn | 
-                            Where-Object {$_.Name -in @('high', 'medium')}
+                        Where-Object { $_.Name -in @('high', 'medium', 'low') }
                         foreach ($risk in $duringSignIn) {
-                            Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -silentnotice
+                            Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -Notice
                         }
 
                         $aggregated = $riskySignIns | Group-Object -Property RiskLevelAggregated | 
-                            Where-Object {$_.Name -in @('high', 'medium')}
+                        Where-Object { $_.Name -in @('high', 'medium', 'low') }
                         foreach ($risk in $aggregated) {
-                            Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -silentnotice
+                            Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -Notice
                         }
 
-                        Out-LogFile ("Review EntraSignInLog_$User.csv/json for complete details") -silentnotice
+                        Out-LogFile ("Review _Investigate_Entra_Sign_In_Log_$User.csv/json for complete details") -Notice
                     }
                 }
                 else {
                     Out-LogFile ("No sign-in logs found for " + $User + " in the specified time period") -Information
                 }
+
             }
             catch {
                 $global:processSuccess = $false
                 Out-LogFile ("Error retrieving sign-in logs for " + $User + " : " + $_.Exception.Message) -isError
                 Write-Error -ErrorRecord $_ -ErrorAction Continue
             }
+            # Only show completion message if successful
+            if ($global:processSuccess) {
+                Out-LogFile "Completed collection of Entra sign-in logs for $User from Entra ID." -Information
+            }
         }
     }
 
     END {
-        # Only show completion message if successful
-        if ($global:processSuccess) {
-            Out-LogFile "Completed exporting Entra sign-in logs" -Information
-        }
+
         Remove-Variable -Name processSuccess -Scope Global -ErrorAction SilentlyContinue
     }
 }

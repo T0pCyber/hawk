@@ -32,11 +32,10 @@ Function Get-HawkTenantDomainActivity {
 			Initialize-HawkGlobalObject
 		}
 
-
-
 		Test-EXOConnection
 		Send-AIEvent -Event "CmdRun"
-		Out-LogFile "Gathering any changes to Domain configuration settings" -action
+
+		Out-LogFile "Initiating collection of domain configuration changes from the UAL." -Action
 	}
 	PROCESS{
 		# Search UAL audit logs for any Domain configuration changes
@@ -87,6 +86,6 @@ Function Get-HawkTenantDomainActivity {
 		}
 	}
 END{
-	Out-LogFile "Completed gathering Domain configuration changes" -Information
+	Out-LogFile "Completed collection of domain configuration changes from the UAL." -Information
 }
 }#End Function Get-HawkTenantDomainActivity

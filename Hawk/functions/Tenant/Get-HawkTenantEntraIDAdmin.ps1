@@ -25,7 +25,7 @@
                 Initialize-HawkGlobalObject
             }
 
-            Out-LogFile "Gathering Microsoft Entra ID Administrators" -Action
+            Out-LogFile "Initiating collection of Microsoft Entra ID Administrators from Microsoft Graph." -Action
 
             # Verify Graph API connection
             Test-GraphConnection
@@ -95,6 +95,6 @@
         }
 
         END {
-            Out-LogFile "Completed exporting Microsoft Entra ID Admins" -Information
+            Out-LogFile "Completed collection of Microsoft Entra ID Administrators from Microsoft Graph." -Information
         }
     }

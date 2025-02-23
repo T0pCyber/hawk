@@ -44,6 +44,7 @@
         Initialize-HawkGlobalObject
     }
 
+	Out-LogFile "Initiating collection of tenant configuration settings from Exchange Online." -Action
 
 	Test-EXOConnection
 	Send-AIEvent -Event "CmdRun"
@@ -65,4 +66,6 @@
 
     Out-LogFile "Gathering Transport Configuration" -action
     Get-TransportConfig | Out-MultipleFileType -FilePrefix "TransportConfig" -csv -json
+
+    Out-LogFile "Completed collection of tenant configuration settings from Exchange Online." -Information
 }

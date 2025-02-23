@@ -49,8 +49,7 @@ Function Get-HawkTenantAdminInboxRuleCreation {
 
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
-
-    Out-LogFile "Analyzing admin inbox rule creation from audit logs" -Action
+    Out-LogFile "Initiating collection of admin inbox rule creation events from the UAL." -Action
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -60,17 +59,16 @@ Function Get-HawkTenantAdminInboxRuleCreation {
 
     try {
         # Search for new inbox rules
-        Out-LogFile "Searching audit logs for inbox rule creation events" -Action
         $searchCommand = "Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations 'New-InboxRule'"
         [array]$NewInboxRules = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
-
+        Out-LogFile "Searching Unified Audit Log for inbox rule creation events." -Action
         if ($NewInboxRules.Count -gt 0) {
-            Out-LogFile ("Found " + $NewInboxRules.Count + " admin inbox rule changes in audit logs") -Information
+            Out-LogFile ("Found " + $NewInboxRules.Count + " admin inbox rule changes in Unified Audit Log.") -Information
 
             # Process and output the results
             $ParsedRules = $NewInboxRules | Get-SimpleUnifiedAuditLog
             if ($ParsedRules) {
-                Out-LogFile "Writing parsed admin inbox rule creation data" -Action
+                Out-LogFile "Writing parsed admin inbox rule creation data." -Action
                 $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Creation" -csv -json
                 $NewInboxRules | Out-MultipleFileType -FilePrefix "Admin_Inbox_Rules_Creation" -csv -json
 
@@ -81,27 +79,17 @@ Function Get-HawkTenantAdminInboxRuleCreation {
                 }
 
                 if ($SuspiciousRules) {
-                    Out-LogFile "Found suspicious admin inbox rule creation requiring investigation" -Notice
-
-                    Out-LogFile "Writing suspicious rule creation data" -Action
+                    Out-LogFile "Found $($SuspiciousRules.Count) inbox rule creation events." -Notice
+                    Out-LogFile "Please verify this activity is legitimate."-Notice
                     $SuspiciousRules | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Creation" -csv -json -Notice
-
-                    # Log details about why each rule was flagged
-                    foreach ($rule in $SuspiciousRules) {
-                        $reasons = @()
-                        if (Test-SuspiciousInboxRule -Rule $rule -Reasons ([ref]$reasons)) {
-                            Out-LogFile "Found suspicious rule creation: '$($rule.Param_Name)'" -Notice
-                      
-                        }
-                    }
                 }
             }
             else {
-                Out-LogFile "Error: Failed to parse inbox rule audit data" -isError
+                Out-LogFile "Error: Failed to parse inbox rule audit data." -isError
             }
         }
         else {
-            Out-LogFile "Get-HawkTenantAdminInboxRuleCreation completed successfully" -Information
+            Out-LogFile "Completed collection of admin inbox rule creation events from the UAL." -Information
             Out-LogFile "No admin inbox rule creation events found in audit logs" -Action
         }
     }
@@ -109,4 +97,6 @@ Function Get-HawkTenantAdminInboxRuleCreation {
         Out-LogFile "Error analyzing admin inbox rule creation: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
+
+    Out-LogFile "Completed collection of admin inbox rule creation events from the UAL." -Information
 }

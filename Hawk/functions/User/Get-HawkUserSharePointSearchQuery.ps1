@@ -24,72 +24,76 @@ Function Get-HawkUserSharePointSearchQuery {
         You will need to conduct individual log pull and review via PowerShell or other SIEM to determine values
         for those fields.
     #>
-        [CmdletBinding()]
-        param(
-            [Parameter(Mandatory=$true)]
-            [array]$UserPrincipalName
-        )
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [array]$UserPrincipalName
+    )
     
-        BEGIN {
-            # Check if Hawk object exists and is fully initialized
-            if (Test-HawkGlobalObject) {
-                Initialize-HawkGlobalObject
-            }
-            Out-LogFile "Starting Unified Audit Log (UAL) search for 'SearchQueryInitiatedSharePoint'" -Action
-            Out-LogFile "Please be patient, this can take a while..." -Information
-            Test-EXOConnection
-        }#End Begin
+    BEGIN {
+        # Check if Hawk object exists and is fully initialized
+        if (Test-HawkGlobalObject) {
+            Initialize-HawkGlobalObject
+        }
+        Test-EXOConnection
+    }#End Begin
     
-        PROCESS {
+    PROCESS {
             
-            #Verify UPN input
-            [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
+        #Verify UPN input
+        [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
     
-            foreach($UserObject in $UserArray) {
-                [string]$User = $UserObject.UserPrincipalName
+        foreach ($UserObject in $UserArray) {
+            [string]$User = $UserObject.UserPrincipalName
+
+            Out-LogFile "Initiating collection of SharePoint Search queries for $User from the UAL." -Action
+            Out-LogFile "Please be patient, this can take a while..." -Information
+
                 
-                # Verify that user has operation enabled for auditing. Otherwise, move onto next user.
-                if (Test-OperationEnabled -User $User -Operation 'SearchQueryInitiated') {
-                    Out-LogFile "Operation 'SearchQueryInitiated' verified enabled for $User." -Information
-                    try {
-                        #Retrieve all audit data for SharePoint search activity
-                        $SearchCommand = "Search-UnifiedAuditLog -Operations 'SearchQueryInitiatedSharePoint' -UserIds $User"
-                        $SharePointSearches = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
+            # Verify that user has operation enabled for auditing. Otherwise, move onto next user.
+            if (Test-OperationEnabled -User $User -Operation 'SearchQueryInitiated') {
+                Out-LogFile "Operation 'SearchQueryInitiated' verified enabled for $User." -Information
+                try {
+                    #Retrieve all audit data for SharePoint search activity
+                    $SearchCommand = "Search-UnifiedAuditLog -Operations 'SearchQueryInitiatedSharePoint' -UserIds $User"
+                    $SharePointSearches = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
                         
-                        if ($SharePointSearches.Count -gt 0){
-                            #Define output directory path for user
-                            $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
+                    if ($SharePointSearches.Count -gt 0) {
+                        #Define output directory path for user
+                        $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
                     
-                            #Create user directory if it doesn't already exist
-                            if (-not (Test-Path -Path $UserFolder)) {
-                                New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
-                            }
-                    
-                            #Compress raw data into more simple view
-                            $SharePointSearchesSimple = $SharePointSearches | Get-SimpleUnifiedAuditLog
-                    
-                            #Export both raw and simplistic views to specified user's folder
-                            $SharePointSearches | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "SharePointSearches_$User" -User $User -csv -json
-                            $SharePointSearchesSimple | Out-MultipleFileType -FilePrefix "Simple_SharePointSearches_$User" -User $User -csv -json
+                        #Create user directory if it doesn't already exist
+                        if (-not (Test-Path -Path $UserFolder)) {
+                            New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
                         }
-                        else {
-                            Out-LogFile "Get-HawkUserSharePointSearchQuery completed successfully" -Information
-                            Out-LogFile "No items found for $User." -Information
-                        }
-                    } catch {
-                        Out-LogFile "Error processing SharePoint Search Activity for $User : $_" -isError
-                        Write-Error -ErrorRecord $_ -ErrorAction Continue
+                    
+                        #Compress raw data into more simple view
+                        $SharePointSearchesSimple = $SharePointSearches | Get-SimpleUnifiedAuditLog
+                    
+                        #Export both raw and simplistic views to specified user's folder
+                        $SharePointSearches | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "SharePointSearches_$User" -User $User -csv -json
+                        $SharePointSearchesSimple | Out-MultipleFileType -FilePrefix "Simple_SharePointSearches_$User" -User $User -csv -json
                     }
-                } else {
-                    Out-LogFile "Operation 'SearchQueryInitiated' is not enabled for $User." -Information
-                    Out-LogFile "No data recorded for $User." -Information
+                    else {
+                        Out-LogFile "No SharePoint Search Queries found for $User." -Information
+                    }
+                }
+                catch {
+                    Out-LogFile "Error processing SharePoint Search Activity for $User : $_" -isError
+                    Write-Error -ErrorRecord $_ -ErrorAction Continue
                 }
             }
+            else {
+                Out-LogFile "Operation 'SearchQueryInitiated' is not enabled for $User." -Information
+                Out-LogFile "No data recorded for $User." -Information
+            }
+            Out-LogFile "Completed collection of SharePoint Search queries for $User from the UAL." -Information
+
+        }
             
-        }#End Process
+    }#End Process
     
-        END{
-            Out-Logfile "Completed exporting SharePoint Search Activity logs" -Information
-        }#End End
+    END {
+    }#End End
     
-    }
+}

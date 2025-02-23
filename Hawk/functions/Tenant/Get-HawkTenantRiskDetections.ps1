@@ -38,7 +38,7 @@ Function Get-HawkTenantRiskDetections {
         Test-GraphConnection
         Send-AIEvent -Event "CmdRun"
 
-        Out-LogFile "Retrieving risk detections from Microsoft Entra ID" -Action
+        Out-LogFile "Initiating collection of Risk Detection events from Entra ID." -Action
 
         # Create tenant folder if it doesn't exist
         $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -93,21 +93,21 @@ Function Get-HawkTenantRiskDetections {
                 ($_.RiskLevel -eq 'high' -or $_.RiskLevel -eq 'medium' -or $_.RiskLevel -eq 'low')
             }
 
-            # Process confirmed compromised risk detections (export as CSV and JSON)
+            # Process confirmed compromised risk detections
             if ($confirmedCompromisedDetections) {
-                Out-LogFile ("Found " + $confirmedCompromisedDetections.Count + " confirmed compromised risk detection events requiring investigation") -Notice
-                foreach ($detection in $confirmedCompromisedDetections) {
-                    Out-LogFile ("Confirmed compromised detection: $($detection.RiskEventType) for user $($detection.UserPrincipalName) at $($detection.DetectedDateTime)") -Notice
-                }
+                Out-LogFile "Found $($confirmedCompromisedDetections.Count) confirmed compromised risk detections" -Notice
+                Out-LogFile "Details in _Investigate_Confirmed_Compromised_Risk_Detection files" -Notice
                 $confirmedCompromisedDetections | Out-MultipleFileType -FilePrefix "_Investigate_Confirmed_Compromised_Risk_Detection" -csv -json -Notice
             }
 
-            # Process other risk detections (combined high/medium/low) (export as CSV and JSON)
+            # Process other risk detections (combined high/medium/low)
             if ($otherDetections) {
-                Out-LogFile ("Found " + $otherDetections.Count + " risk detection events (high/medium/low) for investigation") -Notice
-                foreach ($detection in $otherDetections) {
-                    Out-LogFile ("Risk detection: $($detection.RiskEventType) for user $($detection.UserPrincipalName) at $($detection.DetectedDateTime) with Risk Level = $($detection.RiskLevel)") -Notice
-                }
+                $highRisk = ($otherDetections | Where-Object { $_.RiskLevel -eq 'high' }).Count
+                $mediumRisk = ($otherDetections | Where-Object { $_.RiskLevel -eq 'medium' }).Count
+                $lowRisk = ($otherDetections | Where-Object { $_.RiskLevel -eq 'low' }).Count
+                
+                Out-LogFile "Found risk detections: $highRisk High, $mediumRisk Medium, $lowRisk Low" -Notice
+                Out-LogFile "Details in _Investigate_Risk_Detection.csv/json" -Notice
                 $otherDetections | Out-MultipleFileType -FilePrefix "_Investigate_Risk_Detection" -csv -json -Notice
             }
         }
@@ -118,6 +118,6 @@ Function Get-HawkTenantRiskDetections {
     }
 
     end {
-        Out-LogFile "Completed gathering risk detection data" -Information
+        Out-LogFile "Completed collection of Risk Detection events from Entra ID." -Information
     }
 }

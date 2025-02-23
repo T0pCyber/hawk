@@ -41,7 +41,6 @@ Function Get-HawkTenantAdminInboxRuleModification {
         suspicious patterns. Output files will be created in the configured Hawk output directory under
         the Tenant subfolder.
     #>
-    #>
     [CmdletBinding()]
     param()
 
@@ -54,7 +53,7 @@ Function Get-HawkTenantAdminInboxRuleModification {
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Analyzing admin inbox rule modifications from audit logs" -Action
+    Out-LogFile "Initiating collection of admin inbox rule modification events from the UAL." -Action
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -85,19 +84,9 @@ Function Get-HawkTenantAdminInboxRuleModification {
                 }
 
                 if ($SuspiciousModifications) {
-                    Out-LogFile "Found suspicious rule modifications requiring investigation" -Notice
-                
-                    Out-LogFile "Writing suspicious rule modification data" -Action
+                    Out-LogFile "Found $($SuspiciousModifications.Count) inbox rule modification events" -Notice
+                    Out-LogFile "Please verify this activity is legitimate." -Notice
                     $SuspiciousModifications | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Modification" -csv -json -Notice
-                
-                    # Log details about why each modification was flagged
-                    foreach ($rule in $SuspiciousModifications) {
-                        $reasons = @()
-                        if (Test-SuspiciousInboxRule -Rule $rule -Reasons ([ref]$reasons)) {
-                            # Just enhance the log message but keep all data processing the same
-                            Out-LogFile "Found suspicious rule modification: Operation=$($rule.Operation) User=$($rule.UserId)" -Notice
-                        }
-                    }
                 }
             }
             else {
@@ -113,4 +102,7 @@ Function Get-HawkTenantAdminInboxRuleModification {
         Out-LogFile "Error analyzing admin inbox rule modifications: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
+
+    Out-LogFile "Completed collection of admin inbox rule modification events from the UAL." -Information
+ 
 }

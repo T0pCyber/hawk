@@ -67,13 +67,15 @@ Begin {
 
 	Out-LogFile "Gathering Tenant information" -Action
 	Test-EXOConnection
+    Test-GraphConnection
+    Send-AIEvent -Event "CmdRun"
 }#End BEGIN
 
 PROCESS{
 # Make sure our variables are null
 $AzureApplicationActivityEvents = $null
 
-Out-LogFile "Searching UAL for Entra ID Application Activities" -Action
+Out-LogFile "Initiating collection of Entra ID application audit events from the UAL." -Action
 
 # Search the unified audit log for events related to application activity
 # https://docs.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants
@@ -108,6 +110,6 @@ else {
 }
 }#End PROCESS
 END{
-Out-LogFile "Completed gathering Tenant App Audit Logs" -Information
+Out-LogFile "Completed collection of Entra ID application audit events from the UAL." -Information 
 }#End END
 }

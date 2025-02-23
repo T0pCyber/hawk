@@ -46,7 +46,7 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
-    Out-LogFile "Analyzing admin inbox rule removals from audit logs" -Action
+    Out-LogFile "Initiating collection of admin inbox rule removal events from the UAL." -Action
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
@@ -79,24 +79,9 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
                 }
 
                 if ($SuspiciousRemovals) {
-                    Out-LogFile "Found suspicious admin inbox rule removals requiring investigation" -Notice
-
-                    # Output files with timestamps
-                    $csvPath = Join-Path -Path $TenantPath -ChildPath "_Investigate_Admin_Inbox_Rules_Removal.csv"
-                    $jsonPath = Join-Path -Path $TenantPath -ChildPath "_Investigate_Admin_Inbox_Rules_Removal.json"
-                    Out-LogFile "Additional Information: $csvPath" -Notice
-                    Out-LogFile "Additional Information: $jsonPath" -Notice
-
+                    Out-LogFile "Found $($SuspiciousRemovals.Count) inbox rule removal events" -Notice
+                    Out-LogFile "Please verify this activity is legitimate." -Notice
                     $SuspiciousRemovals | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Removal" -csv -json -Notice
-
-                    # Log details about why each removal was flagged
-                    foreach ($rule in $SuspiciousRemovals) {
-                        $reasons = @()
-                        if (Test-SuspiciousInboxRule -Rule $rule -Reasons ([ref]$reasons)) {
-                            Out-LogFile "Found suspicious rule removal: '$($rule.Param_Name)'" -Notice
-    
-                        }
-                    }
                 }
             }
             else {
@@ -112,4 +97,8 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
         Out-LogFile "Error analyzing admin inbox rule removals: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }
+
+
+    Out-LogFile "Completed collection of admin inbox rule removal events from the UAL." -Information
+
 }
