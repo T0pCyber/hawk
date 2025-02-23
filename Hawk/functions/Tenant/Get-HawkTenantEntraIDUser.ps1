@@ -29,6 +29,7 @@
 
         # Ensure we have a valid Graph connection
         Test-GraphConnection
+        Send-AIEvent -Event "CmdRun"
     }
     PROCESS {
         # Get all users with specific properties needed for DFIR

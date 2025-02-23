@@ -33,20 +33,21 @@
     Out-LogFile "Initiating collection of OAuth / Application Grants from Microsoft Graph." -Action
 
     Test-GraphConnection
+    Send-AIEvent -Event "CmdRun"
 
     # Gather the grants using the internal Graph-based implementation
     [array]$Grants = Get-AzureADPSPermission -ShowProgress
-    
+
     # Create new Property for Consent_Grants output table
     $Grants | Add-Member -NotePropertyName ConsentGrantRiskCategory -NotePropertyValue ""
-    
+
     [bool]$flag = $false
 
     # Define list of Extremely Dangerous grants
     [array]$ExtremelyDangerousGrants = "^AppRoleAssignment\.ReadWrite\.All$", "^RoleManagement\.ReadWrite\.Directory$"
 
     # Define list of High Risk grants
-    [array]$HighRiskGrants = "^BitlockerKey\.Read\.All$", "^Chat\.", "^Directory\.ReadWrite\.All$", "^eDiscovery\.", 
+    [array]$HighRiskGrants = "^BitlockerKey\.Read\.All$", "^Chat\.", "^Directory\.ReadWrite\.All$", "^eDiscovery\.",
         "^Files\.", "^MailboxSettings\.ReadWrite$", "^Mail\.ReadWrite$", "^Mail\.Send$", "^Sites\.", "^User\."
 
     # Search the Grants for the listed bad grants that we can detect
@@ -64,7 +65,7 @@
         Out-LogFile "Found $BroadGrantCount broad-scoped grants ('AllPrincipals' or '*.All')" -notice
         $flag = $true
     }
-    
+
     #Flag Extremely Dangerous grants; if a grant is both broad-scope and E.D., flag as E.D.
     [int]$EDGrantCount = 0
     foreach($grant in $ExtremelyDangerousGrants) {
@@ -80,7 +81,7 @@
         Out-LogFile "Found $EDGrantCount Extremely Dangerous Grant(s)" -notice
         $flag = $true
     }
-    
+
     #Flag High Risk grants; if a grant is both broad-scope and H.R., flag as H.R.
     [int]$HRGrantCount = 0
     foreach($grant in $HighRiskGrants) {
@@ -101,7 +102,7 @@
         Out-LogFile "Please verify these grants are legitimate / required." -Notice
         Out-LogFile 'For more information on understanding these results results, visit' -Notice
         Out-LogFile 'https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants' -Notice
-        
+
         # Create investigation file for concerning grants
         $grantsForInvestigation = $Grants | Where-Object { $_.ConsentGrantRiskCategory -ne "" }
         $grantsForInvestigation | Out-MultipleFileType -FilePrefix "_Investigate_Consent_Grants" -csv -json -Notice

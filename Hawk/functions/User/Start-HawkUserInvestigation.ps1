@@ -19,7 +19,7 @@
         - Administrative changes affecting the user
         - Message trace data and mobile device access
         - AutoReply configuration
-        
+
         All collected data is stored in a structured format for analysis, with suspicious findings
         highlighted for investigation.
 
@@ -107,17 +107,18 @@
 
 	begin {
 		$NonInteractive = Test-HawkNonInteractiveMode -PSBoundParameters $PSBoundParameters
+		Send-AIEvent -Event "CmdRun"
 
 		if ($NonInteractive) {
 			$processedDates = Test-HawkDateParameter -PSBoundParameters $PSBoundParameters -StartDate $StartDate -EndDate $EndDate -DaysToLookBack $DaysToLookBack
 			$StartDate = $processedDates.StartDate
 			$EndDate = $processedDates.EndDate
-	
+
 			# Now call validation with updated StartDate/EndDate
 			$validation = Test-HawkInvestigationParameter `
 				-StartDate $StartDate -EndDate $EndDate `
 				-DaysToLookBack $DaysToLookBack -FilePath $FilePath -NonInteractive
-	
+
 			if (-not $validation.IsValid) {
 				foreach ($error in $validation.ErrorMessages) {
 					Stop-PSFFunction -Message $error -EnableException $true
@@ -148,32 +149,32 @@
 		if ($PSCmdlet.ShouldProcess("Investigating Users")) {
 			Out-LogFile "Starting User Investigation." -Action
 			Send-AIEvent -Event "CmdRun"
-	
-	
+
+
 			# Verify the UPN input
 			[array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
-	
+
 			foreach ($Object in $UserArray) {
 				[string]$User = $Object.UserPrincipalName
-	
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserConfiguration for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserConfiguration." -Action
 					Get-HawkUserConfiguration -User $User
 				}
-	
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserInboxRule for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserInboxRule." -Action
 					Get-HawkUserInboxRule -User $User
 				}
-	
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEmailForwarding for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserEmailForwarding." -Action
 					Get-HawkUserEmailForwarding -User $User
 				}
-	
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAutoReply for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserAutoReply." -Action
@@ -185,25 +186,25 @@
 					Out-LogFile "Running Get-HawkUserEntraIDSignInLog." -Action
 					Get-HawkUserEntraIDSignInLog -UserPrincipalName $User
 				}
-	
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALSignInLog for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserUALSignInLog." -Action
 					Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
 				}
-	
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserMailboxAuditing." -Action
 					Get-HawkUserMailboxAuditing -User $User
 				}
-	
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAdminAudit for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserAdminAudit." -Action
 					Get-HawkUserAdminAudit -User $User
 				}
-	
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMessageTrace for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserMessageTrace." -Action
@@ -232,7 +233,7 @@
 					Out-LogFile "Running Get-HawkUserSharePointSearchQuery." -Action
 					Get-HawkUserSharePointSearchQuery -UserPrincipalName $User
 				}
-	
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMobileDevice for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserMobileDevice." -Action
@@ -249,4 +250,3 @@
 	}
 
 }
-	
