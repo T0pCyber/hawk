@@ -27,6 +27,7 @@ Function Read-HawkAppData {
     # if we don't have an JSON file then do nothing
     else {
         Out-LogFile ("No HawkAppData File found " + $HawkAppdataPath) -Information
-        $global:HawkAppData = @{ "access_key" = $null }
+        Add-HawkAppData -name access_key -Value $null
+        #$global:HawkAppData = @{ "access_key" = "null" }
     }
 }
