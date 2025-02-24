@@ -1,10 +1,10 @@
 <#
 .SYNOPSIS
-    Get the Location of an IP using the freegeoip.net rest API
+    Get the Location of an IP using the ipstack.com rest API
 .DESCRIPTION
-    Get the Location of an IP using the freegeoip.net rest API
-.PARAMETER IPAddress
-    IP address of geolocation
+    Get the Location of an IP using the ipstack.com rest API
+.PARAMETER None
+    No parameters
 .EXAMPLE
     Get-IPStackAPIKey
     Gets all IP Geolocation data of IPs that recieved

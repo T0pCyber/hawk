@@ -24,7 +24,7 @@ Function Add-HawkAppData {
         [string]$Value
     )
 
-    Out-LogFile ("Adding " + $value + " to " + $Name + " in HawkAppData") -Action
+    Out-LogFile ("Adding `"$Value`"  to `"$Name`" in HawkAppData") -Action
 
     # Test if our HawkAppData variable exists
     if ([bool](get-variable HawkAppData -ErrorAction SilentlyContinue)) {
