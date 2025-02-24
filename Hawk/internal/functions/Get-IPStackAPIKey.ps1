@@ -25,7 +25,8 @@ function Get-IPStackAPIKey {
         try {
             # Read in existing HawkAppData
             if (!([bool](Get-Variable HawkAppData -ErrorAction SilentlyContinue))) {
-                if (Read-HawkAppData) {
+                Read-HawkAppData
+                if ($HawkAppData.access_key) {
                     Out-LogFile "HawkAppData JSON file read successfully." -Information
                     [string]$AccessKeyFromFile = $HawkAppData.access_key
                 }

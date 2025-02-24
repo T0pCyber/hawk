@@ -19,14 +19,16 @@ Function Read-HawkAppData {
     # check to see if our JSON file is there
     if (test-path $HawkAppdataPath) {
         Out-LogFile ("Reading file " + $HawkAppdataPath) -Action
-        if (-not [string]::IsNullOrEmpty($global:HawkAppData)) {
+        $global:HawkAppData = ConvertFrom-Json -InputObject ([string](Get-Content $HawkAppdataPath))
+        if (-not [string]::IsNullOrEmpty($global:HawkAppData.access_key)) {
+            Out-LogFile ("HawkAppData JSON read successfully") -Information
             Out-LogFile ("HawkAppData JSON exists, not overwriting") -Information
-            $global:HawkAppData = ConvertFrom-Json -InputObject ([string](Get-Content $HawkAppdataPath))
+            
         }
-    }
-    # if we don't have an JSON file then do nothing
-    else {
-        Out-LogFile ("No HawkAppData File found " + $HawkAppdataPath) -Information
-        Add-HawkAppData -name access_key -Value $null
+        # if we don't have an JSON file then do nothing    
+        else {
+            Out-LogFile ("No HawkAppData File found " + $HawkAppdataPath) -Information
+            Add-HawkAppData -name access_key -Value $null
+        }
     }
 }
