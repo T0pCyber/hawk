@@ -22,28 +22,31 @@ function Get-IPStackAPIKey {
             [string]$AccessKeyFromFile = $HawkAppData.access_key
         }
 
-        #$IsValidAPIKey = $false
-
         # Check for existing key
-        if (-not [string]::IsNullOrEmpty($AccessKeyFromFile)) {
-            $maskedKey = "**************************" + $AccessKeyFromFile.Substring($AccessKeyFromFile.Length - 6)
-            Out-LogFile "Found existing API key ending in: $maskedKey" -Information
-            Out-LogFile "Would you like to use this existing key? (Y/N): " -isPrompt -NoNewLine
-            $useExistingKey = (Read-Host).Trim().ToUpper()
+        while ($useExistingKey -notin @('Y','N')) {
+            if (-not [string]::IsNullOrEmpty($AccessKeyFromFile)) {
+                $maskedKey = "**************************" + $AccessKeyFromFile.Substring($AccessKeyFromFile.Length - 6)
+                Out-LogFile "Found existing API key ending in: $maskedKey" -Information
+                Out-LogFile "Would you like to use this existing key? (Y/N): " -isPrompt -NoNewLine
+                $useExistingKey = (Read-Host).Trim().ToUpper()
 
-            if ($useExistingKey -eq 'Y') {
-                # Test existing key
-                Out-LogFile "Validating existing API key: $maskedKey" -Information
-                if (Test-GeoIPAPIKey -Key $AccessKeyFromFile) {
-                    Out-LogFile "API KEY VALID: $AccessKeyFromFile - Using existing API key from disk." -Information
-                    return $AccessKeyFromFile
+                if ($useExistingKey -notin @('Y','N')) {
+                    Out-LogFile "Please enter Y or N" -Information
                 }
-                else {
+
+                if ($useExistingKey -eq 'Y') {
+                    # Test existing key
+                    Out-LogFile "Validating existing API key: $maskedKey" -Information
+                    if (Test-GeoIPAPIKey -Key $AccessKeyFromFile) {
+                        Out-LogFile "API KEY VALID: $AccessKeyFromFile - Using existing API key from disk." -Information
+                        return $AccessKeyFromFile
+                    }
+                }
+                if ($useExistingKey -eq 'N') {
                     $AccessKeyFromFile = $null
-                    Out-LogFile "Existing API key validation failed." -isError
-                    #return $AccessKeyFromFile
+                    Out-LogFile "Existing API key Unkown or Disabled." -Information
+                    break
                 }
-                
             }
         }
 
@@ -54,10 +57,6 @@ function Get-IPStackAPIKey {
             Out-LogFile "Get your free API key at: https://ipstack.com/" -Information
             Out-LogFile "Please provide your IP Stack API key: " -isPrompt -NoNewLine
             $newKey = (Read-Host).Trim()
-
-            #if ([string]::IsNullOrEmpty($newKey)) {
-            #    throw "Cannot use empty API key"
-            #}
 
             # Validate new key
             if (-not (Test-GeoIPAPIKey -Key $newKey)) {
