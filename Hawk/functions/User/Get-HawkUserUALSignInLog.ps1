@@ -110,7 +110,6 @@
 
                 $AccessKey = Get-IPStackAPIKey
 				Set-Variable -Name AccessKey -Value $AccessKey -Scope Global
-				Write-Host "GET-HAWKUSERUALSIGNINLOG::GET-IPSTACKAPIKEY() -> AccessKey: $($AccessKey.GetType()) :: $AccessKey" -ForeGround Red
 
                 # Loop thru each connection and get the Geo IP location
                 while ($i -lt $ExpandedUserLogonLogs.Count) {
