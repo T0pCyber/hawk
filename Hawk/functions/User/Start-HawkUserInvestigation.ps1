@@ -164,10 +164,8 @@
 
 		# Check if Hawk object exists and is fully initialized
 		if (Test-HawkGlobalObject) {
-			Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to TRUE!" -Information
+			#Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to TRUE!" -Information
 			Initialize-HawkGlobalObject
-		} else {
-			Out-LogFile "START-USERINVESTIGATION::Test-HawkGlobalOjbect evaluated to FALSE!" -Information
 		}
 		$investigationStartTime = Get-Date
 
