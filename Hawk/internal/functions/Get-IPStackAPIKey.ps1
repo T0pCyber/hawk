@@ -38,7 +38,7 @@ function Get-IPStackAPIKey {
                     # Test existing key
                     Out-LogFile "Validating existing API key: $maskedKey" -Information
                     if (Test-GeoIPAPIKey -Key $AccessKeyFromFile) {
-                        Out-LogFile "API KEY VALID: $AccessKeyFromFile - Using existing API key from disk." -Information
+                        Out-LogFile "API KEY VALIDATED :: Using existing API key from disk -> $maskedKey" -Information
                         return $AccessKeyFromFile
                     }
                 }

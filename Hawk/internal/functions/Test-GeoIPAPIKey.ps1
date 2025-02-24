@@ -88,7 +88,7 @@ Function Test-GeoIPAPIKey {
         }
         else {
             # Successful responses lack "success" (it's null) and contain data like "ip"
-            Out-LogFile "Test-GeoIPAPIKey: API Key validated successfully."
+            Out-LogFile "Test-GeoIPAPIKey: API Key validated successfully." -Information
             return $true
         }
     }
