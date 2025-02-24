@@ -108,8 +108,8 @@
                 # Setup our counter
                 $i = 0
 
+                # Conduct IPStack API Key validation (once) so the API Key can be passed to Get-IPGeolocation
                 $AccessKey = Get-IPStackAPIKey
-				Set-Variable -Name AccessKey -Value $AccessKey -Scope Global
 
                 # Loop thru each connection and get the Geo IP location
                 while ($i -lt $ExpandedUserLogonLogs.Count) {
@@ -121,7 +121,7 @@
 
                     # Get the location information for this IP address
                     if($ExpandedUserLogonLogs.item($i).clientip){
-                    $Location = Get-IPGeolocation -IPAddress $ExpandedUserLogonLogs.item($i).clientip -AccessKey $AccessKey
+                        $Location = Get-IPGeolocation -IPAddress $ExpandedUserLogonLogs.item($i).clientip -AccessKey $AccessKey
                     }
                     else {
                         $Location = "IP Address Null"

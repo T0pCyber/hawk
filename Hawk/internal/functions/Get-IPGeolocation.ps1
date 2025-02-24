@@ -26,7 +26,6 @@ function Get-IPGeolocation {
     process {
         try {
        
-
             if ($IPAddress -eq "<null>") {
                 Write-Verbose "Null IP Provided: $IPAddress"
                 return [PSCustomObject]@{
