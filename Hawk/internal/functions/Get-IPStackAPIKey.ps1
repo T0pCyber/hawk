@@ -18,7 +18,6 @@ function Get-IPStackAPIKey {
     begin {
         [string]$newKey = $null
         [string]$AccessKeyFromFile = $null
-        #$useExistingKey = $null
     }
 
     process {
@@ -29,13 +28,10 @@ function Get-IPStackAPIKey {
                 if (Read-HawkAppData) {
                     Out-LogFile "HawkAppData JSON file read successfully." -Information
                     [string]$AccessKeyFromFile = $HawkAppData.access_key
-                    Out-LogFile "Access Key from HawkAppData: $AccessKeyFromFile" -Information
                 }
                 else {
                     Out-LogFile "HawkAppData Access Key is null/empty." -Information
-                    #$AccessKeyFromFile = $null
                 }
-                
             }
 
             # Check for existing access key on disk
@@ -93,7 +89,7 @@ function Get-IPStackAPIKey {
                     Add-HawkAppData -name access_key -Value $newKey
                     $appDataPath = Join-Path $env:LOCALAPPDATA "Hawk\Hawk.json"
                     Out-LogFile "WARNING: Your API key has been saved to: $appDataPath" -Action
-                    Out-LogFile "NOTE: The API key is stored in plaintext format" -Information
+                    Out-LogFile "WARNING: Your API key is stored in plaintext." -Information
                 }
             
                 # Return the validated key

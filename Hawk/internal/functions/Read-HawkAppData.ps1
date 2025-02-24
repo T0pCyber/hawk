@@ -28,6 +28,5 @@ Function Read-HawkAppData {
     else {
         Out-LogFile ("No HawkAppData File found " + $HawkAppdataPath) -Information
         Add-HawkAppData -name access_key -Value $null
-        #$global:HawkAppData = @{ "access_key" = "null" }
     }
 }
