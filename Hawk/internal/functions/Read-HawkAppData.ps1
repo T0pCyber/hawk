@@ -16,13 +16,17 @@
 Function Read-HawkAppData {
     $HawkAppdataPath = join-path $env:LOCALAPPDATA "Hawk\Hawk.json"
 
-    # check to see if our xml file is there
+    # check to see if our JSON file is there
     if (test-path $HawkAppdataPath) {
         Out-LogFile ("Reading file " + $HawkAppdataPath) -Action
-        $global:HawkAppData = ConvertFrom-Json -InputObject ([string](Get-Content $HawkAppdataPath))
+        if (-not [string]::IsNullOrEmpty($global:HawkAppData)) {
+            Out-LogFile ("HawkAppData JSON exists, not overwriting") -Information
+            $global:HawkAppData = ConvertFrom-Json -InputObject ([string](Get-Content $HawkAppdataPath))
+        }
     }
-    # if we don't have an xml file then do nothing
+    # if we don't have an JSON file then do nothing
     else {
         Out-LogFile ("No HawkAppData File found " + $HawkAppdataPath) -Information
+        $global:HawkAppData = @{ "access_key" = $null }
     }
 }
