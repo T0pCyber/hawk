@@ -1,6 +1,8 @@
 ﻿<#
 .SYNOPSIS
-    Get the Location of an IP using the ipstack.com REST API
+    Get-IPGeolocation is called by Get-HawkUserUALSignInLog to resolve IP addresses to geolocation data.
+    An IP address and IP Stack API Key is passed to the function, as it returns a PSCustomObject with the geolocation data.
+
 .DESCRIPTION
     Get the Location of an IP using the ipstack.com REST API
 .PARAMETER IPAddress

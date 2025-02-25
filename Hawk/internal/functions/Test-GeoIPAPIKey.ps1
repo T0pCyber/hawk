@@ -1,7 +1,7 @@
 Function Test-GeoIPAPIKey {
     <#
     .SYNOPSIS
-        Validates the supplied API key for ipstack.com.
+        Validates the supplied data in the form of a REST API key for ipstack.com.
     .DESCRIPTION
         Checks if the provided API key is valid by performing format checks and making a request to ipstack.com,
         using Google's DNS (8.8.8.8) for domain resolution. Returns a boolean indicating the key's validity.

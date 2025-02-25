@@ -1,15 +1,15 @@
 <#
 .SYNOPSIS
-    Get the Location of an IP using the ipstack.com rest API
+    Get-IPStackAPIKey is called by Get-HawkUserUALSignInLog to ensure a valid API key is available for use with ipstack.com.
+    Once a valid key is provided, it is saved and used by Get-IPGeolocation to resolve IP addresses to geolocation data.
 .DESCRIPTION
-    Get the Location of an IP using the ipstack.com rest API
+    Validate REST API key from ipstack.com
 .PARAMETER None
     No parameters
 .EXAMPLE
-    Get-IPStackAPIKey
-    Gets all IP Geolocation data of IPs that recieved
+    [string]$AccessKey = Get-IPStackAPIKey
 .NOTES
-    General notes
+    Get-IPStackAPIKey also uses Test-GeoIPAPIKey to validate the API key.
 #>
 function Get-IPStackAPIKey {
     [CmdletBinding()]
@@ -77,7 +77,7 @@ function Get-IPStackAPIKey {
                     Out-LogFile "Please provide your IP Stack API key: " -isPrompt -NoNewLine
                     $newKey = (Read-Host).Trim()
             
-                    # Ensure user input provided for API key is valid
+                    # Ensure user input provided for API key is not null or empty before testing the API key for validity
                     if ([string]::IsNullOrEmpty($newKey)) {
                         Out-LogFile "Failed to update IP Stack API key: Cannot bind argument to parameter 'Key' because it is an empty string." -isError
                         $isValid = $false
@@ -86,7 +86,6 @@ function Get-IPStackAPIKey {
                         $isValid = Test-GeoIPAPIKey -Key $newKey
                     }
                     
-            
                     # If invalid, inform the user and loop again
                     if (-not $isValid) {
                         Out-LogFile "Invalid API key. Please try again." -Action
@@ -98,6 +97,7 @@ function Get-IPStackAPIKey {
                 $saveChoice = (Read-Host).Trim().ToUpper()
             
                 if ($saveChoice -eq 'Y') {
+                    # Save the ipstack REST API key to HawkAppData
                     Add-HawkAppData -name access_key -Value $newKey
                     $appDataPath = Join-Path $env:LOCALAPPDATA "Hawk\Hawk.json"
                     Out-LogFile "WARNING: Your API key has been saved to: $appDataPath" -Action
