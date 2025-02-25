@@ -94,7 +94,7 @@ function Get-IPStackAPIKey {
             
                 # Once a valid key is entered, prompt to save it
                 Out-LogFile "Would you like to save your API key to disk? (Y/N): " -isPrompt -NoNewLine
-                $saveChoice = ''
+                $saveChoice = $null
                 while ($saveChoice -notin @('Y','N')) {
                     $saveChoice = (Read-Host).Trim().ToUpper()
 
