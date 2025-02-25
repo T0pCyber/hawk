@@ -1,12 +1,14 @@
 ﻿<#
 .SYNOPSIS
-    Get the Location of an IP using the freegeoip.net rest API
+    Get the Location of an IP using the ipstack.com REST API
 .DESCRIPTION
-    Get the Location of an IP using the freegeoip.net rest API
+    Get the Location of an IP using the ipstack.com REST API
 .PARAMETER IPAddress
-    IP address of geolocation
+    IP address to look up for geolocation
+.PARAMETER AccessKey
+    Access key for the API
 .EXAMPLE
-    Get-IPGeolocation
+    Get-IPGeolocation -IPAddress 8.8.8.8 -AccessKey "your_access_key"
     Gets all IP Geolocation data of IPs that recieved
 .NOTES
     General notes
