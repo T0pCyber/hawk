@@ -52,6 +52,10 @@ function Get-IPStackAPIKey {
                             if (Test-GeoIPAPIKey -Key $AccessKeyFromFile) {
                                 Out-LogFile "API KEY VALIDATED :: Using existing API key from disk -> $maskedKey" -Information
                                 return $AccessKeyFromFile
+                            }else {
+                                # If access key on file is invalid, set access key to null and prompt for new key
+                                Out-LogFile "API KEY `"$maskedKey`" INVALID :: Prompt user for new API key" -Information
+                                $AccessKeyFromFile = $null
                             }
                         } elseif ($useExistingKey -eq 'N') {
                             $AccessKeyFromFile = $null
