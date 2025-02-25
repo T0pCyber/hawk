@@ -77,8 +77,15 @@ function Get-IPStackAPIKey {
                     Out-LogFile "Please provide your IP Stack API key: " -isPrompt -NoNewLine
                     $newKey = (Read-Host).Trim()
             
-                    # Validate the key and store the result
-                    $isValid = Test-GeoIPAPIKey -Key $newKey
+                    # Ensure user input provided for API key is valid
+                    if ([string]::IsNullOrEmpty($newKey)) {
+                        Out-LogFile "Failed to update IP Stack API key: Cannot bind argument to parameter 'Key' because it is an empty string." -isError
+                        $isValid = $false
+                    }else {
+                        Out-LogFile "Validating API key: $newKey" -Information
+                        $isValid = Test-GeoIPAPIKey -Key $newKey
+                    }
+                    
             
                     # If invalid, inform the user and loop again
                     if (-not $isValid) {
