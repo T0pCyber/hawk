@@ -94,16 +94,28 @@ function Get-IPStackAPIKey {
             
                 # Once a valid key is entered, prompt to save it
                 Out-LogFile "Would you like to save your API key to disk? (Y/N): " -isPrompt -NoNewLine
-                $saveChoice = (Read-Host).Trim().ToUpper()
+                $saveChoice = ''
+                while ($saveChoice -notin @('Y','N')) {
+                    $saveChoice = (Read-Host).Trim().ToUpper()
+
+                    if ($GeoIPResponse -notin @('Y','N')) {
+                        Out-LogFile "Please enter Y or N for your response: " -isPrompt -NoNewLine
+                    }
             
-                if ($saveChoice -eq 'Y') {
-                    # Save the ipstack REST API key to HawkAppData
-                    Add-HawkAppData -name access_key -Value $newKey
-                    $appDataPath = Join-Path $env:LOCALAPPDATA "Hawk\Hawk.json"
-                    Out-LogFile "WARNING: Your API key has been saved to: $appDataPath" -Action
-                    Out-LogFile "WARNING: Your API key is stored in plaintext." -Information
+                    if ($saveChoice -eq 'Y') {
+                        # Save the ipstack REST API key to HawkAppData
+                        Add-HawkAppData -name access_key -Value $newKey
+                        $appDataPath = Join-Path $env:LOCALAPPDATA "Hawk\Hawk.json"
+                        Out-LogFile "WARNING: Your API key has been saved to: $appDataPath" -Action
+                        Out-LogFile "WARNING: Your API key is stored in plaintext." -Information
+                        break
+                    }
+                    if ($GeoIPResponse -eq 'N') {
+                        Out-LogFile "REST API Key for ipstack.com is not saved to disk." -Information
+                        break
+                    }
                 }
-            
+
                 # Return the validated key
                 return $newKey
             }
