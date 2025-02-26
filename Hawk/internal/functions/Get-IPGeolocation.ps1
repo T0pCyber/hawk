@@ -4,13 +4,13 @@
     An IP address and IP Stack API Key is passed to the function, as it returns a PSCustomObject with the geolocation data.
 
 .DESCRIPTION
-    Get the Location of an IP using the ipstack.com REST API
+    Get the Geographic Location of an IP address using the ipstack.com REST API
 .PARAMETER IPAddress
-    IP address to look up for geolocation
+    IP address to look up for its geographic location
 .PARAMETER AccessKey
-    Access key for the API
+    Access key for ipstack.com's REST API
 .EXAMPLE
-    Get-IPGeolocation -IPAddress 8.8.8.8 -AccessKey "your_access_key"
+    Get-IPGeolocation -IPAddress 8.8.8.8 -AccessKey e904134b5cbb91f752a79f3ba9cbe59a
     Gets all IP Geolocation data of IPs that recieved
 .NOTES
     General notes

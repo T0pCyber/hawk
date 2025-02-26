@@ -116,7 +116,7 @@
 
                     if ([bool]($i % 25)) { }
                     else {
-                        Write-Progress -Activity "Looking Up Ip Address Locations" -CurrentOperation $i -PercentComplete (($i / $ExpandedUserLogonLogs.count) * 100)
+                        Write-Progress -Activity "Looking Up IP Address Locations" -CurrentOperation $i -PercentComplete (($i / $ExpandedUserLogonLogs.count) * 100)
                     }
 
                     # Get the location information for this IP address
@@ -134,7 +134,7 @@
                     $i++
                 }
 
-                Write-Progress -Completed -Activity "Looking Up Ip Address Locations" -Status " "
+                Write-Progress -Completed -Activity "Looking Up IP Address Locations" -Status " "
             }
             else {
                 Out-LogFile "ResolveIPLocations not specified" -Information
