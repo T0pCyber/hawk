@@ -16,8 +16,9 @@ function Get-IPStackAPIKey {
     param()
 
     begin {
-        [string]$newKey = $null
+        [string]$newKey            = $null
         [string]$AccessKeyFromFile = $null
+        [string]$saveChoice        = $null
     }
 
     process {
@@ -94,7 +95,6 @@ function Get-IPStackAPIKey {
             
                 # Once a valid key is entered, prompt to save it
                 Out-LogFile "Would you like to save your API key to disk? (Y/N): " -isPrompt -NoNewLine
-                $saveChoice = $null
                 while ($saveChoice -notin @('Y','N')) {
                     $saveChoice = (Read-Host).Trim().ToUpper()
 
