@@ -110,7 +110,7 @@
 		PSData = @{
 
 			# Tags applied to this module. These help with module discovery in online galleries.
-			Tags         = @("O365", "Security", "Audit", "Breach", "Investigation", "Exchange", "EXO", "Compliance", "Logon", "M365", "Incident-Response", "Solarigate")
+			Tags         = @("O365", "Security", "Audit", "Breach", "Investigation", "Exchange", "EXO", "Compliance", "Logon", "M365", "Incident-Response", "Solarigate", "EntraID", "Entra", "Osprey", "Azure", "Forensics", "Office365", "IncidentResponse")
 
 			# A URL to the license for this module.
 			LicenseUri   = 'https://github.com/T0pCyber/hawk/blob/master/LICENSE'
