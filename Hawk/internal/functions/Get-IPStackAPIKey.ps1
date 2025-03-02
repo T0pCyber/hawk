@@ -36,6 +36,9 @@ function Get-IPStackAPIKey {
                 }
             }
 
+            # If EnableGeoIPLocation is set to true and key exists on disk (supports Hawk automation)
+            # If the key comes back invalid, just run the program without lookuping up GeoIP data
+
             # Check for existing access key on disk
             if (-not [string]::IsNullOrEmpty($AccessKeyFromFile)){
                 do {
@@ -83,13 +86,13 @@ function Get-IPStackAPIKey {
                         Out-LogFile "Failed to update IP Stack API key: Cannot bind argument to parameter 'Key' because it is an empty string." -isError
                         $isValid = $false
                     }else {
-                        Out-LogFile "Validating API key: $newKey" -Information
+                        Out-LogFile "Validating API key: $newKey" -Action
                         $isValid = Test-GeoIPAPIKey -Key $newKey
                     }
                     
                     # If invalid, inform the user and loop again
                     if (-not $isValid) {
-                        Out-LogFile "Invalid API key. Please try again." -Action
+                        Out-LogFile "Invalid API key. Please try again." -Information
                     }
                 } while (-not $isValid)
             

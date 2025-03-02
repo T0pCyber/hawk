@@ -29,6 +29,7 @@ Function Test-MicrosoftIP {
 
     # Check if we have imported all of our IP Addresses
     if ($null -eq $MSFTIPList) {
+        Write-Output "`n"
         Out-Logfile "Building MSFTIPList" -Action
 
         # Load our networking dll pulled from https://github.com/lduchosal/ipnetwork

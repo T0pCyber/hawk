@@ -539,8 +539,6 @@
         $BoolDirectlyCalledByUserInvestigation = ((Get-PSCallStack)[1].FunctionName -like "Start-HawkUserInvestigation*") -or `
                                                  ((Get-PSCallStack)[1].FunctionName -like "Get-HawkUserUALSignInLog*") -or `
                                                  ((Get-PSCallStack)[1].FunctionName -like "Get-HawkUserEntraIDSignInLog*")
-        Out-LogFile "Was directly called by: $BoolDirectlyCalledByUserInvestigation" -Information
-        Out-LogFile (Get-PSCallStack)[1].FunctionName -Information
 
         if ((-not $PSBoundParameters.ContainsKey('EnableGeoIPLocation')) -and $BoolDirectlyCalledByUserInvestigation) {
             Out-LogFile "Would you like to enable GeoIP Location?" -Information

@@ -55,6 +55,7 @@ function Get-IPGeolocation {
             $geoip | ConvertTo-Json -Depth 10
             
             # Create result object
+            Write-Output "`n"
             $isMSFTIP = Test-MicrosoftIP -IPToTest $geoip.ip -Type $geoip.type
             $result = [PSCustomObject]@{
                 IP               = $geoip.ip
