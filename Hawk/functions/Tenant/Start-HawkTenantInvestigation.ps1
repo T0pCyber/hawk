@@ -84,7 +84,7 @@
         Start-HawkTenantInvestigation -WhatIf
 
         Shows what investigation steps would be performed without actually executing them.
-        Useful for understanding the investigation process or validating parameters
+        Useful for understanding the investigation process or validating parameters.
 
     .LINK
         https://hawkforensics.io
