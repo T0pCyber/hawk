@@ -18,10 +18,7 @@
 	Copyright          = 'Copyright (c) 2025 Paul Navarro'
 
 	# Description of the functionality provided by this module
-	Description        = 'A free, open-source forensics PowerShell module for conducting incident response and threat hunting of Microsoft Cloud environments. 
-    Hawk streamlines the collection of forensic data from Microsoft 365 and Entra ID environments to help security professionals, 
-    incident responders, and administrators quickly gather critical log data and identify potential security concerns. 
-    While it includes basic analysis capabilities to flag items of interest, it focuses on efficient data collection rather than automated detection.'
+	Description        = 'A free, open-source forensics PowerShell module for conducting incident response and threat hunting of Microsoft Cloud environments. Hawk streamlines the collection of forensic data from Microsoft 365 and Entra ID environments to help security professionals, incident responders, and administrators quickly gather critical log data and identify potential security concerns. While it includes basic analysis capabilities to flag items of interest, it focuses on efficient data collection rather than automated detection.'
 
 	# Minimum version of the Windows PowerShell engine required by this module
 	PowerShellVersion  = '5.0'
@@ -113,7 +110,7 @@
 		PSData = @{
 
 			# Tags applied to this module. These help with module discovery in online galleries.
-			Tags         = @("O365", "Security", "Audit", "Breach", "Investigation", "Exchange", "EXO", "Compliance", "Logon", "M365", "Incident-Response", "Solarigate")
+			Tags         = @("O365", "Security", "Audit", "Breach", "Investigation", "Exchange", "EXO", "Compliance", "Logon", "M365", "Incident-Response", "Solarigate", "EntraID", "Entra", "Osprey", "Azure", "Forensics", "Office365", "IncidentResponse")
 
 			# A URL to the license for this module.
 			LicenseUri   = 'https://github.com/T0pCyber/hawk/blob/master/LICENSE'

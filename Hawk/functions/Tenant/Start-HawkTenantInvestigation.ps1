@@ -111,7 +111,7 @@
             $StartDate = $processedDates.StartDate
             $EndDate = $processedDates.EndDate
     
-            # Now call validation with updated StartDate/EndDate
+            # Now call validation with updated StartDate/EndDate.
             $validation = Test-HawkInvestigationParameter `
                 -StartDate $StartDate -EndDate $EndDate `
                 -DaysToLookBack $DaysToLookBack -FilePath $FilePath -NonInteractive

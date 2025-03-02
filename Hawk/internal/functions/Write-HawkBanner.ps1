@@ -1,4 +1,4 @@
-Function Write-HawkBanner {
+﻿Function Write-HawkBanner {
     <#
     .SYNOPSIS
         Displays the Hawk welcome banner in the terminal.
@@ -53,7 +53,17 @@ https://hawkforensics.io
 
     Write-Output $banner 
 
+    # Display permission disclaimer in a different color
+    Write-Host "IMPORTANT: HAWK PERMISSIONS CONFIGURATION UPDATE!" -ForegroundColor Yellow
+    Write-Host "With Hawk's migration to MS Graph API, Hawk now requires a new permissions setup." -ForegroundColor Yellow
+    Write-Host "If you encounter permission / privilege errors, please visit:" -ForegroundColor Yellow
+    Write-Host "  → https://hawkforensics.io/pages/user-guide/permissions-setup.html" -ForegroundColor Yellow
+    Write-Host "  → https://hawkforensics.io/pages/tutorials.html" -ForegroundColor Yellow
+    Write-Output ""
+    
+
     if ($DisplayWelcomeMessage) {
+
         Write-Information "Welcome to Hawk! Let's get your investigation environment set up."
         Write-Information "We'll guide you through configuring the output file path and investigation date range."
         Write-Information "You'll need to specify where logs should be saved and the time window for data retrieval."
