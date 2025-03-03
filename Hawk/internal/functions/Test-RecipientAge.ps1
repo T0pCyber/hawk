@@ -1,18 +1,18 @@
 ﻿Function Test-RecipientAge {
-<#
-.SYNOPSIS
-    Check to see if a recipient object was created since our start date
-.DESCRIPTION
-    Check to see if a recipient object was created since our start date.
-    This will be used to determine if a new user has been created within the time frame specified.
-.PARAMETER RecipientID
-    Recipient object ID that is being retrieved
-.EXAMPLE
-    Test-RecipientAge
-    Will test to see if the recipient object was created since the start date
-.NOTES
-    General notes
-#>
+    <#
+    .SYNOPSIS
+        Check to see if a recipient object was created since our start date
+    .DESCRIPTION
+        Check to see if a recipient object was created since our start date.
+        This will be used to determine if a new user has been created within the time frame specified.
+    .PARAMETER RecipientID
+        Recipient object ID that is being retrieved
+    .EXAMPLE
+        Test-RecipientAge
+        Will test to see if the recipient object was created since the start date
+    .NOTES
+        General notes
+    #>
     Param([string]$RecipientID)
 
     $recipient = Get-Recipient -Identity $RecipientID -erroraction SilentlyContinue

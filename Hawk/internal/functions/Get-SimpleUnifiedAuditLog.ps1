@@ -288,24 +288,24 @@
                     ForEach-Object {
                         $orderedObject[$_.Name] = $_.Value
                     }
-            }
-
-            # Add all remaining properties that aren't already added
-            $_.PSObject.Properties |
-                Where-Object {
-                    $_.Name -notin $orderedProperties -and
-                    $_.Name -ne 'ParameterString' -and
-                    $_.Name -notlike 'Param_*'
-                } |
-                ForEach-Object {
-                    $orderedObject[$_.Name] = $_.Value
                 }
 
-            # Return the ordered object
-            [PSCustomObject]$orderedObject
-        }
+                # Add all remaining properties that aren't already added
+                $_.PSObject.Properties |
+                    Where-Object {
+                        $_.Name -notin $orderedProperties -and
+                        $_.Name -ne 'ParameterString' -and
+                        $_.Name -notlike 'Param_*'
+                    } |
+                    ForEach-Object {
+                        $orderedObject[$_.Name] = $_.Value
+                    }
 
-        # Return all processed results with ordered properties
-        $orderedResults
-    }
-}
+                    # Return the ordered object
+                    [PSCustomObject]$orderedObject
+                }
+
+                # Return all processed results with ordered properties
+                $orderedResults
+            }
+        }

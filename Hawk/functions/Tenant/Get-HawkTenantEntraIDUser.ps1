@@ -35,21 +35,21 @@
         # Get all users with specific properties needed for DFIR
         # -Property parameter optimizes API call to only retrieve needed fields
         $users = Get-MgUser -All -Property UserPrincipalName, # Primary user identifier
-            DisplayName, # User's display name
-            Id, # Unique object ID
-            AccountEnabled, # Account status (active/disabled)
-            CreatedDateTime, # Account creation timestamp
-            DeletedDateTime, # Account deletion timestamp (if applicable)
-            LastPasswordChangeDateTime, # Last password modification
-            Mail |                                             # Primary email address
+        DisplayName, # User's display name
+        Id, # Unique object ID
+        AccountEnabled, # Account status (active/disabled)
+        CreatedDateTime, # Account creation timestamp
+        DeletedDateTime, # Account deletion timestamp (if applicable)
+        LastPasswordChangeDateTime, # Last password modification
+        Mail |                                             # Primary email address
             Select-Object UserPrincipalName,
-                DisplayName,
-                Id,
-                AccountEnabled,
-                CreatedDateTime,
-                DeletedDateTime,
-                LastPasswordChangeDateTime,
-                Mail
+            DisplayName,
+            Id,
+            AccountEnabled,
+            CreatedDateTime,
+            DeletedDateTime,
+            LastPasswordChangeDateTime,
+            Mail
 
         # Only process if users were found
         if ($users) {
@@ -65,4 +65,4 @@
     END {
         Out-LogFile "Completed collection of users from Entra ID." -Information
     }
- }
+}

@@ -1,4 +1,4 @@
-Function Test-HawkNonInteractiveMode {
+﻿Function Test-HawkNonInteractiveMode {
     <#
     .SYNOPSIS
         Internal function to detect if Hawk should run in non-interactive mode.
@@ -35,8 +35,8 @@ Function Test-HawkNonInteractiveMode {
     )
 
     return $PSBoundParameters.ContainsKey('StartDate') -or 
-           $PSBoundParameters.ContainsKey('EndDate') -or 
-           $PSBoundParameters.ContainsKey('DaysToLookBack') -or 
-           $PSBoundParameters.ContainsKey('FilePath') -or
-           $PSBoundParameters.ContainsKey('SkipUpdate')
+    $PSBoundParameters.ContainsKey('EndDate') -or 
+    $PSBoundParameters.ContainsKey('DaysToLookBack') -or 
+    $PSBoundParameters.ContainsKey('FilePath') -or
+    $PSBoundParameters.ContainsKey('SkipUpdate')
 }

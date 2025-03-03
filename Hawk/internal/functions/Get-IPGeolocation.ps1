@@ -49,15 +49,15 @@ Function Get-IPGeolocation {
     }
     elseif ($IPAddress -eq "<null>") {
         write-Verbose ("Null IP Provided: " + $IPAddress)
-                $hash = @{
-                IP = $IPAddress
-                CountryName = "NULL IP"
-                RegionName = "Unknown"
-                RegionCode = "Unknown"
-                ContinentName = "Unknown"
-                City = "Unknown"
-                KnownMicrosoftIP = "Unknown"
-            }
+        $hash = @{
+            IP = $IPAddress
+            CountryName = "NULL IP"
+            RegionName = "Unknown"
+            RegionCode = "Unknown"
+            ContinentName = "Unknown"
+            City = "Unknown"
+            KnownMicrosoftIP = "Unknown"
+        }
     }
     # If not then we need to look it up and populate it into the cache
     else {

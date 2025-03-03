@@ -48,7 +48,7 @@
 
     # Define list of High Risk grants
     [array]$HighRiskGrants = "^BitlockerKey\.Read\.All$", "^Chat\.", "^Directory\.ReadWrite\.All$", "^eDiscovery\.",
-        "^Files\.", "^MailboxSettings\.ReadWrite$", "^Mail\.ReadWrite$", "^Mail\.Send$", "^Sites\.", "^User\."
+    "^Files\.", "^MailboxSettings\.ReadWrite$", "^Mail\.ReadWrite$", "^Mail\.Send$", "^Sites\.", "^User\."
 
     # Search the Grants for the listed bad grants that we can detect
 

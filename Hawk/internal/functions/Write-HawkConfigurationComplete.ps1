@@ -1,5 +1,5 @@
 ﻿Function Write-HawkConfigurationComplete {
-        <#
+    <#
     .SYNOPSIS
         Displays the completed Hawk configuration settings.
 

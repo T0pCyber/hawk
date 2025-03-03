@@ -127,9 +127,9 @@
             
             # Act
             $result = Test-HawkInvestigationParameter -StartDate $invalidStartDate `
-                                                      -EndDate $tomorrow `
-                                                      -FilePath $validPath `
-                                                      -NonInteractive
+                -EndDate $tomorrow `
+                -FilePath $validPath `
+                -NonInteractive
             
             # Assert: Expect the specific error message for a date range that is too long.
             $result.ErrorMessages | Should -Contain "Date range cannot exceed 365 days"
