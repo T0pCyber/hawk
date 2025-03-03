@@ -577,7 +577,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 
                 foreach ($currentFilePath in $sourcePaths)
                 {
-                    if ($modifiedSourceDirFullName -ne $null -and $modifiedSourceDirFullName.Length -gt 0)
+                    if ($null -ne $modifiedSourceDirFullName -and $modifiedSourceDirFullName.Length -gt 0)
                     {
                         $index = $currentFilePath.IndexOf($modifiedSourceDirFullName, [System.StringComparison]::OrdinalIgnoreCase)
                         $currentFilePathSubString = $currentFilePath.Substring($index, $modifiedSourceDirFullName.Length)
@@ -608,7 +608,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
                             }
                         }
 
-                        if ($entryToBeUpdated -ne $null)
+                        if ($null -ne $entryToBeUpdated)
                         {
                             $addItemtoArchiveFileMessage = ($LocalizedData.AddItemtoArchiveFile -f $currentFilePath)
                             $entryToBeUpdated.Delete()
@@ -856,7 +856,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
                                 if ($force)
                                 {
                                     Remove-Item -LiteralPath $currentArchiveEntryFileInfo.FullName -Force -ErrorVariable ev -Verbose:$isVerbose -Confirm:$isConfirm
-                                    if ($ev -ne $null)
+                                    if ($null -ne $ev)
                                     {
                                         $hasNonTerminatingError = $true
                                     }
@@ -1033,7 +1033,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
                 $innerException
             )
 
-            if ($innerException -eq $null)
+            if ($null -eq $innerException)
             {
                 $exception = New-Object System.IO.IOException $errorMessage
             }
@@ -1723,7 +1723,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 
                 foreach ($currentFilePath in $sourcePaths)
                 {
-                    if ($modifiedSourceDirFullName -ne $null -and $modifiedSourceDirFullName.Length -gt 0)
+                    if ($null -ne $modifiedSourceDirFullName -and $modifiedSourceDirFullName.Length -gt 0)
                     {
                         $index = $currentFilePath.IndexOf($modifiedSourceDirFullName, [System.StringComparison]::OrdinalIgnoreCase)
                         $currentFilePathSubString = $currentFilePath.Substring($index, $modifiedSourceDirFullName.Length)
@@ -1754,7 +1754,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
                             }
                         }
 
-                        if ($entryToBeUpdated -ne $null)
+                        if ($null -ne $entryToBeUpdated)
                         {
                             $addItemtoArchiveFileMessage = ($LocalizedData.AddItemtoArchiveFile -f $currentFilePath)
                             $entryToBeUpdated.Delete()
@@ -2002,7 +2002,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
                                 if ($force)
                                 {
                                     Remove-Item -LiteralPath $currentArchiveEntryFileInfo.FullName -Force -ErrorVariable ev -Verbose:$isVerbose -Confirm:$isConfirm
-                                    if ($ev -ne $null)
+                                    if ($null -ne $ev)
                                     {
                                         $hasNonTerminatingError = $true
                                     }
@@ -2179,7 +2179,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
                 $innerException
             )
 
-            if ($innerException -eq $null)
+            if ($null -eq $innerException)
             {
                 $exception = New-Object System.IO.IOException $errorMessage
             }
@@ -2259,7 +2259,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
             else
             {
                 $createdItem = New-Item -Path $DestinationPath -ItemType Directory -Confirm:$isConfirm -Verbose:$isVerbose -ErrorAction Stop
-                if ($createdItem -ne $null -and $createdItem.PSProvider.Name -ne "FileSystem")
+                if ($null -ne $createdItem -and $createdItem.PSProvider.Name -ne "FileSystem")
                 {
                     Remove-Item "$DestinationPath" -Force -Recurse -ErrorAction SilentlyContinue
                     $errorMessage = ($LocalizedData.ExpandArchiveInValidDestinationPath -f $DestinationPath)
