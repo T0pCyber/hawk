@@ -238,13 +238,14 @@
         
         # Create the global $Hawk variable immediately with minimal properties
         $Global:Hawk = [PSCustomObject]@{
-            FilePath       = $null  # Will be set shortly
-            DaysToLookBack = $null
-            StartDate      = $null
-            EndDate        = $null
-            WhenCreated    = $null
+            FilePath            = $null  # Will be set shortly
+            DaysToLookBack      = $null
+            StartDate           = $null
+            EndDate             = $null
+            WhenCreated         = $null
             EnableGeoIPLocation = $null
-            TenantName     = $null
+            TenantName          = $null
+            GeoIPNonInteractive = $false
         }
 
         # Set up the file path first, before any other operations
@@ -565,6 +566,7 @@
 
         if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
             $Hawk.EnableGeoIPLocation = $EnableGeoIPLocation
+            $Hawk.GeoIPNonInteractive = $true
         }
 
 

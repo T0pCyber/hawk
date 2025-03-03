@@ -19,9 +19,8 @@ function Get-IPStackAPIKey {
         [string]$newKey             = $null
         [string]$AccessKeyFromFile  = $null
         [string]$saveChoice         = $null
-        [bool]$AccessKeyValid       = $false
-        [bool]$GeoIPFromCommandLine = $Global:Hawk.EnableGeoIPLocation
-        Out-LogFile "GeoIPFromCommandLine -> $GeoIPFromCommandLine" -Information
+        [bool]$GeoIPFromCommandLine = $Global:Hawk.GeoIPNonInteractive
+        Out-LogFile "IPSTACKIPKEY::GeoIPFromCommandLine: $GeoIPFromCommandLine" -Information
     }
 
     process {
