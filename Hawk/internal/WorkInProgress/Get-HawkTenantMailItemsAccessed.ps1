@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantMailItemsAccessed {
+﻿Function Get-HawkTenantMailItemsAccessed
+{
     <#
     .SYNOPSIS
         This will export MailboxItemsAccessed operations from the Unified Audit Log (UAL). Must be connected to Exchange Online
@@ -36,9 +37,11 @@
         [string]$ApplicationID
 
     )
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
 
@@ -49,13 +52,15 @@
 
     }#End Begin
 
-    PROCESS {
+    PROCESS
+    {
         $MailboxItemsAccessed = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -Operations 'MailItemsAccessed' -FreeText $ApplicationID ")
 
         $MailboxItemsAccessed | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "MailItemsAccessed" -csv -json
     }#End Process
 
-    END {
+    END
+    {
 
         Out-Logfile "Completed exporting MailItemsAccessed logs" -Information
     }#End End

@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserConfiguration {
+﻿Function Get-HawkUserConfiguration
+{
     <#
     .SYNOPSIS
         Gathers baseline information about the provided user.
@@ -44,7 +45,8 @@
         [array]$UserPrincipalName
     )
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -54,7 +56,8 @@
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
         [string]$User = $Object.UserPrincipalName
 
         Out-LogFile "Initiating collection of mailbox configuration for $User from Exchange Online." -Action
@@ -63,7 +66,8 @@
         $mbx = Get-EXOMailbox -Identity $user
 
         # Test to see if we have an archive and include that info as well
-        if (!($null -eq $mbx.archivedatabase)) {
+        if (!($null -eq $mbx.archivedatabase))
+        {
             Get-EXOMailboxStatistics -identity $user -Archive | Out-MultipleFileType -FilePrefix "Mailbox_Archive_Statistics" -user $user -txt
         }
 

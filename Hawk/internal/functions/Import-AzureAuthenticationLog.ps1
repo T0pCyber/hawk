@@ -1,5 +1,6 @@
 ﻿
-Function Import-AzureAuthenticationLog {
+Function Import-AzureAuthenticationLog
+{
     <#
     .SYNOPSIS
         Takes in a set of azure Authentication logs and combines them into a unified output
@@ -25,10 +26,12 @@ Function Import-AzureAuthenticationLog {
     $baseproperties = New-Object System.Collections.ArrayList
     
     # Process each entry in the array
-    foreach ($entry in $JsonConvertedLogs) {
+    foreach ($entry in $JsonConvertedLogs)
+    {
     
         if ([bool]($i % 25)) { }
-        Else {
+        Else
+        {
             Write-Progress -Activity "Converting Json Entries" -CurrentOperation ("Entry " + $i) -PercentComplete (($i / $JsonConvertedLogs.count) * 100) -Status ("Processing")
         }
     
@@ -37,36 +40,45 @@ Function Import-AzureAuthenticationLog {
         $processedentry = New-Object -TypeName PSobject
     
         # Look at each member of the entry ... we want to process each in turn and add them to a new object
-        foreach ($member in ($entry | get-member -MemberType NoteProperty)) {
+        foreach ($member in ($entry | get-member -MemberType NoteProperty))
+        {
     
             # Identity unique properties and add to property list of base object if not present
             if ($baseproperties -contains $member.name) { }
-            else {
+            else
+            {
                 $baseproperties.add($member.name) | Out-Null
             }
     
             # Switch statement to deal with known "special" properties
-            switch ($member.name) {
+            switch ($member.name)
+            {
                 # Extended properties can contain addtional values so we need to expand those
-                ExtendedProperties {
+                ExtendedProperties
+                {
                     # Null check
                     if ($null -eq $entry.ExtendedProperties) { }
-                    else {
+                    else
+                    {
                         # expand out each entry and add it to the base properties and to the property of our exported object
-                        Foreach ($Object in $entry.ExtendedProperties) {
+                        Foreach ($Object in $entry.ExtendedProperties)
+                        {
                             # Identity unique properties and add to property list of base object if not present
                             if ($baseproperties -contains $object.name) { }
-                            else {
+                            else
+                            {
                                 $baseproperties.add($object.name) | out-null
                             }
     
                             # For some entries a property can appear in ExtendedProperties and as a normal property
                             # We need to deal with this situation
-                            try {
+                            try
+                            {
                                 # Now add the entry from extendedproperties to the overall properties list
                                 $processedentry | Add-Member -MemberType NoteProperty -Name $object.name -Value $object.value -ErrorAction SilentlyContinue
                             }
-                            catch {
+                            catch
+                            {
                                 if ((($error[0].FullyQualifiedErrorId).split(",")[0]) -eq "MemberAlreadyExists") { }
                             }
                         }
@@ -76,7 +88,8 @@ Function Import-AzureAuthenticationLog {
                         [string]$epstring = $null
     
                         # Convert into a string that is , seperated but with : seperating name and value
-                        foreach ($ep in $entry.extendedproperties) {
+                        foreach ($ep in $entry.extendedproperties)
+                        {
                             [string]$epstring += $ep.name + ":" + $ep.v + ","
                         }
     
@@ -86,14 +99,17 @@ Function Import-AzureAuthenticationLog {
                 }
                 # Need to convert this from a system object into a string
                 # This is an initial pass at this might be a better way to do it
-                Actor {
+                Actor
+                {
                     if ($null -eq $entry.actor) { }
-                    else {
+                    else
+                    {
                         # null the output string
                         [string]$actorstring = $null
     
                         # Convert into a string that is , seperated but with : seperating ID and type
-                        foreach ($actor in $entry.actor) {
+                        foreach ($actor in $entry.actor)
+                        {
                             [string]$actorstring += $actor.id + ":" + $actor.type + ","
                         }
     
@@ -101,14 +117,17 @@ Function Import-AzureAuthenticationLog {
                         $processedentry | Add-Member -MemberType NoteProperty -Name "Actor" -Value ($actorstring.TrimEnd(","))
                     }
                 }
-                Target {
+                Target
+                {
                     if ($null -eq $entry.target) { }
-                    else {
+                    else
+                    {
                         # null the output string
                         [string]$targetstring = $null
     
                         # Convert into a string that is , seperated but with : seperating ID and type
-                        foreach ($target in $entry.target) {
+                        foreach ($target in $entry.target)
+                        {
                             [string]$targetstring += $target.id + ":" + $target.type + ","
                         }
     
@@ -116,17 +135,21 @@ Function Import-AzureAuthenticationLog {
                         $processedentry | Add-Member -MemberType NoteProperty -Name "Target" -Value ($targetstring.TrimEnd(","))
                     }
                 }
-                Creationtime {
+                Creationtime
+                {
                     $processedentry | Add-Member -MemberType NoteProperty -Name CreationTime -value (get-date $entry.Creationtime -format g)
                 }
-                Default {
+                Default
+                {
                     # For some entries a property can appear in ExtendedProperties and as a normal property
                     # We need to deal with this situation
-                    try {
+                    try
+                    {
                         # Now add the entry from extendedproperties to the overall properties list
                         $processedentry | Add-Member -MemberType NoteProperty -Name $member.name -Value $entry.($member.name) -ErrorAction SilentlyContinue
                     }
-                    catch {
+                    catch
+                    {
                         if ((($error[0].FullyQualifiedErrorId).split(",")[0]) -eq "MemberAlreadyExists") { }
                     }
                 }
@@ -145,8 +168,10 @@ Function Import-AzureAuthenticationLog {
     # Build a base object using all unique property names
     $baseobject = $null
     $baseobject = New-Object -TypeName PSobject
-    foreach ($propertyname in $baseproperties) {
-        switch ($propertyname) {
+    foreach ($propertyname in $baseproperties)
+    {
+        switch ($propertyname)
+        {
             CreationTime { $baseobject | Add-Member -MemberType NoteProperty -Name $propertyname -Value (get-date 01/01/1900 -format g) }
             Default { $baseobject | Add-Member -MemberType NoteProperty -Name $propertyname -Value "Base" }
         }
@@ -163,9 +188,11 @@ Function Import-AzureAuthenticationLog {
     # Key coloums that we want ordered at the begining of the output
     [array]$baseorder = "CreationTime", "UserId", "Workload", "ClientIP", "CountryName", "KnownMicrosoftIP"
     
-    foreach ($coloumheader in $baseorder) {
+    foreach ($coloumheader in $baseorder)
+    {
         # If the coloum header exists as one of our base properties then add to to coloumorder array and remove from baseproperties list
-        if ($baseproperties -contains $coloumheader) {
+        if ($baseproperties -contains $coloumheader)
+        {
             [array]$coloumorder += $coloumheader
             $baseproperties.remove($coloumheader)
         }

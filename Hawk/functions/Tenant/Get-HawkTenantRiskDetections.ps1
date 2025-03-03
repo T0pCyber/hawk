@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantRiskDetections {
+﻿Function Get-HawkTenantRiskDetections
+{
     <#
     .SYNOPSIS
         Retrieves risk detection events from Microsoft Entra ID.
@@ -28,9 +29,11 @@
     [CmdletBinding()]
     param()
 
-    begin {
+    begin
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
 
@@ -42,18 +45,22 @@
 
         # Create tenant folder if it doesn't exist
         $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-        if (-not (Test-Path -Path $TenantPath)) {
+        if (-not (Test-Path -Path $TenantPath))
+        {
             New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
         }
     }
 
-    process {
-        try {
+    process
+    {
+        try
+        {
             # Get risk detections
             Out-LogFile "Retrieving risk detections" -Action
             $riskDetections = Get-MgRiskDetection -All
 
-            if ($null -eq $riskDetections -or $riskDetections.Count -eq 0) {
+            if ($null -eq $riskDetections -or $riskDetections.Count -eq 0)
+            {
                 Out-LogFile "No risk detections found" -Information
                 return
             }
@@ -81,7 +88,8 @@
             $riskLevels = $processedDetections | Group-Object -Property RiskLevel | 
                 Sort-Object -Property { $riskOrder[$_.Name] }
             
-            foreach ($level in $riskLevels) {
+            foreach ($level in $riskLevels)
+            {
                 $capitalizedName = $level.Name.Substring(0, 1).ToUpper() + $level.Name.Substring(1).ToLower()
                 Out-LogFile ("- $($level.Count) Risk Detections at Risk Level '${capitalizedName}'") -Information
             }
@@ -94,14 +102,16 @@
             }
 
             # Process confirmed compromised risk detections
-            if ($confirmedCompromisedDetections) {
+            if ($confirmedCompromisedDetections)
+            {
                 Out-LogFile "Found $($confirmedCompromisedDetections.Count) confirmed compromised risk detections" -Notice
                 Out-LogFile "Details in _Investigate_Confirmed_Compromised_Risk_Detection files" -Notice
                 $confirmedCompromisedDetections | Out-MultipleFileType -FilePrefix "_Investigate_Confirmed_Compromised_Risk_Detection" -csv -json -Notice
             }
 
             # Process other risk detections (combined high/medium/low)
-            if ($otherDetections) {
+            if ($otherDetections)
+            {
                 $highRisk = ($otherDetections | Where-Object { $_.RiskLevel -eq 'high' }).Count
                 $mediumRisk = ($otherDetections | Where-Object { $_.RiskLevel -eq 'medium' }).Count
                 $lowRisk = ($otherDetections | Where-Object { $_.RiskLevel -eq 'low' }).Count
@@ -111,13 +121,15 @@
                 $otherDetections | Out-MultipleFileType -FilePrefix "_Investigate_Risk_Detection" -csv -json -Notice
             }
         }
-        catch {
+        catch
+        {
             Out-LogFile "Error retrieving risk detections: $($_.Exception.Message)" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 
-    end {
+    end
+    {
         Out-LogFile "Completed collection of Risk Detection events from Entra ID." -Information
     }
 }

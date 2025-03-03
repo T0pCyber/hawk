@@ -15,25 +15,31 @@ $excludedFiles = @(
 $files = git diff --cached --name-only --diff-filter=AM | Where-Object { $_ -match '\.(ps1|psm1|psd1)$' }
 $hasErrors = $false
 
-foreach ($file in $files) {
+foreach ($file in $files)
+{
     # Check if file is in excluded list using any variation of the path
     $isExcluded = $false
-    foreach ($excludedFile in $excludedFiles) {
-        if ($file -match [regex]::Escape($excludedFile)) {
+    foreach ($excludedFile in $excludedFiles)
+    {
+        if ($file -match [regex]::Escape($excludedFile))
+        {
             $isExcluded = $true
             break
         }
     }
 
-    if (-not $isExcluded) {
+    if (-not $isExcluded)
+    {
         Write-Output "Analyzing $file..."
         $results = Invoke-ScriptAnalyzer -Path $file -Settings $settings
-        if ($results) {
+        if ($results)
+        {
             $results | Format-Table -AutoSize
             $hasErrors = $true
         }
     }
-    else {
+    else
+    {
         Write-Output "Skipping analysis for excluded file: $file"
     }
 }

@@ -1,4 +1,5 @@
-﻿Function Update-HawkModule {
+﻿Function Update-HawkModule
+{
     <#
     .SYNOPSIS
        Hawk upgrade check.
@@ -30,26 +31,31 @@
     )
     
     # If ElevatedUpdate is true then we are running from a forced elevation and we just need to run without prompting
-    if ($ElevatedUpdate) {
+    if ($ElevatedUpdate)
+    {
         # Set upgrade to true
         $Upgrade = $true
     }
-    else {
+    else
+    {
     
         # See if we can do an upgrade check
         if ($null -eq (Get-Command Find-Module)) { }
     
         # If we can then look for an updated version of the module
-        else {
+        else
+        {
             Out-LogFile "Checking for latest version online" -Action
             $onlineversion = Find-Module -name Hawk -erroraction silentlycontinue
             $Localversion = (Get-Module Hawk | Sort-Object -Property Version -Descending)[0]
             Out-LogFile ("Found Version " + $onlineversion.version + " Online") -Information
 
-            if ($null -eq $onlineversion) {
+            if ($null -eq $onlineversion)
+            {
                 Out-LogFile "[ERROR] - Unable to check Hawk version in Gallery" -isError 
             }
-            elseif (([version]$onlineversion.version) -gt ([version]$localversion.version)) {
+            elseif (([version]$onlineversion.version) -gt ([version]$localversion.version))
+            {
                 Out-LogFile "New version of Hawk module found online" -Information
                 Out-LogFile ("Local Version: " + $localversion.version + " Online Version: " + $onlineversion.version) -Information
     
@@ -62,26 +68,35 @@
                 $result = $host.ui.PromptForChoice($title, $message, $options, 0)
     
                 # Check to see what the user choose
-                switch ($result) {
-                    0 { $Upgrade = $true; Send-AIEvent -Event Upgrade -Properties @{"Upgrade" = "True" }
+                switch ($result)
+                {
+                    0
+                    {
+                        $Upgrade = $true; Send-AIEvent -Event Upgrade -Properties @{"Upgrade" = "True" }
                     }
-                    1 { $Upgrade = $false; Send-AIEvent -Event Upgrade -Properties @{"Upgrade" = "False" }
+                    1
+                    {
+                        $Upgrade = $false; Send-AIEvent -Event Upgrade -Properties @{"Upgrade" = "False" }
                     }
                 }
             }
             # If the versions match then we don't need to upgrade
-            else {
+            else
+            {
                 Out-LogFile "Latest Version Installed" -Information
             }
         }
     }
     
     # If we determined that we want to do an upgrade make the needed checks and do it
-    if ($Upgrade) {
+    if ($Upgrade)
+    {
         # Determine if we have an elevated powershell prompt
-        If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        If (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+        {
             # Update the module
-            if ($PSCmdlet.ShouldProcess("Hawk Module", "Update module")) {
+            if ($PSCmdlet.ShouldProcess("Hawk Module", "Update module"))
+            {
                 Out-LogFile "Downloading Updated Hawk Module" -Action
                 Update-Module Hawk -Force
                 Out-LogFile "Update Finished" -Action
@@ -91,7 +106,8 @@
                 if ($ElevatedUpdate) { exit }
     
                 # If we didn't elevate then we are running in the admin prompt and we need to import the new hawk module
-                else {
+                else
+                {
                     Out-LogFile "Starting new PowerShell Window with the updated Hawk Module loaded" -Action
     
                     # We can't load a new copy of the same module from inside the module so we have to start a new window
@@ -102,7 +118,8 @@
             }
         }
         # If we are not running as admin we need to start an admin prompt
-        else {
+        else
+        {
             # Relaunch as an elevated process:
             Out-LogFile "Starting Elevated Prompt" -Action
             Start-Process powershell.exe -ArgumentList "-noexit -Command Import-Module Hawk;Update-HawkModule -ElevatedUpdate" -Verb RunAs -Wait
@@ -116,7 +133,8 @@
         }
     }
     # Since upgrade is false we log and continue
-    else {
+    else
+    {
         Out-LogFile "Skipping Upgrade" -Action
     }
 }

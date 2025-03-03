@@ -1,4 +1,5 @@
-Function Get-HawkUserMailItemsAccessed {
+﻿Function Get-HawkUserMailItemsAccessed
+{
     <#
     .SYNOPSIS
         This will export MailboxItemsAccessed operations from the Unified Audit Log (UAL). Must be connected to Exchange Online
@@ -32,38 +33,46 @@ Function Get-HawkUserMailItemsAccessed {
         [array]$UserPrincipalName
     )
 
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
         Test-EXOConnection
         Send-AIEvent -Event "CmdRun"
     }
 
-    PROCESS {
+    PROCESS
+    {
         #Verify UPN input
         [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-        foreach ($UserObject in $UserArray) {
+        foreach ($UserObject in $UserArray)
+        {
             [string]$User = $UserObject.UserPrincipalName
             Out-LogFile "Initiating collection of MailItemsAccessed for $User from the UAL." -Action
             Out-LogFile "Please be patient, this can take a while..." -Information
 
             # Verify that user has operation enabled for auditing. Otherwise, move onto next user.
-            if (Test-OperationEnabled -User $User -Operation 'MailItemsAccessed') {
+            if (Test-OperationEnabled -User $User -Operation 'MailItemsAccessed')
+            {
                 Out-LogFile "Operation 'MailItemsAccessed' verified enabled for $User." -Information
-                try {
+                try
+                {
                     #Retrieve all audit data for mailitems accessed
                     $SearchCommand = "Search-UnifiedAuditLog -Operations 'MailItemsAccessed' -UserIds $User"
                     $MailboxItemsAccessed = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
 
-                    if ($MailboxItemsAccessed.Count -gt 0) {
+                    if ($MailboxItemsAccessed.Count -gt 0)
+                    {
                         #Define output directory path for user
                         $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
 
                         #Create user directory if it doesn't already exist
-                        if (-not (Test-Path -Path $UserFolder)) {
+                        if (-not (Test-Path -Path $UserFolder))
+                        {
                             New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
                         }
 
@@ -74,16 +83,19 @@ Function Get-HawkUserMailItemsAccessed {
                         $MailboxItemsAccessed | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "MailItemsAccessed_$User" -User $User -csv -json
                         $MailboxItemsAccessedSimple | Out-MultipleFileType -FilePrefix "Simple_MailItemsAccessed_$User" -User $User -csv -json
                     }
-                    else {
+                    else
+                    {
                         Out-LogFile "No MailItemsAccessed found for $User." -Information
                     }
                 }
-                catch {
+                catch
+                {
                     Out-LogFile "Error processing mail items accessed for $User : $_" -isError
                     Write-Error -ErrorRecord $_ -ErrorAction Continue
                 }
             }
-            else {
+            else
+            {
                 Out-LogFile "Operation 'MailItemsAccessed' is not enabled for $User." -Information
                 Out-LogFile "No data recorded for $User." -Information
             }
@@ -93,6 +105,7 @@ Function Get-HawkUserMailItemsAccessed {
         }
     }
 
-    END {
+    END
+    {
     }
 }

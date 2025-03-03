@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserHiddenRule {
+﻿Function Get-HawkUserHiddenRule
+{
     <#
     .SYNOPSIS
     Pulls inbox rules for the specified user using EWS.
@@ -52,7 +53,8 @@
     )
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -64,28 +66,33 @@
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
     # Process each object received
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
 
         # Push the UPN into $user for ease of use
         $user = $Object.UserPrincipalName
 
         # Determine if the email address is null or empty
         [string]$EmailAddress = (Get-EXOMailbox $user).PrimarySmtpAddress
-        if ([string]::IsNullOrEmpty($EmailAddress)) {
+        if ([string]::IsNullOrEmpty($EmailAddress))
+        {
             Out-LogFile "No SMTP Address found. Skipping." -isWarning
             return $null
         }
 
         # If we don't have a credential object, ask for credentials
-        if ($null -eq $EWSCredential) {
+        if ($null -eq $EWSCredential)
+        {
             Out-LogFile "Please provide credentials that have impersonation rights to the mailbox you are looking to check" -Information
             $EWSCredential = Get-Credential
         }
 
         # Import the EWS Managed API
-        if (Test-Path 'C:\Program Files\Microsoft\Exchange\Web Services\2.2\Microsoft.Exchange.WebServices.dll') {
+        if (Test-Path 'C:\Program Files\Microsoft\Exchange\Web Services\2.2\Microsoft.Exchange.WebServices.dll')
+        {
             Out-LogFile "EWS Managed API Found" -Information
-        } else {
+        } else
+        {
             Write-Error "Please install EWS Managed API 2.2 `nhttp://www.microsoft.com/en-us/download/details.aspx?id=42951" -ErrorAction Stop
         }
 
@@ -98,10 +105,12 @@
         $exchService.Credentials = New-Object Microsoft.Exchange.WebServices.Data.WebCredentials($EWSCredential.Username, $EWSCredential.GetNetworkCredential().Password)
 
         # Autodiscover or use global EWS URL
-        if ($null -eq $EWSUrl) {
+        if ($null -eq $EWSUrl)
+        {
             $exchService.AutodiscoverUrl($EmailAddress, { $true })
             $exchService.Url | Set-Variable -Name EWSUrl -Scope Global
-        } else {
+        } else
+        {
             $exchService.Url = $EWSUrl
         }
 
@@ -130,8 +139,10 @@
 
         # Check each rule directly from $ruleResults
         $FoundHidden = $false
-        foreach ($rule in $ruleResults) {
-            if ([string]::IsNullOrEmpty($rule.ExtendedProperties[0].Value) -or [string]::IsNullOrEmpty($rule.ExtendedProperties[1].Value)) {
+        foreach ($rule in $ruleResults)
+        {
+            if ([string]::IsNullOrEmpty($rule.ExtendedProperties[0].Value) -or [string]::IsNullOrEmpty($rule.ExtendedProperties[1].Value))
+            {
                 $priority = ($rule.ExtendedProperties | Where-Object { $_.PropertyDefinition.Tag -eq 38 }).Value
                 Out-LogFile ("Possible Hidden Rule found in mailbox: " + $EmailAddress + " -- Rule Priority: " + $priority) -Notice
                 $RuleOutput = $rule | Select-Object -Property ID, @{ Name = "Priority"; Expression = { ($rule.ExtendedProperties | Where-Object { $_.PropertyDefinition -like "*38*" }).Value } }
@@ -141,7 +152,8 @@
         }
 
         # Log if no hidden rules are found
-        if ($FoundHidden -eq $false) {
+        if ($FoundHidden -eq $false)
+        {
             Out-LogFile "Get-HawkUserHiddenRule completed successfully" -Information
             Out-LogFile ("No Hidden rules found for mailbox: " + $EmailAddress) -action
         }

@@ -12,7 +12,8 @@
 .NOTES
     General notes
 #>
-Function Get-IPGeolocation {
+Function Get-IPGeolocation
+{
 
     Param
     (
@@ -21,12 +22,14 @@ Function Get-IPGeolocation {
     )
 
     # If we don't have a HawkAppData variable then we need to read it in
-    if (!([bool](get-variable HawkAppData -erroraction silentlycontinue))) {
+    if (!([bool](get-variable HawkAppData -erroraction silentlycontinue)))
+    {
         Read-HawkAppData
     }
 
     # if there is no value of access_key then we need to get it from the user
-    if ($null -eq $HawkAppData.access_key) {
+    if ($null -eq $HawkAppData.access_key)
+    {
 
         Out-LogFile "IpStack.com now requires an API access key to gather GeoIP information from their API.`nPlease get a Free access key from https://ipstack.com/ and provide it below." -Information
 
@@ -38,16 +41,19 @@ Function Get-IPGeolocation {
         # add the access key to the appdata file
         Add-HawkAppData -name access_key -Value $Accesskey
     }
-    else {
+    else
+    {
         $Accesskey = $HawkAppData.access_key
     }
 
     # Check the global IP cache and see if we already have the IP there
-    if ($IPLocationCache.ip -contains $IPAddress) {
+    if ($IPLocationCache.ip -contains $IPAddress)
+    {
         return ($IPLocationCache | Where-Object { $_.ip -eq $IPAddress } )
         Write-Verbose ("IP Cache Hit: " + [string]$IPAddress)
     }
-    elseif ($IPAddress -eq "<null>") {
+    elseif ($IPAddress -eq "<null>")
+    {
         write-Verbose ("Null IP Provided: " + $IPAddress)
         $hash = @{
             IP = $IPAddress
@@ -60,7 +66,8 @@ Function Get-IPGeolocation {
         }
     }
     # If not then we need to look it up and populate it into the cache
-    else {
+    else
+    {
         # URI to pull the data from
         $resource = "http://api.ipstack.com/" + $ipaddress + "?access_key=" + $Accesskey
 
@@ -68,7 +75,8 @@ Function Get-IPGeolocation {
         $Error.Clear()
         $geoip = Invoke-RestMethod -Method Get -URI $resource -ErrorAction SilentlyContinue
 
-        if (($Error.Count -gt 0) -or ($null -eq $geoip.type)) {
+        if (($Error.Count -gt 0) -or ($null -eq $geoip.type))
+        {
             Out-LogFile ("Failed to retreive location for IP " + $IPAddress) -isError
             $hash = @{
                 IP = $IPAddress
@@ -80,10 +88,12 @@ Function Get-IPGeolocation {
                 KnownMicrosoftIP = "Unknown"
             }
         }
-        else {
+        else
+        {
             # Determine if this IP is known to be owned by Microsoft
             [string]$isMSFTIP = Test-MicrosoftIP -IPToTest $IPAddress -type $geoip.type
-            if ($isMSFTIP) {
+            if ($isMSFTIP)
+            {
                 $MSFTIP = $isMSFTIP
             }
             # Push return into a response object

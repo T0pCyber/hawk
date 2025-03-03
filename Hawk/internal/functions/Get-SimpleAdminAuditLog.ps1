@@ -1,4 +1,5 @@
-﻿Function Get-SimpleAdminAuditLog {
+﻿Function Get-SimpleAdminAuditLog
+{
     <#
     .SYNOPSIS
         Convert output from search-adminauditlog to be more human readable
@@ -27,7 +28,8 @@
     )
 
     # Setup to process incoming results
-    Begin {
+    Begin
+    {
 
         # Make sure the array is null
         [array]$ResultSet = $null
@@ -35,7 +37,8 @@
     }
 
     # Process thru what ever is comming into the script
-    Process {
+    Process
+    {
 
         # Deal with each object in the input
         $searchresults | ForEach-Object {
@@ -50,7 +53,8 @@
             if ([string]::IsNullOrEmpty($user)) { $user = "***" }
 
             # if we have 'on behalf of' then we need to do some more processing to get the right value
-            elseif ($_.caller -like "*on behalf of*") {
+            elseif ($_.caller -like "*on behalf of*")
+            {
                 $split = $_.caller.split("/")
                 $Start = (($Split[3].split(" "))[0]).TrimEnd('"')
                 $End = $Split[-1].trimend('"')
@@ -58,11 +62,13 @@
                 [string]$User = $Start + " on behalf of " + $end
             }
             # If there is a / in the username lests simply it
-            elseif ($_.caller -contains "/") {
+            elseif ($_.caller -contains "/")
+            {
                 [string]$user = ($_.caller.split("/"))[-1]
             }
             # If none of the above or true just pass it thru
-            else {
+            else
+            {
                 [string]$user = $_.caller
             }
 
@@ -71,14 +77,17 @@
             [string]$FullCommand = $_.cmdletname
 
             # Get all of the switchs and add them in "human" form to the output
-            foreach ($parameter in $switches) {
+            foreach ($parameter in $switches)
+            {
 
                 # Format our values depending on what they are so that they are as close
                 # a match as possible for what would have been entered
-                switch -regex ($parameter.value) {
+                switch -regex ($parameter.value)
+                {
 
                     # If we have a multi value array put in then we need to break it out and add quotes as needed
-                    '[;]'	{
+                    '[;]'
+                    {
 
                         # Reset the formatted value string
                         $FormattedValue = $null
@@ -113,7 +122,8 @@
 
             # Format our modified object
             if ([string]::IsNullOrEmpty($_.objectModified)) { $ObjModified = "" }
-            else {
+            else
+            {
                 $ObjModified = ($_.objectmodified.split("/"))[-1]
                 $ObjModified = ($ObjModified.split("\"))[-1]
             }
@@ -135,7 +145,8 @@
     }
 
     # Final steps
-    End {
+    End
+    {
         # Return the array set
         Return $ResultSet
     }

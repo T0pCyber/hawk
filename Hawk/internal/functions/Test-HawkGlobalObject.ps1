@@ -1,4 +1,5 @@
-Function Test-HawkGlobalObject {
+﻿Function Test-HawkGlobalObject
+{
     <#
     .SYNOPSIS
         Tests if the Hawk global object exists and is properly initialized.
@@ -28,7 +29,8 @@ Function Test-HawkGlobalObject {
         $null -eq $Hawk.StartDate -or 
         $null -eq $Hawk.EndDate -or 
         ($Hawk.PSObject.Properties.Name -contains 'StartDate' -and $null -eq $Hawk.StartDate) -or
-        ($Hawk.PSObject.Properties.Name -contains 'EndDate' -and $null -eq $Hawk.EndDate)) {
+        ($Hawk.PSObject.Properties.Name -contains 'EndDate' -and $null -eq $Hawk.EndDate))
+    {
         return $true
     }
 

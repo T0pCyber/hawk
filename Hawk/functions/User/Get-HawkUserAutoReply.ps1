@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserAutoReply {
+﻿Function Get-HawkUserAutoReply
+{
     <#
     .SYNOPSIS
         Pulls AutoReply Configuration for the specified user.
@@ -31,7 +32,8 @@
     )
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
     
@@ -41,7 +43,8 @@
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
 
         [string]$User = $Object.UserPrincipalName
 
@@ -50,12 +53,14 @@
         $AutoReply = Get-MailboxAutoReplyConfiguration -Identity $User
 
         # Check if the Autoreply is Disabled
-        if ($AutoReply.AutoReplyState -eq 'Disabled') {
+        if ($AutoReply.AutoReplyState -eq 'Disabled')
+        {
 
             Out-LogFile "AutoReply is not enabled or not configured." -Information
         }
         # Output Enabled AutoReplyConfiguration to a generic txt
-        else {
+        else
+        {
 
             $AutoReply | Out-MultipleFileType -FilePreFix "AutoReply" -User $user -txt
         }

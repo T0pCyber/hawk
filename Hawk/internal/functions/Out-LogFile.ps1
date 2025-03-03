@@ -1,4 +1,5 @@
-﻿Function Out-LogFile {
+﻿Function Out-LogFile
+{
     <#
     .SYNOPSIS
         Writes output to a log file with a time date stamp.
@@ -127,7 +128,8 @@
     Write-PSFMessage -Message $string -ModuleName Hawk -FunctionName (Get-PSCallstack)[1].FunctionName
 
     # Make sure we have the Hawk Global Object
-    if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+    if ([string]::IsNullOrEmpty($Hawk.FilePath))
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -143,20 +145,24 @@
     [string]$logstring = ""
 
     # Build the log string based on the type of message
-    if ($action) {
+    if ($action)
+    {
         $logstring = "[$timestamp] - [ACTION] - $string"
     }
-    elseif ($isError) {
+    elseif ($isError)
+    {
         $logstring = "[$timestamp] - [ERROR]  - $string"
     }
-    elseif ($notice) {
+    elseif ($notice)
+    {
         $logstring = "[$timestamp] - [INVESTIGATE] - $string"
 
         # Write to the investigation file
         [string]$InvestigateFile = Join-Path (Split-Path $LogFile -Parent) "_Investigate.txt"
         $logstring | Out-File -FilePath $InvestigateFile -Append
     }
-    elseif ($silentnotice) {
+    elseif ($silentnotice)
+    {
         $logstring = "[$timestamp] - [INVESTIGATE] - Additional Information: $string"
 
         # Write to the investigation file
@@ -167,30 +173,38 @@
         $ScreenOutput = $false
         $LogOutput = $false
     }
-    elseif ($Information) {
+    elseif ($Information)
+    {
         $logstring = "[$timestamp] - [INFO]   - $string"
     }
-    elseif ($isWarning) {
+    elseif ($isWarning)
+    {
         $logstring = "[$timestamp] - [WARNING] - $string"
     }
-    elseif ($isPrompt) {
+    elseif ($isPrompt)
+    {
         $logstring = "[$timestamp] - [PROMPT] -  $string"
     }
-    else {
+    else
+    {
         $logstring = "[$timestamp] - $string"
     }
 
     # Write to log file if enabled
-    if ($LogOutput) {
+    if ($LogOutput)
+    {
         $logstring | Out-File -FilePath $LogFile -Append
     }
 
     # Write to screen if enabled
-    if ($ScreenOutput) {
-        if ($NoNewLine) {
+    if ($ScreenOutput)
+    {
+        if ($NoNewLine)
+        {
             Write-Host $logstring -InformationAction Continue -NoNewLine
         }
-        else {
+        else
+        {
             Write-Information $logstring -InformationAction Continue
         }
     }

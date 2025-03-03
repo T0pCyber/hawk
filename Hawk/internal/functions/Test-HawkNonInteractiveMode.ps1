@@ -1,4 +1,5 @@
-﻿Function Test-HawkNonInteractiveMode {
+﻿Function Test-HawkNonInteractiveMode
+{
     <#
     .SYNOPSIS
         Internal function to detect if Hawk should run in non-interactive mode.

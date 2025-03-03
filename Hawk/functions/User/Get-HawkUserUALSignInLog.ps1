@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserUALSignInLog {
+﻿Function Get-HawkUserUALSignInLog
+{
     <#
 .SYNOPSIS
     Gathers ip addresses that logged into the user account
@@ -39,7 +40,8 @@
     )
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -51,7 +53,8 @@
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
     [array]$RecordTypes = "AzureActiveDirectoryAccountLogon", "AzureActiveDirectory", "AzureActiveDirectoryStsLogon"
 
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
 
         [string]$User = $Object.UserPrincipalName
 
@@ -61,16 +64,19 @@
         Out-LogFile "Initiating collection of Sign-In logs for $User from the UAL." -Action
 
         # Get back the account logon logs for the user
-        foreach ($Type in $RecordTypes) {
+        foreach ($Type in $RecordTypes)
+        {
             Out-LogFile ("Searching Unified Audit log for Records of type: " + $Type) -action
             $UserLogonLogs += Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -UserIds " + $User + " -RecordType " + $Type)
         }
 
         # Make sure we have results
-        if ($null -eq $UserLogonLogs) {
+        if ($null -eq $UserLogonLogs)
+        {
             Out-LogFile "No results found when searching UAL for AzureActiveDirectoryAccountLogon events" -isError
         }
-        else {
+        else
+        {
 
             # Expand out the AuditData and convert from JSON
             Out-LogFile "Converting AuditData" -action
@@ -80,45 +86,55 @@
             $FailedConversions = New-Object System.Collections.ArrayList
 
             # Process our results in a way to deal with JSON Errors
-            Foreach ($Entry in $UserLogonLogs) {
+            Foreach ($Entry in $UserLogonLogs)
+            {
 
-                try {
+                try
+                {
                     $jsonEntry = $Entry.AuditData | ConvertFrom-Json
                     $ExpandedUserLogonLogs.Add($jsonEntry) | Out-Null
                 }
-                catch {
+                catch
+                {
                     $FailedConversions.Add($Entry) | Out-Null
                 }
             }
 
-            if ($FailedConversions.Count -le 0) {
+            if ($FailedConversions.Count -le 0)
+            {
                 # Do nothing or handle the zero-case
             }
-            else {
+            else
+            {
                 Out-LogFile ("$($FailedConversions.Count) Entries failed JSON Conversion") -isError
                 $FailedConversions | Out-MultipleFileType -FilePrefix "Failed_Conversion_Authentication_Logs" -User $User -Csv -Json
             }
             
 
             # Add IP Geo Location information to the data
-            if ($ResolveIPLocations) {
+            if ($ResolveIPLocations)
+            {
                 Out-File "Resolving IP Locations"
                 # Setup our counter
                 $i = 0
 
                 # Loop thru each connection and get the location
-                while ($i -lt $ExpandedUserLogonLogs.Count) {
+                while ($i -lt $ExpandedUserLogonLogs.Count)
+                {
 
                     if ([bool]($i % 25)) { }
-                    Else {
+                    Else
+                    {
                         Write-Progress -Activity "Looking Up Ip Address Locations" -CurrentOperation $i -PercentComplete (($i / $ExpandedUserLogonLogs.count) * 100)
                     }
 
                     # Get the location information for this IP address
-                    if ($ExpandedUserLogonLogs.item($i).clientip) {
+                    if ($ExpandedUserLogonLogs.item($i).clientip)
+                    {
                         $Location = Get-IPGeolocation -ipaddress $ExpandedUserLogonLogs.item($i).clientip
                     }
-                    else {
+                    else
+                    {
                         $Location = "IP Address Null"
                     }
 
@@ -131,7 +147,8 @@
 
                 Write-Progress -Completed -Activity "Looking Up Ip Address Locations" -Status " "
             }
-            else {
+            else
+            {
                 Out-LogFile "ResolveIPLocations not specified" -Information
             }
 

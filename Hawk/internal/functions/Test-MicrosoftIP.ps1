@@ -18,7 +18,8 @@
 .NOTES
     General notes
 #>
-Function Test-MicrosoftIP {
+Function Test-MicrosoftIP
+{
     param
     (
         [Parameter(Mandatory = $true)]
@@ -28,7 +29,8 @@ Function Test-MicrosoftIP {
     )
 
     # Check if we have imported all of our IP Addresses
-    if ($null -eq $MSFTIPList) {
+    if ($null -eq $MSFTIPList)
+    {
         Out-Logfile "Building MSFTIPList" -Action
 
         # Load our networking dll pulled from https://github.com/lduchosal/ipnetwork
@@ -38,7 +40,8 @@ Function Test-MicrosoftIP {
         Out-LogFile ("Loading Networking functions from " + $dll) -Action
         [Reflection.Assembly]::LoadFile($dll)
 
-        if ($Error.Count -gt 0) {
+        if ($Error.Count -gt 0)
+        {
             Out-Logfile "DLL Failed to load can't process IPs" -isError
             Return "Unknown"
         }
@@ -47,7 +50,8 @@ Function Test-MicrosoftIP {
 
         $MSFTJSON = (Invoke-WebRequest -uri ("https://endpoints.office.com/endpoints/Worldwide?ClientRequestId=" + (new-guid).ToString())).content | ConvertFrom-Json
 
-        if ($Error.Count -gt 0) {
+        if ($Error.Count -gt 0)
+        {
             Out-Logfile "Unable to retrieve JSON file" -isError
             Return "Unknown"
         }
@@ -57,7 +61,8 @@ Function Test-MicrosoftIP {
         [array]$ipv4 = $Null
 
         # Put all of the IP addresses from the JSON into a simple array
-        Foreach ($Entry in $MSFTJSON) {
+        Foreach ($Entry in $MSFTJSON)
+        {
             $IPList += $Entry.IPs
         }
 
@@ -65,11 +70,14 @@ Function Test-MicrosoftIP {
         $IPList = $IPList | Select-Object -Unique
 
         # Add the IP Addresses into either the v4 or v6 arrays
-        Foreach ($ip in $IPList) {
-            if ($ip -like "*.*") {
+        Foreach ($ip in $IPList)
+        {
+            if ($ip -like "*.*")
+            {
                 $ipv4 += $ip
             }
-            else {
+            else
+            {
                 $ipv6 += $ip
             }
         }
@@ -78,10 +86,12 @@ Function Test-MicrosoftIP {
         Out-LogFile ("Found " + $ipv4.count + " unique MSFT IPv4 address ranges") -Information
 
         # New up using our networking dll we need to pull these all in as network objects
-        foreach ($ip in $ipv6) {
+        foreach ($ip in $ipv6)
+        {
             [array]$ipv6objects += [System.Net.IPNetwork]::Parse($ip)
         }
-        foreach ($ip in $ipv4) {
+        foreach ($ip in $ipv4)
+        {
             [array]$ipv4objects += [System.Net.IPNetwork]::Parse($ip)
         }
 
@@ -97,14 +107,16 @@ Function Test-MicrosoftIP {
     }
 
     # Determine if we have an ipv6 or ipv4 address
-    if ($Type -like "ipv6") {
+    if ($Type -like "ipv6")
+    {
 
         # Compare to the IPv6 list
         [int]$i = 0
         [int]$count = $MSFTIPList.ipv6objects.count - 1
         # Compare each IP to the ip networks to see if it is in that network
         # If we get back a True or we are beyond the end of the list then stop
-        do {
+        do
+        {
             # Test the IP
             $parsedip = [System.Net.IPAddress]::Parse($IPToTest)
             $test = [System.Net.IPNetwork]::Contains($MSFTIPList.ipv6objects[$i], $parsedip)
@@ -115,14 +127,16 @@ Function Test-MicrosoftIP {
         # Return the value of test true = in MSFT network
         Return $test
     }
-    else {
+    else
+    {
         # Compare to the IPv4 list
         [int]$i = 0
         [int]$count = $MSFTIPList.ipv4objects.count - 1
 
         # Compare each IP to the ip networks to see if it is in that network
         # If we get back a True or we are beyond the end of the list then stop
-        do {
+        do
+        {
             # Test the IP
             $parsedip = [System.Net.IPAddress]::Parse($IPToTest)
             $test = [System.Net.IPNetwork]::Contains($MSFTIPList.ipv4objects[$i], $parsedip)

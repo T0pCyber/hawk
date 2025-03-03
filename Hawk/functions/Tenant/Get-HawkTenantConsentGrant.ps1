@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantConsentGrant {
+﻿Function Get-HawkTenantConsentGrant
+{
     <#
 .SYNOPSIS
     Gathers application grants using Microsoft Graph
@@ -26,7 +27,8 @@
     param()
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -55,50 +57,59 @@
     #Flag broad-scope grants
     [int]$BroadGrantCount = 0
     $Grants | ForEach-Object -Process {
-        if ($_.ConsentType -contains 'AllPrincipals' -or $_.Permission -match 'all') {
+        if ($_.ConsentType -contains 'AllPrincipals' -or $_.Permission -match 'all')
+        {
             $_.ConsentGrantRiskCategory = "Broad-Scope Grant"
             $BroadGrantCount += 1
         }
     }
 
-    if ($BroadGrantCount -gt 0) {
+    if ($BroadGrantCount -gt 0)
+    {
         Out-LogFile "Found $BroadGrantCount broad-scoped grants ('AllPrincipals' or '*.All')" -notice
         $flag = $true
     }
 
     #Flag Extremely Dangerous grants; if a grant is both broad-scope and E.D., flag as E.D.
     [int]$EDGrantCount = 0
-    foreach ($grant in $ExtremelyDangerousGrants) {
+    foreach ($grant in $ExtremelyDangerousGrants)
+    {
         $Grants | ForEach-Object -Process {
-            if ($_.Permission -match $grant) {
+            if ($_.Permission -match $grant)
+            {
                 $_.ConsentGrantRiskCategory = "Extremely Dangerous"
                 $EDGrantCount += 1
             }
         }
     }
 
-    if ($EDGrantCount -gt 0) {
+    if ($EDGrantCount -gt 0)
+    {
         Out-LogFile "Found $EDGrantCount Extremely Dangerous Grant(s)" -notice
         $flag = $true
     }
 
     #Flag High Risk grants; if a grant is both broad-scope and H.R., flag as H.R.
     [int]$HRGrantCount = 0
-    foreach ($grant in $HighRiskGrants) {
+    foreach ($grant in $HighRiskGrants)
+    {
         $Grants | ForEach-Object -Process {
-            if ($_.Permission -match $grant) {
+            if ($_.Permission -match $grant)
+            {
                 $_.ConsentGrantRiskCategory = "High Risk"
                 $HRGrantCount += 1
             }
         }
     }
 
-    if ($HRGrantCount -gt 0) {
+    if ($HRGrantCount -gt 0)
+    {
         Out-LogFile "Found $HRGrantCount High Risk Grant(s)" -notice
         $flag = $true
     }
 
-    if ($flag) {
+    if ($flag)
+    {
         Out-LogFile "Please verify these grants are legitimate / required." -Notice
         Out-LogFile 'For more information on understanding these results results, visit' -Notice
         Out-LogFile 'https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants' -Notice
@@ -107,7 +118,8 @@
         $grantsForInvestigation = $Grants | Where-Object { $_.ConsentGrantRiskCategory -ne "" }
         $grantsForInvestigation | Out-MultipleFileType -FilePrefix "_Investigate_Consent_Grants" -csv -json -Notice
     }
-    else {
+    else
+    {
         Out-LogFile "To review this data follow:" -Information
         Out-LogFile "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/detect-and-remediate-illicit-consent-grants" -Information
     }

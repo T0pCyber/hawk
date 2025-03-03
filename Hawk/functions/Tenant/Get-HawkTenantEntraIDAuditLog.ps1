@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantEntraIDAuditLog {
+﻿Function Get-HawkTenantEntraIDAuditLog
+{
     <#
     .SYNOPSIS
         Retrieves Microsoft Entra ID audit logs using Microsoft Graph API.
@@ -49,7 +50,8 @@
     param()
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -60,16 +62,19 @@
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-    if (-not (Test-Path -Path $TenantPath)) {
+    if (-not (Test-Path -Path $TenantPath))
+    {
         New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
     }
 
-    try {
+    try
+    {
         # Calculate 30 days ago from current date
         $thirtyDaysAgo = (Get-Date).AddDays(-30).Date 
         
         # Warn if Hawk date range extends beyond available window
-        if ($Hawk.StartDate -lt $thirtyDaysAgo) {
+        if ($Hawk.StartDate -lt $thirtyDaysAgo)
+        {
             Out-LogFile "Note: Entra ID audit logs are only available for the past 30 days. Earlier dates will be ignored." -Information
         }
 
@@ -81,18 +86,21 @@
         # Get all audit logs for the date range
         [array]$auditLogs = Get-MgAuditLogDirectoryAudit -Filter $filterString -All
 
-        if ($auditLogs.Count -gt 0) {
+        if ($auditLogs.Count -gt 0)
+        {
             Out-LogFile ("Found " + $auditLogs.Count + " audit log entries") -Information
             
             # Export the complete objects to both CSV and JSON
             $auditLogs | Out-MultipleFileType -FilePrefix "EntraIDAuditLogs" -csv -json
         }
-        else {
+        else
+        {
             Out-LogFile "Get-HawkTenantEntraIDAuditLog completed successfully" -Information
             Out-LogFile "No audit logs found for the specified time period" -Action
         }
     }
-    catch {
+    catch
+    {
         Out-LogFile "Error retrieving Entra ID audit logs: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }

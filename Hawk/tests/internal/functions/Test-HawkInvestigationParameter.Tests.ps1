@@ -3,7 +3,8 @@
         # Mock Test-Path to handle both -IsValid and normal path checks
         Mock Test-Path -ModuleName Hawk {
             param($Path)
-            if ($Path -eq 'C:\ValidPath') {
+            if ($Path -eq 'C:\ValidPath')
+            {
                 return $true
             }
             return $false

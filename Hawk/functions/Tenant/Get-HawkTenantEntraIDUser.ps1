@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantEntraIDUser {
+﻿Function Get-HawkTenantEntraIDUser
+{
     <#
     .SYNOPSIS
         This function will export all the Entra ID users (formerly Azure AD users).
@@ -19,9 +20,11 @@
         Updated to use Microsoft Graph SDK instead of AzureAD module.
         Properties selected for DFIR relevance.
     #>
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
 
@@ -31,7 +34,8 @@
         Test-GraphConnection
         Send-AIEvent -Event "CmdRun"
     }
-    PROCESS {
+    PROCESS
+    {
         # Get all users with specific properties needed for DFIR
         # -Property parameter optimizes API call to only retrieve needed fields
         $users = Get-MgUser -All -Property UserPrincipalName, # Primary user identifier
@@ -52,17 +56,20 @@
             Mail
 
         # Only process if users were found
-        if ($users) {
+        if ($users)
+        {
             # Sort by UPN and export to both CSV and JSON formats
             $users | Sort-Object -Property UserPrincipalName |
                 Out-MultipleFileType -FilePrefix "EntraIDUsers" -csv -json
         }
-        else {
+        else
+        {
             Out-LogFile "Get-HawkTenantEntraIDUser completed successfully" -Information
             Out-LogFile "No users found" -Action
         }
     }
-    END {
+    END
+    {
         Out-LogFile "Completed collection of users from Entra ID." -Information
     }
 }

@@ -1,4 +1,5 @@
-function Write-HawkInvestigationSummary {
+﻿function Write-HawkInvestigationSummary
+{
     <#
     .SYNOPSIS
         Outputs a summary of a Hawk investigation session.
@@ -56,13 +57,16 @@ function Write-HawkInvestigationSummary {
     
     # Create a more readable duration string with labels
     $durationParts = @()
-    if ($duration.Hours -gt 0) {
+    if ($duration.Hours -gt 0)
+    {
         $durationParts += "{0} hours" -f $duration.Hours
     }
-    if ($duration.Minutes -gt 0) {
+    if ($duration.Minutes -gt 0)
+    {
         $durationParts += "{0} minutes" -f $duration.Minutes
     }
-    if ($duration.Seconds -gt 0 -or $durationParts.Count -eq 0) {
+    if ($duration.Seconds -gt 0 -or $durationParts.Count -eq 0)
+    {
         $durationParts += "{0} seconds" -f $duration.Seconds
     }
     $durationStr = $durationParts -join ", "
@@ -71,25 +75,34 @@ function Write-HawkInvestigationSummary {
     Out-LogFile "=========================================================================" -Information
     
     # Output different message based on investigation type
-    if ($InvestigationType -eq 'Tenant') {
+    if ($InvestigationType -eq 'Tenant')
+    {
         Out-LogFile "Tenant Investigation complete for tenant: $($Hawk.TenantName)" -Information
-    } else {
+    } else
+    {
         # Handle user investigation output
-        if ($UserPrincipalName.Count -eq 1) {
+        if ($UserPrincipalName.Count -eq 1)
+        {
             # Single user case
-            if ($UserPrincipalName[0] -is [PSCustomObject]) {
+            if ($UserPrincipalName[0] -is [PSCustomObject])
+            {
                 $upn = $UserPrincipalName[0].UserPrincipalName
-            } else {
+            } else
+            {
                 $upn = $UserPrincipalName[0]
             }
             Out-LogFile "User Investigation complete for user: '$upn'" -Information
-        } else {
+        } else
+        {
             # Multiple users case
             Out-LogFile "User Investigation complete for users:" -Information
-            foreach ($user in $UserPrincipalName) {
-                if ($user -is [PSCustomObject]) {
+            foreach ($user in $UserPrincipalName)
+            {
+                if ($user -is [PSCustomObject])
+                {
                     $upn = $user.UserPrincipalName
-                } else {
+                } else
+                {
                     $upn = $user
                 }
                 Out-LogFile "* $upn" -Information
@@ -101,7 +114,8 @@ function Write-HawkInvestigationSummary {
     Out-LogFile "Please review investigation files at: $($Hawk.FilePath)" -Information
     
     # Only show the additional investigation message for tenant investigations
-    if ($InvestigationType -eq 'Tenant') {
+    if ($InvestigationType -eq 'Tenant')
+    {
         Out-LogFile "To investigate specific users, run: Start-HawkUserInvestigation" -Information
     }
     

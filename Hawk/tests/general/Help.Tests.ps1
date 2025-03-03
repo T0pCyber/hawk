@@ -56,7 +56,8 @@ $commands = Get-Command -Module (Get-Module $ModuleName) -CommandType $commandTy
 ## To test, restart session.
 
 
-foreach ($command in $commands) {
+foreach ($command in $commands)
+{
     $commandName = $command.Name
 
     # Skip all functions that are on the exclusions list
@@ -94,7 +95,8 @@ foreach ($command in $commands) {
             $parameters = $command.ParameterSets.Parameters | Sort-Object -Property Name -Unique | Where-Object Name -notin $common
             $parameterNames = $parameters.Name
             $HelpParameterNames = $Help.Parameters.Parameter.Name | Sort-Object -Unique
-            foreach ($parameter in $parameters) {
+            foreach ($parameter in $parameters)
+            {
                 $parameterName = $parameter.Name
                 $parameterHelp = $Help.parameters.parameter | Where-Object Name -EQ $parameterName
 
@@ -112,7 +114,8 @@ foreach ($command in $commands) {
 
                 $codeType = $parameter.ParameterType.Name
 
-                if ($parameter.ParameterType.IsEnum) {
+                if ($parameter.ParameterType.IsEnum)
+                {
                     # Enumerations often have issues with the typename not being reliably available
                     $names = $parameter.ParameterType::GetNames($parameter.ParameterType)
                     # Parameter type in Help should match code
@@ -120,14 +123,16 @@ foreach ($command in $commands) {
                         $parameterHelp.parameterValueGroup.parameterValue | Should -be $names
                     }
                 }
-                elseif ($parameter.ParameterType.FullName -in $HelpTestEnumeratedArrays) {
+                elseif ($parameter.ParameterType.FullName -in $HelpTestEnumeratedArrays)
+                {
                     # Enumerations often have issues with the typename not being reliably available
                     $names = [Enum]::GetNames($parameter.ParameterType.DeclaredMembers[0].ReturnType)
                     It "help for $commandName has correct parameter type for $parameterName" -TestCases @{ parameterHelp = $parameterHelp; names = $names } {
                         $parameterHelp.parameterValueGroup.parameterValue | Should -be $names
                     }
                 }
-                else {
+                else
+                {
                     # To avoid calling Trim method on a null object.
                     $helpType = if ($parameterHelp.parameterValue) { $parameterHelp.parameterValue.Trim() }
                     # Parameter type in Help should match code
@@ -136,7 +141,8 @@ foreach ($command in $commands) {
                     }
                 }
             }
-            foreach ($helpParm in $HelpParameterNames) {
+            foreach ($helpParm in $HelpParameterNames)
+            {
                 # Shouldn't find extra parameters in help.
                 It "finds help parameter in code: $helpParm" -TestCases @{ helpParm = $helpParm; parameterNames = $parameterNames } {
                     $helpParm -in $parameterNames | Should -Be $true

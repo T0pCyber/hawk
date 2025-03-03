@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantEDiscoveryLog {
+﻿Function Get-HawkTenantEDiscoveryLog
+{
     <#
     .SYNOPSIS
         Gets Unified Audit Logs (UAL) data for eDiscovery
@@ -45,7 +46,8 @@
         - Cmdlet: Command that was executed (if applicable)
     #>
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -56,22 +58,26 @@
     # Search UAL audit logs for any eDiscovery activities
     $eDiscoveryLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'Discovery'")
     
-    if ($null -eq $eDiscoveryLogs) {
+    if ($null -eq $eDiscoveryLogs)
+    {
         Out-LogFile "Get-HawkTenantEDiscoveryLog completed successfully" -Information
         Out-LogFile "No eDiscovery Logs found" -Action
     }
-    else {
+    else
+    {
         Out-LogFile "eDiscovery Logs have been found." -Notice
         Out-LogFile "Please review these eDiscoveryLogs.csv to validate the activity is legitimate." -Notice
 
         # Process and output both simple and detailed formats
         $ParsedLogs = $eDiscoveryLogs | Get-SimpleUnifiedAuditLog
-        if ($ParsedLogs) {
+        if ($ParsedLogs)
+        {
             Out-LogFile "Writing parsed eDiscovery log data" -Action
             $ParsedLogs | Out-MultipleFileType -FilePrefix "Simple_eDiscoveryLogs" -csv -json
             $eDiscoveryLogs | Out-MultipleFileType -FilePrefix "eDiscoveryLogs" -csv -json
         }
-        else {
+        else
+        {
             Out-LogFile "Error: Failed to parse eDiscovery log data" -isError
         }
     }

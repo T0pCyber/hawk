@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantAdminMailboxPermissionChange {
+﻿Function Get-HawkTenantAdminMailboxPermissionChange
+{
     <#
     .SYNOPSIS
         Retrieves audit log entries for mailbox permission changes within the tenant.
@@ -30,7 +31,8 @@
     param()
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -42,22 +44,26 @@
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-    if (-not (Test-Path -Path $TenantPath)) {
+    if (-not (Test-Path -Path $TenantPath))
+    {
         New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
     }
 
-    try {
+    try
+    {
         # Search for mailbox permission changes
         Out-LogFile "Searching audit logs for mailbox permission changes" -action
         $searchCommand = "Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations 'Add-MailboxPermission','Add-RecipientPermission','Add-ADPermission'"
         [array]$PermissionChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
-        if ($PermissionChanges.Count -gt 0) {
+        if ($PermissionChanges.Count -gt 0)
+        {
             Out-LogFile ("Found " + $PermissionChanges.Count + " mailbox permission changes in audit logs") -Information
 
             # Process and output the results
             $ParsedChanges = $PermissionChanges | Get-SimpleUnifiedAuditLog
-            if ($ParsedChanges) {
+            if ($ParsedChanges)
+            {
                 # Output simple format for easy analysis
                 $ParsedChanges | Out-MultipleFileType -FilePrefix "Simple_Mailbox_Permission_Change" -csv -json
 
@@ -78,22 +84,26 @@
                     )
                 }
 
-                if ($SensitiveGrants) {
+                if ($SensitiveGrants)
+                {
                     Out-LogFile "Found $($SensitiveGrants.Count) mailbox permission changes" -Notice
                     Out-LogFile "Please verify this activity is legitimate."-Notice
                     $SensitiveGrants | Out-MultipleFileType -FilePrefix "_Investigate_Mailbox_Permission_Change" -csv -json -Notice
                 }
             }
-            else {
+            else
+            {
                 Out-LogFile "Error: Failed to parse mailbox permission audit data" -isError
             }
         }
-        else {
+        else
+        {
             Out-LogFile "Get-HawkTenantAdminMailBoxPermissionChange completed successfully" -Information
             Out-LogFile "No mailbox permission changes found in audit logs" -action
         }
     }
-    catch {
+    catch
+    {
         Out-LogFile "Error analyzing mailbox permission changes: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }

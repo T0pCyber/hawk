@@ -15,11 +15,13 @@
 .NOTES
     General notes
 #>
-Function Start-SleepWithProgress {
+Function Start-SleepWithProgress
+{
     Param([int]$sleeptime)
 
     # Loop Number of seconds you want to sleep
-    For ($i = 0; $i -le $sleeptime; $i++) {
+    For ($i = 0; $i -le $sleeptime; $i++)
+    {
         $timeleft = ($sleeptime - $i)
 
         # Progress bar showing progress of the sleep

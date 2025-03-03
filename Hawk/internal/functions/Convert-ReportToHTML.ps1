@@ -17,7 +17,8 @@
 .NOTES
     General notes
 #>
-Function Convert-ReportToHTML {
+Function Convert-ReportToHTML
+{
     param
     (
         [Parameter(Mandatory = $true)]
@@ -26,17 +27,21 @@ Function Convert-ReportToHTML {
         $Xsl
     )
 
-    begin {
+    begin
+    {
         # Make sure that the files are there
-        if (!(test-path $Xml)) {
+        if (!(test-path $Xml))
+        {
             Write-Error "XML File not found for conversion" -ErrorAction Stop
         }
-        if (!(test-path $Xsl)) {
+        if (!(test-path $Xsl))
+        {
             Write-Error "XSL File not found for Conversion" -ErrorAction Stop
         }
     }
 
-    process {
+    process
+    {
         # Create the output file name
         $OutputFile = Join-Path (Split-path $xml) ((split-path $xml -Leaf).split(".")[0] + ".html")
 

@@ -1,4 +1,5 @@
-Function Test-HawkInvestigationParameter {
+﻿Function Test-HawkInvestigationParameter
+{
     <#
     .SYNOPSIS
         Validates parameters for Hawk investigation commands in both interactive and non-interactive modes.
@@ -87,52 +88,62 @@ Function Test-HawkInvestigationParameter {
     $errorMessages = @()
 
     # If in non-interactive mode, validate required parameters
-    if ($NonInteractive) {
+    if ($NonInteractive)
+    {
         # Validate FilePath
-        if ([string]::IsNullOrEmpty($FilePath)) {
+        if ([string]::IsNullOrEmpty($FilePath))
+        {
             $isValid = $false
             $errorMessages += "FilePath parameter is required in non-interactive mode"
         }
-        elseif (-not (Test-Path -Path $FilePath -IsValid)) {
+        elseif (-not (Test-Path -Path $FilePath -IsValid))
+        {
             $isValid = $false
             $errorMessages += "Invalid file path provided: $FilePath"
         }
 
         # Validate date parameters
-        if (-not ($StartDate -or $DaysToLookBack)) {
+        if (-not ($StartDate -or $DaysToLookBack))
+        {
             $isValid = $false
             $errorMessages += "Either StartDate or DaysToLookBack must be specified in non-interactive mode"
         }
 
-        if ($StartDate -and -not $EndDate) {
+        if ($StartDate -and -not $EndDate)
+        {
             $isValid = $false
             $errorMessages += "EndDate must be specified when using StartDate in non-interactive mode"
         }
     }
 
     # Validate DaysToLookBack regardless of mode
-    if ($DaysToLookBack) {
-        if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365) {
+    if ($DaysToLookBack)
+    {
+        if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365)
+        {
             $isValid = $false
             $errorMessages += "DaysToLookBack must be between 1 and 365"
         }
     }
 
     # Validate date range if both dates provided
-    if ($StartDate -and $EndDate) {
+    if ($StartDate -and $EndDate)
+    {
         # Convert to UTC for consistent comparison
         $utcStartDate = $StartDate.ToUniversalTime()
         $utcEndDate = $EndDate.ToUniversalTime()
         $currentDate = (Get-Date).ToUniversalTime()
 
-        if ($utcStartDate -gt $utcEndDate) {
+        if ($utcStartDate -gt $utcEndDate)
+        {
             $isValid = $false
             $errorMessages += "StartDate must be before EndDate"
         }
 
         # Compare against tomorrow to allow for the extra day
         $tomorrow = $currentDate.Date.AddDays(1)
-        if ($utcEndDate -gt $tomorrow) {
+        if ($utcEndDate -gt $tomorrow)
+        {
             $isValid = $false
             $errorMessages += "EndDate cannot be more than one day in the future"
         }
@@ -140,7 +151,8 @@ Function Test-HawkInvestigationParameter {
         # Use dates for day difference calculation
         # Test against 366 days to account for extra day added for last day inclusiveness
         $daysDifference = ($utcEndDate.Date - $utcStartDate.Date).Days
-        if ($daysDifference -gt 366) {
+        if ($daysDifference -gt 366)
+        {
             $isValid = $false
             $errorMessages += "Date range cannot exceed 365 days"
         }

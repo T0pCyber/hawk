@@ -6,7 +6,8 @@
 
 #region Good Code Examples - These will pass PSScriptAnalyzer
 # testss
-function Test-GoodFunction {
+function Test-GoodFunction
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true,
@@ -17,7 +18,8 @@ function Test-GoodFunction {
     Write-Output $Parameter
 }
 
-function Test-ValidatedFunction {
+function Test-ValidatedFunction
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true,
@@ -29,7 +31,8 @@ function Test-ValidatedFunction {
     $items = Get-ChildItem -Path $Path
     Write-Output $items
 }
-function Test-AdvancedFunction {
+function Test-AdvancedFunction
+{
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true,

@@ -1,4 +1,5 @@
-﻿Function Get-HawkMessageHeader {
+﻿Function Get-HawkMessageHeader
+{
     <#
 	.SYNOPSIS
 	Gathers the header from the an msg file prepares a report
@@ -34,10 +35,12 @@
     )
 
     # Create the outlook com object
-    try {
+    try
+    {
         $ol = New-Object -ComObject Outlook.Application
     }
-    catch [System.Runtime.InteropServices.COMException] {
+    catch [System.Runtime.InteropServices.COMException]
+    {
         # If we throw a com expection most likely reason is outlook isn't installed
         Out-LogFile "Unable to create outlook com object." -error
         Out-LogFile "Please make sure outlook is installed." -error
@@ -53,7 +56,8 @@
 
 
     # check to see if we have a valid file path
-    if (Test-Path $MSGFile) {
+    if (Test-Path $MSGFile)
+    {
 
         # Convert a possible relative path to a full path
         $MSGFile = (Resolve-Path $MSGFile).Path
@@ -63,11 +67,13 @@
 
         Out-LogFile ("Reading message header from file " + $MSGFile) -action
         # Import the message and start processing the header
-        try {
+        try
+        {
             $msg = $ol.CreateItemFromTemplate($MSGFile)
             $header = $msg.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001E")
         }
-        catch {
+        catch
+        {
             Out-LogFile ("Unable to load " + $MSGFile)
             Out-LogFile $Error[0]
             break
@@ -75,7 +81,8 @@
 
         $headersWithLines = $header.split("`n")
     }
-    else {
+    else
+    {
         # If we don't have a valid file path log an error and stop
         Out-LogFile ("Failed to find file " + $MSGFile) -error
         Write-Error -Message "Failed to find file " + $MSGFile -ErrorAction Stop
@@ -86,9 +93,11 @@
     [array]$Output = $null
 
     # Read thru each line to pull together each entry into a single object
-    foreach ($string in $headersWithLines) {
+    foreach ($string in $headersWithLines)
+    {
         # If our string is not null and we have a leading whitespace then this needs to be added to the previous string as part of the same object.
-        if (!([string]::IsNullOrEmpty($string)) -and ([char]::IsWhiteSpace($string[0]))) {
+        if (!([string]::IsNullOrEmpty($string)) -and ([char]::IsWhiteSpace($string[0])))
+        {
             # Do some string clean up
             $string = $string.trimstart()
             $string = $string.trimend()
@@ -100,14 +109,17 @@
 
         # If we are here we do a null check just in case but we know the first char is not a whitespace
         # So we have a new "object" that we need to process in
-        elseif (!([string]::IsNullOrEmpty($string))) {
+        elseif (!([string]::IsNullOrEmpty($string)))
+        {
 
             # For the inital pass the string will be null or empty so we need to check for that
-            if ([string]::IsNullOrEmpty($CombinedString)) {
+            if ([string]::IsNullOrEmpty($CombinedString))
+            {
                 # Create our new string and continue processing
                 $CombinedString = ($string.trimend())
             }
-            else {
+            else
+            {
                 # We should have everything now so create the object
                 $Object = $null
                 $Object = New-Object -TypeName PSObject
@@ -137,7 +149,8 @@
     # Determine the initial submitting client/ip
 
     [array]$receivedHeadersString = $Output | Where-Object { $_.header -eq "Received" }
-    foreach ($stringHeader in $receivedHeadersString.value) {
+    foreach ($stringHeader in $receivedHeadersString.value)
+    {
         [array]$receivedHeadersObject += Convert-ReceiveHeader -Header $stringHeader
     }
 
@@ -145,13 +158,16 @@
     $receivedHeadersObject = $receivedHeadersObject | Sort-Object -Property ReceivedFromTime
 
     if ($null -eq $receivedHeadersObject) { }
-    else {
+    else
+    {
 
         # Determine how it was submitted to the service
-        if ($receivedHeadersObject[0].ReceivedBy -like "*outlook.com*") {
+        if ($receivedHeadersObject[0].ReceivedBy -like "*outlook.com*")
+        {
             $Findings += (Add-Finding -Name "Submitting Host" -Value $receivedHeadersObject[0].ReceivedBy -Conclusion "Submitted from Office 365" -MoreInformation "Warning - This might have originated from one of your clients")
         }
-        else {
+        else
+        {
             $Findings += (Add-Finding -Name "Submitting Host" -Value $receivedHeadersObject[0].ReceivedBy -Conclusion "Submitted from Internet" -MoreInformation "")
         }
 
@@ -163,12 +179,15 @@
     $AuthAs = $output | Where-Object { $_.header -like 'X-MS-Exchange-Organization-AuthAs' }
     # Make sure we got something back
     if ($null -eq $AuthAs) { }
-    else {
+    else
+    {
         # If auth is anonymous then it came from the internet
-        if ($AuthAs.value -eq "Anonymous") {
+        if ($AuthAs.value -eq "Anonymous")
+        {
             $Findings += (Add-Finding -Name "Authentication Method" -Value $AuthAs.value -Conclusion "Method used to authenticate" -MoreInformation "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help")
         }
-        else {
+        else
+        {
             $Findings += (Add-Finding -Name "Authentication Method" -Value $AuthAs.value -Conclusion "Method used to authenticate" -MoreInformation "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help")
         }
     }
@@ -177,12 +196,15 @@
     $AuthMech = $output | Where-Object { $_.header -like 'X-MS-Exchange-Organization-AuthMechanism' }
     # Make sure we got something back
     if ($null -eq $AuthMech) { }
-    else {
+    else
+    {
         # If auth is anonymous then it came from the internet
-        if ($AuthMech.value -eq "04" -or $AuthMech.value -eq "06") {
+        if ($AuthMech.value -eq "04" -or $AuthMech.value -eq "06")
+        {
             $Findings += (Add-Finding -Name "Authentication Mechanism" -Value $AuthMech.value -Conclusion "04 = Credentials Used; 06 = SMTP Authentication" -MoreInformation "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help")
         }
-        else {
+        else
+        {
             $Findings += (Add-Finding -Name "Authentication Mechanism" -Value $AuthMech.value -Conclusion "Mechanism used to authenticate" -MoreInformation "https://docs.microsoft.com/en-us/exchange/header-firewall-exchange-2013-help")
         }
     }
@@ -195,19 +217,23 @@
     $frommatches = $null
     $frommatches = $From.Value | Select-String -Pattern '(?<=<)([\s\S]*?)(?=>)' -AllMatches
 
-    if ($null -ne $frommatches) {
+    if ($null -ne $frommatches)
+    {
         # Pull the string from the matches
         [string]$fromString = $frommatches.Matches.Groups[1].Value
     }
-    else {
+    else
+    {
         [string]$fromString = $From.value
     }
 
     # Check to see if they match
-    if ($fromString.trim() -eq $ReturnPath.value.trim()) {
+    if ($fromString.trim() -eq $ReturnPath.value.trim())
+    {
         $Findings += (Add-Finding -Name "P1 P2 Match" -Value ("From: " + $From.value + ";  Return-Path: " + $ReturnPath.value) -Conclusion "P1 and P2 Header match" -MoreInformation "")
     }
-    else {
+    else
+    {
         $Findings += (Add-Finding -Name "P1 P2 Match" -Value ("From: " + $From.value + ";  Return-Path: " + $ReturnPath.value) -Conclusion "P1 and P2 Header don't Match" -MoreInformation "WARNING - P1 and P2 Header don't Match")
     }
 
@@ -223,7 +249,8 @@
 
 
 # Function to create a finding object for adding to the output array
-Function Add-Finding {
+Function Add-Finding
+{
     param (
         [string]$Name,
         [string]$Value,
@@ -246,7 +273,8 @@ Function Add-Finding {
 }
 
 # Processing a received header and returns it as a object
-Function Convert-ReceiveHeader {
+Function Convert-ReceiveHeader
+{
     #Core code from https://blogs.technet.microsoft.com/heyscriptingguy/2011/08/18/use-powershell-to-parse-email-message-headerspart-1/
     Param
     (
@@ -265,9 +293,11 @@ Function Convert-ReceiveHeader {
     $headerMatches = $Header | Select-String -Pattern $HeaderRegex -AllMatches
 
     # Check if we got back results
-    if ($null -ne $headerMatches) {
+    if ($null -ne $headerMatches)
+    {
         # Formatch our with
-        Switch -wildcard ($headerMatches.Matches.groups[3].value.trim()) {
+        Switch -wildcard ($headerMatches.Matches.groups[3].value.trim())
+        {
             "SMTP*" { $with = "SMTP" }
             "ESMTP*" { $with = "ESMTP" }
             default { $with = $headerMatches.Matches.groups[3].value.trim() }
@@ -286,7 +316,8 @@ Function Convert-ReceiveHeader {
         return $Output
     }
     # If we failed to match then return null
-    else {
+    else
+    {
         return $null
     }
 }

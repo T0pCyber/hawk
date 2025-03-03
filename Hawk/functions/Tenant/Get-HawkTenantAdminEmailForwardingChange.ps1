@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantAdminEmailForwardingChange {
+﻿Function Get-HawkTenantAdminEmailForwardingChange
+{
     <#
     .SYNOPSIS
         Retrieves audit log entries for email forwarding changes made within the tenant.
@@ -38,7 +39,8 @@
     param()
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -58,11 +60,13 @@
 
     # Ensure the tenant-specific folder exists to store output files. If not, create it.
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-    if (-not (Test-Path -Path $TenantPath)) {
+    if (-not (Test-Path -Path $TenantPath))
+    {
         New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
     }
 
-    try {
+    try
+    {
         # Define both operations and broader search terms to cast a wider net.
         $searchCommand = @"
 Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
@@ -103,13 +107,15 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
 
         Out-LogFile "Completed filtering for forwarding changes." -Information
 
-        if ($ForwardingChanges.Count -gt 0) {
+        if ($ForwardingChanges.Count -gt 0)
+        {
             # Log the number of forwarding configuration changes found.
             Out-LogFile ("Found " + $ForwardingChanges.Count + " change(s) to user email forwarding.") -Information
 
             # Parse the audit data into a simpler format for further processing and output.
             $ParsedChanges = $ForwardingChanges | Get-SimpleUnifiedAuditLog
-            if ($ParsedChanges) {
+            if ($ParsedChanges)
+            {
                 # Write the simplified data for quick analysis and review.
                 $ParsedChanges | Out-MultipleFileType -FilePrefix "Simple_Forwarding_Changes" -csv -json -Notice
 
@@ -120,10 +126,12 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
                 $ForwardingDestinations = @()
 
                 Out-LogFile "Beginning detailed analysis of forwarding changes..." -Action
-                foreach ($change in $ParsedChanges) {
+                foreach ($change in $ParsedChanges)
+                {
                     # Add a status update every 30 seconds
                     $currentTime = Get-Date
-                    if (($currentTime - $lastUpdate).TotalSeconds -ge 30) {
+                    if (($currentTime - $lastUpdate).TotalSeconds -ge 30)
+                    {
                         Out-LogFile "Processing forwarding changes... ($($ForwardingDestinations.Count) destinations found so far)." -Action
                         $lastUpdate = $currentTime
                     }
@@ -131,9 +139,11 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
                     $targetUser = $change.ObjectId
 
                     # Process ForwardingSMTPAddress changes if detected in the audit log.
-                    if ($change.Parameters -match "ForwardingSMTPAddress") {
+                    if ($change.Parameters -match "ForwardingSMTPAddress")
+                    {
                         $smtpAddress = ($change.Parameters | Select-String -Pattern "ForwardingSMTPAddress:\s*([^,]+)").Matches.Groups[1].Value
-                        if ($smtpAddress) {
+                        if ($smtpAddress)
+                        {
                             # Add the SMTP forwarding configuration to the destinations array.
                             $ForwardingDestinations += [PSCustomObject]@{
                                 UserModified = $targetUser
@@ -146,15 +156,19 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
                     }
 
                     # Process ForwardingAddress changes if detected in the audit log.
-                    if ($change.Parameters -match "ForwardingAddress") {
+                    if ($change.Parameters -match "ForwardingAddress")
+                    {
                         $forwardingAddress = ($change.Parameters | Select-String -Pattern "ForwardingAddress:\s*([^,]+)").Matches.Groups[1].Value
-                        if ($forwardingAddress) {
-                            try {
+                        if ($forwardingAddress)
+                        {
+                            try
+                            {
                                 # Attempt to resolve the recipient details from Exchange Online.
                                 $recipient = Get-EXORecipient $forwardingAddress -ErrorAction Stop
 
                                 # Determine the recipient's type and extract the appropriate address.
-                                $targetAddress = switch ($recipient.RecipientType) {
+                                $targetAddress = switch ($recipient.RecipientType)
+                                {
                                     "MailContact" { $recipient.ExternalEmailAddress.Split(":")[-1] }
                                     default { $recipient.PrimarySmtpAddress }
                                 }
@@ -168,7 +182,8 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
                                     ModifiedTime = $change.CreationTime
                                 }
                             }
-                            catch {
+                            catch
+                            {
                                 # Log a warning if the recipient cannot be resolved.
                                 Out-LogFile "Unable to resolve forwarding recipient: $forwardingAddress" -isError
                                 # Add an unresolved entry for transparency in the output.
@@ -187,31 +202,36 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
 
                 Out-LogFile "Completed processing forwarding changes" -Information
 
-                if ($ForwardingDestinations.Count -gt 0) {
+                if ($ForwardingDestinations.Count -gt 0)
+                {
                     # Log the total number of forwarding destinations detected.
                     Out-LogFile ("Found " + $ForwardingDestinations.Count + " forwarding destinations configured") -Information
                     # Write the forwarding destinations data to files for review.
                     $ForwardingDestinations | Out-MultipleFileType -FilePrefix "Forwarding_Recipients" -csv -json -Notice
 
                     # Log details about each forwarding destination for detailed auditing.
-                    foreach ($dest in $ForwardingDestinations) {
+                    foreach ($dest in $ForwardingDestinations)
+                    {
                         Out-LogFile "Forwarding configured: $($dest.UserModified) -> $($dest.TargetSMTPAddress) ($($dest.ChangeType)) by $($dest.ModifiedBy) at $($dest.ModifiedTime)" -Notice
                     }
                 }
             }
-            else {
+            else
+            {
                 # Log a warning if the parsing of audit data fails.
                 Out-LogFile "Error: Failed to parse forwarding change audit data" -isError
             }
         }
-        else {
+        else
+        {
             # Log a message if no forwarding changes are found in the logs.
             Out-LogFile "Get-HawkTenantAdminEmailForwardingChange completed successfully" -Information
             Out-LogFile "No forwarding changes found in filtered results" -action
             Out-LogFile "Retrieved $($AllMailboxChanges.Count) total operations, but none involved forwarding changes" -action
         }
     }
-    catch {
+    catch
+    {
         # Log an error if the analysis encounters an exception.
         Out-LogFile "Error analyzing email forwarding changes: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue

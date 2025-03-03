@@ -1,4 +1,5 @@
-Function Get-HawkUserPath {
+﻿Function Get-HawkUserPath
+{
     <#
     .SYNOPSIS
         Gets the output folder path for a specific user in Hawk
@@ -24,7 +25,8 @@ Function Get-HawkUserPath {
     )
 
     # Check if Hawk global object exists
-    if ([string]::IsNullOrEmpty($Hawk.FilePath)) {
+    if ([string]::IsNullOrEmpty($Hawk.FilePath))
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -32,7 +34,8 @@ Function Get-HawkUserPath {
     $userPath = Join-Path -Path $Hawk.FilePath -ChildPath $User
 
     # Create directory if it doesn't exist
-    if (-not (Test-Path -Path $userPath)) {
+    if (-not (Test-Path -Path $userPath))
+    {
         Out-LogFile "Making output directory for user $userPath"
         New-Item -Path $userPath -ItemType Directory -Force | Out-Null
     }

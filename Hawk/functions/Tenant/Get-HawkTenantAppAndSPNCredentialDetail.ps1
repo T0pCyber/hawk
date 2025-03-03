@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantAppAndSPNCredentialDetail {
+﻿Function Get-HawkTenantAppAndSPNCredentialDetail
+{
     <#
     .SYNOPSIS
         Tenant Azure Active Directory Applications and Service Principal Credential details export using Microsoft Graph.
@@ -22,15 +23,18 @@
     [CmdletBinding()]
     param()
 
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
 
         # Create Tenant folder path if it doesn't exist
         $tenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-        if (-not (Test-Path -Path $tenantPath)) {
+        if (-not (Test-Path -Path $tenantPath))
+        {
             New-Item -Path $tenantPath -ItemType Directory -Force | Out-Null
         }
 
@@ -44,23 +48,29 @@
         $appResults = @()
 
         Out-LogFile "Collecting Entra ID Service Principals" -Action
-        try {
+        try
+        {
             $spns = Get-MgServicePrincipal -All | Sort-Object -Property DisplayName
             Out-LogFile "Collecting Entra ID Registered Applications" -Action
             $apps = Get-MgApplication -All | Sort-Object -Property DisplayName
         }
-        catch {
+        catch
+        {
             Out-LogFile "Error retrieving Service Principals or Applications: $($_.Exception.Message)" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 
-    PROCESS {
-        try {
+    PROCESS
+    {
+        try
+        {
             Out-LogFile "Exporting Service Principal Certificate and Password details" -Action
-            foreach ($spn in $spns) {
+            foreach ($spn in $spns)
+            {
                 # Process key credentials
-                foreach ($key in $spn.KeyCredentials) {
+                foreach ($key in $spn.KeyCredentials)
+                {
                     $newapp = [PSCustomObject]@{
                         AppName = $spn.DisplayName
                         AppObjectID = $spn.Id
@@ -77,7 +87,8 @@
                 }
 
                 # Process password credentials
-                foreach ($pass in $spn.PasswordCredentials) {
+                foreach ($pass in $spn.PasswordCredentials)
+                {
                     $newapp = [PSCustomObject]@{
                         AppName = $spn.DisplayName
                         AppObjectID = $spn.Id
@@ -95,14 +106,17 @@
             }
 
             # Output complete SPN results array as single JSON
-            if ($spnResults.Count -gt 0) {
+            if ($spnResults.Count -gt 0)
+            {
                 $spnResults | ConvertTo-Json | Out-File -FilePath (Join-Path -Path $tenantPath -ChildPath "SPNCertsAndSecrets.json")
             }
 
             Out-LogFile "Exporting Registered Applications Certificate and Password details" -Action
-            foreach ($app in $apps) {
+            foreach ($app in $apps)
+            {
                 # Process key credentials
-                foreach ($key in $app.KeyCredentials) {
+                foreach ($key in $app.KeyCredentials)
+                {
                     $newapp = [PSCustomObject]@{
                         AppName = $app.DisplayName
                         AppObjectID = $app.Id
@@ -119,7 +133,8 @@
                 }
 
                 # Process password credentials
-                foreach ($pass in $app.PasswordCredentials) {
+                foreach ($pass in $app.PasswordCredentials)
+                {
                     $newapp = [PSCustomObject]@{
                         AppName = $app.DisplayName
                         AppObjectID = $app.Id
@@ -137,17 +152,20 @@
             }
 
             # Output complete application results array as single JSON
-            if ($appResults.Count -gt 0) {
+            if ($appResults.Count -gt 0)
+            {
                 $appResults | ConvertTo-Json | Out-File -FilePath (Join-Path -Path $tenantPath -ChildPath "ApplicationCertsAndSecrets.json")
             }
         }
-        catch {
+        catch
+        {
             Out-LogFile "Error processing credentials: $($_.Exception.Message)" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 
-    END {
+    END
+    {
         Out-LogFile "Completed collection of application and service principal credentials from Microsoft Graph." -Information
     }
 }

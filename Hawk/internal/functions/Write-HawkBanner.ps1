@@ -1,4 +1,5 @@
-﻿Function Write-HawkBanner {
+﻿Function Write-HawkBanner
+{
     <#
     .SYNOPSIS
         Displays the Hawk welcome banner in the terminal.
@@ -62,7 +63,8 @@ https://hawkforensics.io
     Write-Output ""
     
 
-    if ($DisplayWelcomeMessage) {
+    if ($DisplayWelcomeMessage)
+    {
 
         Write-Information "Welcome to Hawk! Let's get your investigation environment set up."
         Write-Information "We'll guide you through configuring the output file path and investigation date range."

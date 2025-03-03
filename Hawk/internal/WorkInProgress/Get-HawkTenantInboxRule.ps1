@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantInboxRule {
+﻿Function Get-HawkTenantInboxRule
+{
     <#
     .SYNOPSIS
         Retrieves the currently active inbox rules and forwarding settings from all (or specified) mailboxes.
@@ -60,7 +61,8 @@
         [string]$UserPrincipalName
     )
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -77,7 +79,8 @@
     $result = $host.ui.PromptForChoice($title, $message, $options, 0)
     # If yes log and continue
     # If no log error and exit
-    switch ($result) {
+    switch ($result)
+    {
         0 { Out-LogFile "Starting full Tenant Search" -Action }
         1 { Write-Error -Message "User Stopped Cmdlet" -ErrorAction Stop }
     }
@@ -89,16 +92,19 @@
     Out-LogFile "Getting all Mailboxes" -Action
 
     # If we don't have a value for csvpath then gather all users in the tenant
-    if ([string]::IsNullOrEmpty($CSVPath)) {
+    if ([string]::IsNullOrEmpty($CSVPath))
+    {
         $AllMailboxes = Invoke-Command -Session $exopssession -ScriptBlock { Get-Recipient -RecipientTypeDetails UserMailbox -ResultSize Unlimited | Select-Object -Property DisplayName, PrimarySMTPAddress }
         $Allmailboxes | Out-MultipleFileType -FilePrefix "All_Mailboxes" -csv -json
     }
     # If we do read that in
-    else {
+    else
+    {
         # Import the csv with error checking
         $error.clear()
         $AllMailboxes = Import-Csv $CSVPath
-        if ($error.Count -gt 0) {
+        if ($error.Count -gt 0)
+        {
             Write-Error "Problem importing csv file aborting" -ErrorAction Stop
         }
     }
