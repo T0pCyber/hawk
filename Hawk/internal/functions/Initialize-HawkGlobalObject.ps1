@@ -565,7 +565,6 @@
 
         if ($PSBoundParameters.ContainsKey('EnableGeoIPLocation')) {
             $Hawk.EnableGeoIPLocation = $EnableGeoIPLocation
-            Out-LogFile "INSIDE [INITALIZE HAWKGLOBALOBJECT]::NON-INTERACTIVE MODE - GEOIP: $EnableGeoIPLocation." -Information
         }
 
 

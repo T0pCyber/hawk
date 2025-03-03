@@ -54,6 +54,7 @@ function Get-IPStackAPIKey {
                     }
                 } else {
                     Out-LogFile "GeoIP API key not found on disk." -isError
+                    Out-LogFile "Continuing to process logs without GeoIP lookup information." -Information
                     return $null
                 }
             }
