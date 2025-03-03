@@ -32,17 +32,17 @@
 #>
 [CmdletBinding()]
 Param (
-	[switch]
-	$SkipTest,
+    [switch]
+    $SkipTest,
 
-	[string[]]
-	$CommandPath = @("$global:testroot\..\functions", "$global:testroot\..\internal\functions"),
+    [string[]]
+    $CommandPath = @("$global:testroot\..\functions", "$global:testroot\..\internal\functions"),
 
-	[string]
-	$ModuleName = "Hawk",
+    [string]
+    $ModuleName = "Hawk",
 
-	[string]
-	$ExceptionsFile = "$global:testroot\general\Help.Exceptions.ps1"
+    [string]
+    $ExceptionsFile = "$global:testroot\general\Help.Exceptions.ps1"
 )
 if ($SkipTest) { return }
 . $ExceptionsFile
@@ -65,27 +65,27 @@ foreach ($command in $commands) {
     # The module-qualified command fails on Microsoft.PowerShell.Archive cmdlets
     $Help = Get-Help $commandName -ErrorAction SilentlyContinue
 
-	Describe "Test help for $commandName" {
+    Describe "Test help for $commandName" {
 
-		# If help is not found, synopsis in auto-generated help is the syntax diagram
-		It "should not be auto-generated" -TestCases @{ Help = $Help } {
-			$Help.Synopsis | Should -Not -BeLike '*`[`<CommonParameters`>`]*'
-		}
+        # If help is not found, synopsis in auto-generated help is the syntax diagram
+        It "should not be auto-generated" -TestCases @{ Help = $Help } {
+            $Help.Synopsis | Should -Not -BeLike '*`[`<CommonParameters`>`]*'
+        }
 
-		# Should be a description for every function
-		It "gets description for $commandName" -TestCases @{ Help = $Help } {
-			$Help.Description | Should -Not -BeNullOrEmpty
-		}
+        # Should be a description for every function
+        It "gets description for $commandName" -TestCases @{ Help = $Help } {
+            $Help.Description | Should -Not -BeNullOrEmpty
+        }
 
-		# Should be at least one example
-		It "gets example code from $commandName" -TestCases @{ Help = $Help } {
+        # Should be at least one example
+        It "gets example code from $commandName" -TestCases @{ Help = $Help } {
 			($Help.Examples.Example | Select-Object -First 1).Code | Should -Not -BeNullOrEmpty
-		}
+        }
 
-		# Should be at least one example description
-		It "gets example help from $commandName" -TestCases @{ Help = $Help } {
+        # Should be at least one example description
+        It "gets example help from $commandName" -TestCases @{ Help = $Help } {
 			($Help.Examples.Example.Remarks | Select-Object -First 1).Text | Should -Not -BeNullOrEmpty
-		}
+        }
 
         Context "Test parameter help for $commandName" {
 
@@ -98,15 +98,15 @@ foreach ($command in $commands) {
                 $parameterName = $parameter.Name
                 $parameterHelp = $Help.parameters.parameter | Where-Object Name -EQ $parameterName
 
-				# Should be a description for every parameter
-				It "gets help for parameter: $parameterName : in $commandName" -TestCases @{ parameterHelp = $parameterHelp } {
-					$parameterHelp.Description.Text | Should -Not -BeNullOrEmpty
-				}
+                # Should be a description for every parameter
+                It "gets help for parameter: $parameterName : in $commandName" -TestCases @{ parameterHelp = $parameterHelp } {
+                    $parameterHelp.Description.Text | Should -Not -BeNullOrEmpty
+                }
 
                 $codeMandatory = $parameter.IsMandatory.toString()
-				It "help for $parameterName parameter in $commandName has correct Mandatory value" -TestCases @{ parameterHelp = $parameterHelp; codeMandatory = $codeMandatory } {
-					$parameterHelp.Required | Should -Be $codeMandatory
-				}
+                It "help for $parameterName parameter in $commandName has correct Mandatory value" -TestCases @{ parameterHelp = $parameterHelp; codeMandatory = $codeMandatory } {
+                    $parameterHelp.Required | Should -Be $codeMandatory
+                }
 
                 if ($HelpTestSkipParameterType[$commandName] -contains $parameterName) { continue }
 
@@ -115,32 +115,32 @@ foreach ($command in $commands) {
                 if ($parameter.ParameterType.IsEnum) {
                     # Enumerations often have issues with the typename not being reliably available
                     $names = $parameter.ParameterType::GetNames($parameter.ParameterType)
-						# Parameter type in Help should match code
-					It "help for $commandName has correct parameter type for $parameterName" -TestCases @{ parameterHelp = $parameterHelp; names = $names } {
-						$parameterHelp.parameterValueGroup.parameterValue | Should -be $names
-					}
+                    # Parameter type in Help should match code
+                    It "help for $commandName has correct parameter type for $parameterName" -TestCases @{ parameterHelp = $parameterHelp; names = $names } {
+                        $parameterHelp.parameterValueGroup.parameterValue | Should -be $names
+                    }
                 }
                 elseif ($parameter.ParameterType.FullName -in $HelpTestEnumeratedArrays) {
                     # Enumerations often have issues with the typename not being reliably available
                     $names = [Enum]::GetNames($parameter.ParameterType.DeclaredMembers[0].ReturnType)
-					It "help for $commandName has correct parameter type for $parameterName" -TestCases @{ parameterHelp = $parameterHelp; names = $names } {
-						$parameterHelp.parameterValueGroup.parameterValue | Should -be $names
-					}
+                    It "help for $commandName has correct parameter type for $parameterName" -TestCases @{ parameterHelp = $parameterHelp; names = $names } {
+                        $parameterHelp.parameterValueGroup.parameterValue | Should -be $names
+                    }
                 }
                 else {
                     # To avoid calling Trim method on a null object.
                     $helpType = if ($parameterHelp.parameterValue) { $parameterHelp.parameterValue.Trim() }
-					# Parameter type in Help should match code
-					It "help for $commandName has correct parameter type for $parameterName" -TestCases @{ helpType = $helpType; codeType = $codeType } {
-						$helpType | Should -be $codeType
-					}
+                    # Parameter type in Help should match code
+                    It "help for $commandName has correct parameter type for $parameterName" -TestCases @{ helpType = $helpType; codeType = $codeType } {
+                        $helpType | Should -be $codeType
+                    }
                 }
             }
             foreach ($helpParm in $HelpParameterNames) {
-				# Shouldn't find extra parameters in help.
-				It "finds help parameter in code: $helpParm" -TestCases @{ helpParm = $helpParm; parameterNames = $parameterNames } {
-					$helpParm -in $parameterNames | Should -Be $true
-				}
+                # Shouldn't find extra parameters in help.
+                It "finds help parameter in code: $helpParm" -TestCases @{ helpParm = $helpParm; parameterNames = $parameterNames } {
+                    $helpParm -in $parameterNames | Should -Be $true
+                }
             }
         }
     }

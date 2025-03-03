@@ -17,16 +17,16 @@ Set-PSFConfig -Module 'Hawk' -Name 'Import.IndividualFiles' -Value $false -Initi
 #Set-PSFConfig -Module 'Hawk' -Name 'DaysToLookBack' -Value 90 -Initialize -Validation integerpositive -Description 'How long into the past will the project look'
 
 $handler = {
-	$paramSetPSFLoggingProvider = @{
-		Name = 'logfile'
-		InstanceName = 'Hawk'
-		FilePath = Join-Path -path $args[0] -ChildPath '%date%_logs.csv'
-		TimeFormat = 'yyyy-MM-dd HH:mm:ss.fff'
-		IncludeModules = 'Hawk'
-		UTC = $true
-		Enabled = $true
-	}
+    $paramSetPSFLoggingProvider = @{
+        Name = 'logfile'
+        InstanceName = 'Hawk'
+        FilePath = Join-Path -path $args[0] -ChildPath '%date%_logs.csv'
+        TimeFormat = 'yyyy-MM-dd HH:mm:ss.fff'
+        IncludeModules = 'Hawk'
+        UTC = $true
+        Enabled = $true
+    }
 
-	Set-PSFLoggingProvider @paramSetPSFLoggingProvider
+    Set-PSFLoggingProvider @paramSetPSFLoggingProvider
 }
 Set-PSFConfig -Module 'Hawk' -Name "FilePath" -Value '' -Initialize -Validation string -Handler $handler -Description 'Path where the module maintains logs and exports data'

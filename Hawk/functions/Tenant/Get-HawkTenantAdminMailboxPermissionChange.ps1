@@ -1,4 +1,4 @@
-Function Get-HawkTenantAdminMailboxPermissionChange {
+﻿Function Get-HawkTenantAdminMailboxPermissionChange {
     <#
     .SYNOPSIS
         Retrieves audit log entries for mailbox permission changes within the tenant.
@@ -68,8 +68,8 @@ Function Get-HawkTenantAdminMailboxPermissionChange {
                 $SensitiveGrants = $ParsedChanges | Where-Object {
                     # First check if this is potentially sensitive permission
                     ($_.Param_AccessRights -match 'FullAccess|SendAs' -or
-                     $_.Operation -eq 'Add-ADPermission' -or
-                     $_.Operation -match 'Add-RecipientPermission') -and
+                    $_.Operation -eq 'Add-ADPermission' -or
+                    $_.Operation -match 'Add-RecipientPermission') -and
                     # Then exclude DiscoverySearchMailbox system operations
                     -not (
                         $_.UserId -eq "NT AUTHORITY\SYSTEM (Microsoft.Exchange.ServiceHost)" -and 

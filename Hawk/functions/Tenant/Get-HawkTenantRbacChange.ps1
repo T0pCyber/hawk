@@ -78,7 +78,7 @@
     try {
         # Build search command for Get-AllUnifiedAuditLogEntry
         $searchCommand = "Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations " +
-            "'$($RBACOperations -join "','")'"
+        "'$($RBACOperations -join "','")'"
 
         # Get all RBAC changes using Get-AllUnifiedAuditLogEntry
         [array]$RBACChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand

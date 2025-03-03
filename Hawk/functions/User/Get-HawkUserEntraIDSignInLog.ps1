@@ -1,4 +1,4 @@
-Function Get-HawkUserEntraIDSignInLog {
+﻿Function Get-HawkUserEntraIDSignInLog {
     <#
     .SYNOPSIS
         Retrieves Microsoft Entra ID sign-in logs for specified users from the most recent 14 days.
@@ -143,13 +143,13 @@ Function Get-HawkUserEntraIDSignInLog {
                         
                         # Group and report risk levels
                         $duringSignIn = $riskySignIns | Group-Object -Property RiskLevelDuringSignIn | 
-                        Where-Object { $_.Name -in @('high', 'medium', 'low') }
+                            Where-Object { $_.Name -in @('high', 'medium', 'low') }
                         foreach ($risk in $duringSignIn) {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -Notice
                         }
 
                         $aggregated = $riskySignIns | Group-Object -Property RiskLevelAggregated | 
-                        Where-Object { $_.Name -in @('high', 'medium', 'low') }
+                            Where-Object { $_.Name -in @('high', 'medium', 'low') }
                         foreach ($risk in $aggregated) {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -Notice
                         }

@@ -1,31 +1,31 @@
 ﻿Function Get-HawkTenantEXOAdmin {
-<#
-.SYNOPSIS
-    Exchange Online Administrator export. Must be connected to Exchange Online using the Connect-EXO cmdlet
-.DESCRIPTION
-    After connecting to Exchange Online, this script will enumerate Exchange Online
-    role group members and export the results to a .CSV file. Reviewing EXO admins can assist with determining
-    who can change Exchange Online configurations and view
-.EXAMPLE
-    PS C:\> Export-EXOAdmin -EngagementFolder foldername
-    Exports Exchange Admins UserPrincipalName to .csv
-.OUTPUTS
-    ExchangeOnlineAdministrators.csv/.json
-.NOTES
-#>
-BEGIN {
-    # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
-        Initialize-HawkGlobalObject
-    }
-    Out-LogFile "Initiating collection of Exchange Online Admins." -Action
+    <#
+    .SYNOPSIS
+        Exchange Online Administrator export. Must be connected to Exchange Online using the Connect-EXO cmdlet
+    .DESCRIPTION
+        After connecting to Exchange Online, this script will enumerate Exchange Online
+        role group members and export the results to a .CSV file. Reviewing EXO admins can assist with determining
+        who can change Exchange Online configurations and view
+    .EXAMPLE
+        PS C:\> Export-EXOAdmin -EngagementFolder foldername
+        Exports Exchange Admins UserPrincipalName to .csv
+    .OUTPUTS
+        ExchangeOnlineAdministrators.csv/.json
+    .NOTES
+    #>
+    BEGIN {
+        # Check if Hawk object exists and is fully initialized
+        if (Test-HawkGlobalObject) {
+            Initialize-HawkGlobalObject
+        }
+        Out-LogFile "Initiating collection of Exchange Online Admins." -Action
 
-    Test-EXOConnection
-    Send-AIEvent -Event "CmdRun"
-}
-PROCESS {
-    $roles = foreach ($Role in Get-RoleGroup) {
-        $ExchangeAdmins = Get-RoleGroupMember -Identity $Role.Identity | Select-Object -Property *
+        Test-EXOConnection
+        Send-AIEvent -Event "CmdRun"
+    }
+    PROCESS {
+        $roles = foreach ($Role in Get-RoleGroup) {
+            $ExchangeAdmins = Get-RoleGroupMember -Identity $Role.Identity | Select-Object -Property *
             foreach ($admin in $ExchangeAdmins) {
                 if ([string]::IsNullOrWhiteSpace($admin.WindowsLiveId)) {
                     [PSCustomObject]@{
@@ -43,11 +43,11 @@ PROCESS {
                 }
             }
         }
-    $roles | Out-MultipleFileType -FilePrefix "ExchangeOnlineAdministrators" -csv -json
+        $roles | Out-MultipleFileType -FilePrefix "ExchangeOnlineAdministrators" -csv -json
 
-}
-END {
-    Out-Logfile "Completed exporting Exchange Online Admins." -Information
-}
+    }
+    END {
+        Out-Logfile "Completed exporting Exchange Online Admins." -Information
+    }
 
 }#End Function
