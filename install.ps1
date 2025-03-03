@@ -1035,7 +1035,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 
             if ($innerException -eq $null)
             {
-                $exception = New-object System.IO.IOException $errorMessage
+                $exception = New-Object System.IO.IOException $errorMessage
             }
             else
             {
@@ -2181,7 +2181,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 
             if ($innerException -eq $null)
             {
-                $exception = New-object System.IO.IOException $errorMessage
+                $exception = New-Object System.IO.IOException $errorMessage
             }
             else
             {

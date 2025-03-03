@@ -86,7 +86,7 @@
     }
 
     # Get the exo PS session
-    $exopssession = get-pssession | Where-Object { ($_.ConfigurationName -eq 'Microsoft.Exchange') -and ($_.State -eq 'Opened') }
+    $exopssession = Get-PSSession | Where-Object { ($_.ConfigurationName -eq 'Microsoft.Exchange') -and ($_.State -eq 'Opened') }
 
     # Gather all of the mailboxes
     Out-LogFile "Getting all Mailboxes" -Action

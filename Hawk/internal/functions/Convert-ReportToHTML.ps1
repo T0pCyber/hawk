@@ -30,11 +30,11 @@ Function Convert-ReportToHTML
     begin
     {
         # Make sure that the files are there
-        if (!(test-path $Xml))
+        if (!(Test-Path $Xml))
         {
             Write-Error "XML File not found for conversion" -ErrorAction Stop
         }
-        if (!(test-path $Xsl))
+        if (!(Test-Path $Xsl))
         {
             Write-Error "XSL File not found for Conversion" -ErrorAction Stop
         }
@@ -43,7 +43,7 @@ Function Convert-ReportToHTML
     process
     {
         # Create the output file name
-        $OutputFile = Join-Path (Split-path $xml) ((split-path $xml -Leaf).split(".")[0] + ".html")
+        $OutputFile = Join-Path (Split-Path $xml) ((Split-Path $xml -Leaf).split(".")[0] + ".html")
 
         # Run the transform on the XML and produce the HTML
         $xslt = New-Object System.Xml.Xsl.XslCompiledTransform

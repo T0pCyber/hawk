@@ -49,7 +49,7 @@
     )
 
     # Verify the provided User has the specified Operation enabled
-    $TestResult = Get-Mailbox -Identity $User | Where-Object -Property AuditOwner -eq $Operation
+    $TestResult = Get-Mailbox -Identity $User | Where-Object -Property AuditOwner -EQ $Operation
 
     if ($null -eq $TestResult)
     {

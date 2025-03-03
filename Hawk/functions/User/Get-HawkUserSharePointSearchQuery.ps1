@@ -81,7 +81,7 @@
                         $SharePointSearchesSimple = $SharePointSearches | Get-SimpleUnifiedAuditLog
 
                         #Export both raw and simplistic views to specified user's folder
-                        $SharePointSearches | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "SharePointSearches_$User" -User $User -csv -json
+                        $SharePointSearches | Select-Object -ExpandProperty AuditData | ConvertFrom-Json | Out-MultipleFileType -FilePrefix "SharePointSearches_$User" -User $User -csv -json
                         $SharePointSearchesSimple | Out-MultipleFileType -FilePrefix "Simple_SharePointSearches_$User" -User $User -csv -json
                     }
                     else

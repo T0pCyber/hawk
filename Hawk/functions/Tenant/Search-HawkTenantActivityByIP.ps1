@@ -85,7 +85,7 @@
     {
 
         # Expand out the Data and convert from JSON
-        [array]$ipeventsexpanded = $ipevents | Select-object -ExpandProperty AuditData | ConvertFrom-Json
+        [array]$ipeventsexpanded = $ipevents | Select-Object -ExpandProperty AuditData | ConvertFrom-Json
         Out-LogFile ("Found " + $ipeventsexpanded.count + " related to provided IP" ) -Information
         $ipeventsexpanded | Out-MultipleFileType -FilePrefix "All_Events" -csv -json -User $DirectoryName
 

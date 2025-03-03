@@ -28,7 +28,7 @@ Function Add-HawkAppData
     Out-LogFile ("Adding " + $value + " to " + $Name + " in HawkAppData") -Action
 
     # Test if our HawkAppData variable exists
-    if ([bool](get-variable HawkAppData -ErrorAction SilentlyContinue))
+    if ([bool](Get-Variable HawkAppData -ErrorAction SilentlyContinue))
     {
         $global:HawkAppData | Add-Member -MemberType NoteProperty -Name $Name -Value $Value
     }

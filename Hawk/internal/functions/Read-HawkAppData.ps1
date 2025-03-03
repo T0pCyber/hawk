@@ -15,10 +15,10 @@
 #>
 Function Read-HawkAppData
 {
-    $HawkAppdataPath = join-path $env:LOCALAPPDATA "Hawk\Hawk.json"
+    $HawkAppdataPath = Join-Path $env:LOCALAPPDATA "Hawk\Hawk.json"
 
     # check to see if our xml file is there
-    if (test-path $HawkAppdataPath)
+    if (Test-Path $HawkAppdataPath)
     {
         Out-LogFile ("Reading file " + $HawkAppdataPath) -Action
         $global:HawkAppData = ConvertFrom-Json -InputObject ([string](Get-Content $HawkAppdataPath))

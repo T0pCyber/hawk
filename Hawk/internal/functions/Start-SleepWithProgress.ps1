@@ -28,7 +28,7 @@ Function Start-SleepWithProgress
         Write-Progress -Activity "Sleeping" -CurrentOperation "$Timeleft More Seconds" -PercentComplete (($i / $sleeptime) * 100)
 
         # Sleep 1 second
-        start-sleep 1
+        Start-Sleep 1
     }
 
     Write-Progress -Completed -Activity "Sleeping"

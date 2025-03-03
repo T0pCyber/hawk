@@ -34,7 +34,7 @@ Function Test-MicrosoftIP
         Out-Logfile "Building MSFTIPList" -Action
 
         # Load our networking dll pulled from https://github.com/lduchosal/ipnetwork
-        [string]$dll = join-path (Split-path (((get-module Hawk)[0]).path) -Parent) "\bin\System.Net.IPNetwork.dll"
+        [string]$dll = Join-Path (Split-Path (((Get-Module Hawk)[0]).path) -Parent) "\bin\System.Net.IPNetwork.dll"
 
         $Error.Clear()
         Out-LogFile ("Loading Networking functions from " + $dll) -Action
@@ -48,7 +48,7 @@ Function Test-MicrosoftIP
 
         $Error.clear()
 
-        $MSFTJSON = (Invoke-WebRequest -uri ("https://endpoints.office.com/endpoints/Worldwide?ClientRequestId=" + (new-guid).ToString())).content | ConvertFrom-Json
+        $MSFTJSON = (Invoke-WebRequest -Uri ("https://endpoints.office.com/endpoints/Worldwide?ClientRequestId=" + (New-Guid).ToString())).content | ConvertFrom-Json
 
         if ($Error.Count -gt 0)
         {

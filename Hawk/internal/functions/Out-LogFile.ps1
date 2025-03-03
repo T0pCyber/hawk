@@ -125,7 +125,7 @@
         [switch]$NoNewLine
     )
 
-    Write-PSFMessage -Message $string -ModuleName Hawk -FunctionName (Get-PSCallstack)[1].FunctionName
+    Write-PSFMessage -Message $string -ModuleName Hawk -FunctionName (Get-PSCallStack)[1].FunctionName
 
     # Make sure we have the Hawk Global Object
     if ([string]::IsNullOrEmpty($Hawk.FilePath))
@@ -134,7 +134,7 @@
     }
 
     # Get our log file path
-    $LogFile = Join-path $Hawk.FilePath "Hawk.log"
+    $LogFile = Join-Path $Hawk.FilePath "Hawk.log"
     $ScreenOutput = -not $NoDisplay
     $LogOutput = $true
 
@@ -201,7 +201,7 @@
     {
         if ($NoNewLine)
         {
-            Write-Host $logstring -InformationAction Continue -NoNewLine
+            Write-Host $logstring -InformationAction Continue -NoNewline
         }
         else
         {

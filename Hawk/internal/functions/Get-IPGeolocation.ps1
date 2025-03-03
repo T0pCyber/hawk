@@ -22,7 +22,7 @@ Function Get-IPGeolocation
     )
 
     # If we don't have a HawkAppData variable then we need to read it in
-    if (!([bool](get-variable HawkAppData -erroraction silentlycontinue)))
+    if (!([bool](Get-Variable HawkAppData -ErrorAction silentlycontinue)))
     {
         Read-HawkAppData
     }
@@ -54,7 +54,7 @@ Function Get-IPGeolocation
     }
     elseif ($IPAddress -eq "<null>")
     {
-        write-Verbose ("Null IP Provided: " + $IPAddress)
+        Write-Verbose ("Null IP Provided: " + $IPAddress)
         $hash = @{
             IP = $IPAddress
             CountryName = "NULL IP"
@@ -73,7 +73,7 @@ Function Get-IPGeolocation
 
         # Return Data from web
         $Error.Clear()
-        $geoip = Invoke-RestMethod -Method Get -URI $resource -ErrorAction SilentlyContinue
+        $geoip = Invoke-RestMethod -Method Get -Uri $resource -ErrorAction SilentlyContinue
 
         if (($Error.Count -gt 0) -or ($null -eq $geoip.type))
         {

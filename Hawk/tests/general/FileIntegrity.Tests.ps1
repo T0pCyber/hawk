@@ -29,7 +29,7 @@ Describe "Verifying integrity of module files" {
             {
                 if ($PSVersionTable.PSVersion.Major -lt 6)
                 {
-                    [byte[]]$byte = get-content -Encoding byte -ReadCount 4 -TotalCount 4 -Path $Path
+                    [byte[]]$byte = Get-Content -Encoding byte -ReadCount 4 -TotalCount 4 -Path $Path
                 }
                 else
                 {
@@ -46,7 +46,7 @@ Describe "Verifying integrity of module files" {
     }
 
     Context "Validating PS1 Script files" {
-        $allFiles = Get-ChildItem -Path $script:moduleRoot -Recurse | Where-Object Name -like "*.ps1" | Where-Object FullName -NotLike "$script:moduleRoot\tests\*"
+        $allFiles = Get-ChildItem -Path $script:moduleRoot -Recurse | Where-Object Name -Like "*.ps1" | Where-Object FullName -NotLike "$script:moduleRoot\tests\*"
 
         foreach ($file in $allFiles)
         {
@@ -77,7 +77,7 @@ Describe "Verifying integrity of module files" {
     }
 
     Context "Validating help.txt help files" {
-        $allFiles = Get-ChildItem -Path $script:moduleRoot -Recurse | Where-Object Name -like "*.help.txt" | Where-Object FullName -NotLike "$script:moduleRoot\tests\*"
+        $allFiles = Get-ChildItem -Path $script:moduleRoot -Recurse | Where-Object Name -Like "*.help.txt" | Where-Object FullName -NotLike "$script:moduleRoot\tests\*"
 
         foreach ($file in $allFiles)
         {

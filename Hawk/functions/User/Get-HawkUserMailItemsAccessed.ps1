@@ -80,7 +80,7 @@
                         $MailboxItemsAccessedSimple = $MailboxItemsAccessed | Get-SimpleUnifiedAuditLog
 
                         #Export both raw and simplistic views to specified user's folder
-                        $MailboxItemsAccessed | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "MailItemsAccessed_$User" -User $User -csv -json
+                        $MailboxItemsAccessed | Select-Object -ExpandProperty AuditData | ConvertFrom-Json | Out-MultipleFileType -FilePrefix "MailItemsAccessed_$User" -User $User -csv -json
                         $MailboxItemsAccessedSimple | Out-MultipleFileType -FilePrefix "Simple_MailItemsAccessed_$User" -User $User -csv -json
                     }
                     else
