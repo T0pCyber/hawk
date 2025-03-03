@@ -88,7 +88,9 @@
 	'Get-HawkTenantEntraIDAuditLog',
 	'Get-HawkTenantRiskyUsers',
 	'Get-HawkTenantRiskDetections',
-	'Get-HawkUserUALInboxRuleCreation'
+	'Get-HawkUserUALInboxRuleCreation',
+	'Get-HawkUserUALInboxRuleModification',
+	'Get-HawkUserUALInboxRuleRemoval'
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''
 
