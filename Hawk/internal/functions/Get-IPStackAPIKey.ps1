@@ -16,9 +16,12 @@ function Get-IPStackAPIKey {
     param()
 
     begin {
-        [string]$newKey            = $null
-        [string]$AccessKeyFromFile = $null
-        [string]$saveChoice        = $null
+        [string]$newKey             = $null
+        [string]$AccessKeyFromFile  = $null
+        [string]$saveChoice         = $null
+        [bool]$AccessKeyValid       = $false
+        [bool]$GeoIPFromCommandLine = $Global:Hawk.EnableGeoIPLocation
+        Out-LogFile "GeoIPFromCommandLine -> $GeoIPFromCommandLine" -Information
     }
 
     process {
@@ -36,11 +39,27 @@ function Get-IPStackAPIKey {
                 }
             }
 
-            # If EnableGeoIPLocation is set to true and key exists on disk (supports Hawk automation)
-            # If the key comes back invalid, just run the program without lookuping up GeoIP data
+            # NON-INTERACTIVE MODE: If EnableGeoIPLocation is set to true and key exists on disk (supports Hawk automation)
+            # If the key comes back invalid, continue to run the program without lookuping up GeoIP data
+            if ($GeoIPFromCommandLine) {
+                if (-not [string]::IsNullOrEmpty($AccessKeyFromFile)) {
+                    Out-LogFile "GeoIP API key provided via command line: $AccessKeyFromFile" -Information
+                    $AccessKeyValid = Test-GeoIPAPIKey -Key $AccessKeyFromFile
+                    if ($AccessKeyValid) {
+                        Out-LogFile "GeoIP API key found on disk is valid." -Information
+                        return $AccessKeyFromFile
+                    } else {
+                        Out-LogFile "GeoIP API key found on disk is invalid." -isError
+                        return $null
+                    }
+                } else {
+                    Out-LogFile "GeoIP API key not found on disk." -isError
+                    return $null
+                }
+            }
 
-            # Check for existing access key on disk
-            if (-not [string]::IsNullOrEmpty($AccessKeyFromFile)){
+            # Check for existing access key on disk and prompt to use it if in interactive mode
+            if (-not [string]::IsNullOrEmpty($AccessKeyFromFile) -and (-not $GeoIPFromCommandLine)) {
                 do {
                     $maskedKey = "**************************" + $AccessKeyFromFile.Substring($AccessKeyFromFile.Length - 6)
                     Out-LogFile "Found existing API key ending in: $maskedKey" -Information
@@ -70,7 +89,8 @@ function Get-IPStackAPIKey {
             } 
 
             # If no existing access key is found on disk, prompt for a new one
-            if ([string]::IsNullOrEmpty($AccessKeyFromFile)) {
+            # Check if the user is running in interactive mode
+            if ([string]::IsNullOrEmpty($AccessKeyFromFile) -and (-not $GeoIPFromCommandLine)) {
                 # Display informational messages once before looping
                 Out-LogFile "IpStack.com requires an API access key to gather GeoIP information." -Information
                 Out-LogFile "Get your free API key at: https://ipstack.com/" -Information

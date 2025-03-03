@@ -120,11 +120,12 @@
                     }
 
                     # Get the location information for this IP address
-                    if($ExpandedUserLogonLogs.item($i).clientip){
+                    # Need to perform access key value only once instead of for each IP address
+                    if($ExpandedUserLogonLogs.item($i).clientip -and ([string]::IsNullOrEmpty($AccessKey) -eq $false)) {
                         $Location = Get-IPGeolocation -IPAddress $ExpandedUserLogonLogs.item($i).clientip -AccessKey $AccessKey
                     }
                     else {
-                        $Location = "IP Address Null"
+                        $Location = "Valid REST API Key was not provided or IP address was not found"
                     }
 
                     # Combine the connection object and the location object so that we have a single output ready
