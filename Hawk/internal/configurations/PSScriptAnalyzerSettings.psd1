@@ -20,6 +20,10 @@
         'PSUseSingularNouns'
         # Exclude this to allow test assignments to $PSBoundParameters for mocking
         'PSAvoidAssignmentToAutomaticVariable'
+        # Exclude the following three rules for now as they are not a priority.
+        'PSAvoidOverwritingBuiltInCmdlets'
+        'PSAvoidUsingInvokeExpression'
+        'PSUseShouldProcessForStateChangingFunctions'
     )
     Rules = @{
 
