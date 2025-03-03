@@ -107,7 +107,7 @@
 - Added log pull of user Send activity to the User Investigation (Get-HawkUserMailSendActivity)
 - Added log pull of user SharePoint Search activity to the User Investigation (Get-HawkUserSharePointSearchQuery)
 
-## 4.0.1 (2025-3-02)
+## 4.0.1 (2025-3-0X)
 - Fixed bug in Get-IPGeolocation where API Keys from ipstack.com were not validated
 - Fixed bug in Get-IPGeolocation where API Keys were not validated to meet basic sanity checks/requirements
 - Added commandline agrument '-EnableGeoIPLocation' to Start-HawkUserInvestigation providing the ability to skip interactive prompts when conducting investigations.
