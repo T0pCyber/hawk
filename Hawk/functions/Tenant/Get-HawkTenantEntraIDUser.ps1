@@ -34,13 +34,13 @@
     PROCESS {
         # Get all users with specific properties needed for DFIR
         # -Property parameter optimizes API call to only retrieve needed fields
-        $users = Get-MgUser -All -Property UserPrincipalName,    # Primary user identifier
-            DisplayName,                                         # User's display name
-            Id,                                                 # Unique object ID
-            AccountEnabled,                                     # Account status (active/disabled)
-            CreatedDateTime,                                    # Account creation timestamp
-            DeletedDateTime,                                    # Account deletion timestamp (if applicable)
-            LastPasswordChangeDateTime,                         # Last password modification
+        $users = Get-MgUser -All -Property UserPrincipalName, # Primary user identifier
+            DisplayName, # User's display name
+            Id, # Unique object ID
+            AccountEnabled, # Account status (active/disabled)
+            CreatedDateTime, # Account creation timestamp
+            DeletedDateTime, # Account deletion timestamp (if applicable)
+            LastPasswordChangeDateTime, # Last password modification
             Mail |                                             # Primary email address
             Select-Object UserPrincipalName,
                 DisplayName,

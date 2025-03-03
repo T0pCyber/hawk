@@ -1,4 +1,4 @@
-﻿Function Get-HawkTenantEntraIDAppAuditLog{
+﻿Function Get-HawkTenantEntraIDAppAuditLog {
 <#
 .SYNOPSIS
     Retrieves audit logs for application permission and consent events in Microsoft Entra ID.
@@ -71,7 +71,7 @@ Begin {
     Send-AIEvent -Event "CmdRun"
 }#End BEGIN
 
-PROCESS{
+PROCESS {
 # Make sure our variables are null
 $AzureApplicationActivityEvents = $null
 
@@ -82,7 +82,7 @@ Out-LogFile "Initiating collection of Entra ID application audit events from the
 $AzureApplicationActivityEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Add OAuth2PermissionGrant.','Consent to application.' ")
 
 # If null we found no changes to nothing to do here
-if ($null -eq $AzureApplicationActivityEvents){
+if ($null -eq $AzureApplicationActivityEvents) {
 	Out-LogFile "Get-HawkTenantEntraIDAppAuditLog completed successfully" -Information
 	Out-LogFile "No Application related events found in the search time frame." -Action
 }
@@ -93,7 +93,7 @@ else {
 	Out-LogFile "Please review these Entra_ID_Application_Audit.csv to ensure any changes are legitimate." -Notice
 
 	# Go thru each even and prepare it to output to CSV
-	Foreach ($event in $AzureApplicationActivityEvents){
+	Foreach ($event in $AzureApplicationActivityEvents) {
 
 		$event.auditdata | ConvertFrom-Json | Select-Object -Property Id,
 			Operation,
@@ -101,15 +101,15 @@ else {
 			Workload,
 			ClientIP,
 			UserID,
-			@{Name='ActorUPN';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'actorUPN'}).value}},
-			@{Name='targetName';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'targetName'}).value}},
-			@{Name='env_time';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'env_time'}).value}},
-			@{Name='correlationId';Expression={($_.ExtendedProperties | Where-Object {$_.Name -eq 'correlationId'}).value}}`
+			@{Name = 'ActorUPN'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'actorUPN' }).value } },
+			@{Name = 'targetName'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'targetName' }).value } },
+			@{Name = 'env_time'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'env_time' }).value } },
+			@{Name = 'correlationId'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'correlationId' }).value } }`
 			| Out-MultipleFileType -fileprefix "Entra_ID_Application_Audit" -csv -json -append
 	}
 }
 }#End PROCESS
-END{
+END {
 Out-LogFile "Completed collection of Entra ID application audit events from the UAL." -Information 
 }#End END
 }

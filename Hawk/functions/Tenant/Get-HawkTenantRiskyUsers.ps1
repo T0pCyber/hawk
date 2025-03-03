@@ -1,4 +1,4 @@
-Function Get-HawkTenantRiskyUsers {
+﻿Function Get-HawkTenantRiskyUsers {
     <#
     .SYNOPSIS
         Retrieves and analyzes users flagged as risky in Microsoft Entra ID.
@@ -67,10 +67,10 @@ Function Get-HawkTenantRiskyUsers {
             
             # Define risk level order for consistent sorting
             $riskOrder = @{
-                'high'   = 1
+                'high' = 1
                 'medium' = 2
-                'low'    = 3
-                'none'   = 4
+                'low' = 3
+                'none' = 4
             }
             
             # Log summary of users by risk level

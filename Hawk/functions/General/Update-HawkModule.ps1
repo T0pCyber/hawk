@@ -46,7 +46,7 @@
                $Localversion = (Get-Module Hawk | Sort-Object -Property Version -Descending)[0]
                Out-LogFile ("Found Version " + $onlineversion.version + " Online") -Information
 
-               if ($null -eq $onlineversion){
+               if ($null -eq $onlineversion) {
                    Out-LogFile "[ERROR] - Unable to check Hawk version in Gallery" -isError 
                }
                elseif (([version]$onlineversion.version) -gt ([version]$localversion.version)) {

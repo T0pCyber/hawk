@@ -26,7 +26,7 @@ Function Get-HawkTenantDomainActivity {
 
 	Searches for all Domain configuration actions
 #>
-	BEGIN{
+	BEGIN {
 		# Check if Hawk object exists and is fully initialized
 		if (Test-HawkGlobalObject) {
 			Initialize-HawkGlobalObject
@@ -37,21 +37,21 @@ Function Get-HawkTenantDomainActivity {
 
 		Out-LogFile "Initiating collection of domain configuration changes from the UAL." -Action
 	}
-	PROCESS{
+	PROCESS {
 		# Search UAL audit logs for any Domain configuration changes
 		$DomainConfigurationEvents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -RecordType 'AzureActiveDirectory' -Operations 'Set-AcceptedDomain','Add-FederatedDomain','Update Domain','Add verified domain', 'Add unverified domain', 'remove unverified domain'")
 		# If null we found no changes to nothing to do here
-			if ($null -eq $DomainConfigurationEvents){
+			if ($null -eq $DomainConfigurationEvents) {
 			Out-LogFile "Get-HawkTenantDomainActivity completed successfully" -Information
 			Out-LogFile "No Domain configuration changes found." -Action
 		}
 		# If not null then we must have found some events so flag them
-		else{
+		else {
 			Out-LogFile "Domain configuration changes found." -Notice
 			Out-LogFile "Please review these Domain_Changes_Audit to ensure any changes are legitimate." -Notice
 
 			# Go thru each even and prepare it to output to CSV
-			Foreach ($event in $DomainConfigurationEvents){
+			Foreach ($event in $DomainConfigurationEvents) {
 				$log1 = $event.auditdata | ConvertFrom-Json
 				<#
 				$domainarray = $log1.ModifiedProperties
@@ -85,7 +85,7 @@ Function Get-HawkTenantDomainActivity {
 			}
 		}
 	}
-END{
+END {
 	Out-LogFile "Completed collection of domain configuration changes from the UAL." -Information
 }
 }#End Function Get-HawkTenantDomainActivity

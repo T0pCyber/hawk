@@ -276,7 +276,7 @@ Function Convert-ReceiveHeader {
         # Create the hash to generate the output object
         $fromhash = @{
             ReceivedFrom = $headerMatches.Matches.groups[1].value.trim()
-            ReceivedBy   = $headerMatches.Matches.groups[2].value.trim()
+            ReceivedBy = $headerMatches.Matches.groups[2].value.trim()
             ReceivedWith = $with
             ReceivedTime = [datetime]($headerMatches.Matches.groups[4].value.trim())
         }

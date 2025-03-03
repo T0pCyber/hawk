@@ -62,13 +62,13 @@
                 # Process key credentials
                 foreach ($key in $spn.KeyCredentials) {
                     $newapp = [PSCustomObject]@{
-                        AppName     = $spn.DisplayName
+                        AppName = $spn.DisplayName
                         AppObjectID = $spn.Id
-                        KeyID       = $key.KeyId
-                        StartDate   = $key.StartDateTime
-                        EndDate     = $key.EndDateTime
-                        KeyType     = $key.Type
-                        CredType    = "X509Certificate"
+                        KeyID = $key.KeyId
+                        StartDate = $key.StartDateTime
+                        EndDate = $key.EndDateTime
+                        KeyType = $key.Type
+                        CredType = "X509Certificate"
                     }
                     # Add to array for JSON output
                     $spnResults += $newapp
@@ -79,13 +79,13 @@
                 # Process password credentials
                 foreach ($pass in $spn.PasswordCredentials) {
                     $newapp = [PSCustomObject]@{
-                        AppName     = $spn.DisplayName
+                        AppName = $spn.DisplayName
                         AppObjectID = $spn.Id
-                        KeyID       = $pass.KeyId
-                        StartDate   = $pass.StartDateTime
-                        EndDate     = $pass.EndDateTime
-                        KeyType     = $null
-                        CredType    = "PasswordSecret"
+                        KeyID = $pass.KeyId
+                        StartDate = $pass.StartDateTime
+                        EndDate = $pass.EndDateTime
+                        KeyType = $null
+                        CredType = "PasswordSecret"
                     }
                     # Add to array for JSON output
                     $spnResults += $newapp
@@ -104,13 +104,13 @@
                 # Process key credentials
                 foreach ($key in $app.KeyCredentials) {
                     $newapp = [PSCustomObject]@{
-                        AppName     = $app.DisplayName
+                        AppName = $app.DisplayName
                         AppObjectID = $app.Id
-                        KeyID       = $key.KeyId
-                        StartDate   = $key.StartDateTime
-                        EndDate     = $key.EndDateTime
-                        KeyType     = $key.Type
-                        CredType    = "X509Certificate"
+                        KeyID = $key.KeyId
+                        StartDate = $key.StartDateTime
+                        EndDate = $key.EndDateTime
+                        KeyType = $key.Type
+                        CredType = "X509Certificate"
                     }
                     # Add to array for JSON output
                     $appResults += $newapp
@@ -121,13 +121,13 @@
                 # Process password credentials
                 foreach ($pass in $app.PasswordCredentials) {
                     $newapp = [PSCustomObject]@{
-                        AppName     = $app.DisplayName
+                        AppName = $app.DisplayName
                         AppObjectID = $app.Id
-                        KeyID       = $pass.KeyId
-                        StartDate   = $pass.StartDateTime
-                        EndDate     = $pass.EndDateTime
-                        KeyType     = $pass.Type
-                        CredType    = "PasswordSecret"
+                        KeyID = $pass.KeyId
+                        StartDate = $pass.StartDateTime
+                        EndDate = $pass.EndDateTime
+                        KeyType = $pass.Type
+                        CredType = "PasswordSecret"
                     }
                     # Add to array for JSON output
                     $appResults += $newapp

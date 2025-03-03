@@ -1,4 +1,4 @@
-Function Get-HawkTenantAdminEmailForwardingChange {
+﻿Function Get-HawkTenantAdminEmailForwardingChange {
     <#
     .SYNOPSIS
         Retrieves audit log entries for email forwarding changes made within the tenant.
@@ -92,7 +92,7 @@ Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations @(
                     'ExternalEmailAddress',
                     'PrimarySmtpAddress',
                     'RedirectTo',            
-                    'DeliverToMailboxAndForward',  # Corrected parameter name
+                    'DeliverToMailboxAndForward', # Corrected parameter name
                     'DeliverToAndForward'     # Alternative parameter name
                 ) -or
                 # Check for parameter changes enabling forwarding

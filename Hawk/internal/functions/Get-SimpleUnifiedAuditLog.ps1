@@ -238,10 +238,10 @@
             # Handle and log any processing errors
             Write-Warning "Error processing record: $_"
             $errorProperties = @{
-                RecordType   = $Record.RecordType
+                RecordType = $Record.RecordType
                 CreationDate = Get-Date
-                Error        = $_.Exception.Message
-                Record       = $Record
+                Error = $_.Exception.Message
+                Record = $Record
             }
             $Results += [PSCustomObject]$errorProperties
         }

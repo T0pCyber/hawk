@@ -78,7 +78,7 @@
     # If yes log and continue
     # If no log error and exit
     switch ($result) {
-        0 { Out-LogFile "Starting full Tenant Search" -Action}
+        0 { Out-LogFile "Starting full Tenant Search" -Action }
         1 { Write-Error -Message "User Stopped Cmdlet" -ErrorAction Stop }
     }
 

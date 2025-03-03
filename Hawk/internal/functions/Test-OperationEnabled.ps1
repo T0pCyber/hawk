@@ -1,4 +1,4 @@
-Function Test-OperationEnabled {
+﻿Function Test-OperationEnabled {
     <#
     .SYNOPSIS
         Tests if a specified audit operation is enabled for a given user.
@@ -41,9 +41,9 @@ Function Test-OperationEnabled {
     [CmdletBinding()]
     [OutputType([bool])]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$User,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$Operation
     )
 

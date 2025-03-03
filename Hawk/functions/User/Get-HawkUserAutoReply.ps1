@@ -47,7 +47,7 @@
 
         # Get Autoreply Configuration
         Out-LogFile "Initiating collection of auto-reply configuration for $User from Exchange Online." -Action
-        $AutoReply = Get-MailboxAutoReplyConfiguration -Identity  $User
+        $AutoReply = Get-MailboxAutoReplyConfiguration -Identity $User
 
         # Check if the Autoreply is Disabled
         if ($AutoReply.AutoReplyState -eq 'Disabled') {
