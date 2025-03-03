@@ -104,8 +104,8 @@
                 @{Name = 'ActorUPN'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'actorUPN' }).value } },
                 @{Name = 'targetName'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'targetName' }).value } },
                 @{Name = 'env_time'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'env_time' }).value } },
-                @{Name = 'correlationId'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'correlationId' }).value } }`
-                | Out-MultipleFileType -fileprefix "Entra_ID_Application_Audit" -csv -json -append
+                @{Name = 'correlationId'; Expression = { ($_.ExtendedProperties | Where-Object { $_.Name -eq 'correlationId' }).value } } | `
+                        Out-MultipleFileType -fileprefix "Entra_ID_Application_Audit" -csv -json -append
             }
         }
     }#End PROCESS
