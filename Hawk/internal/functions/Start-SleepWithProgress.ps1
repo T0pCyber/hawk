@@ -20,10 +20,10 @@ Function Start-SleepWithProgress {
 
     # Loop Number of seconds you want to sleep
     For ($i = 0; $i -le $sleeptime; $i++) {
-        $timeleft = ($sleeptime - $i);
+        $timeleft = ($sleeptime - $i)
 
         # Progress bar showing progress of the sleep
-        Write-Progress -Activity "Sleeping" -CurrentOperation "$Timeleft More Seconds" -PercentComplete (($i / $sleeptime) * 100);
+        Write-Progress -Activity "Sleeping" -CurrentOperation "$Timeleft More Seconds" -PercentComplete (($i / $sleeptime) * 100)
 
         # Sleep 1 second
         start-sleep 1

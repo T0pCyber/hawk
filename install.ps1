@@ -270,7 +270,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 				$path
 			)
 
-			$result = $true;
+			$result = $true
 
 			# null and empty check are are already done on Path parameter at the cmdlet layer.
 			foreach ($currentPath in $path)
@@ -282,7 +282,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 				}
 			}
 
-			return $result;
+			return $result
 		}
 
 
@@ -1197,7 +1197,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 		$resolvedPaths = GetResolvedPathHelper $inputPaths $isLiteralPathUsed $PSCmdlet
 		IsValidFileSystemPath $resolvedPaths | Out-Null
 
-		$sourcePath = $resolvedPaths;
+		$sourcePath = $resolvedPaths
 
 		# CSVHelper: This is a helper function used to append comma after each path specifid by
 		# the $sourcePath array. The comma saperated paths are displayed in the -WhatIf message.
@@ -1416,7 +1416,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 				$path
 			)
 
-			$result = $true;
+			$result = $true
 
 			# null and empty check are are already done on Path parameter at the cmdlet layer.
 			foreach ($currentPath in $path)
@@ -1428,7 +1428,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 				}
 			}
 
-			return $result;
+			return $result
 		}
 
 
