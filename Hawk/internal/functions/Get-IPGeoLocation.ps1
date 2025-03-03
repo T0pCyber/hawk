@@ -21,7 +21,7 @@ function Get-IPGeoLocation {
         [Parameter(Mandatory = $true)]
         [string]$IPAddress,
         
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $true)]
         [string]$AccessKey
     )
 
