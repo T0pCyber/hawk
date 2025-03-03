@@ -41,9 +41,9 @@ Function Convert-ReportToHTML {
         $OutputFile = Join-Path (Split-path $xml) ((split-path $xml -Leaf).split(".")[0] + ".html")
 
         # Run the transform on the XML and produce the HTML
-        $xslt = New-Object System.Xml.Xsl.XslCompiledTransform;
-        $xslt.Load($xsl);
-        $xslt.Transform($xml, $OutputFile);
+        $xslt = New-Object System.Xml.Xsl.XslCompiledTransform
+        $xslt.Load($xsl)
+        $xslt.Transform($xml, $OutputFile)
     }
     end
     { }
