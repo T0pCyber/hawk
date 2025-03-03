@@ -20,7 +20,6 @@ function Get-IPStackAPIKey {
         [string]$AccessKeyFromFile  = $null
         [string]$saveChoice         = $null
         [bool]$GeoIPFromCommandLine = $Global:Hawk.GeoIPNonInteractive
-        Out-LogFile "IPSTACKIPKEY::GeoIPFromCommandLine: $GeoIPFromCommandLine" -Information
     }
 
     process {
@@ -42,7 +41,8 @@ function Get-IPStackAPIKey {
             # If the key comes back invalid, continue to run the program without lookuping up GeoIP data
             if ($GeoIPFromCommandLine) {
                 if (-not [string]::IsNullOrEmpty($AccessKeyFromFile)) {
-                    Out-LogFile "GeoIP API key provided via command line: $AccessKeyFromFile" -Information
+                    $maskedKey = "**************************" + $AccessKeyFromFile.Substring($AccessKeyFromFile.Length - 6)
+                    Out-LogFile "GeoIP API key provided via command line: $maskedKey" -Information
                     $AccessKeyValid = Test-GeoIPAPIKey -Key $AccessKeyFromFile
                     if ($AccessKeyValid) {
                         Out-LogFile "GeoIP API key found on disk is valid." -Information
@@ -59,6 +59,7 @@ function Get-IPStackAPIKey {
             }
 
             # Check for existing access key on disk and prompt to use it if in interactive mode
+            # GeoIPFromCommandLine is set to true when running in non-interactive mode
             if (-not [string]::IsNullOrEmpty($AccessKeyFromFile) -and (-not $GeoIPFromCommandLine)) {
                 do {
                     $maskedKey = "**************************" + $AccessKeyFromFile.Substring($AccessKeyFromFile.Length - 6)

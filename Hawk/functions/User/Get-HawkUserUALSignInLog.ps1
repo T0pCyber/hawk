@@ -104,11 +104,12 @@
 
             # Add Geo IP location information to the data
             if ($PSBoundParameters.ContainsKey('ResolveIPLocations')) {
-                Out-LogFile "Resolving IP Locations" -Action
+                Out-LogFile "Attemping to resolve IP Locations" -Information
                 # Setup our counter
                 $i = 0
 
                 # Conduct IPStack API Key validation (once) so the API Key can be passed to Get-IPGeolocation
+                # Get-IPStackAPIKey either returns a valid API key or null
                 $AccessKey = Get-IPStackAPIKey
 
                 # Loop thru each connection and get the Geo IP location
@@ -125,7 +126,7 @@
                         $Location = Get-IPGeolocation -IPAddress $ExpandedUserLogonLogs.item($i).clientip -AccessKey $AccessKey
                     }
                     else {
-                        $Location = "Valid REST API Key was not provided or IP address was not found"
+                        $Location = "Lack valid REST API key or IP address was not found"
                     }
 
                     # Combine the connection object and the location object so that we have a single output ready
