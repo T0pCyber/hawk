@@ -33,7 +33,7 @@
     }
 
     # build our search command to execute
-    $cmd = $UnifiedSearch + " -StartDate `'" + (get-date ($StartDate) -UFormat %m/%d/%Y) + "`' -EndDate `'" + (get-date ($endDate) -UFormat %m/%d/%Y) + "`' -SessionCommand ReturnLargeSet -resultsize 5000 -sessionid " + (Get-Date -UFormat %H%M%S)
+    $cmd = $UnifiedSearch + " -StartDate `'" + (Get-Date ($StartDate) -UFormat %m/%d/%Y) + "`' -EndDate `'" + (Get-Date ($endDate) -UFormat %m/%d/%Y) + "`' -SessionCommand ReturnLargeSet -resultsize 5000 -sessionid " + (Get-Date -UFormat %H%M%S)
     Out-LogFile ("Running Unified Audit Log Search") -Action
     Out-Logfile $cmd -NoDisplay
     

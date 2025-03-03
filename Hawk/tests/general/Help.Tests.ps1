@@ -47,7 +47,7 @@ Param (
 if ($SkipTest) { return }
 . $ExceptionsFile
 
-$includedNames = (Get-ChildItem $CommandPath -Recurse -File | Where-Object Name -like "*.ps1").BaseName
+$includedNames = (Get-ChildItem $CommandPath -Recurse -File | Where-Object Name -Like "*.ps1").BaseName
 $commandTypes = @('Cmdlet', 'Function')
 if ($PSVersionTable.PSEdition -eq 'Desktop' ) { $commandTypes += 'Workflow' }
 $commands = Get-Command -Module (Get-Module $ModuleName) -CommandType $commandTypes | Where-Object Name -In $includedNames
@@ -92,7 +92,7 @@ foreach ($command in $commands)
 
             $common = 'Debug', 'ErrorAction', 'ErrorVariable', 'InformationAction', 'InformationVariable', 'OutBuffer', 'OutVariable', 'PipelineVariable', 'Verbose', 'WarningAction', 'WarningVariable'
 
-            $parameters = $command.ParameterSets.Parameters | Sort-Object -Property Name -Unique | Where-Object Name -notin $common
+            $parameters = $command.ParameterSets.Parameters | Sort-Object -Property Name -Unique | Where-Object Name -NotIn $common
             $parameterNames = $parameters.Name
             $HelpParameterNames = $Help.Parameters.Parameter.Name | Sort-Object -Unique
             foreach ($parameter in $parameters)

@@ -40,7 +40,7 @@ $config.TestResult.Enabled = $true
 if ($TestGeneral)
 {
     Write-PSFMessage -Level Important -Message "Modules imported, proceeding with general tests"
-    foreach ($file in (Get-ChildItem "$PSScriptRoot\general" | Where-Object Name -like "*.Tests.ps1"))
+    foreach ($file in (Get-ChildItem "$PSScriptRoot\general" | Where-Object Name -Like "*.Tests.ps1"))
     {
         if ($file.Name -notlike $Include) { continue }
         if ($file.Name -like $Exclude) { continue }
@@ -55,7 +55,7 @@ if ($TestGeneral)
         {
             $totalRun += $result.TotalCount
             $totalFailed += $result.FailedCount
-            $result.Tests | Where-Object Result -ne 'Passed' | ForEach-Object {
+            $result.Tests | Where-Object Result -NE 'Passed' | ForEach-Object {
                 $testresults += [pscustomobject]@{
                     Block = $_.Block
                     Name = "It $($_.Name)"
@@ -77,8 +77,8 @@ if ($TestFunctions)
     Write-PSFMessage -Level Important -Message "Proceeding with individual tests"
     # Get both regular and internal function tests
     $testFiles = @(
-        Get-ChildItem "$PSScriptRoot\functions" -Recurse -File | Where-Object Name -like "*Tests.ps1"
-        Get-ChildItem "$PSScriptRoot\internal\functions" -Recurse -File | Where-Object Name -like "*Tests.ps1"
+        Get-ChildItem "$PSScriptRoot\functions" -Recurse -File | Where-Object Name -Like "*Tests.ps1"
+        Get-ChildItem "$PSScriptRoot\internal\functions" -Recurse -File | Where-Object Name -Like "*Tests.ps1"
     )
     foreach ($file in $testFiles)
     {
@@ -96,7 +96,7 @@ if ($TestFunctions)
         {
             $totalRun += $result.TotalCount
             $totalFailed += $result.FailedCount
-            $result.Tests | Where-Object Result -ne 'Passed' | ForEach-Object {
+            $result.Tests | Where-Object Result -NE 'Passed' | ForEach-Object {
                 $testresults += [pscustomobject]@{
                     Block = $_.Block
                     Name = "It $($_.Name)"

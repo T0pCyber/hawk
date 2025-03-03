@@ -82,7 +82,7 @@
                         $ExchangeSearchesSimple = $ExchangeSearches | Get-SimpleUnifiedAuditLog
 
                         #Export both raw and simplistic views to specified user's folder
-                        $ExchangeSearches | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "ExchangeSearchQueries_$User" -User $User -csv -json
+                        $ExchangeSearches | Select-Object -ExpandProperty AuditData | ConvertFrom-Json | Out-MultipleFileType -FilePrefix "ExchangeSearchQueries_$User" -User $User -csv -json
                         $ExchangeSearchesSimple | Out-MultipleFileType -FilePrefix "Simple_ExchangeSearchQueries_$User" -User $User -csv -json
                     }
                     else

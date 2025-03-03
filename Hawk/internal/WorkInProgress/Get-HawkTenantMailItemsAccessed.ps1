@@ -56,7 +56,7 @@
     {
         $MailboxItemsAccessed = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -Operations 'MailItemsAccessed' -FreeText $ApplicationID ")
 
-        $MailboxItemsAccessed | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "MailItemsAccessed" -csv -json
+        $MailboxItemsAccessed | Select-Object -ExpandProperty AuditData | ConvertFrom-Json | Out-MultipleFileType -FilePrefix "MailItemsAccessed" -csv -json
     }#End Process
 
     END

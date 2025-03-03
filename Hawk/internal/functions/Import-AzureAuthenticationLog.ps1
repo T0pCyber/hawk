@@ -40,7 +40,7 @@ Function Import-AzureAuthenticationLog
         $processedentry = New-Object -TypeName PSobject
     
         # Look at each member of the entry ... we want to process each in turn and add them to a new object
-        foreach ($member in ($entry | get-member -MemberType NoteProperty))
+        foreach ($member in ($entry | Get-Member -MemberType NoteProperty))
         {
     
             # Identity unique properties and add to property list of base object if not present
@@ -67,7 +67,7 @@ Function Import-AzureAuthenticationLog
                             if ($baseproperties -contains $object.name) { }
                             else
                             {
-                                $baseproperties.add($object.name) | out-null
+                                $baseproperties.add($object.name) | Out-Null
                             }
     
                             # For some entries a property can appear in ExtendedProperties and as a normal property
@@ -137,7 +137,7 @@ Function Import-AzureAuthenticationLog
                 }
                 Creationtime
                 {
-                    $processedentry | Add-Member -MemberType NoteProperty -Name CreationTime -value (get-date $entry.Creationtime -format g)
+                    $processedentry | Add-Member -MemberType NoteProperty -Name CreationTime -Value (Get-Date $entry.Creationtime -Format g)
                 }
                 Default
                 {
@@ -172,7 +172,7 @@ Function Import-AzureAuthenticationLog
     {
         switch ($propertyname)
         {
-            CreationTime { $baseobject | Add-Member -MemberType NoteProperty -Name $propertyname -Value (get-date 01/01/1900 -format g) }
+            CreationTime { $baseobject | Add-Member -MemberType NoteProperty -Name $propertyname -Value (Get-Date 01/01/1900 -Format g) }
             Default { $baseobject | Add-Member -MemberType NoteProperty -Name $propertyname -Value "Base" }
         }
     }

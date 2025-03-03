@@ -46,7 +46,7 @@ Function Compress-HawkData
     #Out-LogFile ("Found " + $allfiles.count + " files to add to zip")
 
     # create the zip file name
-    [string]$zipname = "Hawk_" + (Split-path $Hawk.filepath -Leaf) + ".zip"
+    [string]$zipname = "Hawk_" + (Split-Path $Hawk.filepath -Leaf) + ".zip"
     [string]$zipfullpath = Join-Path $env:TEMP $zipname
 
     Out-LogFile ("Creating temporary zip file " + $zipfullpath)

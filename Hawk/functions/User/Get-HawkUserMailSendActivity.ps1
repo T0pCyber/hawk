@@ -81,7 +81,7 @@
                         $ExchangeSendsSimple = $ExchangeSends | Get-SimpleUnifiedAuditLog
 
                         #Export both raw and simplistic views to specified user's folder
-                        $ExchangeSends | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "SendActivity_$User" -User $User -csv -json
+                        $ExchangeSends | Select-Object -ExpandProperty AuditData | ConvertFrom-Json | Out-MultipleFileType -FilePrefix "SendActivity_$User" -User $User -csv -json
                         $ExchangeSendsSimple | Out-MultipleFileType -FilePrefix "Simple_SendActivity_$User" -User $User -csv -json
                     }
                     else

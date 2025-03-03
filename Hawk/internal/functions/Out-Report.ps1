@@ -43,7 +43,7 @@
     # Set our output path
     # Single report file for all outputs user/tenant/etc.
     # This might change in the future???
-    $reportpath = Join-path $hawk.filepath report.xml
+    $reportpath = Join-Path $hawk.filepath report.xml
     
     # Switch statement to handle the state to color mapping
     switch ($State)
@@ -55,14 +55,14 @@
     }
     
     # Check if we have our XSL file in the output directory
-    $xslpath = Join-path $hawk.filepath Report.xsl
+    $xslpath = Join-Path $hawk.filepath Report.xsl
     
     if (Test-Path $xslpath ) { }
     else
     {
         # Copy the XSL file into the current output path
-        $sourcepath = join-path (split-path (Get-Module Hawk).path) report.xsl
-        if (test-path $sourcepath)
+        $sourcepath = Join-Path (Split-Path (Get-Module Hawk).path) report.xsl
+        if (Test-Path $sourcepath)
         {
             Copy-Item -Path $sourcepath -Destination $hawk.filepath
         }
@@ -75,10 +75,10 @@
     
     # See if we have already created a report file
     # If so we need to import it
-    if (Test-path $reportpath)
+    if (Test-Path $reportpath)
     {
         $reportxml = $null
-        [xml]$reportxml = get-content $reportpath
+        [xml]$reportxml = Get-Content $reportpath
     }
     # Since we have NOTHING we will create a new XML and just add / save / and exit
     else

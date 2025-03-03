@@ -71,7 +71,7 @@
             #https://haveibeenpwned.com/API/v3#ResponseCodes contains the response codes for the API
             try
             {
-                $Result = Invoke-WebRequest -Uri $InvokeURL -Headers $headers -userAgent 'Hawk' -ErrorAction Stop
+                $Result = Invoke-WebRequest -Uri $InvokeURL -Headers $headers -UserAgent 'Hawk' -ErrorAction Stop
             }
             catch
             {
@@ -81,17 +81,17 @@
                 {
                     NotFound
                     {
-                        write-host "Email Provided Not Found in Pwned Database"
+                        Write-Host "Email Provided Not Found in Pwned Database"
                         return
                     }
                     Unauthorized
                     {
-                        write-host "Unauthorised Access - API key provided is not valid or has expired"
+                        Write-Host "Unauthorised Access - API key provided is not valid or has expired"
                         return
                     }
                     Default
                     {
-                        write-host $ErrorMessage
+                        Write-Host $ErrorMessage
                         return
                     }
                 }

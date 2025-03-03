@@ -46,7 +46,7 @@
         else
         {
             Out-LogFile "Checking for latest version online" -Action
-            $onlineversion = Find-Module -name Hawk -erroraction silentlycontinue
+            $onlineversion = Find-Module -Name Hawk -ErrorAction silentlycontinue
             $Localversion = (Get-Module Hawk | Sort-Object -Property Version -Descending)[0]
             Out-LogFile ("Found Version " + $onlineversion.version + " Online") -Information
 

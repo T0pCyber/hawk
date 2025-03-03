@@ -15,11 +15,11 @@
 #>
 Function Out-HawkAppData
 {
-    $HawkAppdataPath = join-path $env:LOCALAPPDATA "Hawk\Hawk.json"
-    $HawkAppdataFolder = join-path $env:LOCALAPPDATA "Hawk"
+    $HawkAppdataPath = Join-Path $env:LOCALAPPDATA "Hawk\Hawk.json"
+    $HawkAppdataFolder = Join-Path $env:LOCALAPPDATA "Hawk"
 
     # test if the folder exists
-    if (test-path $HawkAppdataFolder) { }
+    if (Test-Path $HawkAppdataFolder) { }
     # if it doesn't we need to create it
     else
     {

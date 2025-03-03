@@ -61,9 +61,9 @@ Function Out-MultipleFileType
         # Set the output path
         if ([string]::IsNullOrEmpty($User))
         {
-            $path = join-path $Hawk.filepath "\Tenant"
+            $path = Join-Path $Hawk.filepath "\Tenant"
             # Test the path if it is there do nothing otherwise create it
-            if (test-path $path) { }
+            if (Test-Path $path) { }
             else
             {
                 Out-LogFile ("Making output directory for Tenant " + $Path) -Action
@@ -72,7 +72,7 @@ Function Out-MultipleFileType
         }
         else
         {
-            $path = join-path $Hawk.filepath $user
+            $path = Join-Path $Hawk.filepath $user
 
             # Set a bool so we know this is a user output
             [bool]$UserOutput = $true
@@ -80,7 +80,7 @@ Function Out-MultipleFileType
             [string]$ShortUser = ($User.split('@'))[0]
 
             # Test the path if it is there do nothing otherwise create it
-            if (test-path $path) { }
+            if (Test-Path $path) { }
             else
             {
                 Out-LogFile ("Making output directory for user " + $Path) -Action
@@ -111,8 +111,8 @@ Function Out-MultipleFileType
             if ($xml -eq $true)
             {
                 # lets put the xml files in a seperate directory to not clutter things up
-                $xmlpath = Join-path $Path XML
-                if (Test-path $xmlPath) { }
+                $xmlpath = Join-Path $Path XML
+                if (Test-Path $xmlPath) { }
                 else
                 {
                     Out-LogFile ("Making output directory for xml files " + $xmlPath) -Action

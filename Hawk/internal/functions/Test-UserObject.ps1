@@ -43,7 +43,7 @@ Function Test-UserObject
     }
     # Case 3 - Array of objects
     # Validate that at least one object in the array contains a UserPrincipalName Property
-    elseif ([bool](get-member -inputobject $ToTest[0] -name UserPrincipalName -MemberType Properties))
+    elseif ([bool](Get-Member -InputObject $ToTest[0] -Name UserPrincipalName -MemberType Properties))
     {
         Return $ToTest
     }
