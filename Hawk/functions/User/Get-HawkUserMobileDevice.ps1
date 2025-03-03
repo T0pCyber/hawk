@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserMobileDevice {
+﻿Function Get-HawkUserMobileDevice
+{
     <#
 .SYNOPSIS
     Gathers mobile devices that are connected to the account
@@ -32,7 +33,8 @@
 
     )
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -44,7 +46,8 @@
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
     # Gather the trace
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
 
         [string]$User = $Object.UserPrincipalName
 
@@ -55,16 +58,20 @@
         Out-Logfile ("Gathering Mobile Devices for: " + $User) -Action
         [array]$MobileDevices = Get-MobileDevice -mailbox $User
 
-        if ($Null -eq $MobileDevices) {
+        if ($Null -eq $MobileDevices)
+        {
             Out-Logfile ("No mobile devices found for user: " + $User) -action
         }
-        else {
+        else
+        {
             Out-Logfile ("Found " + $MobileDevices.count + " Devices") -Information
 
             # Check each device to see if it was NEW
             # If so flag it for investigation
-            foreach ($Device in $MobileDevices) {
-                if ($Device.FirstSyncTime -gt $Hawk.StartDate) {
+            foreach ($Device in $MobileDevices)
+            {
+                if ($Device.FirstSyncTime -gt $Hawk.StartDate)
+                {
                     Out-Logfile ("Device found that was first synced inside investigation window") -notice
                     Out-LogFile ("DeviceID: " + $Device.DeviceID) -notice
                     $Device | Out-MultipleFileType -FilePreFix "_Investigate_MobileDevice" -user $user -csv -json -append -Notice

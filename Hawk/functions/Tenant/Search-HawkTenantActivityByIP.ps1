@@ -1,4 +1,5 @@
-﻿Function Search-HawkTenantActivityByIP {
+﻿Function Search-HawkTenantActivityByIP
+{
     <#
     .SYNOPSIS
         Gathers logon activity based on a submitted IP Address.
@@ -45,7 +46,8 @@
     )
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -60,7 +62,8 @@
     $DirectoryName = $IpAddress.replace(":", ".")
 
     # Make sure we got only a single IP address
-    if ($IpAddress -like "*,*") {
+    if ($IpAddress -like "*,*")
+    {
         Out-LogFile "Please provide a single IP address to search." -Information
         Write-Error -Message "Please provide a single IP address to search." -ErrorAction Stop
     }
@@ -71,13 +74,15 @@
     [array]$ipevents = Get-AllUnifiedAuditLogEntry -UnifiedSearch ("Search-UnifiedAuditLog -IPAddresses " + $IPAddress )
 
     # If we didn't get anything back log it
-    if ($null -eq $ipevents) {
+    if ($null -eq $ipevents)
+    {
         Out-LogFile "Get-HawkTenantActivityByIP completed successfully" -Information
         Out-LogFile ("No IP logon events found for IP "	+ $IpAddress) -action
     }
 
     # If we did then process it
-    else {
+    else
+    {
 
         # Expand out the Data and convert from JSON
         [array]$ipeventsexpanded = $ipevents | Select-object -ExpandProperty AuditData | ConvertFrom-Json
@@ -94,10 +99,12 @@
         Out-LogFile ("IP " + $ipaddress + " has tried to access " + $uniqueuserlogons.count + " users") -notice
         $uniqueuserlogons | Out-MultipleFileType -FilePrefix "Unique_Users_Attempted" -csv -json -User $DirectoryName -Notice
 
-        if ($null -eq $uniqueuserlogonssuccess) {
+        if ($null -eq $uniqueuserlogonssuccess)
+        {
             Out-LogFile ("No Successful Logon Events found for this IP: " + $IpAddress)
         }
-        else {
+        else
+        {
             [array]$uniqueuserlogonssuccess = Select-UniqueObject -ObjectArray $successipevents -Property "UserID"
             Out-LogFile ("IP " + $IpAddress + " SUCCESSFULLY accessed " + $uniqueuserlogonssuccess.count + " users") -notice
             $uniqueuserlogonssuccess | Out-MultipleFileType -FilePrefix "Unique_Users_Success" -csv -json -User $DirectoryName -Notice

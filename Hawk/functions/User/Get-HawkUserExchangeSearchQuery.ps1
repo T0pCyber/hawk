@@ -1,4 +1,5 @@
-Function Get-HawkUserExchangeSearchQuery {
+﻿Function Get-HawkUserExchangeSearchQuery
+{
     <#
     .SYNOPSIS
         This will export SearchQueryInitiatedExchange operations from the Unified Audit Log (UAL). Must be connected to Exchange Online
@@ -30,21 +31,25 @@ Function Get-HawkUserExchangeSearchQuery {
         [array]$UserPrincipalName
     )
 
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
         Test-EXOConnection
         Send-AIEvent -Event "CmdRun"
     }#End Begin
 
-    PROCESS {
+    PROCESS
+    {
 
         #Verify UPN input
         [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-        foreach ($UserObject in $UserArray) {
+        foreach ($UserObject in $UserArray)
+        {
             [string]$User = $UserObject.UserPrincipalName
 
             Out-LogFile "Initiating collection of Exchange Search queries for $User from the UAL." -Action
@@ -52,20 +57,24 @@ Function Get-HawkUserExchangeSearchQuery {
             Out-LogFile "Please be patient, this can take a while..." -Information
 
             # Verify that user has operation enabled for auditing. Otherwise, move onto next user.
-            if (Test-OperationEnabled -User $User -Operation 'SearchQueryInitiated') {
+            if (Test-OperationEnabled -User $User -Operation 'SearchQueryInitiated')
+            {
                 Out-LogFile "Operation 'SearchQueryInitiated' verified enabled for $User." -Information
-                try {
+                try
+                {
                     #Retrieve all audit data for Exchange search queries
                     $SearchCommand = "Search-UnifiedAuditLog -Operations 'SearchQueryInitiatedExchange' -UserIds $User"
                     $ExchangeSearches = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
 
-                    if ($ExchangeSearches.Count -gt 0) {
+                    if ($ExchangeSearches.Count -gt 0)
+                    {
 
                         #Define output directory path for user
                         $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
 
                         #Create user directory if it doesn't already exist
-                        if (-not (Test-Path -Path $UserFolder)) {
+                        if (-not (Test-Path -Path $UserFolder))
+                        {
                             New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
                         }
 
@@ -76,16 +85,19 @@ Function Get-HawkUserExchangeSearchQuery {
                         $ExchangeSearches | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "ExchangeSearchQueries_$User" -User $User -csv -json
                         $ExchangeSearchesSimple | Out-MultipleFileType -FilePrefix "Simple_ExchangeSearchQueries_$User" -User $User -csv -json
                     }
-                    else {
+                    else
+                    {
                         Out-LogFile "No Exchange Search Queries found for $User." -Information
                     }
                 }
-                catch {
+                catch
+                {
                     Out-LogFile "Error processing Exchange Search Queries for $User : $_" -isError
                     Write-Error -ErrorRecord $_ -ErrorAction Continue
                 }
             }
-            else {
+            else
+            {
                 Out-LogFile "Operation 'SearchQueryInitiated' is not enabled for $User." -Information
                 Out-LogFile "No data recorded for $User." -Information
             }
@@ -96,7 +108,8 @@ Function Get-HawkUserExchangeSearchQuery {
 
     }#End Process
 
-    END {
+    END
+    {
     }#End End
 
 }

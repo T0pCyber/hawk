@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantEDiscoveryConfiguration {
+﻿Function Get-HawkTenantEDiscoveryConfiguration
+{
     <#
     .SYNOPSIS
         Gets complete eDiscovery configuration data across built-in and custom role assignments.
@@ -58,9 +59,11 @@
 
     #TO DO: UPDATE THIS FUNCTION TO FIND E-Discovery roles created via the graph API
 
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
 
@@ -72,7 +75,8 @@
 
         # Create tenant folder if needed
         $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-        if (-not (Test-Path -Path $TenantPath)) {
+        if (-not (Test-Path -Path $TenantPath))
+        {
             New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
         }
 
@@ -81,20 +85,24 @@
         [array]$RoleAssignements = $null
     }
 
-    PROCESS {
-        try {
+    PROCESS
+    {
+        try
+        {
             #region Exchange Online Role Groups - Full Data
             Out-LogFile "Gathering all Exchange Online role entries with eDiscovery cmdlets" -Action
             
             # Find any roles that have eDiscovery cmdlets
             $EDiscoveryCmdlets = "New-MailboxSearch", "Search-Mailbox"
             
-            foreach ($cmdlet in $EDiscoveryCmdlets) {
+            foreach ($cmdlet in $EDiscoveryCmdlets)
+            {
                 [array]$Roles = $Roles + (Get-ManagementRoleEntry ("*\" + $cmdlet))
             }
 
             # Select just the unique entries based on role name
-            if ($Roles) {
+            if ($Roles)
+            {
                 $UniqueRoles = $Roles | Sort-Object -Property Role -Unique
 
                 Out-LogFile ("Found " + $UniqueRoles.Count + " Roles with E-Discovery Rights") -Information
@@ -105,11 +113,13 @@
                 $UniqueRoles | Export-Csv -Path (Join-Path -Path $TenantPath -ChildPath "EDiscoveryRoles.csv") -NoTypeInformation
 
                 # Get everyone who is assigned one of these roles
-                foreach ($Role in $UniqueRoles) {
+                foreach ($Role in $UniqueRoles)
+                {
                     [array]$RoleAssignements = $RoleAssignements + (Get-ManagementRoleAssignment -Role $Role.Role -Delegating $false)
                 }
 
-                if ($RoleAssignements) {
+                if ($RoleAssignements)
+                {
                     Out-LogFile ("Found " + $RoleAssignements.Count + " Role Assignments for these Roles") -Information
                     
                     # Save complete assignment data
@@ -117,25 +127,29 @@
                         Out-File (Join-Path -Path $TenantPath -ChildPath "CustomEDiscoveryRoles.json")
                     $RoleAssignements | Export-Csv -Path (Join-Path -Path $TenantPath -ChildPath "CustomEDiscoveryRoles.csv") -NoTypeInformation
                 }
-                else {
+                else
+                {
                     Out-LogFile "Get-HawkTenantEDiscoveryConfiguration completed successfully" -Information
                     Out-LogFile "No role assignments found" -action
                 }
             }
-            else {
+            else
+            {
                 Out-LogFile "Get-HawkTenantEDiscoveryConfiguration completed successfully" -Information
                 Out-LogFile "No roles with eDiscovery cmdlets found" -action
             }
 
             #endregion
         }
-        catch {
+        catch
+        {
             Out-LogFile "Error gathering eDiscovery configuration: $($_.Exception.Message)" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 
-    END {
+    END
+    {
         Out-LogFile "Completed collection of eDiscovery configuration data from Exchange Online." -Information
     }
 }

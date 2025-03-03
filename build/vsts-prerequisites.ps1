@@ -11,18 +11,22 @@ $modules = @("Pester", "PSFramework", "PSModuleDevelopment")
 # TODO: uncomment this block of code below and fix RobustCloudCommand error.
 
 $data = Import-PowerShellDataFile -Path "$PSScriptRoot\..\Hawk\Hawk.psd1"
-foreach ($dependency in $data.RequiredModules) {
-    if ($dependency -is [string]) {
+foreach ($dependency in $data.RequiredModules)
+{
+    if ($dependency -is [string])
+    {
         if ($modules -contains $dependency) { continue }
         $modules += $dependency
     }
-    else {
+    else
+    {
         if ($modules -contains $dependency.ModuleName) { continue }
         $modules += $dependency.ModuleName
     }
 }
 
-foreach ($module in $modules) {
+foreach ($module in $modules)
+{
     # Write-Output "Installing module: $module"
     Write-Output "Installing $module"
     Install-Module $module -Force -SkipPublisherCheck -Repository $Repository

@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantUnifiedAuditLog {
+﻿Function Get-HawkTenantUnifiedAuditLog
+{
     <#
     .SYNOPSIS
         Retrieves comprehensive Unified Audit Log (UAL) data for a 48-hour period.
@@ -56,13 +57,15 @@
     )
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
     
     # Make sure the start date isn't more than 90 days in the past
-    if ((Get-Date).adddays(-91) -gt $StartDate) {
+    if ((Get-Date).adddays(-91) -gt $StartDate)
+    {
         Out-Logfile "Start date is over 90 days in the past" -isError
         break
     }
@@ -83,16 +86,19 @@
     [int]$CurrentCount = 0
 
     # Create while loop so we go thru things in intervals until we hit the end
-    while ($currentStart -lt $end) {
+    while ($currentStart -lt $end)
+    {
         # Pull the unified audit log results
         [array]$output = Get-AllUnifiedAuditLogEntry -UnifiedSearch "Search-UnifiedAuditLog" -StartDate $currentStart -EndDate $currentEnd
 
         # See if we have results if so push to csv file
-        if ($null -eq $output) {
+        if ($null -eq $output)
+        {
             Out-LogFile "Get-HawkTenantAuthHistory completed successfully" -Information
             Out-LogFile ("No results found for time period " + $CurrentStart + " - " + $CurrentEnd) -action
         }
-        else {
+        else
+        {
             $output | Out-MultipleFileType -FilePrefix "Audit_Log_Full_$prefix" -Append -csv -json
         }
 

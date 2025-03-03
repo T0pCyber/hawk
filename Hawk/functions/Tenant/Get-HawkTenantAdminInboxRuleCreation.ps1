@@ -1,4 +1,5 @@
-Function Get-HawkTenantAdminInboxRuleCreation {
+﻿Function Get-HawkTenantAdminInboxRuleCreation
+{
     <#
     .SYNOPSIS
         Retrieves audit log entries for inbox rules that were historically created within the tenant.
@@ -43,7 +44,8 @@ Function Get-HawkTenantAdminInboxRuleCreation {
     param()
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -53,21 +55,25 @@ Function Get-HawkTenantAdminInboxRuleCreation {
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-    if (-not (Test-Path -Path $TenantPath)) {
+    if (-not (Test-Path -Path $TenantPath))
+    {
         New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
     }
 
-    try {
+    try
+    {
         # Search for new inbox rules
         $searchCommand = "Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations 'New-InboxRule'"
         [array]$NewInboxRules = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
         Out-LogFile "Searching Unified Audit Log for inbox rule creation events." -Action
-        if ($NewInboxRules.Count -gt 0) {
+        if ($NewInboxRules.Count -gt 0)
+        {
             Out-LogFile ("Found " + $NewInboxRules.Count + " admin inbox rule changes in Unified Audit Log.") -Information
 
             # Process and output the results
             $ParsedRules = $NewInboxRules | Get-SimpleUnifiedAuditLog
-            if ($ParsedRules) {
+            if ($ParsedRules)
+            {
                 Out-LogFile "Writing parsed admin inbox rule creation data." -Action
                 $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Creation" -csv -json
                 $NewInboxRules | Out-MultipleFileType -FilePrefix "Admin_Inbox_Rules_Creation" -csv -json
@@ -78,22 +84,26 @@ Function Get-HawkTenantAdminInboxRuleCreation {
                     Test-SuspiciousInboxRule -Rule $_ -Reasons ([ref]$reasons)
                 }
 
-                if ($SuspiciousRules) {
+                if ($SuspiciousRules)
+                {
                     Out-LogFile "Found $($SuspiciousRules.Count) inbox rule creation events." -Notice
                     Out-LogFile "Please verify this activity is legitimate."-Notice
                     $SuspiciousRules | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Creation" -csv -json -Notice
                 }
             }
-            else {
+            else
+            {
                 Out-LogFile "Error: Failed to parse inbox rule audit data." -isError
             }
         }
-        else {
+        else
+        {
             Out-LogFile "Completed collection of admin inbox rule creation events from the UAL." -Information
             Out-LogFile "No admin inbox rule creation events found in audit logs" -Action
         }
     }
-    catch {
+    catch
+    {
         Out-LogFile "Error analyzing admin inbox rule creation: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }

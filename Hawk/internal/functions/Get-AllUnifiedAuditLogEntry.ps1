@@ -1,4 +1,5 @@
-﻿Function Get-AllUnifiedAuditLogEntry {
+﻿Function Get-AllUnifiedAuditLogEntry
+{
     <#
     .SYNOPSIS
         Make sure we get back all of the unified audit log results for the search we are doing
@@ -24,7 +25,8 @@
     )
 
     # Validate the incoming search command
-    if ($UnifiedSearch -match "-StartDate|-EndDate|-SessionCommand|-ResultSize|-SessionId") {
+    if ($UnifiedSearch -match "-StartDate|-EndDate|-SessionCommand|-ResultSize|-SessionId")
+    {
         Out-LogFile "Do not include any of the following in the Search Command" -isError
         Out-LogFile "-StartDate, -EndDate, -SessionCommand, -ResultSize, -SessionID" -isError
         Write-Error -Message "Unable to process search command, switch in UnifiedSearch that is handled by this cmdlet specified" -ErrorAction Stop
@@ -46,26 +48,31 @@
     $searchScript = [ScriptBlock]::Create($cmd)
     
     # Since we have more than 1k results we need to keep returning results until we have them all
-    while ($Run) {
+    while ($Run)
+    {
         $Output += & $searchScript
     
         # Check for null results if so warn and stop
-        if ($null -eq $Output) {
+        if ($null -eq $Output)
+        {
             Out-LogFile ("Unified Audit log returned no results.") -Information
             $Run = $false
         }
         # Else continue
-        else {
+        else
+        {
             # Sort our result set to make sure the higest number is in the last position
             $Output = $Output | Sort-Object -Property ResultIndex
     
             # if total result count returned is 0 then we should warn and stop
-            if ($Output[-1].ResultCount -eq 0) {
+            if ($Output[-1].ResultCount -eq 0)
+            {
                 Out-LogFile ("Returned Result count was 0") -Information
                 $Run = $false
             }
             # if our resultindex = our resultcount then we have everything and should stop
-            elseif ($Output[-1].Resultindex -ge $Output[-1].ResultCount) {
+            elseif ($Output[-1].Resultindex -ge $Output[-1].ResultCount)
+            {
                 Out-LogFile ("Retrieved all results.") -Information
                 $Run = $false
             }

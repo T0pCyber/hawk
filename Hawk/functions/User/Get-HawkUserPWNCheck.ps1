@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserPWNCheck {
+﻿Function Get-HawkUserPWNCheck
+{
     <#
     .SYNOPSIS
         Checks an email address against haveibeenpwned.com
@@ -22,14 +23,17 @@
         [string[]]$EmailAddress
     )
 
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
             Send-AIEvent -Event "CmdRun"
         }
 
-        if ($null -eq $hibpkey) {
+        if ($null -eq $hibpkey)
+        {
             Write-Host -ForegroundColor Green "
 
                HaveIBeenPwned.com now requires an API access key to gather Stats with from their API.
@@ -45,13 +49,15 @@
     }#End of BEGIN block
 
     # Verify our UPN input
-    PROCESS {
+    PROCESS
+    {
         # Used to silence PSSA parameter usage warning
         if ($null -eq $EmailAddress) { return }
         [array]$UserArray = Test-UserObject -ToTest $EmailAddress
         $headers = @{'hibp-api-key' = $hibpkey }
 
-        foreach ($Object in $UserArray) {
+        foreach ($Object in $UserArray)
+        {
 
             [string]$User = $Object.UserPrincipalName
 
@@ -63,22 +69,28 @@
             $Error.clear()
             #Will catch the error if the email is not found. 404 error means that the email is not found in the database.
             #https://haveibeenpwned.com/API/v3#ResponseCodes contains the response codes for the API
-            try {
+            try
+            {
                 $Result = Invoke-WebRequest -Uri $InvokeURL -Headers $headers -userAgent 'Hawk' -ErrorAction Stop
             }
-            catch {
+            catch
+            {
                 $StatusCode = $_.Exception.Response.StatusCode
                 $ErrorMessage = $_.Exception.Message
-                switch ($StatusCode) {
-                    NotFound {
+                switch ($StatusCode)
+                {
+                    NotFound
+                    {
                         write-host "Email Provided Not Found in Pwned Database"
                         return
                     }
-                    Unauthorized {
+                    Unauthorized
+                    {
                         write-host "Unauthorised Access - API key provided is not valid or has expired"
                         return
                     }
-                    Default {
+                    Default
+                    {
                         write-host $ErrorMessage
                         return
                     }
@@ -95,7 +107,8 @@
         }
     }#End of PROCESS block
 
-    END {
+    END
+    {
         Start-Sleep -Milliseconds 1500
     }#End of END block
 }#End of Function Get-HawkUserPWNCheck

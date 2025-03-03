@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantEXOAdmin {
+﻿Function Get-HawkTenantEXOAdmin
+{
     <#
     .SYNOPSIS
         Exchange Online Administrator export. Must be connected to Exchange Online using the Connect-EXO cmdlet
@@ -13,9 +14,11 @@
         ExchangeOnlineAdministrators.csv/.json
     .NOTES
     #>
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
         Out-LogFile "Initiating collection of Exchange Online Admins." -Action
@@ -23,18 +26,23 @@
         Test-EXOConnection
         Send-AIEvent -Event "CmdRun"
     }
-    PROCESS {
-        $roles = foreach ($Role in Get-RoleGroup) {
+    PROCESS
+    {
+        $roles = foreach ($Role in Get-RoleGroup)
+        {
             $ExchangeAdmins = Get-RoleGroupMember -Identity $Role.Identity | Select-Object -Property *
-            foreach ($admin in $ExchangeAdmins) {
-                if ([string]::IsNullOrWhiteSpace($admin.WindowsLiveId)) {
+            foreach ($admin in $ExchangeAdmins)
+            {
+                if ([string]::IsNullOrWhiteSpace($admin.WindowsLiveId))
+                {
                     [PSCustomObject]@{
                         ExchangeAdminGroup = $Role.Name
                         Members = $admin.DisplayName
                         RecipientType = $admin.RecipientType
                     }
                 }
-                else {
+                else
+                {
                     [PSCustomObject]@{
                         ExchangeAdminGroup = $Role.Name
                         Members = $admin.WindowsLiveId
@@ -46,7 +54,8 @@
         $roles | Out-MultipleFileType -FilePrefix "ExchangeOnlineAdministrators" -csv -json
 
     }
-    END {
+    END
+    {
         Out-Logfile "Completed exporting Exchange Online Admins." -Information
     }
 

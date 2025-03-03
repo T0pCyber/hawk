@@ -13,7 +13,8 @@
 .NOTES
     General notes
 #>
-Function Show-HawkHelp {
+Function Show-HawkHelp
+{
 
     Out-LogFile "Creating Hawk Help File"
 

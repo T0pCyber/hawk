@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserAdminAudit {
+﻿Function Get-HawkUserAdminAudit
+{
     <#
     .SYNOPSIS
         Searches the Unified Audit logs for any commands that were run against the provided user object.
@@ -36,7 +37,8 @@
         [array]$UserPrincipalName
     )
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
     
@@ -47,7 +49,8 @@
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
         [string]$User = $Object.UserPrincipalName
 
         # Get the mailbox name since that is what we store in the admin audit log
@@ -55,7 +58,8 @@
 
         Out-LogFile "Initiating collection of admin audit events for $User from the UAL." -Action
 
-        try {
+        try
+        {
             # Build search command for Get-AllUnifiedAuditLogEntry
             $searchCommand = "Search-UnifiedAuditLog -UserIds $User -RecordType ExchangeAdmin -Operations '*'"
 
@@ -63,14 +67,16 @@
             [array]$UserChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
             # If there are any results process and output them
-            if ($UserChanges.Count -gt 0) {
+            if ($UserChanges.Count -gt 0)
+            {
                 Out-LogFile ("Found " + $UserChanges.Count + " changes made to this user") -Information
 
                 # Get the user's output folder path
                 $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
 
                 # Ensure user folder exists
-                if (-not (Test-Path -Path $UserFolder)) {
+                if (-not (Test-Path -Path $UserFolder))
+                {
                     New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
                 }
 
@@ -78,23 +84,27 @@
                 $ParsedChanges = $UserChanges | Get-SimpleUnifiedAuditLog
 
                 # Output the processed results
-                if ($ParsedChanges) {
+                if ($ParsedChanges)
+                {
                     $ParsedChanges | Out-MultipleFileType -FilePrefix "Simple_User_Changes" -csv -json -User $User
                 }
 
                 # Output the raw changes
                 $UserChanges | Out-MultipleFileType -FilePrefix "User_Changes" -csv -json -User $User
             }
-            else {
+            else
+            {
                 Out-LogFile "Get-HawkUserAdminAudit completed successfully" -Information
                 Out-LogFile "No User Changes found." -action
             }
         }
-        catch {
+        catch
+        {
             Out-LogFile "Error processing audit logs for $User : $_" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
-        finally {
+        finally
+        {
             Out-LogFile "Completed collection of admin audit events for $User from the UAL." -Information
         }
     }

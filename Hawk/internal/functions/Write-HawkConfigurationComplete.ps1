@@ -1,4 +1,5 @@
-﻿Function Write-HawkConfigurationComplete {
+﻿Function Write-HawkConfigurationComplete
+{
     <#
     .SYNOPSIS
         Displays the completed Hawk configuration settings.
@@ -40,7 +41,8 @@
         [PSCustomObject]$Hawk
     )
 
-    process {
+    process
+    {
         Write-Output ""
         Out-LogFile "====================================================================" -Information
         Out-LogFile "Configuration Complete!" -Information
@@ -54,7 +56,8 @@
 
         # Format property names and create array of formatted names
         $formattedNames = @()
-        foreach ($prop in $properties) {
+        foreach ($prop in $properties)
+        {
             $name = $prop.Name -creplace '([A-Z])', ' $1' -replace '_', ' '
             $formattedNames += $name.Trim()
         }
@@ -63,14 +66,17 @@
         $maxLength = ($formattedNames | Measure-Object -Property Length -Maximum).Maximum
 
         # Output each property with consistent alignment
-        for ($i = 0; $i -lt $properties.Count; $i++) {
+        for ($i = 0; $i -lt $properties.Count; $i++)
+        {
             $prop = $properties[$i]
             $formattedName = $formattedNames[$i].PadRight($maxLength)
             
             # Get value with N/A fallback
-            $value = if ($null -eq $prop.Value -or [string]::IsNullOrEmpty($prop.Value.ToString())) {
+            $value = if ($null -eq $prop.Value -or [string]::IsNullOrEmpty($prop.Value.ToString()))
+            {
                 "N/A"
-            } else {
+            } else
+            {
                 $prop.Value
             }
 

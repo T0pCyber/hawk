@@ -27,7 +27,8 @@
 .NOTES
     Need to review invesigation criteria of data being exported
 #>
-Function Out-MultipleFileType {
+Function Out-MultipleFileType
+{
     param
     (
         [Parameter (ValueFromPipeLine = $true)]
@@ -44,10 +45,12 @@ Function Out-MultipleFileType {
 
     )
 
-    begin {
+    begin
+    {
 
         # If no file types were specified then we need to error out here
-        if (($xml -eq $false) -and ($csv -eq $false) -and ($txt -eq $false) -and ($json -eq $false)) {
+        if (($xml -eq $false) -and ($csv -eq $false) -and ($txt -eq $false) -and ($json -eq $false))
+        {
             Out-LogFile "No output type specified on object" -isError
             Write-Error -Message "No output type specified on object" -ErrorAction Stop
         }
@@ -56,16 +59,19 @@ Function Out-MultipleFileType {
         [array]$AllObject = $null
 
         # Set the output path
-        if ([string]::IsNullOrEmpty($User)) {
+        if ([string]::IsNullOrEmpty($User))
+        {
             $path = join-path $Hawk.filepath "\Tenant"
             # Test the path if it is there do nothing otherwise create it
             if (test-path $path) { }
-            else {
+            else
+            {
                 Out-LogFile ("Making output directory for Tenant " + $Path) -Action
                 $Null = New-Item $Path -ItemType Directory
             }
         }
-        else {
+        else
+        {
             $path = join-path $Hawk.filepath $user
 
             # Set a bool so we know this is a user output
@@ -75,7 +81,8 @@ Function Out-MultipleFileType {
 
             # Test the path if it is there do nothing otherwise create it
             if (test-path $path) { }
-            else {
+            else
+            {
                 Out-LogFile ("Making output directory for user " + $Path) -Action
                 $Null = New-Item $Path -ItemType Directory
             }
@@ -83,34 +90,42 @@ Function Out-MultipleFileType {
 
     }
 
-    process {
+    process
+    {
         # Collect up all of the incoming data into a single object for processing and output
         [array]$AllObject = $AllObject + $Object
 
     }
 
-    end {
-        if ($null -eq $AllObject) {
+    end
+    {
+        if ($null -eq $AllObject)
+        {
             Out-LogFile "No Data Found" -Action
         }
-        else {
+        else
+        {
 
             # Determine what file type or types we need to write this object into and output it
             # Output XML File
-            if ($xml -eq $true) {
+            if ($xml -eq $true)
+            {
                 # lets put the xml files in a seperate directory to not clutter things up
                 $xmlpath = Join-path $Path XML
                 if (Test-path $xmlPath) { }
-                else {
+                else
+                {
                     Out-LogFile ("Making output directory for xml files " + $xmlPath) -Action
                     $null = New-Item $xmlPath -ItemType Directory
                 }
 
                 # Build the file name and write it out
-                if ($UserOutput) {
+                if ($UserOutput)
+                {
                     $filename = Join-Path $xmlpath ($FilePrefix + "_" + $ShortUser + ".xml")
                 }
-                else {
+                else
+                {
                     $filename = Join-Path $xmlPath ($FilePrefix + ".xml")
                 }
                 Out-LogFile ("Writing Data to " + $filename) -Action
@@ -123,17 +138,21 @@ Function Out-MultipleFileType {
             }
 
             # Output CSV file
-            if ($csv -eq $true) {
+            if ($csv -eq $true)
+            {
                 # Build the file name
-                if ($UserOutput) {
+                if ($UserOutput)
+                {
                     $filename = Join-Path $Path ($FilePrefix + "_" + $ShortUser + ".csv")
                 }
-                else {
+                else
+                {
                     $filename = Join-Path $Path ($FilePrefix + ".csv")
                 }
 
                 # If we have -append then append the data
-                if ($append) {
+                if ($append)
+                {
 
                     Out-LogFile ("Appending Data to " + $filename) -NoDisplay
 
@@ -142,7 +161,8 @@ Function Out-MultipleFileType {
                 }
 
                 # Otherwise overwrite
-                else {
+                else
+                {
                     Out-LogFile ("Writing Data to " + $filename) -Action
                     $AllObject | Export-Csv $filename -NoTypeInformation -Encoding UTF8
                 }
@@ -152,23 +172,28 @@ Function Out-MultipleFileType {
             }
 
             # Output Text files
-            if ($txt -eq $true) {
+            if ($txt -eq $true)
+            {
                 # Build the file name
-                if ($UserOutput) {
+                if ($UserOutput)
+                {
                     $filename = Join-Path $Path ($FilePrefix + "_" + $ShortUser + ".txt")
                 }
-                else {
+                else
+                {
                     $filename = Join-Path $Path ($FilePrefix + ".txt")
                 }
 
                 # If we have -append then append the data
-                if ($Append) {
+                if ($Append)
+                {
                     Out-LogFile ("Appending Data to " + $filename) -NoDisplay
                     $AllObject | Format-List * | Out-File $filename -Append
                 }
 
                 # Otherwise overwrite
-                else {
+                else
+                {
                     Out-LogFile ("Writing Data to " + $filename) -Action
                     $AllObject | Format-List * | Out-File $filename
                 }
@@ -178,17 +203,21 @@ Function Out-MultipleFileType {
             }
 
             # Output JSON file
-            if ($json -eq $true) {
+            if ($json -eq $true)
+            {
                 # Build the file name
-                if ($UserOutput) {
+                if ($UserOutput)
+                {
                     $filename = Join-Path $Path ($FilePrefix + "_" + $ShortUser + ".json")
                 }
-                else {
+                else
+                {
                     $filename = Join-Path $Path ($FilePrefix + ".json")
                 }
 
                 # If we have -append then append the data
-                if ($append) {
+                if ($append)
+                {
 
                     Out-LogFile ("Appending Data to " + $filename) -NoDisplay
 
@@ -197,7 +226,8 @@ Function Out-MultipleFileType {
                 }
 
                 # Otherwise overwrite
-                else {
+                else
+                {
                     Out-LogFile ("Writing Data to " + $filename) -Action
                     $AllObject | ConvertTo-Json -Depth 100 | Out-File -FilePath $filename -Encoding utf8
                 }

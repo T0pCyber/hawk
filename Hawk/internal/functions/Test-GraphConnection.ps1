@@ -14,19 +14,24 @@
     https://learn.microsoft.com/en-us/powershell/microsoftgraph/get-started?view=graph-powershell-1.0
 
 #>
-Function Test-GraphConnection {
-    try {
+Function Test-GraphConnection
+{
+    try
+    {
         $null = Get-MgOrganization -ErrorAction Stop
     }
-    catch {
+    catch
+    {
         # Fallback if $Hawk is not initialized
         $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss")
 
-        if ($null -eq $Hawk) {
+        if ($null -eq $Hawk)
+        {
             # Use standardized timestamp format when Hawk isn't initialized
             Write-Output "[$timestamp UTC] - [ACTION] - Connecting to Microsoft Graph API"
         }
-        else {
+        else
+        {
             # $Hawk exists, so we can safely use Out-LogFile 
             Write-Output "[$timestamp UTC] - [ACTION] - Connecting to Microsoft Graph API"
         }

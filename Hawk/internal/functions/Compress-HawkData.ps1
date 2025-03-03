@@ -15,19 +15,23 @@
 .NOTES
     General notes
 #>
-Function Compress-HawkData {
+Function Compress-HawkData
+{
     Out-LogFile ("Compressing all data in " + $Hawk.FilePath + " for Upload")
     # Make sure we don't already have a zip file
     if ($null -eq (Get-ChildItem *.zip -Path $Hawk.filepath)) { }
-    else {
+    else
+    {
         Out-LogFile ("Removing existing zip file(s) from " + $Hawk.filepath)
         $allfiles = Get-ChildItem *.zip -Path $Hawk.FilePath
         # Remove the existing zip files
-        foreach ($file in $allfiles) {
+        foreach ($file in $allfiles)
+        {
             $Error.Clear()
             Remove-Item $File.FullName -Confirm:$false -ErrorAction SilentlyContinue
             # Make sure we didn't throw an error when we tried to remove them
-            if ($Error.Count -gt 0) {
+            if ($Error.Count -gt 0)
+            {
                 Out-LogFile "Unable to remove existing zip files from " + $Hawk.filepath + " please remove them manually"
                 Write-Error -Message ("Unable to remove existing zip files from " + $Hawk.filepath + " please remove them manually") -ErrorAction Stop
             }

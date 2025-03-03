@@ -1,5 +1,6 @@
 ﻿# Gets user inbox rules and looks for Investigate rules
-Function Get-HawkUserInboxRule {
+Function Get-HawkUserInboxRule
+{
     <#
 .SYNOPSIS
     Exports inbox rules for the specified user.
@@ -41,7 +42,8 @@ Function Get-HawkUserInboxRule {
     )
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -52,7 +54,8 @@ Function Get-HawkUserInboxRule {
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
 
         [string]$User = $Object.UserPrincipalName
 
@@ -60,15 +63,18 @@ Function Get-HawkUserInboxRule {
         Out-LogFile "Initiating collection of Exchange Inbox Rules for $User from Exchange Online." -Action
         $InboxRules = Get-InboxRule -mailbox $User
 
-        if ($null -eq $InboxRules) { 
+        if ($null -eq $InboxRules)
+        { 
             Out-LogFile "No Inbox Rules found for $user" -action
         } 
-        else {
+        else
+        {
             # Track if we found any suspicious rules
             $foundSuspiciousRules = $false
             
             # If the rules contains one of a number of known suspicious properties flag them
-            foreach ($Rule in $InboxRules) {
+            foreach ($Rule in $InboxRules)
+            {
                 # Set our flag to false
                 $Investigate = $false
 
@@ -79,7 +85,8 @@ Function Get-HawkUserInboxRule {
                 if (!([string]::IsNullOrEmpty($Rule.RedirectTo))) { $Investigate = $true }
 
                 # If we have set the Investigate flag then output to investigation file
-                if ($Investigate -eq $true) {
+                if ($Investigate -eq $true)
+                {
                     $foundSuspiciousRules = $true
                     # Description is multiline
                     $Rule.Description = $Rule.Description.replace("`r`n", " ").replace("`t", "")
@@ -88,7 +95,8 @@ Function Get-HawkUserInboxRule {
             }
 
             # Output notice only once if suspicious rules were found
-            if ($foundSuspiciousRules) {
+            if ($foundSuspiciousRules)
+            {
                 $suspiciousRuleCount = ($InboxRules | Where-Object { 
                         $_.DeleteMessage -eq $true -or 
                         ![string]::IsNullOrEmpty($_.ForwardAsAttachmentTo) -or 
@@ -123,7 +131,8 @@ Function Get-HawkUserInboxRule {
         $SweepRules = Get-SweepRule -Mailbox $User
 
         if ($null -eq $SweepRules) { Out-LogFile "No Sweep Rules found" -Information }
-        else {
+        else
+        {
 
             # Output all rules to a user CSV
             $SweepRules | Out-MultipleFileType -FilePreFix "SweepRules" -user $User -csv -json

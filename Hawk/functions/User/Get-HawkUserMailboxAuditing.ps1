@@ -1,4 +1,5 @@
-﻿function Get-HawkUserMailboxAuditing {
+﻿function Get-HawkUserMailboxAuditing
+{
     <#
     .SYNOPSIS
         Gathers Mailbox Audit data if enabled for the user.
@@ -78,7 +79,8 @@
     )
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
     
@@ -88,20 +90,24 @@
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
         [string]$User = $Object.UserPrincipalName
 
         Out-LogFile "Initiating collection of Mailbox Audit Logs for $User from the UAL." -Action
 
         # Test if mailbox auditing is enabled
         $mbx = Get-Mailbox -Identity $User
-        if ($mbx.AuditEnabled -eq $true) {
+        if ($mbx.AuditEnabled -eq $true)
+        {
             Out-LogFile "Mailbox Auditing is enabled." -Information
 
-            try {
+            try
+            {
                 # Get the user's folder path
                 $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
-                if (-not (Test-Path -Path $UserFolder)) {
+                if (-not (Test-Path -Path $UserFolder))
+                {
                     New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
                 }
 
@@ -110,19 +116,22 @@
                 $searchCommand = "Search-UnifiedAuditLog -UserIds $User -RecordType ExchangeItem"
                 $itemLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
-                if ($itemLogs.Count -gt 0) {
+                if ($itemLogs.Count -gt 0)
+                {
                     Out-LogFile ("Found " + $itemLogs.Count + " ExchangeItem events.") -Information
 
                     # Process and output flattened data
                     $ParsedItemLogs = $itemLogs | Get-SimpleUnifiedAuditLog
-                    if ($ParsedItemLogs) {
+                    if ($ParsedItemLogs)
+                    {
                         $ParsedItemLogs | Out-MultipleFileType -FilePrefix "ExchangeItem_Simple" -csv -json -User $User
                     }
 
                     # Output raw data
                     $itemLogs | Out-MultipleFileType -FilePrefix "ExchangeItem_Logs" -csv -json -User $User
                 }
-                else {
+                else
+                {
                     Out-LogFile "ExchangeItem event search completed successfully" -Information
                     Out-LogFile "No ExchangeItem events found." -Action
                 }
@@ -133,20 +142,23 @@
                 $searchCommand = "Search-UnifiedAuditLog -UserIds $User -RecordType ExchangeItemGroup"
                 $groupLogs = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
-                if ($groupLogs.Count -gt 0) {
+                if ($groupLogs.Count -gt 0)
+                {
                     Out-LogFile ("Found " + $groupLogs.Count + " ExchangeItemGroup events.") -Information
                     Out-LogFile "Processing all ExchangeItemGroup events, this can take a while..." -action
 
                     # Process and output flattened data
                     $ParsedGroupLogs = $groupLogs | Get-SimpleUnifiedAuditLog
-                    if ($ParsedGroupLogs) {
+                    if ($ParsedGroupLogs)
+                    {
                         $ParsedGroupLogs | Out-MultipleFileType -FilePrefix "ExchangeItemGroup_Simple" -csv -json -User $User
                     }
 
                     # Output raw data
                     $groupLogs | Out-MultipleFileType -FilePrefix "ExchangeItemGroup_Logs" -csv -json -User $User
                 }
-                else {
+                else
+                {
                     Out-LogFile "ExchangeItemGroup search completed successfully" -Information
                     Out-LogFile "No ExchangeItemGroup events found." -action
                 }
@@ -155,12 +167,14 @@
                 $totalEvents = ($itemLogs.Count + $groupLogs.Count)
                 Out-LogFile "Completed processing $totalEvents total events." -Information
             }
-            catch {
+            catch
+            {
                 Out-LogFile "Error retrieving audit logs: $($_.Exception.Message)" -isError
                 Write-Error -ErrorRecord $_ -ErrorAction Continue
             }
         }
-        else {
+        else
+        {
             Out-LogFile ("Auditing not enabled for " + $User) -Information
             Out-LogFile "Enable auditing to track mailbox access patterns." -Information
         }

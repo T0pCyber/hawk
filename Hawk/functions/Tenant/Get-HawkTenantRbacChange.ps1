@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantRBACChange {
+﻿Function Get-HawkTenantRBACChange
+{
     <#
     .SYNOPSIS
         Looks for any changes made to Role-Based Access Control (RBAC).
@@ -38,7 +39,8 @@
     [CmdletBinding()]
     param()
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -69,13 +71,15 @@
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-    if (-not (Test-Path -Path $TenantPath)) {
+    if (-not (Test-Path -Path $TenantPath))
+    {
         New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
     }
 
     Out-LogFile "Initiating collection of RBAC Changes from the UAL." -Action
 
-    try {
+    try
+    {
         # Build search command for Get-AllUnifiedAuditLogEntry
         $searchCommand = "Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations " +
         "'$($RBACOperations -join "','")'"
@@ -84,30 +88,35 @@
         [array]$RBACChanges = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
         # Process results if any found
-        if ($RBACChanges.Count -gt 0) {
+        if ($RBACChanges.Count -gt 0)
+        {
             Out-LogFile ("Found " + $RBACChanges.Count + " changes made to Roles-Based Access Control") -Information
 
             # Parse changes using Get-SimpleUnifiedAuditLog
             $ParsedChanges = $RBACChanges | Get-SimpleUnifiedAuditLog
 
             # Output results if successfully parsed
-            if ($ParsedChanges) {
+            if ($ParsedChanges)
+            {
                 # Write simple format for easy analysis
                 $ParsedChanges | Out-MultipleFileType -FilePrefix "Simple_RBAC_Changes" -csv -json
 
                 # Write full audit logs for complete record
                 $RBACChanges | Out-MultipleFileType -FilePrefix "RBAC_Changes" -csv -json
             }
-            else {
+            else
+            {
                 Out-LogFile "Error: Failed to parse RBAC changes" -isError
             }
         }
-        else {
+        else
+        {
             Out-LogFile "Get-HawkTenantRbacChange completed successfully" -Information
             Out-LogFile "No RBAC changes found." -action
         }
     }
-    catch {
+    catch
+    {
         Out-LogFile "Error searching for RBAC changes: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }

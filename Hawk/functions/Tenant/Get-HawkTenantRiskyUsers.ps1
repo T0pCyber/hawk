@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantRiskyUsers {
+﻿Function Get-HawkTenantRiskyUsers
+{
     <#
     .SYNOPSIS
         Retrieves and analyzes users flagged as risky in Microsoft Entra ID.
@@ -33,9 +34,11 @@
     [CmdletBinding()]
     param()
 
-    begin {
+    begin
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
 
@@ -47,18 +50,22 @@
 
         # Create tenant folder if it doesn't exist
         $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-        if (-not (Test-Path -Path $TenantPath)) {
+        if (-not (Test-Path -Path $TenantPath))
+        {
             New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
         }
     }
 
-    process {
-        try {
+    process
+    {
+        try
+        {
             # Get current risky users
             Out-LogFile "Retrieving current risky users" -Action
             $riskyUsers = Get-MgRiskyUser -All
 
-            if ($null -eq $riskyUsers -or $riskyUsers.Count -eq 0) {
+            if ($null -eq $riskyUsers -or $riskyUsers.Count -eq 0)
+            {
                 Out-LogFile "No risky users found" -Information
                 return
             }
@@ -77,7 +84,8 @@
             $riskLevels = $riskyUsers | Group-Object -Property RiskLevel | 
                 Sort-Object -Property { $riskOrder[$_.Name] }
             
-            foreach ($level in $riskLevels) {
+            foreach ($level in $riskLevels)
+            {
                 $capitalizedName = $level.Name.Substring(0, 1).ToUpper() + $level.Name.Substring(1).ToLower()
                 Out-LogFile ("- $($level.Count) users at Risk Level '${capitalizedName}'") -Information
             }
@@ -102,7 +110,8 @@
             }
 
             # Process compromised users
-            if ($riskyUserGroups.Compromised) {
+            if ($riskyUserGroups.Compromised)
+            {
                 Out-LogFile "Found $($riskyUserGroups.Compromised.Count) confirmed compromised accounts" -Notice
                 Out-LogFile "Details in _Investigate_Compromised_Users files" -Notice
                 $riskyUserGroups.Compromised | Out-MultipleFileType -FilePrefix "_Investigate_Compromised_Users" -json -Notice
@@ -110,27 +119,33 @@
 
             # Combine High, Medium, and Low risk users into a single collection
             $nonCompromisedRiskUsers = @()
-            if ($riskyUserGroups.High) {
+            if ($riskyUserGroups.High)
+            {
                 Out-LogFile ("Found " + $riskyUserGroups.High.Count + " High Risk users requiring immediate investigation") -Notice
-                foreach ($user in $riskyUserGroups.High) {
+                foreach ($user in $riskyUserGroups.High)
+                {
                     Out-LogFile ("High Risk user detected: $($user.UserPrincipalName)") -Notice
                     Out-LogFile ("Risk Level: $($user.RiskLevel), Risk State: $($user.RiskState)") -Notice
                 }
                 $nonCompromisedRiskUsers += $riskyUserGroups.High
             }
 
-            if ($riskyUserGroups.Medium) {
+            if ($riskyUserGroups.Medium)
+            {
                 Out-LogFile ("Found " + $riskyUserGroups.Medium.Count + " Medium Risk users requiring investigation") -Notice
-                foreach ($user in $riskyUserGroups.Medium) {
+                foreach ($user in $riskyUserGroups.Medium)
+                {
                     Out-LogFile ("Medium Risk user detected: $($user.UserPrincipalName)") -Notice
                     Out-LogFile ("Risk Level: $($user.RiskLevel), Risk State: $($user.RiskState)") -Notice
                 }
                 $nonCompromisedRiskUsers += $riskyUserGroups.Medium
             }
 
-            if ($riskyUserGroups.Low) {
+            if ($riskyUserGroups.Low)
+            {
                 Out-LogFile ("Found " + $riskyUserGroups.Low.Count + " Low Risk users for review") -Notice
-                foreach ($user in $riskyUserGroups.Low) {
+                foreach ($user in $riskyUserGroups.Low)
+                {
                     Out-LogFile ("Low Risk user detected: $($user.UserPrincipalName)") -Notice
                     Out-LogFile ("Risk Level: $($user.RiskLevel), Risk State: $($user.RiskState)") -Notice
                 }
@@ -138,7 +153,8 @@
             }
 
             # Combine High, Medium, and Low risk users summary
-            if ($nonCompromisedRiskUsers.Count -gt 0) {
+            if ($nonCompromisedRiskUsers.Count -gt 0)
+            {
                 $highRisk = ($riskyUserGroups.High).Count
                 $mediumRisk = ($riskyUserGroups.Medium).Count
                 $lowRisk = ($riskyUserGroups.Low).Count
@@ -147,13 +163,15 @@
                 $nonCompromisedRiskUsers | Out-MultipleFileType -FilePrefix "_Investigate_Risky_Users" -csv -json -Notice
             }
         }
-        catch {
+        catch
+        {
             Out-LogFile "Error retrieving risky users: $($_.Exception.Message)" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 
-    end {
+    end
+    {
         Out-LogFile "Completed collection of Risky Users from Entra ID." -Information
     }
 }

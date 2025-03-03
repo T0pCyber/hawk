@@ -1,4 +1,5 @@
-Function Get-HawkTenantAdminInboxRuleRemoval {
+﻿Function Get-HawkTenantAdminInboxRuleRemoval
+{
     <#
     .SYNOPSIS
         Retrieves audit log entries for inbox rules that were removed within the tenant.
@@ -39,7 +40,8 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
     param()
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -50,22 +52,26 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-    if (-not (Test-Path -Path $TenantPath)) {
+    if (-not (Test-Path -Path $TenantPath))
+    {
         New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
     }
 
-    try {
+    try
+    {
         # Search for removed inbox rules
         Out-LogFile "Searching audit logs for inbox rule removals" -action
         $searchCommand = "Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations 'Remove-InboxRule'"
         [array]$RemovedInboxRules = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
-        if ($RemovedInboxRules.Count -gt 0) {
+        if ($RemovedInboxRules.Count -gt 0)
+        {
             Out-LogFile ("Found " + $RemovedInboxRules.Count + " admin inbox rule removals in audit logs") -Information
 
             # Process and output the results
             $ParsedRules = $RemovedInboxRules | Get-SimpleUnifiedAuditLog
-            if ($ParsedRules) {
+            if ($ParsedRules)
+            {
                 # Output simple format for easy analysis
                 $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Removal" -csv -json
 
@@ -78,22 +84,26 @@ Function Get-HawkTenantAdminInboxRuleRemoval {
                     Test-SuspiciousInboxRule -Rule $_ -Reasons ([ref]$reasons)
                 }
 
-                if ($SuspiciousRemovals) {
+                if ($SuspiciousRemovals)
+                {
                     Out-LogFile "Found $($SuspiciousRemovals.Count) inbox rule removal events" -Notice
                     Out-LogFile "Please verify this activity is legitimate." -Notice
                     $SuspiciousRemovals | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Removal" -csv -json -Notice
                 }
             }
-            else {
+            else
+            {
                 Out-LogFile "Error: Failed to parse inbox rule removal audit data" -isError
             }
         }
-        else {
+        else
+        {
             Out-LogFile "Get-HawkTenantAdminInboxRuleRemoval completed successfully" -Information
             Out-LogFile "No inbox rule removals found in audit logs" -action
         }
     }
-    catch {
+    catch
+    {
         Out-LogFile "Error analyzing admin inbox rule removals: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }

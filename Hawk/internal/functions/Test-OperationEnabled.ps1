@@ -1,4 +1,5 @@
-﻿Function Test-OperationEnabled {
+﻿Function Test-OperationEnabled
+{
     <#
     .SYNOPSIS
         Tests if a specified audit operation is enabled for a given user.
@@ -50,9 +51,11 @@
     # Verify the provided User has the specified Operation enabled
     $TestResult = Get-Mailbox -Identity $User | Where-Object -Property AuditOwner -eq $Operation
 
-    if ($null -eq $TestResult) {
+    if ($null -eq $TestResult)
+    {
         return $false
-    } else {
+    } else
+    {
         return $true
     }
 }

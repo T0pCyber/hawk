@@ -1,4 +1,5 @@
-Function Get-HawkTenantAdminInboxRuleModification {
+﻿Function Get-HawkTenantAdminInboxRuleModification
+{
     <#
     .SYNOPSIS
         Retrieves audit log entries for inbox rules that were historically modified within the tenant.
@@ -45,7 +46,8 @@ Function Get-HawkTenantAdminInboxRuleModification {
     param()
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -57,22 +59,26 @@ Function Get-HawkTenantAdminInboxRuleModification {
 
     # Create tenant folder if it doesn't exist
     $TenantPath = Join-Path -Path $Hawk.FilePath -ChildPath "Tenant"
-    if (-not (Test-Path -Path $TenantPath)) {
+    if (-not (Test-Path -Path $TenantPath))
+    {
         New-Item -Path $TenantPath -ItemType Directory -Force | Out-Null
     }
 
-    try {
+    try
+    {
         # Search for modified inbox rules
         Out-LogFile "Searching audit logs for inbox rule modification events" -Action
         $searchCommand = "Search-UnifiedAuditLog -RecordType ExchangeAdmin -Operations 'Set-InboxRule'"
         [array]$ModifiedInboxRules = Get-AllUnifiedAuditLogEntry -UnifiedSearch $searchCommand
 
-        if ($ModifiedInboxRules.Count -gt 0) {
+        if ($ModifiedInboxRules.Count -gt 0)
+        {
             Out-LogFile ("Found " + $ModifiedInboxRules.Count + " admin inbox rule modifications in audit logs") -Information
 
             # Process and output the results
             $ParsedRules = $ModifiedInboxRules | Get-SimpleUnifiedAuditLog
-            if ($ParsedRules) {
+            if ($ParsedRules)
+            {
                 Out-LogFile "Writing parsed admin inbox rule modification data" -Action
                 $ParsedRules | Out-MultipleFileType -FilePrefix "Simple_Admin_Inbox_Rules_Modification" -csv -json
                 $ModifiedInboxRules | Out-MultipleFileType -FilePrefix "Admin_Inbox_Rules_Modification" -csv -json
@@ -83,22 +89,26 @@ Function Get-HawkTenantAdminInboxRuleModification {
                     Test-SuspiciousInboxRule -Rule $_ -Reasons ([ref]$reasons)
                 }
 
-                if ($SuspiciousModifications) {
+                if ($SuspiciousModifications)
+                {
                     Out-LogFile "Found $($SuspiciousModifications.Count) inbox rule modification events" -Notice
                     Out-LogFile "Please verify this activity is legitimate." -Notice
                     $SuspiciousModifications | Out-MultipleFileType -FilePrefix "_Investigate_Admin_Inbox_Rules_Modification" -csv -json -Notice
                 }
             }
-            else {
+            else
+            {
                 Out-LogFile "Error: Failed to parse inbox rule audit data" -isError
             }
         }
-        else {
+        else
+        {
             Out-LogFile "Get-HawkTenantAdminInboxRuleModification completed successfully" -Information 
             Out-LogFile "No inbox rule modifications found in audit logs" -action
         }
     }
-    catch {
+    catch
+    {
         Out-LogFile "Error analyzing admin inbox rule modifications: $($_.Exception.Message)" -isError
         Write-Error -ErrorRecord $_ -ErrorAction Continue
     }

@@ -1,4 +1,5 @@
-function Test-LicenseType {
+﻿function Test-LicenseType
+{
     <#
     .SYNOPSIS
         Identifies the Microsoft 365 license type (E5/G5, E3/G3, or other) for the current tenant and returns both the license type and corresponding retention period.
@@ -47,7 +48,8 @@ function Test-LicenseType {
     [OutputType([PSCustomObject])]
     param()
 
-    try {
+    try
+    {
         # Get tenant subscriptions
         $subscriptions = Get-MgSubscribedSku
 
@@ -58,14 +60,16 @@ function Test-LicenseType {
         }
 
         # Check for E5/G5 or equivalent license
-        if ($subscriptions.SkuPartNumber -match 'ENTERPRISEPREMIUM|SPE_E5|DEVELOPERPACK_E5|M365_E5|SPE_G5|ENTERPRISEPREMIUM_GOV|M365_G5|MICROSOFT365_G5') {
+        if ($subscriptions.SkuPartNumber -match 'ENTERPRISEPREMIUM|SPE_E5|DEVELOPERPACK_E5|M365_E5|SPE_G5|ENTERPRISEPREMIUM_GOV|M365_G5|MICROSOFT365_G5')
+        {
             $licenseInfo.LicenseType = if ($subscriptions.SkuPartNumber -match '_G5|_GOV') { 'G5' } else { 'E5' }
             $licenseInfo.RetentionPeriod = 365
             return $licenseInfo
         }
 
         # Check for E3/G3 or equivalent license
-        if ($subscriptions.SkuPartNumber -match 'ENTERPRISEPACK|M365_E3|DEVELOPERPACK_E3|SPE_G3|ENTERPRISEPACK_GOV|M365_G3|MICROSOFT365_G3') {
+        if ($subscriptions.SkuPartNumber -match 'ENTERPRISEPACK|M365_E3|DEVELOPERPACK_E3|SPE_G3|ENTERPRISEPACK_GOV|M365_G3|MICROSOFT365_G3')
+        {
             $licenseInfo.LicenseType = if ($subscriptions.SkuPartNumber -match '_G3|_GOV') { 'G3' } else { 'E3' }
             $licenseInfo.RetentionPeriod = 180
             return $licenseInfo
@@ -74,7 +78,8 @@ function Test-LicenseType {
         # Return default values for unknown license type
         return $licenseInfo
     }
-    catch {
+    catch
+    {
         Out-LogFile "Unable to determine license type. Defaulting to 90 days retention." -information
         return [PSCustomObject]@{
             LicenseType = 'Unknown'

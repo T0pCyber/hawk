@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantEntraIDAdmin {
+﻿Function Get-HawkTenantEntraIDAdmin
+{
     <#
     .SYNOPSIS
         Tenant Microsoft Entra ID Administrator export using Microsoft Graph.
@@ -19,9 +20,11 @@
     [CmdletBinding()]
     param()
 
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
 
@@ -32,19 +35,23 @@
         Send-AIEvent -Event "CmdRun"
     }
 
-    PROCESS {
-        try {
+    PROCESS
+    {
+        try
+        {
             # Retrieve all directory roles from Microsoft Graph
             $directoryRoles = Get-MgDirectoryRole -ErrorAction Stop
             Out-LogFile "Retrieved $(($directoryRoles | Measure-Object).Count) directory roles" -Information
 
             # Process each role and its members
-            $roles = foreach ($role in $directoryRoles) {
+            $roles = foreach ($role in $directoryRoles)
+            {
                 # Get all members assigned to current role
                 $members = Get-MgDirectoryRoleMember -DirectoryRoleId $role.Id -ErrorAction Stop
 
                 # Handle roles with no members
-                if (-not $members) {
+                if (-not $members)
+                {
                     [PSCustomObject]@{
                         AdminGroupName = $role.DisplayName
                         Members = "No Members"
@@ -52,11 +59,14 @@
                         ObjectId = $null
                     }
                 }
-                else {
+                else
+                {
                     # Process each member of the role
-                    foreach ($member in $members) {
+                    foreach ($member in $members)
+                    {
                         # Check if member is a user
-                        if ($member.AdditionalProperties.'@odata.type' -eq "#microsoft.graph.user") {
+                        if ($member.AdditionalProperties.'@odata.type' -eq "#microsoft.graph.user")
+                        {
                             [PSCustomObject]@{
                                 AdminGroupName = $role.DisplayName
                                 Members = $member.AdditionalProperties.userPrincipalName
@@ -64,7 +74,8 @@
                                 ObjectId = $member.Id
                             }
                         }
-                        else {
+                        else
+                        {
                             # Handle groups and service principals
                             [PSCustomObject]@{
                                 AdminGroupName = $role.DisplayName
@@ -78,23 +89,27 @@
             }
 
             # Export results if any roles were found
-            if ($roles) {
+            if ($roles)
+            {
                 $roles | Out-MultipleFileType -FilePrefix "EntraIDAdministrators" -csv -json
                 Out-LogFile "Successfully exported Microsoft Entra ID Administrators data" -Information
             }
-            else {
+            else
+            {
                 Out-LogFile "Get-HawkTenantEntraID completed" -Information
                 Out-LogFile "No administrator roles found or accessible" -Action
             }
         }
-        catch {
+        catch
+        {
             # Handle and log any errors during execution
             Out-LogFile "Error retrieving Microsoft Entra ID Administrators: $($_.Exception.Message)" -isError
             Write-Error -ErrorRecord $_ -ErrorAction Continue
         }
     }
 
-    END {
+    END
+    {
         Out-LogFile "Completed collection of Microsoft Entra ID Administrators from Microsoft Graph." -Information
     }
 }

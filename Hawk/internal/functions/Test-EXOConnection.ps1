@@ -13,12 +13,15 @@
 .NOTES
     General notes
 #>
-Function Test-EXOConnection {
+Function Test-EXOConnection
+{
     # In all cases make sure we are "connected" to EXO
-    try {
+    try
+    {
         $null = Get-OrganizationConfig -erroraction stop
     }
-    catch [System.Management.Automation.CommandNotFoundException] {
+    catch [System.Management.Automation.CommandNotFoundException]
+    {
         # Connect to EXO if we couldn't find the command
         Out-LogFile "Not Connected to Exchange Online" -Information
         Out-LogFile "Connecting to EXO using Exchange Online Module" -Action

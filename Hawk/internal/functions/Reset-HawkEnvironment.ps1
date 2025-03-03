@@ -1,4 +1,5 @@
-﻿Function Reset-HawkEnvironment {
+﻿Function Reset-HawkEnvironment
+{
     <#
     .SYNOPSIS
         Resets all Hawk-related variables to allow for a fresh instance.
@@ -62,26 +63,34 @@
         'HawkAppData'           # Hawk application data
     )
 
-    foreach ($varName in $hawkVariables) {
-        if (Get-Variable -Name $varName -ErrorAction SilentlyContinue) {
-            try {
-                if ($PSCmdlet.ShouldProcess("Variable $varName", "Remove")) {
+    foreach ($varName in $hawkVariables)
+    {
+        if (Get-Variable -Name $varName -ErrorAction SilentlyContinue)
+        {
+            try
+            {
+                if ($PSCmdlet.ShouldProcess("Variable $varName", "Remove"))
+                {
                     Remove-Variable -Name $varName -Scope Global -Force -ErrorAction Stop
                     Write-Information "Successfully removed `$$varName"
                 }
             }
-            catch {
+            catch
+            {
                 Write-Warning "Failed to remove `$$varName : $_"
             }
         }
-        else {
+        else
+        {
             Write-Information "`$$varName was not present"
         }
     }
 
     # Clear any PSFramework configuration cache
-    if ($PSCmdlet.ShouldProcess("PSFramework cache", "Clear")) {
-        if (Get-Command -Name 'Clear-PSFResultCache' -ErrorAction SilentlyContinue) {
+    if ($PSCmdlet.ShouldProcess("PSFramework cache", "Clear"))
+    {
+        if (Get-Command -Name 'Clear-PSFResultCache' -ErrorAction SilentlyContinue)
+        {
             Clear-PSFResultCache
             Write-Information "Cleared PSFramework result cache"
         }

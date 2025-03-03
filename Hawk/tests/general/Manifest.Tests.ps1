@@ -39,12 +39,14 @@
 
         foreach ($assembly in $manifest.RequiredAssemblies)
         {
-            if ($assembly -like "*.dll") {
+            if ($assembly -like "*.dll")
+            {
                 It "The file $assembly should exist" -TestCases @{ moduleRoot = $moduleRoot; assembly = $assembly } {
                     Test-Path "$moduleRoot\$assembly" | Should -Be $true
                 }
             }
-            else {
+            else
+            {
                 It "The file $assembly should load from the GAC" -TestCases @{ moduleRoot = $moduleRoot; assembly = $assembly } {
                     { Add-Type -AssemblyName $assembly } | Should -Not -Throw
                 }

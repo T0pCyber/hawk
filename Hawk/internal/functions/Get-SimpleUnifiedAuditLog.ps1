@@ -1,4 +1,5 @@
-﻿function Get-SimpleUnifiedAuditLog {
+﻿function Get-SimpleUnifiedAuditLog
+{
     <#
     .SYNOPSIS
         Flattens nested Microsoft 365 Unified Audit Log records into a simplified format.
@@ -68,11 +69,13 @@
         [switch]$PreserveTypes
     )
 
-    begin {
+    begin
+    {
         # Collection to store processed results
         $Results = @()
 
-        function ConvertTo-FlatObject {
+        function ConvertTo-FlatObject
+        {
             param (
                 [Parameter(Mandatory = $true)]
                 [PSObject]$InputObject,
@@ -88,29 +91,36 @@
             $flatProperties = @{}
 
             # Process each property of the input object
-            foreach ($prop in $InputObject.PSObject.Properties) {
+            foreach ($prop in $InputObject.PSObject.Properties)
+            {
                 # Build the property key name, incorporating prefix if provided
                 $key = if ($Prefix) { "${Prefix}_$($prop.Name)" } else { $prop.Name }
 
                 # Special handling for Parameters array - common in UAL records
-                if ($prop.Name -eq 'Parameters' -and $prop.Value -is [Array]) {
+                if ($prop.Name -eq 'Parameters' -and $prop.Value -is [Array])
+                {
                     # Create human-readable parameter string
-                    $paramStrings = foreach ($param in $prop.Value) {
+                    $paramStrings = foreach ($param in $prop.Value)
+                    {
                         "$($param.Name)=$($param.Value)"
                     }
                     $flatProperties['ParameterString'] = $paramStrings -join ' | '
 
                     # Create individual parameter properties
-                    foreach ($param in $prop.Value) {
+                    foreach ($param in $prop.Value)
+                    {
                         $paramKey = "Param_$($param.Name)"
                         $flatProperties[$paramKey] = $param.Value
                     }
 
                     # Reconstruct full command if Operation property exists
-                    if ($InputObject.Operation) {
-                        $paramStrings = foreach ($param in $prop.Value) {
+                    if ($InputObject.Operation)
+                    {
+                        $paramStrings = foreach ($param in $prop.Value)
+                        {
                             # Format parameter values based on content
-                            $value = switch -Regex ($param.Value) {
+                            $value = switch -Regex ($param.Value)
+                            {
                                 '\s' { "'$($param.Value)'" } # Quote values containing spaces
                                 '^True$|^False$' { "`$$($param.Value.ToLower())" } # Format booleans
                                 ';' { "'$($param.Value)'" } # Quote values containing semicolons
@@ -124,79 +134,104 @@
                 }
 
                 # Handle different value types
-                switch ($prop.Value) {
+                switch ($prop.Value)
+                {
                     # Recursively process nested hashtables
-                    { $_ -is [System.Collections.IDictionary] } {
+                    { $_ -is [System.Collections.IDictionary] }
+                    {
                         $nestedObject = ConvertTo-FlatObject -InputObject $_ -Prefix $key -PreserveTypes:$PreserveTypes
-                        foreach ($nestedKey in $nestedObject.Keys) {
-                            $uniqueKey = if ($flatProperties.ContainsKey($nestedKey)) {
+                        foreach ($nestedKey in $nestedObject.Keys)
+                        {
+                            $uniqueKey = if ($flatProperties.ContainsKey($nestedKey))
+                            {
                                 $counter = 1
-                                while ($flatProperties.ContainsKey("${nestedKey}_$counter")) {
+                                while ($flatProperties.ContainsKey("${nestedKey}_$counter"))
+                                {
                                     $counter++
                                 }
                                 "${nestedKey}_$counter"
-                            } else {
+                            } else
+                            {
                                 $nestedKey
                             }
                             $flatProperties[$uniqueKey] = $nestedObject[$nestedKey]
                         }
                     }
                     # Process arrays (excluding Parameters which was handled above)
-                    { $_ -is [System.Collections.IList] -and $prop.Name -ne 'Parameters' } {
-                        if ($_.Count -gt 0) {
-                            if ($_[0] -is [PSObject]) {
+                    { $_ -is [System.Collections.IList] -and $prop.Name -ne 'Parameters' }
+                    {
+                        if ($_.Count -gt 0)
+                        {
+                            if ($_[0] -is [PSObject])
+                            {
                                 # Handle array of objects
-                                for ($i = 0; $i -lt $_.Count; $i++) {
+                                for ($i = 0; $i -lt $_.Count; $i++)
+                                {
                                     $nestedObject = ConvertTo-FlatObject -InputObject $_[$i] -Prefix "${key}_${i}" -PreserveTypes:$PreserveTypes
-                                    foreach ($nestedKey in $nestedObject.Keys) {
-                                        $uniqueKey = if ($flatProperties.ContainsKey($nestedKey)) {
+                                    foreach ($nestedKey in $nestedObject.Keys)
+                                    {
+                                        $uniqueKey = if ($flatProperties.ContainsKey($nestedKey))
+                                        {
                                             $counter = 1
-                                            while ($flatProperties.ContainsKey("${nestedKey}_$counter")) {
+                                            while ($flatProperties.ContainsKey("${nestedKey}_$counter"))
+                                            {
                                                 $counter++
                                             }
                                             "${nestedKey}_$counter"
-                                        } else {
+                                        } else
+                                        {
                                             $nestedKey
                                         }
                                         $flatProperties[$uniqueKey] = $nestedObject[$nestedKey]
                                     }
                                 }
                             }
-                            else {
+                            else
+                            {
                                 # Handle array of simple values
                                 $flatProperties[$key] = $_ -join "|"
                             }
                         }
-                        else {
+                        else
+                        {
                             # Handle empty arrays
                             $flatProperties[$key] = [string]::Empty
                         }
                     }
                     # Recursively process nested objects
-                    { $_ -is [PSObject] } {
+                    { $_ -is [PSObject] }
+                    {
                         $nestedObject = ConvertTo-FlatObject -InputObject $_ -Prefix $key -PreserveTypes:$PreserveTypes
-                        foreach ($nestedKey in $nestedObject.Keys) {
-                            $uniqueKey = if ($flatProperties.ContainsKey($nestedKey)) {
+                        foreach ($nestedKey in $nestedObject.Keys)
+                        {
+                            $uniqueKey = if ($flatProperties.ContainsKey($nestedKey))
+                            {
                                 $counter = 1
-                                while ($flatProperties.ContainsKey("${nestedKey}_$counter")) {
+                                while ($flatProperties.ContainsKey("${nestedKey}_$counter"))
+                                {
                                     $counter++
                                 }
                                 "${nestedKey}_$counter"
-                            } else {
+                            } else
+                            {
                                 $nestedKey
                             }
                             $flatProperties[$uniqueKey] = $nestedObject[$nestedKey]
                         }
                     }
                     # Handle simple values
-                    default {
-                        if ($PreserveTypes) {
+                    default
+                    {
+                        if ($PreserveTypes)
+                        {
                             # Keep original type if PreserveTypes is specified
                             $flatProperties[$key] = $_
                         }
-                        else {
+                        else
+                        {
                             # Convert values to appropriate types
-                            $flatProperties[$key] = switch ($_) {
+                            $flatProperties[$key] = switch ($_)
+                            {
                                 { $_ -is [datetime] } { $_ }
                                 { $_ -is [bool] } { $_ }
                                 { $_ -is [int] } { $_ }
@@ -214,14 +249,17 @@
         }
     }
 
-    process {
-        try {
+    process
+    {
+        try
+        {
             # Extract base properties excluding AuditData
             $baseProperties = $Record | Select-Object * -ExcludeProperty AuditData
 
             # Process AuditData if present
             $auditData = $Record.AuditData | ConvertFrom-Json
-            if ($auditData) {
+            if ($auditData)
+            {
                 # Flatten the audit data
                 $flatAuditData = ConvertTo-FlatObject -InputObject $auditData -PreserveTypes:$PreserveTypes
 
@@ -234,7 +272,8 @@
                 $Results += [PSCustomObject]$combinedProperties
             }
         }
-        catch {
+        catch
+        {
             # Handle and log any processing errors
             Write-Warning "Error processing record: $_"
             $errorProperties = @{
@@ -247,7 +286,8 @@
         }
     }
 
-    end {
+    end
+    {
         # Define the ordered common schema properties
         $orderedProperties = @(
             'CreationTime',
@@ -271,14 +311,17 @@
             $orderedObject = [ordered]@{}
 
             # Add ordered common schema properties first
-            foreach ($prop in $orderedProperties) {
-                if ($_.PSObject.Properties.Name -contains $prop) {
+            foreach ($prop in $orderedProperties)
+            {
+                if ($_.PSObject.Properties.Name -contains $prop)
+                {
                     $orderedObject[$prop] = $_.$prop
                 }
             }
 
             # Add ParameterString if it exists
-            if ($_.PSObject.Properties.Name -contains 'ParameterString') {
+            if ($_.PSObject.Properties.Name -contains 'ParameterString')
+            {
                 $orderedObject['ParameterString'] = $_.ParameterString
 
                 # Add all Param_* properties immediately after ParameterString

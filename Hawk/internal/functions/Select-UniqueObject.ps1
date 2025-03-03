@@ -17,7 +17,8 @@
 .NOTES
     General notes
 #>
-Function Select-UniqueObject {
+Function Select-UniqueObject
+{
     param
     (
         [Parameter(Mandatory = $true)]
@@ -33,7 +34,8 @@ Function Select-UniqueObject {
     [array]$UniqueObjectID = $ObjectArray | Select-Object -Unique -ExpandProperty $Property
 
     # Select the whole object based on the unique names found
-    foreach ($Name in $UniqueObjectID) {
+    foreach ($Name in $UniqueObjectID)
+    {
         [array]$Output = $Output + ($ObjectArray | Where-Object { $_.($Property) -eq $Name } | Select-Object -First 1)
     }
 

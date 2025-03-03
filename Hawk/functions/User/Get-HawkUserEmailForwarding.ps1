@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserEmailForwarding {
+﻿Function Get-HawkUserEmailForwarding
+{
     <#
 	.SYNOPSIS
 	Pulls mail forwarding configuration for a specified user.
@@ -39,7 +40,8 @@
     )
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
     
@@ -50,7 +52,8 @@
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
 
         [string]$User = $Object.UserPrincipalName
 
@@ -59,12 +62,14 @@
         $mbx = Get-Mailbox -identity $User
 
         # Check if forwarding is configured by user or admin
-        if ([string]::IsNullOrEmpty($mbx.ForwardingSMTPAddress) -and [string]::IsNullOrEmpty($mbx.ForwardingAddress)) {
+        if ([string]::IsNullOrEmpty($mbx.ForwardingSMTPAddress) -and [string]::IsNullOrEmpty($mbx.ForwardingAddress))
+        {
             Out-LogFile "Get-HawkUserEmailForwarding completed successfully" -Information
             Out-LogFile "No forwarding configuration found" -action
         }
         # If populated report it and add to a CSV file of positive finds
-        else {
+        else
+        {
             Out-LogFile "Found email forwarding configured for $User" -Notice
             Out-LogFile "Please verify this activity is legitimate." -Notice
             $mbx | Select-Object DisplayName, UserPrincipalName, PrimarySMTPAddress, ForwardingSMTPAddress, ForwardingAddress, DeliverToMailboxAndForward, WhenChangedUTC | Out-MultipleFileType -FilePreFix "_Investigate_Users_WithForwarding" -append -user $user -csv -json -Notice

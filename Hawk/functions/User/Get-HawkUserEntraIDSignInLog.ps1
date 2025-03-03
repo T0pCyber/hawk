@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserEntraIDSignInLog {
+﻿Function Get-HawkUserEntraIDSignInLog
+{
     <#
     .SYNOPSIS
         Retrieves Microsoft Entra ID sign-in logs for specified users from the most recent 14 days.
@@ -50,8 +51,10 @@
         [array]$UserPrincipalName
     )
 
-    BEGIN {
-        if (Test-HawkGlobalObject) {
+    BEGIN
+    {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
 
@@ -68,38 +71,47 @@
         $requestedStart = $Hawk.StartDate.ToUniversalTime()
         
         # Compare dates manually since PowerShell doesn't have DateTime.Max
-        $effectiveStartDate = if ($requestedStart -gt $twoWeeksAgo) {
+        $effectiveStartDate = if ($requestedStart -gt $twoWeeksAgo)
+        {
             $requestedStart
         }
-        else {
+        else
+        {
             $twoWeeksAgo
         }
 
 
     }
 
-    PROCESS {
-        foreach ($Object in $UserArray) {
+    PROCESS
+    {
+        foreach ($Object in $UserArray)
+        {
             [string]$User = $Object.UserPrincipalName
             
-            try {
+            try
+            {
                 Out-LogFile "Initiating collection of sign-in logs for $User from Entra ID." -Action
 
                 # Notify user about 14-day limit and any date adjustment
                 Out-LogFile "Hawk Entra ID Sign-in logs is limited to the most recent 14 days" -Information
                 
-                if ($Hawk.StartDate.ToUniversalTime() -lt $twoWeeksAgo) {
+                if ($Hawk.StartDate.ToUniversalTime() -lt $twoWeeksAgo)
+                {
                     Out-LogFile "Your requested date range exceeds this limit. Data will only be available from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
                 }
-                else {
+                else
+                {
                     Out-LogFile "Retrieving data from $($effectiveStartDate.ToString('yyyy-MM-dd')) to $($endDateUtc.ToString('yyyy-MM-dd'))" -Information
                 }
 
                 # Use adjusted date range and ensure we have valid dates
-                $startDateUtc = if ($effectiveStartDate) {
+                $startDateUtc = if ($effectiveStartDate)
+                {
                     $effectiveStartDate.ToString('yyyy-MM-ddTHH:mm:ssZ')
                 }
-                else {
+                else
+                {
                     $twoWeeksAgo.ToString('yyyy-MM-ddTHH:mm:ssZ')
                 }
                 
@@ -111,9 +123,11 @@
                 $processedCount = 0
                 $signInLogs = Get-MgAuditLogSignIn -Filter $filter -All -ErrorAction Stop
 
-                foreach ($log in $signInLogs) {
+                foreach ($log in $signInLogs)
+                {
                     $processedCount++
-                    if ($processedCount % 100 -eq 0) {
+                    if ($processedCount % 100 -eq 0)
+                    {
                         Write-Progress -Activity "Retrieving Entra Sign-in Logs" `
                             -Status "Processed $processedCount logs" `
                             -PercentComplete -1
@@ -122,7 +136,8 @@
 
                 Write-Progress -Activity "Retrieving Entra Sign-in Logs" -Completed
 
-                if ($signInLogs.Count -gt 0) {
+                if ($signInLogs.Count -gt 0)
+                {
                     Out-LogFile ("Retrieved " + $signInLogs.Count + " sign-in log entries for " + $User) -Information
 
                     # Write all logs to CSV/JSON
@@ -134,7 +149,8 @@
                         $_.RiskLevelAggregated -in @('high', 'medium', 'low')
                     }
 
-                    if ($riskySignIns.Count -gt 0) {
+                    if ($riskySignIns.Count -gt 0)
+                    {
                         # Flag for investigation
                         Out-LogFile ("Found " + $riskySignIns.Count + " risky sign-ins for " + $User) -Notice
                         
@@ -144,37 +160,43 @@
                         # Group and report risk levels
                         $duringSignIn = $riskySignIns | Group-Object -Property RiskLevelDuringSignIn | 
                             Where-Object { $_.Name -in @('high', 'medium', 'low') }
-                        foreach ($risk in $duringSignIn) {
+                        foreach ($risk in $duringSignIn)
+                        {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with risk level during sign-in: " + $risk.Name) -Notice
                         }
 
                         $aggregated = $riskySignIns | Group-Object -Property RiskLevelAggregated | 
                             Where-Object { $_.Name -in @('high', 'medium', 'low') }
-                        foreach ($risk in $aggregated) {
+                        foreach ($risk in $aggregated)
+                        {
                             Out-LogFile ("Found " + $risk.Count + " sign-ins with aggregated risk level: " + $risk.Name) -Notice
                         }
 
                         Out-LogFile ("Review _Investigate_Entra_Sign_In_Log_$User.csv/json for complete details") -Notice
                     }
                 }
-                else {
+                else
+                {
                     Out-LogFile ("No sign-in logs found for " + $User + " in the specified time period") -Information
                 }
 
             }
-            catch {
+            catch
+            {
                 $global:processSuccess = $false
                 Out-LogFile ("Error retrieving sign-in logs for " + $User + " : " + $_.Exception.Message) -isError
                 Write-Error -ErrorRecord $_ -ErrorAction Continue
             }
             # Only show completion message if successful
-            if ($global:processSuccess) {
+            if ($global:processSuccess)
+            {
                 Out-LogFile "Completed collection of Entra sign-in logs for $User from Entra ID." -Information
             }
         }
     }
 
-    END {
+    END
+    {
 
         Remove-Variable -Name processSuccess -Scope Global -ErrorAction SilentlyContinue
     }

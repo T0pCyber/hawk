@@ -1,4 +1,5 @@
-Function Test-HawkDateParameter {
+﻿Function Test-HawkDateParameter
+{
     <#
     .SYNOPSIS
         Internal helper function that processes and validates date parameters for Hawk investigations.
@@ -81,25 +82,31 @@ Function Test-HawkDateParameter {
     )
 
     # Check if user provided both StartDate AND DaysToLookBack
-    if ($PSBoundParameters.ContainsKey('DaysToLookBack') -and $PSBoundParameters.ContainsKey('StartDate')) {
+    if ($PSBoundParameters.ContainsKey('DaysToLookBack') -and $PSBoundParameters.ContainsKey('StartDate'))
+    {
         Stop-PSFFunction -Message "DaysToLookBack cannot be used together with StartDate in non-interactive mode." -EnableException $true
     }
 
     # Must specify either StartDate or DaysToLookBack 
-    if (-not $PSBoundParameters.ContainsKey('DaysToLookBack') -and -not $PSBoundParameters.ContainsKey('StartDate')) {
+    if (-not $PSBoundParameters.ContainsKey('DaysToLookBack') -and -not $PSBoundParameters.ContainsKey('StartDate'))
+    {
         Stop-PSFFunction -Message "Either StartDate or DaysToLookBack must be specified in non-interactive mode" -EnableException $true
     }
 
     # Process DaysToLookBack if provided
-    if ($PSBoundParameters.ContainsKey('DaysToLookBack')) {
-        if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365) {
+    if ($PSBoundParameters.ContainsKey('DaysToLookBack'))
+    {
+        if ($DaysToLookBack -lt 1 -or $DaysToLookBack -gt 365)
+        {
             Stop-PSFFunction -Message "DaysToLookBack must be between 1 and 365" -EnableException $true
         }
         
-        if ($PSBoundParameters.ContainsKey('EndDate') -and -not $PSBoundParameters.ContainsKey('StartDate')) {
+        if ($PSBoundParameters.ContainsKey('EndDate') -and -not $PSBoundParameters.ContainsKey('StartDate'))
+        {
             # Check EndDate is not more than one day in future
             $tomorrow = (Get-Date).ToUniversalTime().Date.AddDays(1)
-            if ($EndDate.ToUniversalTime().Date -gt $tomorrow) {
+            if ($EndDate.ToUniversalTime().Date -gt $tomorrow)
+            {
                 Stop-PSFFunction -Message "EndDate cannot be more than one day in the future" -EnableException $true
             }
 
@@ -109,23 +116,28 @@ Function Test-HawkDateParameter {
             $StartDate = $StartDateUTC
             $EndDate = $EndDateUTC
         }
-        else {
+        else
+        {
             # Convert DaysToLookBack to StartDate/EndDate
             $ConvertedDates = Convert-HawkDaysToDate -DaysToLookBack $DaysToLookBack
             $StartDate = $ConvertedDates.StartDate
             $EndDate = $ConvertedDates.EndDate
         }
     }
-    else {
+    else
+    {
         # For explicit start/end dates
-        if ($StartDate) {
+        if ($StartDate)
+        {
             $StartDate = $StartDate.ToUniversalTime().Date
         }
 
-        if ($EndDate) {
+        if ($EndDate)
+        {
             # Validate against tomorrow to allow for the extra day
             $tomorrow = (Get-Date).ToUniversalTime().Date.AddDays(1)
-            if ($EndDate.ToUniversalTime().Date -gt $tomorrow) {
+            if ($EndDate.ToUniversalTime().Date -gt $tomorrow)
+            {
                 Stop-PSFFunction -Message "EndDate cannot be more than one day in the future" -EnableException $true
             }
             # Add one day to include full end date
@@ -133,14 +145,17 @@ Function Test-HawkDateParameter {
         }
 
         # Validate date range
-        if ($StartDate -and $EndDate) {
-            if ($StartDate -gt $EndDate) {
+        if ($StartDate -and $EndDate)
+        {
+            if ($StartDate -gt $EndDate)
+            {
                 Stop-PSFFunction -Message "StartDate must be before EndDate" -EnableException $true
             }
 
             # Test against 366 days to account for extra day added for last day inclusiveness
             $daysDifference = ($EndDate.Date - $StartDate.Date).Days
-            if ($daysDifference -gt 366) {
+            if ($daysDifference -gt 366)
+            {
                 Stop-PSFFunction -Message "Date range cannot exceed 365 days" -EnableException $true
             }
         }

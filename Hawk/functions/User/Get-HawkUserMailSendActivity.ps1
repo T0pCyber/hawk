@@ -1,4 +1,5 @@
-Function Get-HawkUserMailSendActivity {
+﻿Function Get-HawkUserMailSendActivity
+{
     <#
     .SYNOPSIS
         This will export Send operations from the Unified Audit Log (UAL). Must be connected to Exchange Online
@@ -30,41 +31,49 @@ Function Get-HawkUserMailSendActivity {
         [array]$UserPrincipalName
     )
 
-    BEGIN {
+    BEGIN
+    {
         # Check if Hawk object exists and is fully initialized
-        if (Test-HawkGlobalObject) {
+        if (Test-HawkGlobalObject)
+        {
             Initialize-HawkGlobalObject
         }
         Test-EXOConnection
         Send-AIEvent -Event "CmdRun"
     }#End Begin
 
-    PROCESS {
+    PROCESS
+    {
 
         #Verify UPN input
         [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
-        foreach ($UserObject in $UserArray) {
+        foreach ($UserObject in $UserArray)
+        {
             [string]$User = $UserObject.UserPrincipalName
 
             Out-LogFile "Initiating collection of mail 'Send' logs for $User from the UAL." -Action
             Out-LogFile "Please be patient, this can take a while..." -Information
 
             # Verify that user has operation enabled for auditing. Otherwise, move onto next user.
-            if (Test-OperationEnabled -User $User -Operation 'Send') {
+            if (Test-OperationEnabled -User $User -Operation 'Send')
+            {
                 Out-LogFile "Operation 'Send' verified enabled for $User." -Information
-                try {
+                try
+                {
                     #Retrieve all audit data for Exchange send activity
                     $SearchCommand = "Search-UnifiedAuditLog -Operations 'Send' -UserIds $User"
                     $ExchangeSends = Get-AllUnifiedAuditLogEntry -UnifiedSearch $SearchCommand
 
-                    if ($ExchangeSends.Count -gt 0) {
+                    if ($ExchangeSends.Count -gt 0)
+                    {
 
                         #Define output directory path for user
                         $UserFolder = Join-Path -Path $Hawk.FilePath -ChildPath $User
 
                         #Create user directory if it doesn't already exist
-                        if (-not (Test-Path -Path $UserFolder)) {
+                        if (-not (Test-Path -Path $UserFolder))
+                        {
                             New-Item -Path $UserFolder -ItemType Directory -Force | Out-Null
                         }
 
@@ -75,16 +84,19 @@ Function Get-HawkUserMailSendActivity {
                         $ExchangeSends | Select-Object -ExpandProperty AuditData | Convertfrom-Json | Out-MultipleFileType -FilePrefix "SendActivity_$User" -User $User -csv -json
                         $ExchangeSendsSimple | Out-MultipleFileType -FilePrefix "Simple_SendActivity_$User" -User $User -csv -json
                     }
-                    else {
+                    else
+                    {
                         Out-LogFile "No mail 'Send' logs found for $User." -Information
                     }
                 }
-                catch {
+                catch
+                {
                     Out-LogFile "Error processing Send Activity for $User : $_" -isError
                     Write-Error -ErrorRecord $_ -ErrorAction Continue
                 }
             }
-            else {
+            else
+            {
                 Out-LogFile "Operation 'Send' is not enabled for $User." -Information
                 Out-LogFile "No data recorded for $User." -Information
             }
@@ -94,7 +106,8 @@ Function Get-HawkUserMailSendActivity {
 
     }#End Process
 
-    END {
+    END
+    {
     }#End End
 
 }

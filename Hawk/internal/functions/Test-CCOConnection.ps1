@@ -13,6 +13,7 @@
 .NOTES
     General notes
 #>
-Function Test-CCOConnection {
+Function Test-CCOConnection
+{
     Write-Output "Not yet implemented"
 }

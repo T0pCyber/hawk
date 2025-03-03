@@ -17,7 +17,8 @@
 .NOTES
     General notes
 #>
-Function Add-HawkAppData {
+Function Add-HawkAppData
+{
     param
     (
         [string]$Name,
@@ -27,10 +28,12 @@ Function Add-HawkAppData {
     Out-LogFile ("Adding " + $value + " to " + $Name + " in HawkAppData") -Action
 
     # Test if our HawkAppData variable exists
-    if ([bool](get-variable HawkAppData -ErrorAction SilentlyContinue)) {
+    if ([bool](get-variable HawkAppData -ErrorAction SilentlyContinue))
+    {
         $global:HawkAppData | Add-Member -MemberType NoteProperty -Name $Name -Value $Value
     }
-    else {
+    else
+    {
         $global:HawkAppData = New-Object -TypeName PSObject
         $global:HawkAppData | Add-Member -MemberType NoteProperty -Name $Name -Value $Value
     }

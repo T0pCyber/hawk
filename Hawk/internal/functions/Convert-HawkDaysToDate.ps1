@@ -1,4 +1,5 @@
-﻿Function Convert-HawkDaysToDate {
+﻿Function Convert-HawkDaysToDate
+{
     <#
     .SYNOPSIS
         Converts the DaysToLookBack parameter into a StartDate and EndDate for use in Hawk investigations.

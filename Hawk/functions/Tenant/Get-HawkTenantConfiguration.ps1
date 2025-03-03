@@ -1,4 +1,5 @@
-﻿Function Get-HawkTenantConfiguration {
+﻿Function Get-HawkTenantConfiguration
+{
     <#
 	.SYNOPSIS
 		Gather basic tenant configuration and saves the output to a text file
@@ -40,7 +41,8 @@
 	#>
 
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 

@@ -1,4 +1,5 @@
-﻿Function Get-HawkUserMessageTrace {
+﻿Function Get-HawkUserMessageTrace
+{
     <#
 .SYNOPSIS
     Pull that last 7 days of message trace data for the specified user.
@@ -28,7 +29,8 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
 
     )
     # Check if Hawk object exists and is fully initialized
-    if (Test-HawkGlobalObject) {
+    if (Test-HawkGlobalObject)
+    {
         Initialize-HawkGlobalObject
     }
 
@@ -40,18 +42,21 @@ Single UPN of a user, commans seperated list of UPNs, or array of objects that c
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
 
     # Gather the trace
-    foreach ($Object in $UserArray) {
+    foreach ($Object in $UserArray)
+    {
         Out-LogFile "Initiating collection of Message Trace Data for $User from Exchange Online." -Action
 
         [string]$User = $Object.UserPrincipalName
 
         [string]$PrimarySMTP = (Get-Mailbox -identity $User).primarysmtpaddress
 
-        if ([string]::IsNullOrEmpty($PrimarySMTP)) {
+        if ([string]::IsNullOrEmpty($PrimarySMTP))
+        {
             Out-LogFile ("Failed to find Primary SMTP Address for user: " + $User) -isError
             Write-Error ("Failed to find Primary SMTP Address for user: " + $User)
         }
-        else {
+        else
+        {
             # Get the 7 day message trace for the primary SMTP address as the sender
             Out-LogFile ("Gathering messages sent by: " + $PrimarySMTP) -action
 

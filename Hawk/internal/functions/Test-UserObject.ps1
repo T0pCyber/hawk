@@ -15,7 +15,8 @@
 .NOTES
     General notes
 #>
-Function Test-UserObject {
+Function Test-UserObject
+{
     param ([array]$ToTest)
 
     # So we take three inputs here to -userprincipalname string,array,and array of strings
@@ -25,13 +26,16 @@ Function Test-UserObject {
     #Case 1 - String
     #Case 2 - Array of Strings
     #Check to see if the value of the entry is of type string
-    if ($ToTest[0] -is [string]) {
+    if ($ToTest[0] -is [string])
+    {
         # Very basic check to see if this is a UPN
-        if ($ToTest[0] -match '@') {
+        if ($ToTest[0] -match '@')
+        {
             [array]$Output = $ToTest | Select-Object -Property @{Name = "UserPrincipalName"; Expression = { $_ } }
             Return $Output
         }
-        else {
+        else
+        {
             Out-LogFile "Unable to determine if input is a UserPrincipalName" -isError
             Out-LogFile "Please provide a UPN or array of objects with propertly UserPrincipalName populated" -Information
             Write-Error "Unable to determine if input is a User Principal Name" -ErrorAction Stop
@@ -39,10 +43,12 @@ Function Test-UserObject {
     }
     # Case 3 - Array of objects
     # Validate that at least one object in the array contains a UserPrincipalName Property
-    elseif ([bool](get-member -inputobject $ToTest[0] -name UserPrincipalName -MemberType Properties)) {
+    elseif ([bool](get-member -inputobject $ToTest[0] -name UserPrincipalName -MemberType Properties))
+    {
         Return $ToTest
     }
-    else {
+    else
+    {
         Out-LogFile "Unable to determine if input is a UserPrincipalName" -isError
         Out-LogFile "Please provide a UPN or array of objects with propertly UserPrincipalName populated" -Information
         Write-Error "Unable to determine if input is a User Principal Name" -ErrorAction Stop

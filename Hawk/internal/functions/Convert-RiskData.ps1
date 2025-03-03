@@ -1,4 +1,5 @@
-function Convert-HawkRiskData {
+﻿function Convert-HawkRiskData
+{
     <#
     .SYNOPSIS
         Parses and flattens risk detection additional information data.
@@ -32,33 +33,43 @@ function Convert-HawkRiskData {
         [object[]]$RiskData
     )
 
-    begin {
+    begin
+    {
         $processedData = @()
     }
 
-    process {
-        foreach ($record in $RiskData) {
+    process
+    {
+        foreach ($record in $RiskData)
+        {
             # Create copy of original record excluding AdditionalInfo
             $processedRecord = $record | Select-Object * -ExcludeProperty AdditionalInfo
 
-            if ($record.AdditionalInfo) {
-                try {
+            if ($record.AdditionalInfo)
+            {
+                try
+                {
                     # Parse JSON if string, otherwise use as-is
-                    if ($record.AdditionalInfo -is [string]) {
+                    if ($record.AdditionalInfo -is [string])
+                    {
                         $additionalInfo = $record.AdditionalInfo | ConvertFrom-Json
                     }
-                    else {
+                    else
+                    {
                         $additionalInfo = $record.AdditionalInfo
                     }
 
                     # Convert each key-value pair to a property
-                    foreach ($item in $additionalInfo) {
+                    foreach ($item in $additionalInfo)
+                    {
                         $propertyName = "AdditionalInfo_$($item.Key)"
-                        if ($item.Value -is [array]) {
+                        if ($item.Value -is [array])
+                        {
                             # Join array values with pipe delimiter
                             $propertyValue = $item.Value -join '|'
                         }
-                        else {
+                        else
+                        {
                             $propertyValue = $item.Value
                         }
 
@@ -66,7 +77,8 @@ function Convert-HawkRiskData {
                         Add-Member -InputObject $processedRecord -MemberType NoteProperty -Name $propertyName -Value $propertyValue -Force
                     }
                 }
-                catch {
+                catch
+                {
                     Write-Warning "Error processing AdditionalInfo for record: $_"
                 }
             }
@@ -75,7 +87,8 @@ function Convert-HawkRiskData {
         }
     }
 
-    end {
+    end
+    {
         return $processedData
     }
 }
