@@ -123,7 +123,7 @@
                     # Get the location information for this IP address
                     # Need to perform access key value only once instead of for each IP address
                     if($ExpandedUserLogonLogs.item($i).clientip -and ([string]::IsNullOrEmpty($AccessKey) -eq $false)) {
-                        $Location = Get-IPGeolocation -IPAddress $ExpandedUserLogonLogs.item($i).clientip -AccessKey $AccessKey
+                        $Location = Get-IPGeoLocation -IPAddress $ExpandedUserLogonLogs.item($i).clientip -AccessKey $AccessKey
                     }
                     else {
                         $Location = "Lack valid REST API key or IP address was not found"

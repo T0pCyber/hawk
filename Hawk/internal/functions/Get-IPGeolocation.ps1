@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-    Get-IPGeolocation is called by Get-HawkUserUALSignInLog to resolve IP addresses to geolocation data.
+    Get-IPGeoLocation is called by Get-HawkUserUALSignInLog to resolve IP addresses to geolocation data.
     An IP address and IP Stack API Key is passed to the function, as it returns a PSCustomObject with the geolocation data.
 
 .DESCRIPTION
@@ -10,12 +10,12 @@
 .PARAMETER AccessKey
     Access key for ipstack.com's REST API
 .EXAMPLE
-    Get-IPGeolocation -IPAddress 8.8.8.8 -AccessKey e904134b5cbb91f752a79f3ba9cbe59a
-    Gets all IP Geolocation data of IPs that recieved
+    Get-IPGeoLocation -IPAddress 8.8.8.8 -AccessKey e904134b5cbb91f752a79f3ba9cbe59a
+    Gets all IP GeoLocation data of IPs that recieved
 .NOTES
     General notes
 #>
-function Get-IPGeolocation {
+function Get-IPGeoLocation {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
