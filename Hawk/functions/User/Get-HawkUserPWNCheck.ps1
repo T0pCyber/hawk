@@ -49,7 +49,7 @@
             # Used to silence PSSA parameter usage warning
             if ($null -eq $EmailAddress) { return }
            [array]$UserArray = Test-UserObject -ToTest $EmailAddress
-           $headers=@{'hibp-api-key' = $hibpkey}
+           $headers = @{'hibp-api-key' = $hibpkey }
 
            foreach ($Object in $UserArray) {
 
@@ -70,11 +70,11 @@
                    $StatusCode = $_.Exception.Response.StatusCode
                    $ErrorMessage = $_.Exception.Message
                    switch ($StatusCode) {
-                       NotFound{
+                       NotFound {
                            write-host "Email Provided Not Found in Pwned Database"
                            return
                        }
-                       Unauthorized{
+                       Unauthorized {
                            write-host "Unauthorised Access - API key provided is not valid or has expired"
                            return
                        }

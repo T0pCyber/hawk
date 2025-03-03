@@ -58,7 +58,7 @@ Function Get-HawkUserInboxRule {
 
         # Get Inbox rules
         Out-LogFile "Initiating collection of Exchange Inbox Rules for $User from Exchange Online." -Action
-        $InboxRules = Get-InboxRule -mailbox  $User
+        $InboxRules = Get-InboxRule -mailbox $User
 
         if ($null -eq $InboxRules) { 
             Out-LogFile "No Inbox Rules found for $user" -action

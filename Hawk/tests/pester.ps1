@@ -57,10 +57,10 @@ if ($TestGeneral)
 			$totalFailed += $result.FailedCount
 			$result.Tests | Where-Object Result -ne 'Passed' | ForEach-Object {
 				$testresults += [pscustomobject]@{
-					Block    = $_.Block
-					Name	 = "It $($_.Name)"
-					Result   = $_.Result
-					Message  = $_.ErrorRecord.DisplayErrorMessage
+					Block = $_.Block
+					Name = "It $($_.Name)"
+					Result = $_.Result
+					Message = $_.ErrorRecord.DisplayErrorMessage
 				}
 			}
 		}
@@ -98,10 +98,10 @@ if ($TestFunctions)
 			$totalFailed += $result.FailedCount
 			$result.Tests | Where-Object Result -ne 'Passed' | ForEach-Object {
 				$testresults += [pscustomobject]@{
-					Block    = $_.Block
-					Name	 = "It $($_.Name)"
-					Result   = $_.Result
-					Message  = $_.ErrorRecord.DisplayErrorMessage
+					Block = $_.Block
+					Name = "It $($_.Name)"
+					Result = $_.Result
+					Message = $_.ErrorRecord.DisplayErrorMessage
 				}
 			}
 		}

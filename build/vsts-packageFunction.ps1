@@ -39,8 +39,8 @@ foreach ($dependency in (Import-PowerShellDataFile -Path "$moduleRoot\$moduleNam
 {
 	$param = @{
 		Repository = $Repository
-		Name	   = $dependency.ModuleName
-		Path	   = $modulesFolder.FullName
+		Name = $dependency.ModuleName
+		Path = $modulesFolder.FullName
 	}
 	if ($dependency -is [string]) { $param['Name'] = $dependency }
 	if ($dependency.RequiredVersion)

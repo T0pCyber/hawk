@@ -378,7 +378,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 			# The Soure Path contains one or more directory (this directory can have files under it) and no files to be compressed.
 			if ($sourceFilePaths.Count -eq 0 -and $sourceDirPaths.Count -gt 0)
 			{
-				$currentSegmentWeight = 100/[double]$sourceDirPaths.Count
+				$currentSegmentWeight = 100 / [double]$sourceDirPaths.Count
 				$previousSegmentWeight = 0
 				foreach ($currentSourceDirPath in $sourceDirPaths)
 				{
@@ -402,7 +402,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 			elseif ($sourceFilePaths.Count -gt 0 -and $sourceDirPaths.Count -gt 0)
 			{
 				# each directory is considered as an individual segments & all the individual files are clubed in to a separate sgemnet.
-				$currentSegmentWeight = 100/[double]($sourceDirPaths.Count + 1)
+				$currentSegmentWeight = 100 / [double]($sourceDirPaths.Count + 1)
 				$previousSegmentWeight = 0
 
 				foreach ($currentSourceDirPath in $sourceDirPaths)
@@ -693,7 +693,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 					}
 
 					$currentEntryCount += 1
-					ProgressBarHelper "Compress-Archive" $progressBarStatus $previousSegmentWeight $currentSegmentWeight $sourcePaths.Count  $currentEntryCount
+					ProgressBarHelper "Compress-Archive" $progressBarStatus $previousSegmentWeight $currentSegmentWeight $sourcePaths.Count $currentEntryCount
 				}
 			}
 			finally
@@ -913,7 +913,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 					# $previousSegmentWeight is set to 0 as there are no prior segments.
 					$previousSegmentWeight = 0
 					$currentSegmentWeight = 100
-					ProgressBarHelper "Expand-Archive" $progressBarStatus $previousSegmentWeight $currentSegmentWeight $zipArchive.Entries.Count  $currentEntryCount
+					ProgressBarHelper "Expand-Archive" $progressBarStatus $previousSegmentWeight $currentSegmentWeight $zipArchive.Entries.Count $currentEntryCount
 				}
 			}
 			finally
@@ -966,7 +966,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 				$previousSegmentWeight -ge 0 -and
 				$currentSegmentWeight -gt 0)
 			{
-				$entryDefaultWeight = $currentSegmentWeight/[double]$totalNumberofEntries
+				$entryDefaultWeight = $currentSegmentWeight / [double]$totalNumberofEntries
 
 				$percentComplete = $previousSegmentWeight + ($entryDefaultWeight * $currentEntryCount)
 				Write-Progress -Activity $cmdletName -Status $status -PercentComplete $percentComplete
@@ -1524,7 +1524,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 			# The Soure Path contains one or more directory (this directory can have files under it) and no files to be compressed.
 			if ($sourceFilePaths.Count -eq 0 -and $sourceDirPaths.Count -gt 0)
 			{
-				$currentSegmentWeight = 100/[double]$sourceDirPaths.Count
+				$currentSegmentWeight = 100 / [double]$sourceDirPaths.Count
 				$previousSegmentWeight = 0
 				foreach ($currentSourceDirPath in $sourceDirPaths)
 				{
@@ -1548,7 +1548,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 			elseif ($sourceFilePaths.Count -gt 0 -and $sourceDirPaths.Count -gt 0)
 			{
 				# each directory is considered as an individual segments & all the individual files are clubed in to a separate sgemnet.
-				$currentSegmentWeight = 100/[double]($sourceDirPaths.Count + 1)
+				$currentSegmentWeight = 100 / [double]($sourceDirPaths.Count + 1)
 				$previousSegmentWeight = 0
 
 				foreach ($currentSourceDirPath in $sourceDirPaths)
@@ -1839,7 +1839,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 					}
 
 					$currentEntryCount += 1
-					ProgressBarHelper "Compress-Archive" $progressBarStatus $previousSegmentWeight $currentSegmentWeight $sourcePaths.Count  $currentEntryCount
+					ProgressBarHelper "Compress-Archive" $progressBarStatus $previousSegmentWeight $currentSegmentWeight $sourcePaths.Count $currentEntryCount
 				}
 			}
 			finally
@@ -2059,7 +2059,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 					# $previousSegmentWeight is set to 0 as there are no prior segments.
 					$previousSegmentWeight = 0
 					$currentSegmentWeight = 100
-					ProgressBarHelper "Expand-Archive" $progressBarStatus $previousSegmentWeight $currentSegmentWeight $zipArchive.Entries.Count  $currentEntryCount
+					ProgressBarHelper "Expand-Archive" $progressBarStatus $previousSegmentWeight $currentSegmentWeight $zipArchive.Entries.Count $currentEntryCount
 				}
 			}
 			finally
@@ -2112,7 +2112,7 @@ PreparingToExpandVerboseMessage=Preparing to expand...
 				$previousSegmentWeight -ge 0 -and
 				$currentSegmentWeight -gt 0)
 			{
-				$entryDefaultWeight = $currentSegmentWeight/[double]$totalNumberofEntries
+				$entryDefaultWeight = $currentSegmentWeight / [double]$totalNumberofEntries
 
 				$percentComplete = $previousSegmentWeight + ($entryDefaultWeight * $currentEntryCount)
 				Write-Progress -Activity $cmdletName -Status $status -PercentComplete $percentComplete

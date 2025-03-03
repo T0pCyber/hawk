@@ -56,7 +56,7 @@
     Get-AdminAuditLogConfig | Out-MultipleFileType -FilePrefix "AdminAuditLogConfig" -txt
 
     Out-LogFile "Gathering Organization Configuration" -action
-    Get-OrganizationConfig| Out-MultipleFileType -FilePrefix "OrgConfig" -txt
+    Get-OrganizationConfig | Out-MultipleFileType -FilePrefix "OrgConfig" -txt
 
     Out-LogFile "Gathering Remote Domains" -action
     Get-RemoteDomain | Out-MultipleFileType -FilePrefix "RemoteDomain" -csv -json

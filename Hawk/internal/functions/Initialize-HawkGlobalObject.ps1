@@ -145,7 +145,7 @@
 
             # Return both path and tenant name
             return @{
-                Path       = $FullOutputPath
+                Path = $FullOutputPath
                 TenantName = $TenantName
             }
 
@@ -231,12 +231,12 @@
 
         # Create the global $Hawk variable immediately with minimal properties
         $Global:Hawk = [PSCustomObject]@{
-            FilePath       = $null  # Will be set shortly
+            FilePath = $null  # Will be set shortly
             DaysToLookBack = $null
-            StartDate      = $null
-            EndDate        = $null
-            WhenCreated    = $null
-            TenantName     = $null
+            StartDate = $null
+            EndDate = $null
+            WhenCreated = $null
+            TenantName = $null
         }
 
         # Set up the file path first, before any other operations
@@ -330,7 +330,7 @@
 
                 # Validate the input is within range
                 # Validate the input is within range
-                if (($StartRead -gt 365) -or ($StartRead -lt 1))   {
+                if (($StartRead -gt 365) -or ($StartRead -lt 1)) {
                     Out-LogFile -string "Days to go back must be between 1 and 365." -isError
                     Remove-Variable -Name StartDate -ErrorAction SilentlyContinue
                     continue

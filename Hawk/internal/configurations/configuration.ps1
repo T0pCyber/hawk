@@ -18,13 +18,13 @@ Set-PSFConfig -Module 'Hawk' -Name 'Import.IndividualFiles' -Value $false -Initi
 
 $handler = {
 	$paramSetPSFLoggingProvider = @{
-		Name		   = 'logfile'
-		InstanceName   = 'Hawk'
-		FilePath	   = Join-Path -path $args[0] -ChildPath '%date%_logs.csv'
-		TimeFormat	   = 'yyyy-MM-dd HH:mm:ss.fff'
+		Name = 'logfile'
+		InstanceName = 'Hawk'
+		FilePath = Join-Path -path $args[0] -ChildPath '%date%_logs.csv'
+		TimeFormat = 'yyyy-MM-dd HH:mm:ss.fff'
 		IncludeModules = 'Hawk'
-		UTC		       = $true
-		Enabled	       = $true
+		UTC = $true
+		Enabled = $true
 	}
 
 	Set-PSFLoggingProvider @paramSetPSFLoggingProvider

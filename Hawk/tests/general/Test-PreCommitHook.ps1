@@ -40,8 +40,8 @@ function Test-AdvancedFunction {
 
     $result = [PSCustomObject]@{
         SizeInBytes = $SizeInBytes
-        SizeInKB    = [math]::Round($SizeInBytes / 1KB, 2)
-        SizeInMB    = [math]::Round($SizeInBytes / 1MB, 2)
+        SizeInKB = [math]::Round($SizeInBytes / 1KB, 2)
+        SizeInMB = [math]::Round($SizeInBytes / 1MB, 2)
     }
 
     Write-Output $result

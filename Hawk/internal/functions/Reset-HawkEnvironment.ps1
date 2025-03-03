@@ -1,4 +1,4 @@
-Function Reset-HawkEnvironment {
+﻿Function Reset-HawkEnvironment {
     <#
     .SYNOPSIS
         Resets all Hawk-related variables to allow for a fresh instance.
@@ -45,7 +45,7 @@ Function Reset-HawkEnvironment {
         This function should be used when you need to start a fresh Hawk investigation
         without closing your PowerShell session.
     #>
-    [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='Medium')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
     param()
 
     # Store original preference
@@ -56,9 +56,9 @@ Function Reset-HawkEnvironment {
 
     # List of known Hawk-related variables to remove
     $hawkVariables = @(
-        'Hawk',                  # Main Hawk configuration object
-        'IPlocationCache',       # IP geolocation cache
-        'MSFTIPList',           # Microsoft IP address list
+        'Hawk', # Main Hawk configuration object
+        'IPlocationCache', # IP geolocation cache
+        'MSFTIPList', # Microsoft IP address list
         'HawkAppData'           # Hawk application data
     )
 

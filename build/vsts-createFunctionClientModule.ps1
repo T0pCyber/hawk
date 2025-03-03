@@ -141,22 +141,22 @@ $functionsToExport = (Get-ChildItem -Path $functionFolder.FullName -Recurse -Fil
 # Get Manifest of published version, in order to catch build-phase changes such as module version.
 $originalManifestData = Import-PowerShellDataFile -Path "$publishRoot\Hawk.psd1"
 $prereqHash = @{
-	ModuleName    = 'PSFramework'
+	ModuleName = 'PSFramework'
 	ModuleVersion = (Get-Module PSFramework).Version
 }
 $paramNewModuleManifest = @{
-	Path			  = ('{0}\{1}.psd1' -f $workingRoot.FullName, $ModuleName)
+	Path = ('{0}\{1}.psd1' -f $workingRoot.FullName, $ModuleName)
 	FunctionsToExport = $functionsToExport
-	CompanyName	      = $originalManifestData.CompanyName
-	Author		      = $originalManifestData.Author
-	Description	      = $originalManifestData.Description
-	ModuleVersion	  = $originalManifestData.ModuleVersion
-	RootModule	      = ('{0}.psm1' -f $ModuleName)
-	Copyright		  = $originalManifestData.Copyright
-	TypesToProcess    = @()
-	FormatsToProcess  = @()
+	CompanyName = $originalManifestData.CompanyName
+	Author = $originalManifestData.Author
+	Description = $originalManifestData.Description
+	ModuleVersion = $originalManifestData.ModuleVersion
+	RootModule = ('{0}.psm1' -f $ModuleName)
+	Copyright = $originalManifestData.Copyright
+	TypesToProcess = @()
+	FormatsToProcess = @()
 	RequiredAssemblies = @()
-	RequiredModules   = @($prereqHash)
+	RequiredModules = @($prereqHash)
 	CompatiblePSEditions = 'Core', 'Desktop'
 	PowerShellVersion = '5.1'
 }

@@ -99,7 +99,7 @@
         # Cache all service principals
         Write-Verbose "Retrieving all ServicePrincipal objects..."
         $servicePrincipals = Get-MgServicePrincipal -All
-        foreach($sp in $servicePrincipals) {
+        foreach ($sp in $servicePrincipals) {
             CacheObject -Object $sp -Type 'ServicePrincipal'
         }
         $servicePrincipalCount = $servicePrincipals.Count
@@ -107,7 +107,7 @@
         # Cache users
         Write-Verbose ("Retrieving up to {0} User objects..." -f $PrecacheSize)
         $users = Get-MgUser -Top $PrecacheSize
-        foreach($user in $users) {
+        foreach ($user in $users) {
             CacheObject -Object $user -Type 'User'
         }
     

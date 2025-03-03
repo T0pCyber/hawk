@@ -47,15 +47,15 @@ Function Get-IPGeolocation {
         return ($IPLocationCache | Where-Object { $_.ip -eq $IPAddress } )
         Write-Verbose ("IP Cache Hit: " + [string]$IPAddress)
     }
-    elseif ($IPAddress -eq "<null>"){
+    elseif ($IPAddress -eq "<null>") {
         write-Verbose ("Null IP Provided: " + $IPAddress)
                 $hash = @{
-                IP               = $IPAddress
-                CountryName      = "NULL IP"
-                RegionName       = "Unknown"
-                RegionCode       = "Unknown"
-                ContinentName    = "Unknown"
-                City             = "Unknown"
+                IP = $IPAddress
+                CountryName = "NULL IP"
+                RegionName = "Unknown"
+                RegionCode = "Unknown"
+                ContinentName = "Unknown"
+                City = "Unknown"
                 KnownMicrosoftIP = "Unknown"
             }
     }
@@ -71,29 +71,29 @@ Function Get-IPGeolocation {
         if (($Error.Count -gt 0) -or ($null -eq $geoip.type)) {
             Out-LogFile ("Failed to retreive location for IP " + $IPAddress) -isError
             $hash = @{
-                IP               = $IPAddress
-                CountryName      = "Failed to Resolve"
-                RegionName       = "Unknown"
-                RegionCode       = "Unknown"
-                ContinentName    = "Unknown"
-                City             = "Unknown"
+                IP = $IPAddress
+                CountryName = "Failed to Resolve"
+                RegionName = "Unknown"
+                RegionCode = "Unknown"
+                ContinentName = "Unknown"
+                City = "Unknown"
                 KnownMicrosoftIP = "Unknown"
             }
         }
         else {
             # Determine if this IP is known to be owned by Microsoft
             [string]$isMSFTIP = Test-MicrosoftIP -IPToTest $IPAddress -type $geoip.type
-            if ($isMSFTIP){
-                $MSFTIP =  $isMSFTIP
+            if ($isMSFTIP) {
+                $MSFTIP = $isMSFTIP
             }
             # Push return into a response object
             $hash = @{
-                IP               = $geoip.ip
-                CountryName      = $geoip.country_name
-                ContinentName    = $geoip.continent_name
-                RegionName       = $geoip.region_name
-                RegionCode       = $geoip.region_code
-                City             = $geoip.City
+                IP = $geoip.ip
+                CountryName = $geoip.country_name
+                ContinentName = $geoip.continent_name
+                RegionName = $geoip.region_name
+                RegionCode = $geoip.region_code
+                City = $geoip.City
                 KnownMicrosoftIP = $MSFTIP
             }
             $result = New-Object PSObject -Property $hash

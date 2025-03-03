@@ -1,4 +1,4 @@
-Function Get-HawkTenantRiskDetections {
+﻿Function Get-HawkTenantRiskDetections {
     <#
     .SYNOPSIS
         Retrieves risk detection events from Microsoft Entra ID.
@@ -71,10 +71,10 @@ Function Get-HawkTenantRiskDetections {
             
             # Define risk level order
             $riskOrder = @{
-                'high'   = 1
+                'high' = 1
                 'medium' = 2
-                'low'    = 3
-                'none'   = 4
+                'low' = 3
+                'none' = 4
             }
             
             # Log summary of detections by risk level
