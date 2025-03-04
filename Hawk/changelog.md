@@ -108,3 +108,9 @@
 - Added log pull of user SharePoint Search activity to the User Investigation (Get-HawkUserSharePointSearchQuery)
 - Added telemetry discloser on Readme and updated license
 - Added AppInsight GUID
+
+## 4.1 (2025-3-xx)
+
+- Added Get-HawkUserUALInboxRuleCreation: Analyzes audit logs for inbox rules created by specific users
+- Added Get-HawkUserUALInboxRuleModification: Analyzes audit logs for inbox rules modified by specific users
+- Added Get-HawkUserUALInboxRuleRemoval: Analyzes audit logs for inbox rules removed by specific users
