@@ -169,6 +169,24 @@
 					Get-HawkUserInboxRule -User $User
 				}
 
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALInboxRuleCreation for $User")) {
+					Write-Output ""
+					Out-LogFile "Running Get-HawkUserUALInboxRuleCreation." -Action
+					Get-HawkUserUALInboxRuleCreation -User $User
+				}
+
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALInboxRuleModification for $User")) {
+					Write-Output ""
+					Out-LogFile "Running Get-HawkUserUALInboxRuleModification." -Action
+					Get-HawkUserUALInboxRuleModification -User $User
+				}
+
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserUALInboxRuleRemoval for $User")) {
+					Write-Output ""
+					Out-LogFile "Running Get-HawkUserUALInboxRuleRemoval." -Action
+					Get-HawkUserUALInboxRuleRemoval -User $User
+				}
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserEmailForwarding for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserEmailForwarding." -Action
