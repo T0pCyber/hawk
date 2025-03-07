@@ -8,17 +8,20 @@ Function Get-HawkUserInboxRule {
     Looks for rules that forward or delete email and flag them for follow up
 .PARAMETER UserPrincipalName
     Single UPN of a user, commans seperated list of UPNs, or array of objects that contain UPNs.
+.PARAMETER OutputFormat
+    Specifies the format(s) in which to output the data. Valid options are JSON, NDJSON, CSV, and TXT.
+    Multiple formats can be specified. Default is JSON and CSV.
 .OUTPUTS
 
-    File: _Investigate_InboxRules.csv
+    File: _Investigate_InboxRules.csv/.json/.ndjson
     Path: \<User>
     Description: Inbox rules that delete or forward messages.
 
-    File: InboxRules.csv
+    File: InboxRules.csv/.json/.ndjson
     Path: \<User>
     Description: All inbox rules that were found for the user.
 
-    File: All_InboxRules.csv
+    File: All_InboxRules.csv/.json/.ndjson
     Path: \
     Description: All users inbox rules.
 .EXAMPLE
@@ -26,18 +29,32 @@ Function Get-HawkUserInboxRule {
     Get-HawkUserInboxRule -UserPrincipalName user@contoso.com
 
     Pulls all inbox rules for user@contoso.com and looks for Investigate rules.
+    Outputs data in default formats (CSV and JSON).
+.EXAMPLE
+
+    Get-HawkUserInboxRule -UserPrincipalName user@contoso.com -OutputFormat NDJSON,CSV
+
+    Pulls all inbox rules for user@contoso.com and outputs in NDJSON and CSV formats.
 .EXAMPLE
 
     Get-HawkUserInboxRule -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"})
 
     Gathers inbox rules for all users who have "C-Level" set in CustomAttribute1
+.EXAMPLE
+
+    Get-HawkUserInboxRule -UserPrincipalName (get-mailbox -Filter {Customattribute1 -eq "C-level"}) -OutputFormat NDJSON
+
+    Gathers inbox rules for all users who have "C-Level" set in CustomAttribute1 and outputs in NDJSON format only.
 #>
 
     param
     (
         [Parameter(Mandatory = $true)]
-        [array]$UserPrincipalName
+        [array]$UserPrincipalName,
 
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('JSON', 'NDJSON', 'CSV', 'TXT')]
+        [string[]]$OutputFormat = @('JSON', 'CSV')
     )
 
     # Check if Hawk object exists and is fully initialized
@@ -45,12 +62,24 @@ Function Get-HawkUserInboxRule {
         Initialize-HawkGlobalObject
     }
 
-
     Test-EXOConnection
     Send-AIEvent -Event "CmdRun"
 
     # Verify our UPN input
     [array]$UserArray = Test-UserObject -ToTest $UserPrincipalName
+
+    # Convert the OutputFormat array to switches for Out-MultipleFileType
+    $outParams = Convert-OutputFormatToParameters -OutputFormat $OutputFormat
+
+    # $outParams = @{}
+    # foreach ($format in $OutputFormat) {
+    #     switch ($format) {
+    #         'JSON' { $outParams['json'] = $true }
+    #         'NDJSON' { $outParams['ndjson'] = $true }
+    #         'CSV' { $outParams['csv'] = $true }
+    #         'TXT' { $outParams['txt'] = $true }
+    #     }
+    # }
 
     foreach ($Object in $UserArray) {
 
@@ -83,7 +112,7 @@ Function Get-HawkUserInboxRule {
                     $foundSuspiciousRules = $true
                     # Description is multiline
                     $Rule.Description = $Rule.Description.replace("`r`n", " ").replace("`t", "")
-                    $Rule | Out-MultipleFileType -FilePreFix "_Investigate_InboxRules" -user $user -csv -json -append
+                    $Rule | Out-MultipleFileType -FilePreFix "_Investigate_InboxRules" -user $user @outParams -append -Notice
                 }
             }
 
@@ -97,7 +126,7 @@ Function Get-HawkUserInboxRule {
                     }).Count
 
                 Out-LogFile "Found $suspiciousRuleCount inbox rules requiring investigation for $User" -Notice
-                Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_InboxRules.csv/json" -Notice
+                Out-LogFile "Please verify this activity is legitimate. Details in _Investigate_InboxRules files" -Notice
             }
 
             # Description is multiline
@@ -111,10 +140,10 @@ Function Get-HawkUserInboxRule {
             }
 
             # Output all of the inbox rules to a generic csv
-            $InboxRules | Out-MultipleFileType -FilePreFix "InboxRules" -User $user -csv -json
+            $InboxRules | Out-MultipleFileType -FilePreFix "InboxRules" -User $user @outParams
 
             # Add all of the inbox rules to a generic collection file
-            $InboxRules | Out-MultipleFileType -FilePrefix "All_InboxRules" -User $user -csv -json -Append
+            $InboxRules | Out-MultipleFileType -FilePrefix "All_InboxRules" -User $user @outParams -Append
         }
 
         # Get any Sweep Rules
@@ -126,10 +155,10 @@ Function Get-HawkUserInboxRule {
         else {
 
             # Output all rules to a user CSV
-            $SweepRules | Out-MultipleFileType -FilePreFix "SweepRules" -user $User -csv -json
+            $SweepRules | Out-MultipleFileType -FilePreFix "SweepRules" -user $User @outParams
 
             # Add any found to the whole tenant list
-            $SweepRules | Out-MultipleFileType -FilePreFix "All_SweepRules" -csv -json -append
+            $SweepRules | Out-MultipleFileType -FilePreFix "All_SweepRules" @outParams -append
 
         }
         Out-LogFile "Completed collection of Exchange Inbox Rules for $User from Exchange Online." -Information

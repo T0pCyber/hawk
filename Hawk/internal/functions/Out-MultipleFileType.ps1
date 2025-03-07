@@ -1,4 +1,5 @@
-﻿<#
+﻿Function Out-MultipleFileType {
+    <#
 .SYNOPSIS
     Sends the output of a cmdlet to a txt file and a clixml file
 .DESCRIPTION
@@ -19,6 +20,9 @@
     txt file format
 .PARAMETER json
     Export data in JSON format. The data will be converted using ConvertTo-Json with a depth of 100 to preserve object structure.
+.PARAMETER ndjson
+    Export data in Newline Delimited JSON (NDJSON) format. Each object is represented as a single line of JSON.
+    This format is optimized for SIEM ingestion and streaming data processing.
 .PARAMETER Notice
     Notification that data retrieved meets the investigation criteria
 .EXAMPLE
@@ -27,7 +31,6 @@
 .NOTES
     Need to review invesigation criteria of data being exported
 #>
-Function Out-MultipleFileType {
     param
     (
         [Parameter (ValueFromPipeLine = $true)]
@@ -40,6 +43,7 @@ Function Out-MultipleFileType {
         [Switch]$csv = $false,
         [Switch]$txt = $false,
         [Switch]$json = $false,
+        [Switch]$ndjson = $false,
         [Switch]$Notice
 
     )
@@ -47,7 +51,7 @@ Function Out-MultipleFileType {
     begin {
 
         # If no file types were specified then we need to error out here
-        if (($xml -eq $false) -and ($csv -eq $false) -and ($txt -eq $false) -and ($json -eq $false)) {
+        if (($xml -eq $false) -and ($csv -eq $false) -and ($txt -eq $false) -and ($json -eq $false) -and ($ndjson -eq $false)) {
             Out-LogFile "No output type specified on object" -isError
             Write-Error -Message "No output type specified on object" -ErrorAction Stop
         }
@@ -200,6 +204,35 @@ Function Out-MultipleFileType {
                 else {
                     Out-LogFile ("Writing Data to " + $filename) -Action
                     $AllObject | ConvertTo-Json -Depth 100 | Out-File -FilePath $filename -Encoding utf8
+                }
+
+                # If notice is set we need to write the file name to _Investigate.txt
+                if ($Notice) { Out-LogFile -string ($filename) -silentnotice }
+            }
+            
+            # Output NDJSON file
+            if ($ndjson -eq $true) {
+                # Build the file name
+                if ($UserOutput) {
+                    $filename = Join-Path $Path ($FilePrefix + "_" + $ShortUser + ".ndjson")
+                }
+                else {
+                    $filename = Join-Path $Path ($FilePrefix + ".ndjson")
+                }
+
+                # If we have -append then append the data
+                if ($append) {
+                    Out-LogFile ("Appending Data to " + $filename) -NoDisplay
+                    
+                    # Use our custom function for NDJSON format
+                    $AllObject | Convert-ToNDJSON -FilePath $filename -Append
+                }
+                # Otherwise overwrite
+                else {
+                    Out-LogFile ("Writing Data to " + $filename) -Action
+                    
+                    # Use our custom function for NDJSON format
+                    $AllObject | Convert-ToNDJSON -FilePath $filename
                 }
 
                 # If notice is set we need to write the file name to _Investigate.txt
