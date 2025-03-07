@@ -62,6 +62,11 @@
         Shows what would happen if the command runs. The command is not executed.
         Use this parameter to understand which investigation steps would be performed without actually collecting data.
 
+   .PARAMETER OutputFormat
+        Specifies the output formats for data export. Valid values are JSON, NDJSON, CSV, and TXT.
+        By default, data is exported in both JSON and CSV formats.
+        This parameter allows customizing which file formats are generated during the investigation.
+		
     .OUTPUTS
         Creates multiple CSV and JSON files containing investigation results.
         All outputs are organized in user-specific folders under the specified FilePath directory.
