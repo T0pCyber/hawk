@@ -129,8 +129,8 @@
         }
     
         # We need to check if an entity with the ID $identity already exists
-        if ($reportxml.report.entity.identity.contains($Identity)) { }
-        # Didn't find and entity so we are going to create the whole thing and once
+        if ($reportxml.report.entity | Where-Object { $_.identity -eq $Identity }) { }
+        # Didn't find an entity so we are going to create the whole thing at once
         else {
             # Create all of the needed elements
             $newentity = $reportxml.CreateElement("entity")

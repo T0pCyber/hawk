@@ -452,62 +452,11 @@
             }
         }
 
-        # End date logic remains unchanged except for final +1 day fix
-        if ($null -eq $EndDate) {
-            Out-LogFile "Please specify the last day of the search window:" -isPrompt
-            Out-LogFile " Enter a number of days to go back from today (1-365)" -isPrompt
-            Out-LogFile " OR enter a specific date in MM/DD/YYYY format" -isPrompt
-            Out-LogFile " Default is today's date:" -isPrompt -NoNewLine
-            $EndRead = (Read-Host).Trim()
-
-            # End date validation
-            if ($null -eq ($EndRead -as [DateTime])) {
-                if ([string]::IsNullOrEmpty($EndRead)) {
-                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
-                }
-                else {
-                    Out-LogFile -string "End Date: $EndRead days." -Information
-                    [DateTime]$EndDate = ((Get-Date).ToUniversalTime().AddDays( - ($EndRead - 1))).Date
-                }
-
-                if ($StartDate -gt $EndDate) {
-                    Out-LogFile -string "StartDate cannot be more recent than EndDate" -isError
-                }
-                else {
-                    # --- FINAL FIX: Always move to next day at 00:00 UTC ---
-                    $EndDate = $EndDate.ToUniversalTime().Date.AddDays(1)
-
-                    # Write-Output ""
-                    # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
-                }
-            }
-            elseif (!($null -eq ($EndRead -as [DateTime]))) {
-                [DateTime]$EndDate = (Get-Date $EndRead).ToUniversalTime().Date
-
-                if ($StartDate -gt $EndDate) {
-                    Out-LogFile -string "EndDate is earlier than StartDate. Setting EndDate to today." -isWarning
-                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
-                }
-                elseif ($EndDate -gt ((Get-Date).ToUniversalTime().AddDays(1))) {
-                    Out-LogFile -string "EndDate too far in the future. Setting EndDate to today." -isWarning
-                    [DateTime]$EndDate = (Get-Date).ToUniversalTime().Date
-                }
-
-                # --- FINAL FIX: Always move to next day at 00:00 UTC ---
-                $EndDate = $EndDate.ToUniversalTime().Date.AddDays(1)
-
-                # Out-LogFile -string "End date set to: ${EndDate}Z`n" -Information
-            }
-            else {
-                Out-LogFile -string "Invalid date information provided. Could not determine if this was a date or an integer." -isError
-            }
-        }
-
         # --- AFTER the EndDate block, do a final check to "re-anchor" StartDate if it was given in days ---
         if ($StartDays -gt 0) {
             # Recalculate StartDate based on EndDate = $EndDate and StartDays = $StartDays
             Out-LogFile -string "End date set to midnight UTC of next day to include all data from $($EndDate.AddDays(-1).Date.ToString('yyyy-MM-dd'))Z" -Information
-            $StartDate = $EndDate.AddDays(-1).AddDays(-$StartDays).Date
+            $StartDate = $EndDate.AddDays(-$StartDays).Date
 
             # (Optional) Additional validations again if necessary:
             if ($StartDate -gt (Get-Date).ToUniversalTime()) {
