@@ -139,7 +139,7 @@
 	process {
 		if (Test-PSFFunctionInterrupt) { return }
 
-		# Check if Hawk object exists and is fully initialized
+		# If Hawk object is missing or incomplete, initialize it interactively
 		if (Test-HawkGlobalObject) {
 			Initialize-HawkGlobalObject
 		}

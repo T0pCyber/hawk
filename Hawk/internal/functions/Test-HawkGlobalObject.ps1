@@ -12,10 +12,10 @@ Function Test-HawkGlobalObject {
     
     .EXAMPLE
         Test-HawkGlobalObject
-        Returns $true if Hawk object is properly initialized, $false otherwise.
-    
-    .OUTPUTS 
-        Boolean indicating if reinitialization is needed
+        Returns $true if Hawk object needs initialization (missing or incomplete), $false if properly initialized.
+
+    .OUTPUTS
+        Boolean indicating if reinitialization is needed ($true = needs init, $false = already initialized)
     #>
     [CmdletBinding()]
     [OutputType([bool])]
