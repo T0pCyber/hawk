@@ -253,6 +253,18 @@
             Out-LogFile "Running Get-HawkTenantAppAndSPNCredentialDetail." -action
             Get-HawkTenantAppAndSPNCredentialDetail
         }
+
+        if ($PSCmdlet.ShouldProcess("Agent Identities", "Get Entra Agent ID identities")) {
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantAgentIdentity." -action
+            Get-HawkTenantAgentIdentity
+        }
+
+        if ($PSCmdlet.ShouldProcess("AI Interactions", "Get Copilot and AI application activity")) {
+            Write-Output ""
+            Out-LogFile "Running Get-HawkTenantAIInteraction." -action
+            Get-HawkTenantAIInteraction
+        }
 	
         if ($PSCmdlet.ShouldProcess("Entra ID Users", "Get Entra ID user list")) {
             Write-Output ""

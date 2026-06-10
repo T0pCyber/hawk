@@ -1,9 +1,9 @@
-@{
+﻿@{
 	# Script module or binary module file associated with this manifest
 	RootModule         = 'Hawk.psm1'
 
 	# Version number of this module.
-	ModuleVersion      = '4.0'
+	ModuleVersion      = '4.1.0'
 
 	# ID used to uniquely identify this module
 	GUID               = '1f6b6b91-79c4-4edf-83a1-66d2dc8c3d85'
@@ -90,7 +90,10 @@
 	'Get-HawkUserEntraIDSignInLog',
 	'Get-HawkTenantEntraIDAuditLog',
 	'Get-HawkTenantRiskyUsers',
-	'Get-HawkTenantRiskDetections'
+	'Get-HawkTenantRiskDetections',
+	'Get-HawkTenantAgentIdentity',
+	'Get-HawkTenantAIInteraction',
+	'Get-HawkUserAIInteraction'
 	# Cmdlets to export from this module
 	# CmdletsToExport = ''
 

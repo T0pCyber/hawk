@@ -193,6 +193,12 @@
 					Get-HawkUserUALSignInLog -User $User -ResolveIPLocations
 				}
 
+				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserAIInteraction for $User")) {
+					Write-Output ""
+					Out-LogFile "Running Get-HawkUserAIInteraction." -Action
+					Get-HawkUserAIInteraction -UserPrincipalName $User
+				}
+
 				if ($PSCmdlet.ShouldProcess("Running Get-HawkUserMailboxAuditing for $User")) {
 					Write-Output ""
 					Out-LogFile "Running Get-HawkUserMailboxAuditing." -Action

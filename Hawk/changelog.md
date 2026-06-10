@@ -108,3 +108,12 @@
 - Added log pull of user SharePoint Search activity to the User Investigation (Get-HawkUserSharePointSearchQuery)
 - Added telemetry discloser on Readme and updated license
 - Added AppInsight GUID
+
+## 4.1.0 (2026-06-10)
+
+- Added Get-HawkTenantAgentIdentity, which inventories Microsoft Entra Agent ID (AI agent) identities via Microsoft Graph and flags orphaned, secret-based, or disabled agents (recent creation is noted as supporting context, not a standalone flag).
+- Added Get-HawkTenantAIInteraction, which collects tenant-wide Microsoft Copilot and AI application / agent interactions from the Unified Audit Log and flags jailbreak attempts, third-party AI app use, and sensitivity-labeled resource access.
+- Added Get-HawkUserAIInteraction, which collects per-user Copilot and AI application / agent interactions from the Unified Audit Log; added to Start-HawkUserInvestigation.
+- Added Get-HawkTenantAgentIdentity and Get-HawkTenantAIInteraction to Start-HawkTenantInvestigation.
+- Added internal helper Get-HawkAllGraphResult, an Invoke-MgGraphRequest paging wrapper (with include-unknown-enum-members) that reaches the agentIdentity Graph cast and /beta agent log endpoints and degrades gracefully when unavailable.
+- Added internal helper Test-SuspiciousAgentIdentity, which detects agent identities warranting investigation.
